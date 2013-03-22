@@ -11,44 +11,16 @@
 #import "ServerConnection.h"
 #import "SendingView.h"
 
-@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate>{
-    
-    
-    UIBarButtonItem             *_editButton;
-    UIToolbar                   *_bottomToolbar;
-    UIBarButtonItem             *_deleteButton;
-    UIBarButtonItem             *_sendButton;
+@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate>
+{    
+    ServerConnection *serverConnection;
+    SendingView *sendingView;
 
-    UILabel                     *_usernameLabel;
-    UIImageView                 *_profilePicture;
-
-
-    UIButton                    *_listButton;
-    
-    
-    NSArray                     *_paths;
-    NSArray                     *_items;
-    
-    
-    NSMutableArray              *_selectedItems;
-    NSMutableArray              *_selectedItemsSend;
-    NSMutableArray              *_selectedItemsDelete;
-
-    UITableView                 *_tableView;
-    UITableView                 *_tableViewGrid;
-
-    NSString                    *_username;
-       
-    TagViewController           *_tagViewController;
-    ServerConnection            *serverConnection;
-    SendingView                 *sendingView;
-
-    UILabel                     *noImages;
+    UILabel *noImages;
     //UIButton                *sendTable;
-    int                          selectedTableIndex;
-    int                         photosWithErrors;
-    
-    IBOutlet UIView                      *view1;
+    int selectedTableIndex;
+    int photosWithErrors;
+    IBOutlet UIView *view1;
 }
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *editButton;
 @property (nonatomic,strong) IBOutlet UIToolbar *bottomToolbar;

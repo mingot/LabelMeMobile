@@ -167,6 +167,8 @@
 		FC5C939E16FCB8AE00637B69 /* cruz.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C939D16FCB8AE00637B69 /* cruz.png */; };
 		FC5C93A016FCB8BF00637B69 /* app-login-A@2x-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C939F16FCB8BF00637B69 /* app-login-A@2x-Portrait.png */; };
 		FC5C93A216FCB8C800637B69 /* app-login-A@2x-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93A116FCB8C800637B69 /* app-login-A@2x-568h@2x.png */; };
+		FC5C93A616FCE3A100637B69 /* DetectorGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */; };
+		FC5C93A716FCE3A100637B69 /* DetectorGalleryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -364,6 +366,9 @@
 		FC5C939D16FCB8AE00637B69 /* cruz.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cruz.png; path = archivos/cruz.png; sourceTree = "<group>"; };
 		FC5C939F16FCB8BF00637B69 /* app-login-A@2x-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "app-login-A@2x-Portrait.png"; path = "archivos/app-login-A@2x-Portrait.png"; sourceTree = "<group>"; };
 		FC5C93A116FCB8C800637B69 /* app-login-A@2x-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "app-login-A@2x-568h@2x.png"; path = "archivos/app-login-A@2x-568h@2x.png"; sourceTree = "<group>"; };
+		FC5C93A316FCE39F00637B69 /* DetectorGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectorGalleryViewController.h; sourceTree = "<group>"; };
+		FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectorGalleryViewController.m; sourceTree = "<group>"; };
+		FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetectorGalleryViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -415,6 +420,7 @@
 				A537747A165C3E9900BF0649 /* CreditsViewController_iPhone.xib */,
 				A5377488165C506C00BF0649 /* CreditsViewController_iPad.xib */,
 				A537748A165C51C300BF0649 /* CreditsViewController_iPhone5.xib */,
+				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
 			);
 			name = "XIB files";
 			sourceTree = "<group>";
@@ -511,6 +517,8 @@
 				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
 				A5480D7516179D8E009F630D /* Box.h */,
 				A5480D7616179D8E009F630D /* Box.m */,
+				FC5C93A316FCE39F00637B69 /* DetectorGalleryViewController.h */,
+				FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */,
 				A5480D6C16178868009F630D /* XIB files */,
 				A558D64C1613A365001DED8C /* Categories */,
 				A558D64116138D37001DED8C /* Icons */,
@@ -837,6 +845,7 @@
 				A5B8F9E516651DB900D8F73A /* forward@2x.png in Resources */,
 				A5B8F9EF166568E200D8F73A /* silueta.png in Resources */,
 				A5B8F9F0166568E200D8F73A /* silueta@2x.png in Resources */,
+				FC5C93A716FCE3A100637B69 /* DetectorGalleryViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -871,6 +880,7 @@
 				A5BE1EC616443E6500FE54B5 /* SendingView.m in Sources */,
 				A5817E05165932720061FE67 /* WebsiteViewController.m in Sources */,
 				A537747B165C3E9900BF0649 /* CreditsViewController.m in Sources */,
+				FC5C93A616FCE3A100637B69 /* DetectorGalleryViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -30,13 +30,13 @@
 @synthesize createAccountButton = _createAccountButton;
 @synthesize keyboardToolbar = _keyboardToolbar;
 @synthesize tabBarController = _tabBarController;
-@synthesize galleryViewController = _galleryViewController;
-@synthesize settingsViewController = _settingsViewController;
-//@synthesize cameraOverlay = _cameraOverlay;
-//@synthesize imagePicker = _imagePicker;
 @synthesize navController1 = _navController1;
 @synthesize navController3 = _navController3;
+@synthesize navController4 = _navController4;
 @synthesize popover = _popover;
+@synthesize galleryViewController = _galleryViewController;
+@synthesize settingsViewController = _settingsViewController;
+@synthesize detectorGalleryController = _detectorGalleryController;
 
 
 #pragma mark Initialization
@@ -360,10 +360,9 @@
 
 
 -(void)signInComplete{
-    if (!previousSession) {
+    if (!previousSession)
         [self saveSessionWithUsername:self.usernameField.text andPassword:self.passwordField.text];
-                
-    }
+            
     [self createUserFolders:self.usernameField.text];
     //[self.signInButton setEnabled:YES];
     self.tabBarController =[[UITabBarController alloc]init];
@@ -372,27 +371,21 @@
         CGRect screenSize = [[UIScreen mainScreen] bounds];
         
         if (screenSize.size.height == 568) {
-             self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone5" bundle:nil];
+            self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone5" bundle:nil];
             self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone5" bundle:nil];
-
+            self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
             
-                    }
-        else if (screenSize.size.height == 480){
-             self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone" bundle:nil];
+        }else if (screenSize.size.height == 480){
+            self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone" bundle:nil];
             self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone" bundle:nil];
-
-            
-    
-            }
+            self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
+            //TODO: add .xibs for iphone 4 and iPAD
+        }
         
-        
-        
-    }
-    else{
+    }else{
         self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPad" bundle:nil];
         self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPad" bundle:nil];
-
-
+        
     }
    
     [self.galleryViewController setUsername:self.usernameField.text];
@@ -400,11 +393,12 @@
     viewcontroller.tabBarItem =[[UITabBarItem alloc]initWithTitle:@"Camera" image:nil tag:1];
     [viewcontroller.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"camera.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"cameraActive.png"]];
     self.navController1 = [[UINavigationController alloc] initWithRootViewController:self.galleryViewController];
-    self.navController3 = [[UINavigationController alloc] initWithRootViewController:self.settingsViewController];
+    self.navController3 = [[UINavigationController alloc] initWithRootViewController:self.detectorGalleryController];
+    self.navController4 = [[UINavigationController alloc] initWithRootViewController:self.settingsViewController];
     [self.settingsViewController setUsername:self.usernameField.text];
 
     
-    self.tabBarController.viewControllers = @[self.navController1,viewcontroller,self.navController3];
+    self.tabBarController.viewControllers = @[self.navController1,viewcontroller,self.navController3,self.navController4];
     NSFileManager * filemng = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSString *path = [[NSString alloc] initWithString:[[documentsDirectory stringByAppendingPathComponent:self.usernameField.text] stringByAppendingPathComponent:@"profilepicture.jpg" ]];
@@ -657,12 +651,11 @@
 }
 #pragma mark -
 #pragma mark Presenting TagviewController
--(void)presentTagviewControllerWithImage:(UIImage *)image{
+-(void)presentTagviewControllerWithImage:(UIImage *)image
+{
     
 }
 
-#pragma mark -
-#pragma mark Restoration
 
 #pragma mark -
 #pragma mark Memory Management
@@ -674,20 +667,4 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)dealloc{
-    
-    self.scrollView;
-    self.usernameField;
-    self.passwordField;
-    self.keyboardToolbar;
-    self.signInButton;
-    self.forgotPasswordButton;
-    self.createAccountButton;
-    self.tabBarController;
-    self.navController1;
-    self.navController3;
-    self.galleryViewController;
-    self.settingsViewController;
-    
-}
 @end

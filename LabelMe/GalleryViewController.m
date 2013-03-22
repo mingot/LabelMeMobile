@@ -39,6 +39,8 @@
 @synthesize tableView = _tableView;
 @synthesize tableViewGrid = _tableViewGrid;
 @synthesize username = _username;
+
+
 #pragma mark -
 #pragma mark Initialization Method
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -66,8 +68,10 @@
 #pragma mark -
 #pragma mark View lifecycle
 
-- (void)viewDidLoad{
+- (void)viewDidLoad
+{
     [super viewDidLoad];
+    
     [self.usernameLabel setText:self.username];
     [self.usernameLabel setTextColor:[UIColor colorWithRed:51/255.0f green:51/255.0f blue:51/255.0f alpha:1.0]];
     //[self.usernameLabel setTextColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
@@ -103,22 +107,15 @@
         CGRect screenSize = [[UIScreen mainScreen] bounds];
         
         if (screenSize.size.height == 568) {
-            
             self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone5" bundle:nil];
             
-        }
-        else if (screenSize.size.height == 480){
-            
+        }else if (screenSize.size.height == 480){
             self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
             
         }
-        
-        
-        
-    }
-    else{
+    }else{
         self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPad" bundle:nil];
-
+        
     }
     
     self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.frame.size.height+2, self.view.frame.size.width, self.view.frame.size.height-self.navigationController.navigationBar.frame.size.height-2) style:UITableViewStyleGrouped];
@@ -175,7 +172,10 @@
     
     // Do any additional setup after loading the view from its nib.
 }
-- (void) viewWillAppear:(BOOL)animated {
+
+
+- (void) viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
 
     //[[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
@@ -184,14 +184,15 @@
     if ([filemng fileExistsAtPath:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]]) {
         
         [self.profilePicture setImage:[UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]] ];
-    }
-    else{
+    }else{
         [self.profilePicture setImage:[UIImage imageNamed:@"silueta.png"]];
     }
 
     
     [self reloadGallery];
 }
+
+
 - (void) viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     if (self.editButton.title == @"Cancel") {
@@ -214,9 +215,9 @@
     }
     //[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     [self reloadGallery];
-
-
 }
+
+
 #pragma mark -
 #pragma mark Gallery Management
 
@@ -519,7 +520,8 @@
 }
 #pragma mark -
 #pragma mark Deleting Methods
--(void)deletePhotoAndAnnotation{
+-(void)deletePhotoAndAnnotation
+{
     int index = 0;
     NSError *error = nil;
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
@@ -559,9 +561,12 @@
     }
     [self reloadGallery];
 }
+
+
 #pragma mark -
 #pragma mark Sending Methods
--(void)sendPhoto{
+-(void)sendPhoto
+{
    /* ServerConnection * sConnection = [[ServerConnection alloc] init];
     sConnection.delegate = self;*/
     NSDictionary *dict = [[NSDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
@@ -602,9 +607,12 @@
     //[sConnection release];
     
 }
+
+
 #pragma mark -
 #pragma mark ServerConnectionDelegate Methods
--(void)photoSentCorrectly:(NSString *)filename{
+-(void)photoSentCorrectly:(NSString *)filename
+{
     [self.selectedItemsSend removeObject:filename];
     NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
     if (objects != nil) {
@@ -648,11 +656,16 @@
     }
     [self reloadGallery];
 }
--(void)sendingProgress:(float)prog{
-    [sendingView.progressView setProgress:prog];
 
+
+-(void)sendingProgress:(float)prog
+{
+    [sendingView.progressView setProgress:prog];
 }
--(void)sendPhotoError{
+
+
+-(void)sendPhotoError
+{
     photosWithErrors++;
     [self.selectedItemsSend removeObjectAtIndex:0];
     if (self.selectedItemsSend.count > 0) {
@@ -978,7 +991,8 @@
 }
 #pragma mark -
 #pragma mark SendingView
--(void)cancel{
+-(void)cancel
+{
     [serverConnection cancelRequestFor:0];
     [self.selectedItemsSend removeAllObjects];
     [sendingView reset];
@@ -1000,27 +1014,6 @@
     [super didReceiveMemoryWarning];
 }
 
--(void)dealloc{
-    self.editButton;
-    self.bottomToolbar;
-    self.deleteButton;
-    self.sendButton;
-    self.usernameLabel;
 
-    self.profilePicture;
-    self.listButton;
-    self.paths;
-    self.items;
-    self.selectedItems;
-    
-    self.selectedItemsSend;
-    self.selectedItemsDelete;
-    self.tagViewController;
-    self.tableView;
-    self.tableViewGrid;
-    
-
-
-}
 
 @end

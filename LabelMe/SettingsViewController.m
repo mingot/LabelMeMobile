@@ -31,33 +31,25 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.tabBarItem = [[UITabBarItem alloc]initWithTitle:@"Settings" image:nil tag:2];
+        self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:nil tag:3];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"settings.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"settingsActive.png"]];
         self.username = [[NSString alloc] init];
+        
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
             CGRect screenSize = [[UIScreen mainScreen] bounds];
             
             if (screenSize.size.height == 568) {
                 self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPhone5" bundle:nil];
                 
-                
-                
             }
             else if (screenSize.size.height == 480){
                 self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPhone" bundle:nil];
                 
-                
-                
             }
-            
-            
-            
-        }
-        else{
+        }else{
             self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPad" bundle:nil];
             
         }
-
     }
     return self;
 }
@@ -99,7 +91,8 @@
 }
 #pragma mark - IBActions
 
--(IBAction)logOutAction:(id)sender{
+-(IBAction)logOutAction:(id)sender
+{
     NSFileManager * filemng = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
 
@@ -108,7 +101,9 @@
     [self dismissViewControllerAnimated:YES completion:NULL];
     [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"previousTab"];
 }
--(IBAction)profilePictureAction:(id)sender{
+
+-(IBAction)profilePictureAction:(id)sender
+{
     UIButton *button = (UIButton *) sender;
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         UIActionSheet *photoSourceSheet = [[UIActionSheet
@@ -129,7 +124,10 @@
     }
 
 }
--(IBAction)valueDidChange:(id)sender{
+
+
+-(IBAction)valueDidChange:(id)sender
+{
     NSArray *paths = [self newArrayWithFolders:self.username];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
     NSNumber *dictnum = nil;
@@ -164,14 +162,18 @@
     [dict writeToFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"] atomically:NO];
     //[paths release];
 }
+
+
+
 #pragma mark - UIActionSheetDelegate methods
 
-- (void) actionSheet:(UIActionSheet * ) actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
+- (void) actionSheet:(UIActionSheet * ) actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
     
-        if (buttonIndex == actionSheet.cancelButtonIndex) {
+    if (buttonIndex == actionSheet.cancelButtonIndex) {
         return;
-    }
-    else if (buttonIndex == actionSheet.destructiveButtonIndex){
+        
+    }else if (buttonIndex == actionSheet.destructiveButtonIndex){
         NSFileManager * filemng = [NSFileManager defaultManager];
         NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
 
@@ -180,7 +182,6 @@
         }
         [self.tableView reloadData];
         return;
-    
     }
     
     UIImagePickerController *picker = [[UIImagePickerController alloc]
@@ -190,16 +191,14 @@
     //picker.allowsEditing = YES;
     switch (buttonIndex) {
         case 1:
-
             picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-
-            
             break;
+            
         case 2:
             picker.sourceType = UIImagePickerControllerSourceTypeCamera;
             [picker setCameraDevice:UIImagePickerControllerCameraDeviceFront];
-            
             break;
+            
         default:
             break;
     }
@@ -208,25 +207,25 @@
             if ([self.popover isPopoverVisible]) {
                 [self.popover dismissPopoverAnimated:YES];
                 
-            }
-            else{
+            }else{
                 UIPopoverController *popover = [[UIPopoverController alloc] initWithContentViewController:picker];
                 [popover presentPopoverFromRect:actionSheet.frame inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
                 
                 self.popover = popover;
             }
 
-        }
-        else{
+        }else{
             [self presentViewController:picker animated:YES completion:NULL];
         }
         
-    }
-    else{
+    }else{
         [self presentViewController:picker animated:YES completion:NULL];
 
     }
 }
+
+
+
 #pragma mark - UIImagePickerControllerDelegate methods
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
