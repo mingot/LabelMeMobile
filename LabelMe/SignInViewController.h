@@ -49,19 +49,19 @@
 }
 #pragma mark -
 #pragma mark Properties
-@property (retain,nonatomic) IBOutlet UIScrollView  *scrollView;
-@property (retain,nonatomic) IBOutlet UITextField   *usernameField;
-@property (retain,nonatomic) IBOutlet UITextField   *passwordField;
-@property (retain,nonatomic) IBOutlet UIButton      *signInButton;
-@property (retain,nonatomic) IBOutlet UIButton      *forgotPasswordButton;
-@property (retain,nonatomic) IBOutlet UIButton      *createAccountButton;
-@property (retain,nonatomic) UIToolbar              *keyboardToolbar;
-@property (retain,nonatomic) UITabBarController     *tabBarController;
-@property (retain,nonatomic) UINavigationController *navController1;
-@property (retain,nonatomic) UINavigationController *navController3;
-@property (retain,nonatomic) GalleryViewController  *galleryViewController;
-@property (retain,nonatomic) SettingsViewController  *settingsViewController;
-@property (retain,nonatomic) UIPopoverController     *popover;
+@property (strong,nonatomic) IBOutlet UIScrollView  *scrollView;
+@property (strong,nonatomic) IBOutlet UITextField   *usernameField;
+@property (strong,nonatomic) IBOutlet UITextField   *passwordField;
+@property (strong,nonatomic) IBOutlet UIButton      *signInButton;
+@property (strong,nonatomic) IBOutlet UIButton      *forgotPasswordButton;
+@property (strong,nonatomic) IBOutlet UIButton      *createAccountButton;
+@property (strong,nonatomic) UIToolbar              *keyboardToolbar;
+@property (strong,nonatomic) UITabBarController     *tabBarController;
+@property (strong,nonatomic) UINavigationController *navController1;
+@property (strong,nonatomic) UINavigationController *navController3;
+@property (strong,nonatomic) GalleryViewController  *galleryViewController;
+@property (strong,nonatomic) SettingsViewController  *settingsViewController;
+@property (strong,nonatomic) UIPopoverController     *popover;
 //@property (retain,nonatomic) UIImagePickerController *imagePicker;
 //@property (retain,nonatomic) CameraOverlayViewController *cameraOverlay;
 

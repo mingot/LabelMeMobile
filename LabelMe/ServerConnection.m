@@ -116,10 +116,6 @@ static BOOL didSignIn = NO;
 
     }
 
-    [boundary release];
-    [theRequest release];
-    [contentType release];
-    [postBody release];
     
     //[NSURLConnection connectionWithRequest:theRequest delegate:self];
 }
@@ -162,10 +158,6 @@ static BOOL didSignIn = NO;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
     }
-    [boundary release];
-    [theRequest release];
-    [contentType release];
-    [postBody release];
     
 }
 -(void)forgotPassword:(NSString *)email{
@@ -191,10 +183,6 @@ static BOOL didSignIn = NO;
         
     }
     
-    [boundary release];
-    [theRequest release];
-    [contentType release];
-    [postBody release];
 }
 -(void)sendPhoto:(UIImage *) photo filename: (NSString *)filename path:(NSString *)objectpath withSize:(CGPoint)size andAnnotation:(NSMutableArray *) annotation{
     cancel = NO;
@@ -209,7 +197,6 @@ static BOOL didSignIn = NO;
         if ((networkStatus != ReachableViaWiFi) && (networkStatus !=NotReachable)) {
             [self errorWithTitle:@"Check your connection" andDescription:@"Sorry, wifi connection is required."];
             [self.delegate sendPhotoError];
-            [dict release];
             return;
         }
     }
@@ -221,9 +208,6 @@ static BOOL didSignIn = NO;
         NSString *pass = [[NSString alloc] initWithData:[fields objectAtIndex:1] encoding:NSUTF8StringEncoding];
 
         [self checkLoginForUsername:user andPassword:pass];
-        [user release];
-        [pass release];
-        [fields release];
         return;
     }
     NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
@@ -257,9 +241,6 @@ static BOOL didSignIn = NO;
 
     }
     self.filenamePending = @"";
-    [boundary release];
-    [theRequest release];
-    [bodyStream release];
     
 }
 -(void)sendPhotoWithFilename:(NSString *)filename{
@@ -292,9 +273,6 @@ static BOOL didSignIn = NO;
 
     }
     self.filenamePending = @"";
-    [boundary release];
-    [theRequest release];
-    [bodyStream release];
 
 }
 /*-(void)createBodyWithArray:(NSArray *)info{
@@ -346,13 +324,6 @@ static BOOL didSignIn = NO;
         NSString *path = [[NSString alloc] initWithFormat:@"%@/%@",tmpPath,self.filenamePending ];
         [postBody writeToFile:path atomically:YES];
         [self checkLoginForUsername:user andPassword:pass];
-        [path release];
-        [user release];
-        [pass release];
-        [fields release];
-        [boundary release];
-        [theRequest release];
-        [postBody release];
         return;
     }
     [theRequest setHTTPBody:postBody];
@@ -365,9 +336,6 @@ static BOOL didSignIn = NO;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
     }self.filenamePending = @"";
-    [boundary release];
-    [theRequest release];
-    [postBody release];
 }
 -(BOOL)createHTTPBodyWithImage: (UIImage *)image size:(CGPoint)point filename:(NSString *)filename  path:(NSString *)objectpath andAnnotation:(NSMutableArray *)annotation{
     BOOL ret= NO;
@@ -399,11 +367,6 @@ static BOOL didSignIn = NO;
         if([postBody writeToFile:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] atomically:NO]){
             ret = YES;
         }
-        [boundary release];
-        [imageData release];
-        [annotationData release];
-        [postBody release];
-        [location release];
         
     }
     return ret;
@@ -435,9 +398,6 @@ static BOOL didSignIn = NO;
 
     }
     self.filenamePending = @"";
-    [boundary release];
-    [theRequest release];
-    [bodyStream release];
 
 }
 -(NSString *)generateDateString{
@@ -493,7 +453,7 @@ static BOOL didSignIn = NO;
 }
 
 -(NSData *)createXMLFromAnnotation:(NSMutableArray *) annotation andImageSize:(CGPoint) point{
-    NSMutableData *XMLString = [[[NSMutableData alloc] init] autorelease];
+    NSMutableData *XMLString = [[NSMutableData alloc] init];
     NSString *boundary = [[NSString alloc]initWithString:@"--022289--"];
         for (int i=0; i<annotation.count; i++) {
 
@@ -518,7 +478,6 @@ static BOOL didSignIn = NO;
         }
     
     
-    [boundary release];
     return XMLString;
 }
 -(void)downloadProfilePictureToUsername:(NSString *) username{
@@ -544,7 +503,6 @@ static BOOL didSignIn = NO;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
     }
-    [theRequest release];
 }
 -(void)uploadProfilePicture:(UIImage *)ppicture{
     NSArray *fields = [[NSArray alloc] initWithArray:[self signInAgain]];
@@ -579,10 +537,6 @@ static BOOL didSignIn = NO;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
     }
-    [boundary release];
-    [theRequest release];
-    [postBody release];
-    [imageData release];
 
 }
 -(NSArray *) signInAgain{
@@ -614,7 +568,6 @@ static BOOL didSignIn = NO;
      if (cancel) {
 
         [connection cancel];
-        [connection release];
         cancel = NO;
     }
     [receivedData appendData:data];
@@ -623,7 +576,6 @@ static BOOL didSignIn = NO;
 -(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite{
     if (cancel) {
         [connection cancel];
-        [connection release];
         cancel = NO;
     }
     if ([connection.currentRequest.URL.absoluteString isEqualToString:self.sendPhotoURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.updateAnnotationURL]) {
@@ -661,7 +613,7 @@ static BOOL didSignIn = NO;
     }
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 
-    [connection release]; // no se si deberia ir aqui
+     // no se si deberia ir aqui
 }
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection{
     if ([connection.currentRequest.URL.absoluteString isEqualToString:self.checkLoginURL]) {
@@ -692,8 +644,6 @@ static BOOL didSignIn = NO;
                 break;
                 
         }
-        [response release];
-        [divided release];
     }
     else if ([connection.currentRequest.URL.absoluteString isEqualToString:self.createAccountURL]) {
         NSString *response = [[NSString alloc]initWithData:receivedData encoding:NSUTF8StringEncoding];
@@ -711,8 +661,6 @@ static BOOL didSignIn = NO;
                 break;
                 
         }
-        [response release];
-        [divided release];
         
     }
     else if ([connection.currentRequest.URL.absoluteString isEqualToString:self.sendPhotoURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.updateAnnotationURL]){
@@ -741,8 +689,6 @@ static BOOL didSignIn = NO;
                 break;
         }
 
-        [result release];
-        [divided release];
        // [self.delegate photoSentCorrectly:filename];
         
     }
@@ -764,7 +710,6 @@ static BOOL didSignIn = NO;
     }
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 
-    [connection release];
     [receivedData setLength:0];
 
 }
@@ -780,12 +725,10 @@ static BOOL didSignIn = NO;
 #pragma mark Memory Management
 
 -(void)dealloc{
-    [self.checkLoginURL release];
-    [receivedData  release];
-    [self.createAccountURL release];
-    [self.sendPhotoURL release];
-    [self.filenamePending release];
-    [super dealloc];
+    self.checkLoginURL;
+    self.createAccountURL;
+    self.sendPhotoURL;
+    self.filenamePending;
 }
 
 @end

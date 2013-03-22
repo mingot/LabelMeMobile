@@ -77,7 +77,6 @@
     [titleView setImage:titleImage];
     [self.navigationItem setTitleView:titleView];
     //[titleImage release];
-    [titleView release];
 
     UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"] ;
     //[self.view setBackgroundColor:[UIColor colorWithRed:236/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
@@ -248,10 +247,9 @@
         CustomBadge *accessory = [CustomBadge customBadgeWithString:numBadge withStringColor:[UIColor whiteColor] withInsetColor:[UIColor redColor] withBadgeFrame:YES withBadgeFrameColor:[UIColor whiteColor] withScale:1.0 withShining:YES];
         [accessory setFrame:CGRectMake(size.width- 0.30*size2.width, 0, 0.30*size2.width, 0.30*size2.width)];
         ret = accessory;
-        [numBadge release];
     }
     else if (num.intValue == 0){
-        UIImageView *accessory =  [[[UIImageView alloc] initWithFrame:CGRectMake(size.width- 0.25*size2.width, 0, 0.25*size2.width, 0.25*size2.width)] autorelease];
+        UIImageView *accessory =  [[UIImageView alloc] initWithFrame:CGRectMake(size.width- 0.25*size2.width, 0, 0.25*size2.width, 0.25*size2.width)];
         accessory.image = [UIImage imageNamed:@"tick.png"];
         ret = accessory;
 
@@ -323,7 +321,6 @@
             [self.navigationController setToolbarHidden:NO];
             NSArray *toolbarItems = [[NSArray alloc] initWithObjects:self.sendButton,self.deleteButton, nil];
             [self.navigationController.toolbar setItems:toolbarItems];
-            [toolbarItems release];
             [self.tableViewGrid setFrame:CGRectMake(self.tableViewGrid.frame.origin.x, self.tableViewGrid.frame.origin.y, self.tableViewGrid.frame.size.width, self.tableViewGrid.frame.size.height - self.navigationController.toolbar.frame.size.height)];
             [self.editButton setStyle:UIBarButtonSystemItemCancel];
             
@@ -422,10 +419,6 @@
     [self.navigationController pushViewController:self.tagViewController animated:YES];
     
     
-    [img release];
-    [user release];
-    [filename release];
-    [objects release];
 }
 -(IBAction)listSendAction:(id)sender{
     /*[self.usernameLabel setHidden:YES];
@@ -458,8 +451,6 @@
     actionSheet.tag = 0;
     //[actionSheet showFromTabBar:self.tabBarController.tabBar];
     [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
-    [actionSheet release];
-    [str release];
 }
 
 -(IBAction)sendAction:(id)sender{
@@ -537,7 +528,6 @@
         [NSKeyedArchiver archiveRootObject:dict toFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:OBJECTS],[self.selectedItems objectAtIndex:index] ]];
         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"It can not be removed." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
-        [alert release];
     }
     else {
         UIImage *thumim =  [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:THUMB],[self.selectedItemsDelete objectAtIndex:index]]];
@@ -548,7 +538,6 @@
             [filemng createFileAtPath:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:THUMB],[self.selectedItemsDelete objectAtIndex:index]] contents:thum attributes:nil];
             UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"It can not be removed." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];
-            [alert release];
         }
         else {
             
@@ -556,7 +545,6 @@
 
                 UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"It can not be removed." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
                 [alert show];
-                [alert release];
             }
             else{
                 [filemng removeItemAtPath:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:OBJECTS],[[[self.selectedItemsDelete objectAtIndex:index] stringByDeletingPathExtension] stringByAppendingPathExtension:@"txt"]  ] error:&error];
@@ -565,7 +553,6 @@
         }
     }
     [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:YES];
-    [dict release];
     [self.selectedItemsDelete removeObjectAtIndex:index];
     if(self.selectedItemsDelete.count > 0){
         [self deletePhotoAndAnnotation];
@@ -613,8 +600,6 @@
         [serverConnection updateAnnotationFrom:[self.selectedItemsSend objectAtIndex:0] withSize:point :annotation];
     }
     //[sConnection release];
-    [image release];
-    [dict release];
     
 }
 #pragma mark -
@@ -634,8 +619,6 @@
     [dict removeObjectForKey:filename];
     [dict setObject:newdictnum forKey:filename];
     [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
-    [newdictnum release];
-    [dict release];
     if (self.selectedItemsSend.count > 0) {
         [sendingView.progressView setProgress:0];
         [sendingView incrementNum];
@@ -716,8 +699,6 @@
     [dict removeObjectForKey:filename];
     [dict setObject:newdictnum forKey:filename];
     [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
-    [newdictnum release];
-    [dict release];
     if (self.selectedItemsSend.count > 0) {
         [self sendPhoto];
     }
@@ -809,7 +790,7 @@
     UITableViewCell *cell = nil;
      NSDictionary *dict = [[NSDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     if (tableView.tag == 0) {
-        cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil] autorelease];
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
         NSFileManager * filemng = [NSFileManager defaultManager];
         [self setItems:[filemng contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.paths objectAtIndex:THUMB]] error:NULL]];
         for(int i = 0; i < self.items.count; i++) {
@@ -862,8 +843,6 @@
                 [button setClipsToBounds:NO];*/
                
                 [cell addSubview:button];
-                [imageView release];
-                [imview release];
             }
         }
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
@@ -874,7 +853,7 @@
        
         NSNumber *num = [dict objectForKey:[self.items objectAtIndex:indexPath.row]];
         
-        cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil] autorelease];
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
         UIButton  *button = nil;
         if (num.intValue < 0) {
             button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -926,7 +905,6 @@
         UIImage *newimage = [[UIImage alloc]initWithContentsOfFile:[[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:[self.items objectAtIndex:indexPath.row]] ];
         [cell.detailTextLabel setNumberOfLines:2];
         NSString *detailText = [[NSString alloc]initWithFormat:@"%d objects\n%d x %d",annotation.count,(int)newimage.size.width,(int)newimage.size.height];
-        [newimage release];
         //    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 10, 90, 90)];
         //    imageView.image = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:THUMB],[self.items objectAtIndex:indexPath.row]]];
         //    UIGraphicsBeginImageContext(CGSizeMake(100, 100));
@@ -958,13 +936,7 @@
         [cell.imageView.layer setShadowRadius:3.0];
         [cell.imageView.layer setCornerRadius:6.0];
         [cell.imageView setClipsToBounds:NO];*/
-        [path release];
-        [detailText release];
-        [imageView release];
-        [imview release];
         // [img release];
-        [date release];
-        [dict release];
     }
    
 
@@ -1029,31 +1001,26 @@
 }
 
 -(void)dealloc{
-    [self.editButton            release];
-    [self.bottomToolbar         release];
-    [self.deleteButton          release];
-    [self.sendButton            release];
-    [self.usernameLabel         release];
+    self.editButton;
+    self.bottomToolbar;
+    self.deleteButton;
+    self.sendButton;
+    self.usernameLabel;
 
-    [self.profilePicture        release];
-    [self.listButton            release];
-    [self.paths                 release];
-    [self.items                 release];
-    [self.selectedItems         release];
+    self.profilePicture;
+    self.listButton;
+    self.paths;
+    self.items;
+    self.selectedItems;
     
-    [self.selectedItemsSend     release];
-    [self.selectedItemsDelete   release];
-    [self.tagViewController     release];
-    [self.tableView             release];
-    [self.tableViewGrid         release];
+    self.selectedItemsSend;
+    self.selectedItemsDelete;
+    self.tagViewController;
+    self.tableView;
+    self.tableViewGrid;
     
-    [noImages                   release];
-    [serverConnection           release];
-    [sendingView                release];
-    [view1                      release];
 
 
-    [super              dealloc];
 }
 
 @end

@@ -36,18 +36,18 @@
     
     
 }
-@property (nonatomic,retain) id <CreateAccountDelegate> delegate;
-@property (nonatomic,retain) IBOutlet UITextField *usernameField;
-@property (nonatomic,retain) IBOutlet UITextField *passwordField;
-@property (nonatomic,retain) IBOutlet UITextField *biologicalNameField;
-@property (nonatomic,retain) IBOutlet UITextField *emailField;
-@property (nonatomic,retain) IBOutlet UITextField *institutionField;
-@property (nonatomic,retain) IBOutlet UIToolbar   *topToolbar;
-@property (nonatomic,retain) IBOutlet UIScrollView   *scrollView;
+@property (nonatomic,strong) id <CreateAccountDelegate> delegate;
+@property (nonatomic,strong) IBOutlet UITextField *usernameField;
+@property (nonatomic,strong) IBOutlet UITextField *passwordField;
+@property (nonatomic,strong) IBOutlet UITextField *biologicalNameField;
+@property (nonatomic,strong) IBOutlet UITextField *emailField;
+@property (nonatomic,strong) IBOutlet UITextField *institutionField;
+@property (nonatomic,strong) IBOutlet UIToolbar   *topToolbar;
+@property (nonatomic,strong) IBOutlet UIScrollView   *scrollView;
 
-@property (nonatomic,retain) UIToolbar  *keyboardToolbar;
+@property (nonatomic,strong) UIToolbar  *keyboardToolbar;
 
-@property (nonatomic,retain) UITabBarController   *tabBarController;
+@property (nonatomic,strong) UITabBarController   *tabBarController;
 
 
 #pragma mark -

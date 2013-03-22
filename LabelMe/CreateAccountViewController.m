@@ -73,12 +73,6 @@
     [labelmeView setFrame:CGRectMake((self.view.frame.size.width-labelmeView.frame.size.width)/2, 10, labelmeView.frame.size.width, labelmeView.frame.size.height)];
     [self.scrollView addSubview:labelmeView];
     
-    [labelmeView    release];
-    [flexibleSpace  release];
-    [cancelButton   release];
-    [nextButton     release];
-    [doneButton     release];
-    [previousButton release];
 
 }
 #pragma mark -
@@ -154,8 +148,6 @@
         serverConnection.delegate = self;
         NSArray *fields = [[NSArray alloc] initWithObjects:self.biologicalNameField.text,self.institutionField.text,self.usernameField.text,self.passwordField.text,self.emailField.text, nil];
         [serverConnection createAccountWithFields:fields];
-        [fields release];
-        [serverConnection release];
        // [self dismissViewControllerAnimated:YES completion:NULL];
         
     }
@@ -324,16 +316,15 @@
 
 
 -(void)dealloc{
-    [self.usernameField release];
-    [self.passwordField release];
-    [self.biologicalNameField release];
-    [self.emailField release];
-    [self.institutionField release];
-    [self.keyboardToolbar release];
-    [self.topToolbar release];
-    [self.scrollView release];
-    [self.tabBarController release];
-    [super dealloc];
+    self.usernameField;
+    self.passwordField;
+    self.biologicalNameField;
+    self.emailField;
+    self.institutionField;
+    self.keyboardToolbar;
+    self.topToolbar;
+    self.scrollView;
+    self.tabBarController;
 }
 - (void)didReceiveMemoryWarning
 {

@@ -50,30 +50,30 @@
     
     IBOutlet UIView                      *view1;
 }
-@property (nonatomic,retain) IBOutlet UIBarButtonItem *editButton;
-@property (nonatomic,retain) IBOutlet UIToolbar *bottomToolbar;
-@property (nonatomic,retain) IBOutlet UIBarButtonItem *deleteButton;
-@property (nonatomic,retain) IBOutlet UIBarButtonItem *sendButton;
+@property (nonatomic,strong) IBOutlet UIBarButtonItem *editButton;
+@property (nonatomic,strong) IBOutlet UIToolbar *bottomToolbar;
+@property (nonatomic,strong) IBOutlet UIBarButtonItem *deleteButton;
+@property (nonatomic,strong) IBOutlet UIBarButtonItem *sendButton;
 
-@property (nonatomic,retain) IBOutlet UILabel *usernameLabel;
-@property (nonatomic, retain) IBOutlet UIImageView *profilePicture;
+@property (nonatomic,strong) IBOutlet UILabel *usernameLabel;
+@property (nonatomic, strong) IBOutlet UIImageView *profilePicture;
 
-@property (nonatomic,retain) IBOutlet UIButton *listButton;
+@property (nonatomic,strong) IBOutlet UIButton *listButton;
 
-@property (nonatomic,retain) NSArray *paths;
-@property (nonatomic,retain) NSArray *items;
+@property (nonatomic,strong) NSArray *paths;
+@property (nonatomic,strong) NSArray *items;
 
-@property (nonatomic,retain) NSMutableArray *selectedItems;
-@property (nonatomic,retain) NSMutableArray *selectedItemsSend;
-@property (nonatomic,retain) NSMutableArray *selectedItemsDelete;
+@property (nonatomic,strong) NSMutableArray *selectedItems;
+@property (nonatomic,strong) NSMutableArray *selectedItemsSend;
+@property (nonatomic,strong) NSMutableArray *selectedItemsDelete;
 
-@property (nonatomic,retain) IBOutlet UITableView *tableView;
-@property (nonatomic,retain) IBOutlet UITableView *tableViewGrid;
+@property (nonatomic,strong) IBOutlet UITableView *tableView;
+@property (nonatomic,strong) IBOutlet UITableView *tableViewGrid;
 
-@property (nonatomic,retain) TagViewController *tagViewController;
+@property (nonatomic,strong) TagViewController *tagViewController;
 
 
-@property (nonatomic,retain) NSString *username;
+@property (nonatomic,strong) NSString *username;
 
 
 

@@ -457,11 +457,10 @@
 #pragma mark Memory Management
 -(void) dealloc{
 
-    [self.objects release], self.objects = nil;
+    self.objects, self.objects = nil;
     //[self.label release], self.label = nil;
-    [self.colorArray release], self.colorArray = nil;
+    self.colorArray, self.colorArray = nil;
     
-    [super dealloc];
    
 }
 

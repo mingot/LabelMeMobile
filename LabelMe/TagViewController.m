@@ -74,7 +74,6 @@
     [titleView setImage:titleImage];
     [self.navigationItem setTitleView:titleView];
     //[titleImage release];
-    [titleView release];
 
     [self.navigationController.navigationBar setTintColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
    // [self.bottomToolbar setTintColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
@@ -94,18 +93,15 @@
     [addButtonView setImage:[UIImage imageNamed:@"newLabel.png"] forState:UIControlStateNormal];
     [addButtonView addTarget:self action:@selector(addAction:) forControlEvents:UIControlEventTouchUpInside];
     self.addButton = [[UIBarButtonItem alloc] initWithCustomView:addButtonView];
-    [addButtonView release];
     UIButton *deleteButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [deleteButtonView setImage:[UIImage imageNamed:@"delete.png"] forState:UIControlStateNormal];
     [deleteButtonView addTarget:self action:@selector(deleteAction:) forControlEvents:UIControlEventTouchUpInside];
     self.deleteButton = [[UIBarButtonItem alloc] initWithCustomView:deleteButtonView];
-    [deleteButtonView release];
     [self.deleteButton setEnabled:NO];
     UIButton *sendButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [sendButtonView setImage:[UIImage imageNamed:@"send.png"] forState:UIControlStateNormal];
     [sendButtonView addTarget:self action:@selector(sendAction:) forControlEvents:UIControlEventTouchUpInside];
     self.sendButton = [[UIBarButtonItem alloc] initWithCustomView:sendButtonView];
-    [sendButtonView release];
 
     /*self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:@selector(deleteAction:)];
     [self.deleteButton setImage:[UIImage imageNamed:@"delete.png"]];*/
@@ -206,7 +202,6 @@
     [tiplabel setTextColor:[UIColor redColor]];
     [tiplabel setBackgroundColor:[UIColor clearColor]];
     [tip addSubview:tiplabel];
-    [tiplabel release];
     [tip addTarget:self
             action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
     [self.scrollView addSubview:tip];
@@ -216,7 +211,6 @@
         [tip setHidden:YES];
     }
     [self.labelsView setBackgroundView:backgroundView];
-    [backgroundView release];
     
     
 }
@@ -240,7 +234,6 @@
     }
     
     
-    [dict release];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
     // [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
@@ -407,16 +400,13 @@
     NSNumber *num = [[NSNumber alloc] initWithInt:-1];
     [dict setObject:num forKey:filename];
     [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
-    [plistPath release];
-    [dict release];
-    [num release];
     
     
 }
 
 
 -(void)createFilename{
-    NSString *date = [[[NSString alloc]initWithString:[[[NSDate date] description] substringToIndex:19]] autorelease]  ;
+    NSString *date = [[NSString alloc]initWithString:[[[NSDate date] description] substringToIndex:19]]  ;
     date = [date stringByReplacingOccurrencesOfString:@" " withString:@""];
     date = [date stringByReplacingOccurrencesOfString:@"-" withString:@""];
     date = [date stringByReplacingOccurrencesOfString:@":" withString:@""];
@@ -452,7 +442,6 @@
     self.label.hidden=NO;
     [self.annotationView setNeedsDisplay];
 
-    [box release];
     if (!self.labelsView.hidden) {
         [self.labelsView setHidden:YES];
         [labelsButtonView setSelected:NO];
@@ -464,20 +453,17 @@
         NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue -1];
         [dict removeObjectForKey:self.filename];
         [dict setObject:newdictnum forKey:self.filename];
-        [newdictnum release];
     }
     else{
         NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
         [dict removeObjectForKey:self.filename];
         [dict setObject:newdictnum forKey:self.filename];
 
-        [newdictnum release];
     }
     
 
     // ya la cambia??
     [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
-    [dict release];
     [self selectedAnObject:YES];
 }
 
@@ -489,7 +475,7 @@
         if (![box.label isEqualToString:self.label.text]) {
             
             box.label= self.label.text;
-            [box.label retain];
+            box.label;
             [box.label replaceByUnderscore];
 
             // [str release];
@@ -559,7 +545,6 @@
         actionSheet.actionSheetStyle = UIBarStyleBlackTranslucent;
         //[actionSheet showFromToolbar:self.bottomToolbar];
         [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
-        [actionSheet release];
     }
    
     
@@ -619,7 +604,6 @@
                 NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
                 [dict removeObjectForKey:self.filename];
                 [dict setObject:newdictnum forKey:self.filename];
-                [newdictnum release];
             }
            
         }
@@ -630,7 +614,6 @@
 
                 [dict removeObjectForKey:self.filename];
                 [dict setObject:newdictnum forKey:self.filename];
-                [newdictnum release];
 
             }
             else{
@@ -638,14 +621,12 @@
                 
                 [dict removeObjectForKey:self.filename];
                 [dict setObject:newdictnum forKey:self.filename];
-                [newdictnum release];
                 
             }
 
         }
         
         [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
-        [dict release];
 
         [self.annotationView.objects removeObjectAtIndex:[self.annotationView SelectedBox]];
        /* Box *b;
@@ -688,7 +669,6 @@
         [sConnection updateAnnotationFrom:self.filename withSize:point :self.annotationView.objects];
     }
     
-    [dict release];
     
 }
 
@@ -738,39 +718,39 @@
 
 }
 -(void)saveImage:(UIImage *)image{
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
 
-    if (self.paths == nil) {
-        //NSArray *tmp = [self newArrayWithFolders:self.username];
-        self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
-        //[tmp release];
+        if (self.paths == nil) {
+            //NSArray *tmp = [self newArrayWithFolders:self.username];
+            self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
+            //[tmp release];
 
-    }
-    [self createFilename];
-    [self createPlistEntry:self.filename];
+        }
+        [self createFilename];
+        [self createPlistEntry:self.filename];
 
-    NSFileManager * filemng = [NSFileManager defaultManager];
-    
-    
+        NSFileManager * filemng = [NSFileManager defaultManager];
+        
+        
    
-    
-    
-    
-    
-    if([filemng createFileAtPath:[[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil]){
-    }
-    else {
         
-    }
-    if([filemng createFileAtPath:[[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil]){
-    }
-    else {
         
+        
+        
+        if([filemng createFileAtPath:[[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil]){
+        }
+        else {
+            
+        }
+        if([filemng createFileAtPath:[[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil]){
+        }
+        else {
+            
+        }
+        
+        //[self saveThumbnail];
+        [self saveDictionary];
     }
-    
-    //[self saveThumbnail];
-    [self saveDictionary];
-    [pool release];
    /* image = nil;
     [image release];*/
        
@@ -885,21 +865,18 @@
             [dict removeObjectForKey:self.filename];
             [dict setObject:newdictnum forKey:self.filename];
 
-            [newdictnum release];
         }
         else{
             NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
             [dict removeObjectForKey:self.filename];
             [dict setObject:newdictnum forKey:self.filename];
 
-            [newdictnum release];
         }
         
         // ya la cambia??
         [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
         [self.sendButton setEnabled:YES];
 
-        [dict release];
     }
     [self saveDictionary];
     //[self saveThumbnail];
@@ -929,7 +906,6 @@
 
     
     [self.labelsView reloadData];
-    [dict release];
 
 }
 #pragma mark -
@@ -1037,7 +1013,7 @@
     }
     
     // Create label with section title
-    UILabel *label = [[[UILabel alloc] init] autorelease];
+    UILabel *label = [[UILabel alloc] init];
     label.frame = CGRectMake(0,6,tableView.frame.size.width , 30);
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor redColor];
@@ -1048,7 +1024,7 @@
     
     // Create header view and add label as a subview
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 42)];
-    [view autorelease];
+//    [view autorelease];
     [view addSubview:label];
     
     return view;
@@ -1063,7 +1039,7 @@
      UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
      //
      if (cell == nil) {
-     cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier] autorelease];
+     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
      }
     
     //[cell setBackgroundColor:[UIColor colorWithRed:(230/255.0) green:(230/255.0) blue:(230/255.0) alpha:1.0]];
@@ -1079,7 +1055,6 @@
             [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, b.label.length)];
 
             cell.textLabel.attributedText = attrString;
-            [attrString release];
 
         }
         else{
@@ -1096,7 +1071,6 @@
             [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, 10)];
             
             cell.textLabel.attributedText = attrString;
-            [attrString release];
             
         }
         else{
@@ -1188,8 +1162,6 @@
     [dict removeObjectForKey:filename];
     [dict setObject:newdictnum forKey:filename];
     [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
-    [newdictnum release];
-    [dict release];
 }
 
 -(void)photoNotOnServer:(NSString *)filename{
@@ -1208,8 +1180,6 @@
     [dict setObject:newdictnum forKey:filename];
     [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
     [self sendAction:self.sendButton];
-    [newdictnum release];
-    [dict release];
     
 }
 #pragma mark - MemoryManagement
@@ -1223,26 +1193,23 @@
 }
 -(void) dealloc{
     
-    [self.scrollView release];
-    [sConnection release];
+    self.scrollView;
 
-    [self.label release];
-    [self.addButton release];
-    [self.deleteButton release];
-    [self.sendButton release];
-    [self.imageView release];
+    self.label;
+    self.addButton;
+    self.deleteButton;
+    self.sendButton;
+    self.imageView;
     //[self.colorArray release];
-    [self.filename release];
-    [self.paths release];
-    [self.annotationView release];
-    [self.username release];
-    [self.composeView release];
-    [self.bottomToolbar release];
-    [self.labelsView release];
-    [self.sendingView release];
-    [labelsButtonView release];
+    self.filename;
+    self.paths;
+    self.annotationView;
+    self.username;
+    self.composeView;
+    self.bottomToolbar;
+    self.labelsView;
+    self.sendingView;
 
-    [super dealloc];
 
 
 

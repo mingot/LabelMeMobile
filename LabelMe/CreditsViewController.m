@@ -66,8 +66,7 @@
     // Dispose of any resources that can be recreated.
 }
 -(void)dealloc{
-    [self.scrollView release];
-    [super dealloc];
+    self.scrollView;
     
 }
 @end

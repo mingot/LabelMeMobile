@@ -62,7 +62,6 @@
         
         NSDictionary *dict = [[NSDictionary alloc] init];
         [dict writeToFile:[path stringByAppendingFormat:@"/%@.plist",username] atomically:NO];
-        [dict release];
         
     }
     if (![filemng fileExistsAtPath:[path stringByAppendingString:@"/settings.plist"] isDirectory:&isDir]) {
@@ -76,13 +75,10 @@
         [dict setObject:[NSNumber numberWithBool:NO] forKey:@"wifi"];
         [dict setObject:[NSNumber numberWithBool:YES] forKey:@"signinauto"];
         [dict writeToFile:[path stringByAppendingString:@"/settings.plist"] atomically:YES];
-        [dict release];
         
     }
 
     
-    [path release];
-    [paths release];
     return YES;
 }
 -(NSArray *) newArrayWithFolders: (NSString *)username{
@@ -91,7 +87,6 @@
     NSString *path = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,username ];
     //NSArray *paths = [[NSArray alloc] initWithObjects:[path stringByAppendingPathComponent:@"images"],[path stringByAppendingPathComponent:@"thumbnail"],[path stringByAppendingPathComponent:@"annotations"],path, nil];
     NSArray *paths = [NSArray arrayWithObjects:[path stringByAppendingPathComponent:@"images"],[path stringByAppendingPathComponent:@"thumbnail"],[path stringByAppendingPathComponent:@"annotations"],path, nil];
-    [path release];
     return paths;
 }
 

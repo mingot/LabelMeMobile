@@ -154,7 +154,6 @@
                                                                       [lastPhotoButton setImage:[img thumbnailImage:100 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh] forState:UIControlStateNormal];
                                                                       // we only need the first (most recent) photo -- stop the enumeration
                                                                       img = nil;
-                                                                      [img release];
                                                                       *stop = YES;
                                                                   }
                                                               }];
@@ -163,7 +162,6 @@
                                      *stop = NO;
                                  } failureBlock:^(NSError *error) {
                                  }];
-    [assetsLibrary release];
     
     
 }
@@ -401,7 +399,7 @@
     //[self.imagePicker.navigationController pushViewController:self.tagViewController animated:NO];
     
 
-    NSString *location = [[[NSString alloc] initWithString:@""] autorelease];
+    NSString *location = [[NSString alloc] initWithString:@""];
 
     if (self.imagePicker.sourceType == UIImagePickerControllerSourceTypeCamera) {
         location = [[locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
@@ -431,9 +429,8 @@
 }
 
 -(void)dealloc{
-    [self.imagePicker release];
-    [self.tagViewController release];
+    self.imagePicker;
+    self.tagViewController;
     //[self.imageToAnnotate release];
-    [super dealloc];
 }
 @end

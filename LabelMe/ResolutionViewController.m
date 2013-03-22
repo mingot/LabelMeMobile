@@ -74,7 +74,7 @@
      UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
      //
      if (cell == nil) {
-     cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
+     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
      }
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     // change to accomodate user
@@ -131,7 +131,6 @@
         [cell setAccessoryType:UITableViewCellAccessoryNone];
     }
     [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
-    [path release];
     
     return cell;
     
@@ -147,8 +146,6 @@
     [dict setObject:dictnum forKey:@"resolution"];
     [dict writeToFile:[path stringByAppendingPathComponent:@"settings.plist"] atomically:YES];
     [self.tableView reloadData];
-    [path release];
-    [dict release];
     
 }
 @end

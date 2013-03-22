@@ -42,23 +42,23 @@
     UIButton *tip;
   
 }
-@property (retain, nonatomic) IBOutlet UIScrollView *scrollView;
-@property (retain, nonatomic) IBOutlet UITextField *label;
-@property (retain, nonatomic) IBOutlet UIBarButtonItem *addButton;
-@property (retain, nonatomic)  UIBarButtonItem *deleteButton;
-@property (retain, nonatomic) IBOutlet UIBarButtonItem *sendButton;
-@property (retain, nonatomic) IBOutlet UIBarButtonItem *labelsButton;
-@property (retain, nonatomic) IBOutlet UIToolbar *bottomToolbar;
-@property (nonatomic, retain) UIImageView *imageView;
-@property (retain, nonatomic)  UITableView *labelsView;
+@property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (strong, nonatomic) IBOutlet UITextField *label;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *addButton;
+@property (strong, nonatomic)  UIBarButtonItem *deleteButton;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *sendButton;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *labelsButton;
+@property (strong, nonatomic) IBOutlet UIToolbar *bottomToolbar;
+@property (nonatomic, strong) UIImageView *imageView;
+@property (strong, nonatomic)  UITableView *labelsView;
 
 //@property (retain, nonatomic) NSArray *colorArray;
-@property (nonatomic, retain) NSString *filename;
-@property (nonatomic, retain) NSArray *paths;
-@property (retain, nonatomic)  TagView *annotationView;
-@property (retain,nonatomic) NSString *username;
-@property (retain,nonatomic) UIView *composeView;
-@property (retain,nonatomic) SendingView *sendingView;
+@property (nonatomic, strong) NSString *filename;
+@property (nonatomic, strong) NSArray *paths;
+@property (strong, nonatomic)  TagView *annotationView;
+@property (strong,nonatomic) NSString *username;
+@property (strong,nonatomic) UIView *composeView;
+@property (strong,nonatomic) SendingView *sendingView;
 
 
 

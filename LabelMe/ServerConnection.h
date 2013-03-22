@@ -48,21 +48,21 @@
 
 
 
-@property (nonatomic, assign) id <ServerConnectionDelegate> delegate;
+@property (nonatomic, weak) id <ServerConnectionDelegate> delegate;
 //@property (nonatomic, retain) NSURLConnection   *loginConnection;
-@property (nonatomic, retain) NSString          *checkLoginURL;
+@property (nonatomic, strong) NSString          *checkLoginURL;
 //@property (nonatomic, retain) NSURLConnection   *createAccountConnection;
-@property (nonatomic, retain) NSString          *createAccountURL;
+@property (nonatomic, strong) NSString          *createAccountURL;
 //@property (nonatomic, retain) NSURLConnection   *sendPhotoConnection;
-@property (nonatomic, retain) NSString          *sendPhotoURL;
-@property (nonatomic, retain) NSString          *updateAnnotationURL;
-@property (nonatomic, retain) NSString          *downloadProfilePictureURL;
-@property (nonatomic, retain) NSString          *uploadProfilePictureURL;
-@property (nonatomic, retain) NSString          *forgotPasswordURL;
+@property (nonatomic, strong) NSString          *sendPhotoURL;
+@property (nonatomic, strong) NSString          *updateAnnotationURL;
+@property (nonatomic, strong) NSString          *downloadProfilePictureURL;
+@property (nonatomic, strong) NSString          *uploadProfilePictureURL;
+@property (nonatomic, strong) NSString          *forgotPasswordURL;
 
 //@property (nonatomic, retain) NSURLConnection   *profilePictureConnection;
 
-@property (nonatomic, retain) NSString          *filenamePending;
+@property (nonatomic, strong) NSString          *filenamePending;
 
 -(void)setURLs;
 -(void)checkLoginForUsername:(NSString *)username andPassword:(NSString *)password;

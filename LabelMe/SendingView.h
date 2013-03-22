@@ -24,14 +24,14 @@
     int num;
     
 }
-@property (nonatomic, assign) id <SendingViewDelegate> delegate;
+@property (nonatomic, weak) id <SendingViewDelegate> delegate;
 
-@property (nonatomic, retain) UIProgressView *progressView;
-@property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
-@property (nonatomic, retain) UILabel *label;
-@property (nonatomic, retain) UIButton *cancelButton;
+@property (nonatomic, strong) UIProgressView *progressView;
+@property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
+@property (nonatomic, strong) UILabel *label;
+@property (nonatomic, strong) UIButton *cancelButton;
 
-@property (nonatomic, retain) NSString *filename;
+@property (nonatomic, strong) NSString *filename;
 
 -(void)setTotal:(int) i;
 -(void)incrementNum;

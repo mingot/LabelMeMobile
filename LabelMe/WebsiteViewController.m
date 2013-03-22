@@ -83,7 +83,6 @@
     
     //Load the request in the UIWebView.*/
     [self.website loadRequest:theRequest];
-    [theRequest release];
         [self.scrollView setContentSize:self.website.frame.size];
 
     // Do any additional setup after loading the view from its nib.
@@ -150,13 +149,12 @@
     // Dispose of any resources that can be recreated.
 }
 -(void)dealloc{
-    [self.back release];
-    [self.forward release];
-    [self.reload release];
-    [self.bottomToolbar release];
-    [self.website release];
-    [self.scrollView release];
-    [super dealloc];
+    self.back;
+    self.forward;
+    self.reload;
+    self.bottomToolbar;
+    self.website;
+    self.scrollView;
 }
 
 @end

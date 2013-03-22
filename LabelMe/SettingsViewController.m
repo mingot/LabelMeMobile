@@ -88,7 +88,6 @@
 
     [self setTitle:@"Settings"];
     
-    [logoutButton release];
 
 }
 -(void)viewWillAppear:(BOOL)animated{
@@ -117,7 +116,6 @@
                                            cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Photo"
                                            otherButtonTitles:@"Choose Existing Photo", @"Take Photo",  nil];
         [photoSourceSheet showFromTabBar:self.tabBarController.tabBar];
-        [photoSourceSheet release];
     }
     else { // No camera, just use the library.
         UIActionSheet *photoSourceSheet = [[UIActionSheet
@@ -126,7 +124,6 @@
                                            otherButtonTitles: @"Choose Existing Photo",  nil];
         //[photoSourceSheet showFromTabBar:self.tabBarController.tabBar];
         [photoSourceSheet showFromRect:button.frame inView:self.view animated:YES];
-        [photoSourceSheet release];
 
         
     }
@@ -165,7 +162,6 @@
     
     }
     [dict writeToFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"] atomically:NO];
-[dict release];
     //[paths release];
 }
 #pragma mark - UIActionSheetDelegate methods
@@ -241,7 +237,6 @@
     if ([filemng createFileAtPath:path contents:UIImageJPEGRepresentation([img thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil]) {
         ServerConnection *sConnection = [[ServerConnection alloc]init];
         [sConnection uploadProfilePicture:[img thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh]];
-        [sConnection release];
     }
     if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
         UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
@@ -249,12 +244,10 @@
     }
     [self.tableView reloadData];
     [picker dismissViewControllerAnimated:NO completion:NULL];
-    [picker release];
 }
 
 - (void) imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [self dismissViewControllerAnimated:YES completion:NULL];
-    [picker release];
 }
 
 #pragma mark -
@@ -310,7 +303,7 @@
     }
     
     // Create label with section title
-    UILabel *label = [[[UILabel alloc] init] autorelease];
+    UILabel *label = [[UILabel alloc] init];
     label.frame = CGRectMake(20, 6, 300, 30);
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
@@ -321,7 +314,7 @@
     
     // Create header view and add label as a subview
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 40)];
-    [view autorelease];
+//    [view autorelease];
     [view addSubview:label];
     
     return view;
@@ -344,7 +337,7 @@
     UITableViewCell *cell = nil;
 
     if (indexPath.section == 0) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
         UIButton *profilePictureButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [cell.imageView setBackgroundColor:[UIColor clearColor]];
         cell.imageView.layer.masksToBounds = YES;
@@ -365,7 +358,7 @@
 
     }
     else if (indexPath.section == 1){
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         NSNumber *numberfiles =[NSNumber numberWithInteger: [[filemng contentsOfDirectoryAtPath:[paths objectAtIndex:THUMB] error:NULL] count]];
         
         [cell.textLabel setText:@"Number of images: "];
@@ -374,7 +367,7 @@
         [cell.textLabel setTextAlignment:NSTextAlignmentCenter];
     }
     else if (indexPath.section == 2){
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         
         [cell.textLabel setText:@"Go to LabelMe Website"];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
@@ -382,8 +375,8 @@
         [cell.textLabel setTextAlignment:NSTextAlignmentCenter];
     }
     else if (indexPath.section == 3){
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil] autorelease];
-        UISwitch *sw = [[[UISwitch alloc] initWithFrame:CGRectZero] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectZero];
         [sw setOnTintColor:[UIColor colorWithRed:(180.0/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0]];
 
 
@@ -438,7 +431,7 @@
         }
     }
     else if (indexPath.section == 4){
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         
         [cell.textLabel setText:@"About LabelMe"];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
@@ -486,7 +479,6 @@
 
         [resolution setUsername:self.username];
         [self.navigationController pushViewController:resolution animated:YES];
-        [resolution release];
     }
     else if ((indexPath.section == 4) ) {
         CreditsViewController *credits = nil;
@@ -515,7 +507,6 @@
         }
         [credits setHidesBottomBarWhenPushed:YES];
         [self.navigationController pushViewController:credits animated:YES];
-        [credits release];
     }
 
 }
@@ -527,10 +518,9 @@
     // Dispose of any resources that can be recreated.
 }
 -(void)dealloc{
-    [self.tableView release];
-    [self.username release];
-    [self.website release];
-    [super dealloc];
+    self.tableView;
+    self.username;
+    self.website;
 }
 
 @end

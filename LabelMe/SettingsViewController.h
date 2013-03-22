@@ -16,10 +16,10 @@
     WebsiteViewController *_website;
     
 }
-@property (nonatomic,retain)  UITableView *tableView;
-@property (nonatomic,retain) NSString *username;
-@property (nonatomic,retain) UIPopoverController *popover;
-@property (nonatomic,retain) WebsiteViewController *website;
+@property (nonatomic,strong)  UITableView *tableView;
+@property (nonatomic,strong) NSString *username;
+@property (nonatomic,strong) UIPopoverController *popover;
+@property (nonatomic,strong) WebsiteViewController *website;
 
 
 

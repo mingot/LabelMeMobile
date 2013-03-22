@@ -258,13 +258,6 @@ static float LINEWIDTH = 6;
     }
     NSString *tmp = [[NSString alloc] initWithFormat:@"%@-%@-%@-%@",day,month2,year,time ];
     self.date = tmp;
-    [tmp release];
-    [month2 release];
-    [day release];
-    [month release];
-    [year release];
-    [time release];
-    [originalDate release];
 }
 
 -(id) initWithCoder:(NSCoder *)aDecoder{
@@ -321,10 +314,9 @@ static float LINEWIDTH = 6;
 }
 -(void) dealloc{
 
-    [self.color release];
-    [self.label release];
-    [self.date  release];
-    [super dealloc];
+    self.color;
+    self.label;
+    self.date;
 
     
     

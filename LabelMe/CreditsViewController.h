@@ -11,5 +11,5 @@
 @interface CreditsViewController : UIViewController{
     UIScrollView *_scrollView;
 }
-@property (nonatomic,retain) IBOutlet UIScrollView *scrollView;
+@property (nonatomic,strong) IBOutlet UIScrollView *scrollView;
 @end

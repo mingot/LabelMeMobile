@@ -24,10 +24,10 @@
     //float   LINEWIDTH;
 }
 
-@property (retain, nonatomic) NSString *label;
-@property (retain, nonatomic) NSString *date;
+@property (strong, nonatomic) NSString *label;
+@property (strong, nonatomic) NSString *date;
 
-@property (retain, nonatomic) UIColor *color;
+@property (strong, nonatomic) UIColor *color;
 
 - (id)initWithPoints:(CGPoint) upper:(CGPoint) lower;
 

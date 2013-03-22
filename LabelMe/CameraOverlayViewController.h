@@ -26,14 +26,14 @@
    // UIImage *_imageToAnnotate;
 
 }
-@property (nonatomic,retain) UIImagePickerController *imagePicker;
-@property (nonatomic,retain) TagViewController *tagViewController;
+@property (nonatomic,strong) UIImagePickerController *imagePicker;
+@property (nonatomic,strong) TagViewController *tagViewController;
 //@property (nonatomic,retain) UIImage *imageToAnnotate;
-@property (nonatomic,retain) IBOutlet UIButton *flashButton;
-@property (nonatomic,retain) IBOutlet UIButton *autoButton;
-@property (nonatomic,retain) IBOutlet UIButton *onButton;
-@property (nonatomic,retain) IBOutlet UIButton *offButton;
-@property (nonatomic,retain) IBOutlet UIButton *cameraButton;
+@property (nonatomic,strong) IBOutlet UIButton *flashButton;
+@property (nonatomic,strong) IBOutlet UIButton *autoButton;
+@property (nonatomic,strong) IBOutlet UIButton *onButton;
+@property (nonatomic,strong) IBOutlet UIButton *offButton;
+@property (nonatomic,strong) IBOutlet UIButton *cameraButton;
 
 
 -(IBAction)cameraRollAction:(id)sender;

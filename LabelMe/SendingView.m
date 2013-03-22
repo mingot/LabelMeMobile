@@ -91,12 +91,11 @@
 }
 */
 -(void)dealloc{
-    [self.label release];
-    [self.progressView release];
-    [self.activityIndicator release];
-    [self.filename release];
-    [self.cancelButton release];
-    [super dealloc];
+    self.label;
+    self.progressView;
+    self.activityIndicator;
+    self.filename;
+    self.cancelButton;
 }
 
 @end

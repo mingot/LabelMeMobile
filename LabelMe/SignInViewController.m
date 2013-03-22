@@ -92,11 +92,6 @@
     [self.view addSubview:sendingView];
     
    
-    [flexibleSpace  release];
-    [cancelButton   release];
-    [doneButton     release];
-    [nextButton     release];
-    [previousButton release];
 }
 
 #pragma mark -
@@ -244,7 +239,6 @@
     //[createAccountViewController setModalTransitionStyle:UIModalTransitionStylePartialCurl];
     [self presentViewController:createAccountViewController animated:YES completion:NULL ];
     //[self.navigationController pushViewController:createAccountViewController animated:YES];
-    [createAccountViewController release];
 
 
 }
@@ -252,7 +246,6 @@
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Forgot Password" message:@"Please, enter your email address." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
     [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
     [alert show];
-    [alert release];
 }
 -(IBAction)valueChanged:(id)sender{
     UIBarButtonItem * doneButton = [[self.keyboardToolbar items] objectAtIndex:4];
@@ -311,7 +304,6 @@
             self.passwordField.text = @"";
         }
         }
-        [dict release];
 
         //[paths release];
     }
@@ -324,7 +316,6 @@
         ServerConnection *sconnecton = [[ServerConnection alloc]init];
         if ([[alertView textFieldAtIndex:0].text checkEmailFormat] ) {
             [sconnecton forgotPassword:[alertView textFieldAtIndex:0].text];
-            [sconnecton release];
             [self errorWithTitle:@"Forgot Password" andDescription:@"An email will be sent to you with your username and a new password."];
         }
         else{
@@ -414,7 +405,6 @@
 
     
     self.tabBarController.viewControllers = @[self.navController1,viewcontroller,self.navController3];
-    [viewcontroller release];
     NSFileManager * filemng = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSString *path = [[NSString alloc] initWithString:[[documentsDirectory stringByAppendingPathComponent:self.usernameField.text] stringByAppendingPathComponent:@"profilepicture.jpg" ]];
@@ -523,7 +513,6 @@
             }
             
         }
-        [imagePicker release];
         
         switch ([[NSUserDefaults standardUserDefaults] integerForKey:@"previousTab"]) {
             case 0:
@@ -625,7 +614,7 @@
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
     
-    NSString *location = [[[NSString alloc] initWithString:@""] autorelease];
+    NSString *location = [[NSString alloc] initWithString:@""];
     
     if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
         location = [[locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
@@ -687,22 +676,18 @@
 
 - (void)dealloc{
     
-    [self.scrollView             release];
-    [self.usernameField          release];
-    [self.passwordField          release];
-    [self.keyboardToolbar        release];
-    [self.signInButton           release];
-    [self.forgotPasswordButton   release];
-    [self.createAccountButton    release];
-    [self.tabBarController       release];
-    [self.navController1         release];
-    [self.navController3         release];
-    [self.galleryViewController  release];
-    [self.settingsViewController release];
-    [sendingView release];
-    [sConnection release];
-    [locationMng release];
-    [super dealloc];
+    self.scrollView;
+    self.usernameField;
+    self.passwordField;
+    self.keyboardToolbar;
+    self.signInButton;
+    self.forgotPasswordButton;
+    self.createAccountButton;
+    self.tabBarController;
+    self.navController1;
+    self.navController3;
+    self.galleryViewController;
+    self.settingsViewController;
     
 }
 @end

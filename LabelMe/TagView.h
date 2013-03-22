@@ -41,10 +41,10 @@
     CGRect                  visibleFrame;
 
 }
-@property (nonatomic, assign) id <TagViewDelegate> delegate;
-@property (nonatomic, retain) NSMutableArray *objects;
+@property (nonatomic, weak) id <TagViewDelegate> delegate;
+@property (nonatomic, strong) NSMutableArray *objects;
 //@property (nonatomic, retain) UITextField *label;
-@property (nonatomic, retain) NSArray *colorArray;
+@property (nonatomic, strong) NSArray *colorArray;
 
 
 
