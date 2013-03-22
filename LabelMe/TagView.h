@@ -1,0 +1,66 @@
+//
+//  TagView.h
+//  LabelMe_work
+//
+//  Created by David Way on 4/4/12.
+//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "Box.h"
+
+
+@protocol TagViewDelegate <NSObject>
+
+@optional
+-(void)objectModified;
+-(void)selectedAnObject:(BOOL)value;
+-(void)hiddenTextField:(BOOL)value;
+-(void)stringLabel:(NSString *)string;
+-(void)correctOrientation:(CGPoint)upperLeft : (CGPoint)lowerRight SuperviewFrame:(CGRect)viewSize;
+
+@end
+@interface TagView : UIView{
+    NSMutableArray *   _objects;
+    //UITextField *           _label;
+    CGPoint                  firstLocation;
+    NSArray *               _colorArray;
+    
+    int                      selectedBox;
+    //int                      numLabels;
+    int                      corner;
+    BOOL                     move;
+    BOOL                     size;
+    
+    float                   UPPERBOUND;
+    float                   LOWERBOUND;
+    float                   LEFTBOUND;
+    float                   RIGHTBOUND;
+    float                   lineOriginal;
+    float                   LINEWIDTH;
+    CGRect                  visibleFrame;
+
+}
+@property (nonatomic, assign) id <TagViewDelegate> delegate;
+@property (nonatomic, retain) NSMutableArray *objects;
+//@property (nonatomic, retain) UITextField *label;
+@property (nonatomic, retain) NSArray *colorArray;
+
+
+
+-(void) setSelectedBox:(int) i;
+-(int) SelectedBox;
+/*-(void) setNumLabels:(int) i;
+-(int) numLabels;*/
+-(void) drawBox:(CGContextRef ) context:(Box *) box1:(CGFloat) alpha;
+-(void) drawSelectedBox:(CGContextRef ) context:(Box *) box;
+-(void) reset;
+-(void)setLINEWIDTH:(float)factor;
+-(int)whereIs:(CGPoint) point;
+-(int)boxInterior:(int) i:(CGPoint) point;
+-(void)setVisibleFrame:(CGRect)rect;
+-(CGRect)visibleFrame;
+//-(void)copyDictionary:(NSDictionary *)dict;
+
+
+@end
