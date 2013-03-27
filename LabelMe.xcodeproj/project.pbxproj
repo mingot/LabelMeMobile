@@ -180,6 +180,13 @@
 		FCED896317034CD70027CBE1 /* ConvolutionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED896217034CD70027CBE1 /* ConvolutionHelper.m */; };
 		FCED896817034D350027CBE1 /* UIImage+HOG.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED896717034D350027CBE1 /* UIImage+HOG.m */; };
 		FCED897017034F980027CBE1 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCED896F17034F980027CBE1 /* opencv2.framework */; };
+		FCED8972170350F80027CBE1 /* bottle.txt in Resources */ = {isa = PBXBuildFile; fileRef = FCED8971170350F80027CBE1 /* bottle.txt */; };
+		FCED8974170353FB0027CBE1 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCED8973170353FB0027CBE1 /* CoreMedia.framework */; };
+		FCED8976170354010027CBE1 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCED8975170354010027CBE1 /* CoreVideo.framework */; };
+		FCED897E170375050027CBE1 /* ShowTrainingSetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED897C170375050027CBE1 /* ShowTrainingSetViewController.m */; };
+		FCED897F170375050027CBE1 /* ShowTrainingSetViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCED897D170375050027CBE1 /* ShowTrainingSetViewController.xib */; };
+		FCED898317037A5F0027CBE1 /* ShowImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED898117037A5F0027CBE1 /* ShowImageViewController.m */; };
+		FCED898417037A5F0027CBE1 /* ShowImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -398,6 +405,15 @@
 		FCED896617034D350027CBE1 /* UIImage+HOG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+HOG.h"; sourceTree = "<group>"; };
 		FCED896717034D350027CBE1 /* UIImage+HOG.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+HOG.m"; sourceTree = "<group>"; };
 		FCED896F17034F980027CBE1 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
+		FCED8971170350F80027CBE1 /* bottle.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bottle.txt; sourceTree = "<group>"; };
+		FCED8973170353FB0027CBE1 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		FCED8975170354010027CBE1 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		FCED897B170375050027CBE1 /* ShowTrainingSetViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowTrainingSetViewController.h; sourceTree = "<group>"; };
+		FCED897C170375050027CBE1 /* ShowTrainingSetViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowTrainingSetViewController.m; sourceTree = "<group>"; };
+		FCED897D170375050027CBE1 /* ShowTrainingSetViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ShowTrainingSetViewController.xib; sourceTree = "<group>"; };
+		FCED898017037A5F0027CBE1 /* ShowImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowImageViewController.h; sourceTree = "<group>"; };
+		FCED898117037A5F0027CBE1 /* ShowImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowImageViewController.m; sourceTree = "<group>"; };
+		FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ShowImageViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -405,6 +421,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCED8976170354010027CBE1 /* CoreVideo.framework in Frameworks */,
+				FCED8974170353FB0027CBE1 /* CoreMedia.framework in Frameworks */,
 				FCED897017034F980027CBE1 /* opencv2.framework in Frameworks */,
 				A5FAFA0916430D37002B56B4 /* AssetsLibrary.framework in Frameworks */,
 				A5D91D171641ECEF00EA0442 /* QuartzCore.framework in Frameworks */,
@@ -425,6 +443,7 @@
 		A5480D6C16178868009F630D /* XIB files */ = {
 			isa = PBXGroup;
 			children = (
+				FCED897A170362270027CBE1 /* Detector */,
 				A558D63816134F79001DED8C /* SignInViewController_iPhone.xib */,
 				A54E1840164C77A000369509 /* SignInViewController_iPad.xib */,
 				A558D63F16136DD2001DED8C /* SignInViewController_iPhone5.xib */,
@@ -450,10 +469,6 @@
 				A537747A165C3E9900BF0649 /* CreditsViewController_iPhone.xib */,
 				A5377488165C506C00BF0649 /* CreditsViewController_iPad.xib */,
 				A537748A165C51C300BF0649 /* CreditsViewController_iPhone5.xib */,
-				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
-				FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */,
-				FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */,
-				FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */,
 			);
 			name = "XIB files";
 			sourceTree = "<group>";
@@ -476,6 +491,8 @@
 		A558D60A16134E0B001DED8C = {
 			isa = PBXGroup;
 			children = (
+				FCED8975170354010027CBE1 /* CoreVideo.framework */,
+				FCED8973170353FB0027CBE1 /* CoreMedia.framework */,
 				FC5C93A116FCB8C800637B69 /* app-login-A@2x-568h@2x.png */,
 				FC5C939F16FCB8BF00637B69 /* app-login-A@2x-Portrait.png */,
 				FC5C939D16FCB8AE00637B69 /* cruz.png */,
@@ -546,6 +563,7 @@
 		A558D62016134E0C001DED8C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				FCED8971170350F80027CBE1 /* bottle.txt */,
 				A5A2FF94162A324800918301 /* nophoto.gif */,
 				A5F2D2511624DF50002955C2 /* badgenaranja.png */,
 				A5833CAA1624AABF005D9757 /* badgerojo.png */,
@@ -690,10 +708,14 @@
 				FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */,
 				FC5C93A816FCFA8F00637B69 /* DetectorDescriptionViewController.h */,
 				FC5C93A916FCFA9000637B69 /* DetectorDescriptionViewController.m */,
-				FC5C93AD16FCFE8C00637B69 /* TrainDetectorViewController.h */,
-				FC5C93AE16FCFE8D00637B69 /* TrainDetectorViewController.m */,
 				FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */,
 				FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */,
+				FC5C93AD16FCFE8C00637B69 /* TrainDetectorViewController.h */,
+				FC5C93AE16FCFE8D00637B69 /* TrainDetectorViewController.m */,
+				FCED897B170375050027CBE1 /* ShowTrainingSetViewController.h */,
+				FCED897C170375050027CBE1 /* ShowTrainingSetViewController.m */,
+				FCED898017037A5F0027CBE1 /* ShowImageViewController.h */,
+				FCED898117037A5F0027CBE1 /* ShowImageViewController.m */,
 				FCED895B17034CAF0027CBE1 /* DetectView.h */,
 				FCED895C17034CAF0027CBE1 /* DetectView.m */,
 				FCED896117034CD70027CBE1 /* ConvolutionHelper.h */,
@@ -729,6 +751,19 @@
 				A5480D7616179D8E009F630D /* Box.m */,
 			);
 			name = Labelling;
+			sourceTree = "<group>";
+		};
+		FCED897A170362270027CBE1 /* Detector */ = {
+			isa = PBXGroup;
+			children = (
+				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
+				FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */,
+				FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */,
+				FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */,
+				FCED897D170375050027CBE1 /* ShowTrainingSetViewController.xib */,
+				FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */,
+			);
+			name = Detector;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -913,6 +948,9 @@
 				FC5C93AC16FCFA9200637B69 /* DetectorDescriptionViewController.xib in Resources */,
 				FC5C93B116FCFE8F00637B69 /* TrainDetectorViewController.xib in Resources */,
 				FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */,
+				FCED8972170350F80027CBE1 /* bottle.txt in Resources */,
+				FCED897F170375050027CBE1 /* ShowTrainingSetViewController.xib in Resources */,
+				FCED898417037A5F0027CBE1 /* ShowImageViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -955,6 +993,8 @@
 				FCED896017034CCA0027CBE1 /* Classifier.mm in Sources */,
 				FCED896317034CD70027CBE1 /* ConvolutionHelper.m in Sources */,
 				FCED896817034D350027CBE1 /* UIImage+HOG.m in Sources */,
+				FCED897E170375050027CBE1 /* ShowTrainingSetViewController.m in Sources */,
+				FCED898317037A5F0027CBE1 /* ShowImageViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -24,8 +24,8 @@
     // correction of the aspect fill of prevLayer
     // FIXME: hardcoded numbers
     CGFloat offset, scale;
-    offset = self.frame.size.width*0.08/2.0;
-    scale = 1.3;
+    offset = 0;//self.frame.size.width*0.08/2.0;
+    scale = 1; //1.3;
     
     // Drawing code
     if (self.corners.count!=0)

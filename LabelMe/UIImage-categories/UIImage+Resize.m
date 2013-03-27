@@ -21,12 +21,63 @@
 // Returns a copy of this image that is cropped to the given bounds.
 // The bounds will be adjusted using CGRectIntegral.
 // This method ignores the image's imageOrientation setting.
-- (UIImage *)croppedImage:(CGRect)bounds {
-    CGImageRef imageRef = CGImageCreateWithImageInRect([self CGImage], bounds);
-    UIImage *croppedImage = [UIImage imageWithCGImage:imageRef];
+//- (UIImage *)croppedImage:(CGRect)bounds {
+//    CGImageRef imageRef = CGImageCreateWithImageInRect([self CGImage], bounds);
+//    UIImage *croppedImage = [UIImage imageWithCGImage:imageRef];
+//    CGImageRelease(imageRef);
+//    return croppedImage;
+//}
+
+- (UIImage *)croppedImage: (CGRect)bounds
+{
+    
+    CGAffineTransform txTranslate;
+    CGAffineTransform txCompound;
+    CGRect adjustedBounds;
+    BOOL drawTransposed;
+    
+    switch (self.imageOrientation) {
+        case UIImageOrientationDown:
+        case UIImageOrientationDownMirrored:
+            txTranslate = CGAffineTransformMakeTranslation(self.size.width, self.size.height);
+            txCompound = CGAffineTransformRotate(txTranslate, M_PI);
+            adjustedBounds = CGRectApplyAffineTransform(bounds, txCompound);
+            drawTransposed = NO;
+            break;
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+            txTranslate = CGAffineTransformMakeTranslation(self.size.height, 0.0);
+            txCompound = CGAffineTransformRotate(txTranslate, M_PI_2);
+            adjustedBounds = CGRectApplyAffineTransform(bounds, txCompound);
+            drawTransposed = YES;
+            break;
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            txTranslate = CGAffineTransformMakeTranslation(0.0, self.size.width);
+            txCompound = CGAffineTransformRotate(txTranslate, M_PI + M_PI_2);
+            adjustedBounds = CGRectApplyAffineTransform(bounds, txCompound);
+            drawTransposed = YES;
+            break;
+        default:
+            adjustedBounds = bounds;
+            drawTransposed = NO;
+    }
+    
+    CGImageRef imageRef = CGImageCreateWithImageInRect([self CGImage], adjustedBounds);
+    UIImage *croppedImage;
+    if (CGRectEqualToRect(adjustedBounds, bounds))
+        croppedImage = [UIImage imageWithCGImage:imageRef];
+    else
+        croppedImage = [[UIImage imageWithCGImage:imageRef] resizedImage:bounds.size
+                                                               transform:[self transformForOrientation:bounds.size]
+                                                          drawTransposed:drawTransposed
+                                                    interpolationQuality:kCGInterpolationHigh];
+    
+    //clean
     CGImageRelease(imageRef);
     return croppedImage;
 }
+
 
 // Returns a copy of this image that is squared to the thumbnail size.
 // If transparentBorder is non-zero, a transparent border of the given size will be added around the edges of the thumbnail. (Adding a transparent border of at least one pixel in size has the side-effect of antialiasing the edges of the image when rotating it using Core Animation.)
@@ -293,5 +344,49 @@
     //
     //    return [cropFilter imageFromCurrentlyProcessedOutput];
 }
+
+
+// Returns an affine transform that takes into account the image orientation when drawing a scaled image
+- (CGAffineTransform)transformForOrientation:(CGSize)newSize
+{
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    
+    switch (self.imageOrientation) {
+        case UIImageOrientationDown:           // EXIF = 3
+        case UIImageOrientationDownMirrored:   // EXIF = 4
+            transform = CGAffineTransformTranslate(transform, newSize.width, newSize.height);
+            transform = CGAffineTransformRotate(transform, M_PI);
+            break;
+            
+        case UIImageOrientationLeft:           // EXIF = 6
+        case UIImageOrientationLeftMirrored:   // EXIF = 5
+            transform = CGAffineTransformTranslate(transform, newSize.width, 0);
+            transform = CGAffineTransformRotate(transform, M_PI_2);
+            break;
+            
+        case UIImageOrientationRight:          // EXIF = 8
+        case UIImageOrientationRightMirrored:  // EXIF = 7
+            transform = CGAffineTransformTranslate(transform, 0, newSize.height);
+            transform = CGAffineTransformRotate(transform, -M_PI_2);
+            break;
+    }
+    
+    switch (self.imageOrientation) {
+        case UIImageOrientationUpMirrored:     // EXIF = 2
+        case UIImageOrientationDownMirrored:   // EXIF = 4
+            transform = CGAffineTransformTranslate(transform, newSize.width, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+            
+        case UIImageOrientationLeftMirrored:   // EXIF = 5
+        case UIImageOrientationRightMirrored:  // EXIF = 7
+            transform = CGAffineTransformTranslate(transform, newSize.height, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+    }
+    
+    return transform;
+}
+
 
 @end
