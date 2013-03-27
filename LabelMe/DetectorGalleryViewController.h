@@ -7,12 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DetectorDescriptionViewController.h"
 
 @interface DetectorGalleryViewController : UIViewController <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource>
 
 
 @property (nonatomic, strong) NSMutableArray *detectors;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (nonatomic, strong) DetectorDescriptionViewController *detectorController;
 
 
 

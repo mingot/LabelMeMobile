@@ -169,6 +169,17 @@
 		FC5C93A216FCB8C800637B69 /* app-login-A@2x-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93A116FCB8C800637B69 /* app-login-A@2x-568h@2x.png */; };
 		FC5C93A616FCE3A100637B69 /* DetectorGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */; };
 		FC5C93A716FCE3A100637B69 /* DetectorGalleryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */; };
+		FC5C93AB16FCFA9200637B69 /* DetectorDescriptionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93A916FCFA9000637B69 /* DetectorDescriptionViewController.m */; };
+		FC5C93AC16FCFA9200637B69 /* DetectorDescriptionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */; };
+		FC5C93B016FCFE8F00637B69 /* TrainDetectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93AE16FCFE8D00637B69 /* TrainDetectorViewController.m */; };
+		FC5C93B116FCFE8F00637B69 /* TrainDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */; };
+		FC5C93B516FCFEAB00637B69 /* ExecuteDetectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */; };
+		FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */; };
+		FCED895D17034CAF0027CBE1 /* DetectView.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED895C17034CAF0027CBE1 /* DetectView.m */; };
+		FCED896017034CCA0027CBE1 /* Classifier.mm in Sources */ = {isa = PBXBuildFile; fileRef = FCED895F17034CCA0027CBE1 /* Classifier.mm */; };
+		FCED896317034CD70027CBE1 /* ConvolutionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED896217034CD70027CBE1 /* ConvolutionHelper.m */; };
+		FCED896817034D350027CBE1 /* UIImage+HOG.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED896717034D350027CBE1 /* UIImage+HOG.m */; };
+		FCED897017034F980027CBE1 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCED896F17034F980027CBE1 /* opencv2.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -369,6 +380,24 @@
 		FC5C93A316FCE39F00637B69 /* DetectorGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectorGalleryViewController.h; sourceTree = "<group>"; };
 		FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectorGalleryViewController.m; sourceTree = "<group>"; };
 		FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetectorGalleryViewController.xib; sourceTree = "<group>"; };
+		FC5C93A816FCFA8F00637B69 /* DetectorDescriptionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectorDescriptionViewController.h; sourceTree = "<group>"; };
+		FC5C93A916FCFA9000637B69 /* DetectorDescriptionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectorDescriptionViewController.m; sourceTree = "<group>"; };
+		FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetectorDescriptionViewController.xib; sourceTree = "<group>"; };
+		FC5C93AD16FCFE8C00637B69 /* TrainDetectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrainDetectorViewController.h; sourceTree = "<group>"; };
+		FC5C93AE16FCFE8D00637B69 /* TrainDetectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrainDetectorViewController.m; sourceTree = "<group>"; };
+		FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TrainDetectorViewController.xib; sourceTree = "<group>"; };
+		FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExecuteDetectorViewController.h; sourceTree = "<group>"; };
+		FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExecuteDetectorViewController.m; sourceTree = "<group>"; };
+		FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ExecuteDetectorViewController.xib; sourceTree = "<group>"; };
+		FCED895B17034CAF0027CBE1 /* DetectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectView.h; sourceTree = "<group>"; };
+		FCED895C17034CAF0027CBE1 /* DetectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectView.m; sourceTree = "<group>"; };
+		FCED895E17034CCA0027CBE1 /* Classifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Classifier.h; sourceTree = "<group>"; };
+		FCED895F17034CCA0027CBE1 /* Classifier.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Classifier.mm; sourceTree = "<group>"; };
+		FCED896117034CD70027CBE1 /* ConvolutionHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConvolutionHelper.h; sourceTree = "<group>"; };
+		FCED896217034CD70027CBE1 /* ConvolutionHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConvolutionHelper.m; sourceTree = "<group>"; };
+		FCED896617034D350027CBE1 /* UIImage+HOG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+HOG.h"; sourceTree = "<group>"; };
+		FCED896717034D350027CBE1 /* UIImage+HOG.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+HOG.m"; sourceTree = "<group>"; };
+		FCED896F17034F980027CBE1 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -376,6 +405,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCED897017034F980027CBE1 /* opencv2.framework in Frameworks */,
 				A5FAFA0916430D37002B56B4 /* AssetsLibrary.framework in Frameworks */,
 				A5D91D171641ECEF00EA0442 /* QuartzCore.framework in Frameworks */,
 				A55A844F162CD34C00C917DD /* SystemConfiguration.framework in Frameworks */,
@@ -421,6 +451,9 @@
 				A5377488165C506C00BF0649 /* CreditsViewController_iPad.xib */,
 				A537748A165C51C300BF0649 /* CreditsViewController_iPhone5.xib */,
 				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
+				FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */,
+				FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */,
+				FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */,
 			);
 			name = "XIB files";
 			sourceTree = "<group>";
@@ -428,6 +461,8 @@
 		A5480D781617A364009F630D /* UIImage-categories */ = {
 			isa = PBXGroup;
 			children = (
+				FCED896617034D350027CBE1 /* UIImage+HOG.h */,
+				FCED896717034D350027CBE1 /* UIImage+HOG.m */,
 				A5480D791617A364009F630D /* UIImage+Alpha.h */,
 				A5480D7A1617A364009F630D /* UIImage+Alpha.m */,
 				A5480D7B1617A364009F630D /* UIImage+Resize.h */,
@@ -468,6 +503,7 @@
 		A558D61816134E0C001DED8C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FCED896F17034F980027CBE1 /* opencv2.framework */,
 				A5FAFA0816430D37002B56B4 /* AssetsLibrary.framework */,
 				A5D91D161641ECEF00EA0442 /* QuartzCore.framework */,
 				A55A844E162CD34C00C917DD /* SystemConfiguration.framework */,
@@ -485,6 +521,8 @@
 		A558D61F16134E0C001DED8C /* LabelMe */ = {
 			isa = PBXGroup;
 			children = (
+				FC5C93B816FD017100637B69 /* Labelling */,
+				FC5C93B716FD014200637B69 /* Detector */,
 				A55A8447162CCFAA00C917DD /* Reachability.h */,
 				A55A8448162CCFAA00C917DD /* Reachability.m */,
 				A5949C7D1625E18500627709 /* CustomBadge.h */,
@@ -497,28 +535,6 @@
 				A558D63716134F79001DED8C /* SignInViewController.m */,
 				A564641A1614BA0D007D444E /* CreateAccountViewController.h */,
 				A564641B1614BA0D007D444E /* CreateAccountViewController.m */,
-				A5CAAF4E16163A870095D703 /* GalleryViewController.h */,
-				A5CAAF4F16163A870095D703 /* GalleryViewController.m */,
-				A5480D6716176CEB009F630D /* CameraOverlayViewController.h */,
-				A5480D6816176CEB009F630D /* CameraOverlayViewController.m */,
-				A5A567721617D756008AFE2E /* SettingsViewController.h */,
-				A5A567731617D756008AFE2E /* SettingsViewController.m */,
-				A5C8BFCC162F4EC4009A39E0 /* ResolutionViewController.h */,
-				A5C8BFCD162F4EC4009A39E0 /* ResolutionViewController.m */,
-				A52C36761617C99400FEF74D /* TagViewController.h */,
-				A52C36771617C99400FEF74D /* TagViewController.m */,
-				A5817E02165932720061FE67 /* WebsiteViewController.h */,
-				A5817E03165932720061FE67 /* WebsiteViewController.m */,
-				A5377478165C3E9900BF0649 /* CreditsViewController.h */,
-				A5377479165C3E9900BF0649 /* CreditsViewController.m */,
-				A5480D721617969A009F630D /* TagView.h */,
-				A5480D731617969A009F630D /* TagView.m */,
-				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
-				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
-				A5480D7516179D8E009F630D /* Box.h */,
-				A5480D7616179D8E009F630D /* Box.m */,
-				FC5C93A316FCE39F00637B69 /* DetectorGalleryViewController.h */,
-				FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */,
 				A5480D6C16178868009F630D /* XIB files */,
 				A558D64C1613A365001DED8C /* Categories */,
 				A558D64116138D37001DED8C /* Icons */,
@@ -632,9 +648,9 @@
 		A558D64C1613A365001DED8C /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				A5480D781617A364009F630D /* UIImage-categories */,
 				A510E0EC161B857400BC1B3A /* UITextField+CorrectOrientation.h */,
 				A510E0ED161B857400BC1B3A /* UITextField+CorrectOrientation.m */,
-				A5480D781617A364009F630D /* UIImage-categories */,
 				A5480D5E16173525009F630D /* NSObject+Folders.h */,
 				A5480D5F16173525009F630D /* NSObject+Folders.m */,
 				A558D6451613A29C001DED8C /* NSObject+ShowAlert.h */,
@@ -665,6 +681,54 @@
 				A5CAAF42161637D70095D703 /* uitabbar_selection_indicator.png */,
 			);
 			path = iconos_labelmeapp;
+			sourceTree = "<group>";
+		};
+		FC5C93B716FD014200637B69 /* Detector */ = {
+			isa = PBXGroup;
+			children = (
+				FC5C93A316FCE39F00637B69 /* DetectorGalleryViewController.h */,
+				FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */,
+				FC5C93A816FCFA8F00637B69 /* DetectorDescriptionViewController.h */,
+				FC5C93A916FCFA9000637B69 /* DetectorDescriptionViewController.m */,
+				FC5C93AD16FCFE8C00637B69 /* TrainDetectorViewController.h */,
+				FC5C93AE16FCFE8D00637B69 /* TrainDetectorViewController.m */,
+				FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */,
+				FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */,
+				FCED895B17034CAF0027CBE1 /* DetectView.h */,
+				FCED895C17034CAF0027CBE1 /* DetectView.m */,
+				FCED896117034CD70027CBE1 /* ConvolutionHelper.h */,
+				FCED896217034CD70027CBE1 /* ConvolutionHelper.m */,
+				FCED895E17034CCA0027CBE1 /* Classifier.h */,
+				FCED895F17034CCA0027CBE1 /* Classifier.mm */,
+			);
+			name = Detector;
+			sourceTree = "<group>";
+		};
+		FC5C93B816FD017100637B69 /* Labelling */ = {
+			isa = PBXGroup;
+			children = (
+				A5CAAF4E16163A870095D703 /* GalleryViewController.h */,
+				A5CAAF4F16163A870095D703 /* GalleryViewController.m */,
+				A5480D6716176CEB009F630D /* CameraOverlayViewController.h */,
+				A5480D6816176CEB009F630D /* CameraOverlayViewController.m */,
+				A5A567721617D756008AFE2E /* SettingsViewController.h */,
+				A5A567731617D756008AFE2E /* SettingsViewController.m */,
+				A5C8BFCC162F4EC4009A39E0 /* ResolutionViewController.h */,
+				A5C8BFCD162F4EC4009A39E0 /* ResolutionViewController.m */,
+				A52C36761617C99400FEF74D /* TagViewController.h */,
+				A52C36771617C99400FEF74D /* TagViewController.m */,
+				A5817E02165932720061FE67 /* WebsiteViewController.h */,
+				A5817E03165932720061FE67 /* WebsiteViewController.m */,
+				A5377478165C3E9900BF0649 /* CreditsViewController.h */,
+				A5377479165C3E9900BF0649 /* CreditsViewController.m */,
+				A5480D721617969A009F630D /* TagView.h */,
+				A5480D731617969A009F630D /* TagView.m */,
+				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
+				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
+				A5480D7516179D8E009F630D /* Box.h */,
+				A5480D7616179D8E009F630D /* Box.m */,
+			);
+			name = Labelling;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -846,6 +910,9 @@
 				A5B8F9EF166568E200D8F73A /* silueta.png in Resources */,
 				A5B8F9F0166568E200D8F73A /* silueta@2x.png in Resources */,
 				FC5C93A716FCE3A100637B69 /* DetectorGalleryViewController.xib in Resources */,
+				FC5C93AC16FCFA9200637B69 /* DetectorDescriptionViewController.xib in Resources */,
+				FC5C93B116FCFE8F00637B69 /* TrainDetectorViewController.xib in Resources */,
+				FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -881,6 +948,13 @@
 				A5817E05165932720061FE67 /* WebsiteViewController.m in Sources */,
 				A537747B165C3E9900BF0649 /* CreditsViewController.m in Sources */,
 				FC5C93A616FCE3A100637B69 /* DetectorGalleryViewController.m in Sources */,
+				FC5C93AB16FCFA9200637B69 /* DetectorDescriptionViewController.m in Sources */,
+				FC5C93B016FCFE8F00637B69 /* TrainDetectorViewController.m in Sources */,
+				FC5C93B516FCFEAB00637B69 /* ExecuteDetectorViewController.m in Sources */,
+				FCED895D17034CAF0027CBE1 /* DetectView.m in Sources */,
+				FCED896017034CCA0027CBE1 /* Classifier.mm in Sources */,
+				FCED896317034CD70027CBE1 /* ConvolutionHelper.m in Sources */,
+				FCED896817034D350027CBE1 /* UIImage+HOG.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -977,6 +1051,12 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/..\"",
+					"\"$(SRCROOT)/../DetectMe\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "LabelMe/LabelMe-Prefix.pch";
 				INFOPLIST_FILE = "LabelMe/LabelMe-Info.plist";
@@ -993,6 +1073,12 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/..\"",
+					"\"$(SRCROOT)/../DetectMe\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "LabelMe/LabelMe-Prefix.pch";
 				INFOPLIST_FILE = "LabelMe/LabelMe-Info.plist";
@@ -1009,6 +1095,12 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/..\"",
+					"\"$(SRCROOT)/../DetectMe\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "LabelMe/LabelMe-Prefix.pch";
 				INFOPLIST_FILE = "LabelMe/LabelMe-Info.plist";

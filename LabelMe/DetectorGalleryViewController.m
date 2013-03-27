@@ -18,6 +18,7 @@
 
 @synthesize detectors = _detectors;
 @synthesize tableView = _tableView;
+@synthesize detectorController = _detectorController;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -37,6 +38,9 @@
     self.title = @"Detectors Gallery";
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(Edit:)];
     [self.navigationItem setLeftBarButtonItem:addButton];
+    self.detectorController = [[DetectorDescriptionViewController alloc]initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
+    
+    
     [super viewDidLoad];
 }
 
@@ -57,17 +61,17 @@
     static NSString *CellIdentifier = @"Cell";
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier];
-        cell.hidesAccessoryWhenEditing = YES;
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     int count = 0;
     if(self.editing && indexPath.row != 0)
         count = 1;
     if(indexPath.row == ([self.detectors count]) && self.editing){
-        cell.text = @"Add Data";
+        cell.textLabel.text = @"Add Data";
         return cell;
     }
-    cell.text = [self.detectors objectAtIndex:indexPath.row];
+    cell.textLabel.text = [self.detectors objectAtIndex:indexPath.row];
     return cell;
 }
 
@@ -144,7 +148,13 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 
-
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (self.editing == NO) {
+        self.detectorController.title = [self.detectors objectAtIndex:indexPath.row];
+        [self.navigationController pushViewController:self.detectorController animated:YES];
+    }
+}
 
 
 
@@ -152,4 +162,8 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     [self setTableView:nil];
     [super viewDidUnload];
 }
+
+
+
+
 @end
