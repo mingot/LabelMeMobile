@@ -34,7 +34,7 @@
 
 - (void)viewDidLoad
 {
-    self.detectors = [[NSMutableArray alloc] initWithObjects:@"SunDay",@"MonDay",@"TuesDay",@"WednesDay",@"Thus  Day",@"FriDay",@"SaturDay",nil];
+    self.detectors = [[NSMutableArray alloc] initWithObjects:@"car",@"bottle",@"cat",nil];
     self.title = @"Detectors Gallery";
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(Edit:)];
     [self.navigationItem setLeftBarButtonItem:addButton];
@@ -152,7 +152,11 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self.editing == NO) {
         self.detectorController.title = [self.detectors objectAtIndex:indexPath.row];
+        self.detectorController.classifierName = self.detectorController.title;
+        self.detectorController.classToLearn = self.detectorController.title;
+        self.detectorController.view = nil; //to reexecute viewDidLoad
         [self.navigationController pushViewController:self.detectorController animated:YES];
+        
     }
 }
 

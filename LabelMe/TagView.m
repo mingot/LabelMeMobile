@@ -23,6 +23,8 @@
 @synthesize  objects = _objects;
 @synthesize  colorArray = _colorArray;
 //@synthesize  label = _label;
+
+
 #pragma mark -
 #pragma mark  Init
 - (id)initWithFrame:(CGRect)frame

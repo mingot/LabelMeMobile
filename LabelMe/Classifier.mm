@@ -170,6 +170,7 @@ using namespace cv;
 
 - (id) initWithTemplateWeights:(double *)templateWeights
 {
+        
     if(self = [super init])
     {
         self.weightsDimensions = (int *) malloc(3*sizeof(int));

@@ -262,6 +262,8 @@
     }
     return  ret;
 }
+
+
 -(UIImage * ) addBorderTo:(UIImage *)image{
     CGImageRef bgimage = [image CGImage];
 	float width = CGImageGetWidth(bgimage);
@@ -397,7 +399,8 @@
 
     }
 }
--(void)imageDidSelectedWithIndex:(int)selectedImage{
+-(void)imageDidSelectedWithIndex:(int)selectedImage
+{
     NSString *path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.items objectAtIndex:selectedImage]   ];
     
     //NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
@@ -419,8 +422,9 @@
     self.tagViewController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.tagViewController animated:YES];
     
-    
 }
+
+
 -(IBAction)listSendAction:(id)sender{
     /*[self.usernameLabel setHidden:YES];
     [self.progressView setHidden:NO];

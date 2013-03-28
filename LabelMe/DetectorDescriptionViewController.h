@@ -15,10 +15,18 @@
 
 @property (strong, nonatomic) TrainDetectorViewController *trainController;
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
+@property (strong, nonatomic) Classifier *svmClassifier;
+@property (strong, nonatomic) NSString *classifierName;
+@property (strong, nonatomic) NSString *classToLearn;
+@property (weak, nonatomic) IBOutlet UIButton *executeButton;
+@property (weak, nonatomic) IBOutlet UILabel *classifierNameLabel;
+@property (weak, nonatomic) IBOutlet UILabel *classToLearnLabel;
+
 
 
 - (IBAction)trainAction:(id)sender;
 - (IBAction)executeAction:(id)sender;
+- (IBAction)trainFromSetAction:(id)sender;
 
 
 

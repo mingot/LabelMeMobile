@@ -213,49 +213,10 @@ static float LINEWIDTH = 6;
     NSString *day = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(8, 2)]];
     NSString *year = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(0, 4)]];
     NSString *month = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(5, 2)]];
-    NSString *month2 = nil;
     int m = [month intValue];
-    switch (m) {
-        case 1:
-            month2 = [[NSString alloc] initWithString:@"Jan"];
-
-            break;
-        case 2:
-            month2 = [[NSString alloc] initWithString:@"Feb"];
-            break;
-        case 3:
-            month2 = [[NSString alloc] initWithString:@"Mar"];
-            break;
-        case 4:
-            month2 = [[NSString alloc] initWithString:@"Apr"];
-            break;
-        case 5:
-            month2 = [[NSString alloc] initWithString:@"May"];
-            break;
-        case 6:
-            month2 = [[NSString alloc] initWithString:@"Jun"];
-            break;
-        case 7:
-            month2 = [[NSString alloc] initWithString:@"Jul"];
-            break;
-        case 8:
-            month2 = [[NSString alloc] initWithString:@"Aug"];
-            break;
-        case 9:
-            month2 = [[NSString alloc] initWithString:@"Sep"];
-            break;
-        case 10:
-            month2 = [[NSString alloc] initWithString:@"Oct"];
-            break;
-        case 11:
-            month2 = [[NSString alloc] initWithString:@"Nov"];
-            break;
-        case 12:
-            month2 = [[NSString alloc] initWithString:@"Dec"];
-            break;
-        default:
-            break;
-    }
+    
+    NSArray *months = [[NSArray alloc] initWithObjects:@"Jan",@"Feb",@"Mar",@"Apr",@"May",@"Jun",@"Jul",@"Aug",@"Sep",@"Oct",@"Nov",@"Dec",nil];
+    NSString *month2 = [months objectAtIndex:m-1];
     NSString *tmp = [[NSString alloc] initWithFormat:@"%@-%@-%@-%@",day,month2,year,time ];
     self.date = tmp;
 }
@@ -282,6 +243,7 @@ static float LINEWIDTH = 6;
     }
     return self;
 }
+
 - (void) encodeWithCoder:(NSCoder *)aCoder{
     [aCoder encodeObject: self.label forKey:@"label"];
     [aCoder encodeObject:self.color forKey:@"color"];
@@ -296,13 +258,13 @@ static float LINEWIDTH = 6;
     [aCoder encodeFloat:LEFTBOUND forKey:@"LEFTBOUND"];
     [aCoder encodeFloat:LINEWIDTH forKey:@"LINEWIDTH"];
     [aCoder encodeBool:sent forKey:@"sent"];
-
-
-
 }
+
+
 -(void)setSent:(BOOL)value{
     sent = value;
 }
+
 -(BOOL)sent{
     return sent;
 }
