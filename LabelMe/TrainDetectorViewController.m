@@ -15,7 +15,6 @@
 
 
 
-
 @interface TrainDetectorViewController ()
 {
     // change state when learnAction button is pressed
@@ -27,10 +26,6 @@
 @property UIBarButtonItem *numberOfTrainingButton; 
 
 @end
-
-
-
-
 
 
 
@@ -90,25 +85,31 @@
     
     // Previous layer to show the video image
 	self.prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
-    self.prevLayer.frame = self.detectView.frame;
 	self.prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
 	[self.view.layer addSublayer: self.prevLayer];
     
-    // detect view frame
-    ConvolutionPoint *detectFrame = [[ConvolutionPoint alloc] initWithRect:CGRectMake(3.0/8, 3.0/8, 1.0/4, 1.0/4) label:0 imageIndex:0];
-    [self.detectView setCorners:[[NSArray alloc] initWithObjects:detectFrame, nil]];
+    //detectView setting
+    self.detectView.prevLayer = self.prevLayer;
     [self.view addSubview:self.detectView];
 }
 
 
 - (void) viewDidAppear:(BOOL)animated
 {
-    //Start the capture
+    //set the frame here after all the navigation tabs have been uploaded and we have the definite frame size
+    self.prevLayer.frame = self.detectView.frame;
+    
+    //Insert the detect Frame in the view
+    ConvolutionPoint *detectFrame = [[ConvolutionPoint alloc] initWithRect:CGRectMake(3.0/8, 3.0/8, 1.0/4, 1.0/4) label:0 imageIndex:0];
+    [self.detectView setCorners:[[NSArray alloc] initWithObjects:detectFrame, nil]];
+    [self.detectView setNeedsDisplay];
+    
+    //Reset the number of training images in the button
     [self.numberOfTrainingButton setTitle:[NSString stringWithFormat:@"%d",self.trainingSet.images.count]];
+    
+    //Start the capture
     [self.captureSession startRunning];
 }
-
-
 
 
 - (void)viewDidUnload
@@ -152,7 +153,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         //We release some components
         CGContextRelease(newContext);
         CGColorSpaceRelease(colorSpace);
-        
         
         if(takePhoto) //Asynch for when the addButton (addAction) is pressed
         {

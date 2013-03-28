@@ -12,21 +12,6 @@
 
 
 
-@interface ConvolutionHelper : NSObject
-
-
-//Return the points with a score greater than -1
-+ (NSArray *) convolve:(UIImage *)image
-        withClassifier:(Classifier *)svmClassifier;
-
-+ (void) convolution:(double *)result matrixA:(double *)matrixA :(int *)sizeA matrixB:(double *)matrixB :(int *)sizeB;
-
-+ (NSArray *)nms:(NSArray *)convolutionPointsCandidates maxOverlapArea:(double)overlap minScoreThreshold:(double)scoreThreshold;
-
-@end
-
-
-
 @interface ConvolutionPoint : NSObject
 
 @property double score;
@@ -44,3 +29,22 @@
 - (double) fractionOfAreaOverlappingWith:(ConvolutionPoint *) cp;
 
 @end
+
+
+
+
+@interface ConvolutionHelper : NSObject
+
+
+//Return the points with a score greater than -1
++ (NSArray *) convolve:(UIImage *)image
+        withClassifier:(Classifier *)svmClassifier;
+
++ (void) convolution:(double *)result matrixA:(double *)matrixA :(int *)sizeA matrixB:(double *)matrixB :(int *)sizeB;
+
++ (NSArray *)nms:(NSArray *)convolutionPointsCandidates maxOverlapArea:(double)overlap minScoreThreshold:(double)scoreThreshold;
+
+@end
+
+
+

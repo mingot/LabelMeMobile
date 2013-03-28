@@ -95,11 +95,11 @@
     
     // Previous layer to show the video image
 	self.prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
-	self.prevLayer.frame = self.detectView.frame;
 	self.prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
 	[self.view.layer addSublayer: self.prevLayer];
     
     // Add subviews in front of  the prevLayer
+    self.detectView.prevLayer = self.prevLayer;
     [self.view addSubview:self.HOGimageView];
     [self.view addSubview:self.detectView];
     
@@ -108,11 +108,31 @@
 
 - (void) viewDidAppear:(BOOL)animated
 {
+    //set the frame here after all the navigation tabs have been uploaded and we have the definite frame size
+    self.prevLayer.frame = self.detectView.frame;
+    
     //Start the capture
     [self.captureSession startRunning];
 }
 
-
+- (ConvolutionPoint *) convertConvolutionPointForDetectView:(ConvolutionPoint *) cp
+{
+    ConvolutionPoint *newCP = [[ConvolutionPoint alloc] init];
+    double xmin = cp.ymin;
+    double ymin = 1 - cp.xmin;
+    double xmax = cp.ymax;
+    double ymax = 1 - cp.xmax;
+    
+    CGPoint upperLeft = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(xmin, ymin)];
+    CGPoint lowerRight = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(xmax, ymax)];
+    
+    newCP.xmin = upperLeft.x;
+    newCP.ymin = upperLeft.y;
+    newCP.xmax = lowerRight.x;
+    newCP.ymax = lowerRight.y;
+    
+    return newCP;
+}
 
 #pragma mark -
 #pragma mark AVCaptureSession delegate

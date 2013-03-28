@@ -1,4 +1,4 @@
-//
+                                                                                                                                                                                  //
 //  DetectView.h
 //  ImageG
 //
@@ -7,12 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 
 @interface DetectView : UIView
 
+// ConvolutionPoint Array of the detected boxes
 @property (nonatomic,strong) NSArray *corners;
+// To transform a point from the device reference to prevLayer reference
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer *prevLayer;
 
 
--(void)reset;
+- (void)reset;
 
 @end

@@ -11,42 +11,37 @@
 #import "math.h"
 
 
+static inline double min(double x, double y) { return (x <= y ? x : y); }
+static inline double max(double x, double y) { return (x <= y ? y : x); }
+
+
 @implementation DetectView
 
 @synthesize corners = _corners;
 
 
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
 {
-    
-    // correction of the aspect fill of prevLayer
-    // FIXME: hardcoded numbers
-    CGFloat offset, scale;
-    offset = 0;//self.frame.size.width*0.08/2.0;
-    scale = 1; //1.3;
-    
-    // Drawing code
-    if (self.corners.count!=0)
-    {
+
+    if (self.corners.count!=0){
         CGContextRef context = UIGraphicsGetCurrentContext();
         ConvolutionPoint *p;
         CGFloat x,y,w,h;
         
-        for (int i=0; i<self.corners.count; i++) 
-        {
-            p = [self.corners objectAtIndex:i];
+        for (int i=0; i<self.corners.count; i++){
+        
+            //convert the point from the device system of reference to the prevLayer system of reference
+            p = [self convertConvolutionPointForDetectView:[self.corners objectAtIndex:i]];
             
-            x = p.xmin * self.frame.size.width - offset;
-            y = p.ymin * self.frame.size.height;
-            w = (p.xmax - p.xmin)*self.frame.size.width*scale;
-            h = (p.ymax - p.ymin)*self.frame.size.height;
+            //set the rectangle within the current boundaries 
+            x = max(0,p.xmin);
+            y = max(0,p.ymin);
+            w = min(self.frame.size.width,p.xmax) - x;
+            h = min(self.frame.size.height,p.ymax) - y;
             
             
             CGRect box = CGRectMake(x, y, w, h);
-            if(i==0)
-            {
+            if(i==0){
                 CGContextSetLineWidth(context, 4);
                 CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
                 CGContextStrokeRect(context, box);
@@ -55,10 +50,27 @@
                 CGContextSetLineWidth(context, 1);
                 CGContextSetStrokeColorWithColor(context, [UIColor purpleColor].CGColor);
                 
-            }else CGContextStrokeRect(context, box );
+            }else CGContextStrokeRect(context, box);
         }
     }
 }
+
+
+- (ConvolutionPoint *) convertConvolutionPointForDetectView:(ConvolutionPoint *) cp
+{
+    ConvolutionPoint *newCP = [[ConvolutionPoint alloc] init];
+    
+    CGPoint upperLeft = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(cp.ymin, 1 - cp.xmin)];
+    CGPoint lowerRight = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(cp.ymax, 1 - cp.xmax)];
+    
+    newCP.xmin = upperLeft.x;
+    newCP.ymin = upperLeft.y;
+    newCP.xmax = lowerRight.x;
+    newCP.ymax = lowerRight.y;
+    
+    return newCP;
+}
+
 
 - (void)reset
 {
