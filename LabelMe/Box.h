@@ -10,39 +10,35 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Box : NSObject <NSCoding>{
+@interface Box : NSObject <NSCoding>
+{
     CGPoint upperLeft;
     CGPoint lowerRigth;
-    NSString *      _label;
-    UIColor *       _color;
-    NSString * _date;
-    float   UPPERBOUND;
-    float   LOWERBOUND;
-    float   LEFTBOUND;
-    float   RIGHTBOUND;
+    @public float   UPPERBOUND;
+    @public float   LOWERBOUND;
+    @public float   LEFTBOUND;
+    @public float   RIGHTBOUND;
     BOOL    sent;
-    //float   LINEWIDTH;
 }
 
 @property (strong, nonatomic) NSString *label;
 @property (strong, nonatomic) NSString *date;
-
 @property (strong, nonatomic) UIColor *color;
 
-- (id)initWithPoints:(CGPoint) upper:(CGPoint) lower;
 
--(void)setBounds:(CGRect)rect;
--(int) setUpperLeft:(CGPoint ) point;
--(int) setLowerRight:(CGPoint ) point;
--(CGPoint) upperLeft;
--(CGPoint) lowerRight;
--(void) updatePoints:(CGPoint) start:(CGPoint) end;
--(void) updateUpperLeft:(CGPoint) start:(CGPoint) end;
--(void) updateLowerRight:(CGPoint) start:(CGPoint) end;
--(CGPoint) bounds;
--(void)setSent:(BOOL)value;
--(BOOL)sent;
-+(void)setLINEWIDTH:(float)value;
--(void)generateDateString;
+- (id) initWithPoints:(CGPoint)upper :(CGPoint)lower;
+- (void) setBounds:(CGRect)rect;
+- (int) setUpperLeft:(CGPoint)point;
+- (int) setLowerRight:(CGPoint)point;
+- (CGPoint) upperLeft;
+- (CGPoint) lowerRight;
+- (void) updatePoints:(CGPoint)start :(CGPoint) end;
+- (void) updateUpperLeft:(CGPoint)start :(CGPoint) end;
+- (void) updateLowerRight:(CGPoint)start :(CGPoint) end;
+- (CGPoint) bounds;
+- (void) setSent:(BOOL)value;
+- (BOOL) sent;
++ (void) setLINEWIDTH:(float)value;
+- (void) generateDateString;
 
 @end

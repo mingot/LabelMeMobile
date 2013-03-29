@@ -62,6 +62,7 @@
 {
     self.imageController.title = [NSString stringWithFormat:@"Image%d", indexPath.row];
     self.imageController.imageView.image = [self.listOfImages objectAtIndex:indexPath.row];
+    self.imageController.imageView.contentMode = UIViewContentModeScaleAspectFit;
     [self.navigationController pushViewController:self.imageController animated:YES];
 }
 

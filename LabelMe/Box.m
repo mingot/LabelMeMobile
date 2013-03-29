@@ -24,8 +24,8 @@ static float LINEWIDTH = 6;
         // Initialization code here.
         upperLeft = CGPointMake(0, 0 );
         lowerRigth = CGPointMake(150, 150);
-        self.label= [[NSString alloc]initWithString:@""];
-        self.date= [[NSString alloc]initWithString:@""];
+        self.label= @"";
+        self.date= @"";
 
         self.color = [[UIColor alloc] init];
         sent = NO;
@@ -34,7 +34,7 @@ static float LINEWIDTH = 6;
     
     return self;
 }
-- (id)initWithPoints:(CGPoint) upper:(CGPoint) lower
+- (id)initWithPoints:(CGPoint)upper :(CGPoint) lower
 {
     self = [super init];
     if (self) {
@@ -127,7 +127,8 @@ static float LINEWIDTH = 6;
     return lowerRigth;
 }
 
--(void) updatePoints:(CGPoint) start:(CGPoint) end{
+-(void) updatePoints:(CGPoint)start :(CGPoint) end
+{
     if (upperLeft.y+end.y-start.y<UPPERBOUND +LINEWIDTH/2) {
         end.y=UPPERBOUND+ LINEWIDTH/2-upperLeft.y+start.y;
         
@@ -146,19 +147,15 @@ static float LINEWIDTH = 6;
         
     }
     
-    
-    
-    
     upperLeft.x=(upperLeft.x+end.x-start.x);
     upperLeft.y=(upperLeft.y+end.y-start.y);
     lowerRigth.x=(lowerRigth.x+end.x-start.x);
     lowerRigth.y=(lowerRigth.y+end.y-start.y);
-    
-    
-    
-    
 }
--(void) updateUpperLeft:(CGPoint) start:(CGPoint) end{
+
+
+-(void) updateUpperLeft:(CGPoint)start :(CGPoint)end
+{
     upperLeft.x=upperLeft.x+end.x-start.x;
     upperLeft.y=upperLeft.y+end.y-start.y;
     if (upperLeft.y<UPPERBOUND +LINEWIDTH/2) {
@@ -179,10 +176,11 @@ static float LINEWIDTH = 6;
         upperLeft.y=lowerRigth.y;
         lowerRigth.y=copy;
     }
-    
-    
 }
--(void) updateLowerRight:(CGPoint) start:(CGPoint) end{
+
+
+-(void) updateLowerRight:(CGPoint)start :(CGPoint) end
+{
     lowerRigth.x=lowerRigth.x+end.x-start.x;
     lowerRigth.y=lowerRigth.y+end.y-start.y;
     if (lowerRigth.y>LOWERBOUND-LINEWIDTH/2) {
@@ -203,10 +201,11 @@ static float LINEWIDTH = 6;
         upperLeft.y=lowerRigth.y;
         lowerRigth.y=copy;
     }
-    
 }
--(void)generateDateString{
-    
+
+
+-(void)generateDateString
+{    
     NSString *originalDate = [[NSString alloc] initWithString:[[[NSDate date] description] substringToIndex:19]];
     //NSString *originalDate = [[NSString alloc] initWithString:@"0101010101010101010"];
     NSString *time = [[NSString alloc] initWithString:[originalDate substringFromIndex:11]];
@@ -221,7 +220,8 @@ static float LINEWIDTH = 6;
     self.date = tmp;
 }
 
--(id) initWithCoder:(NSCoder *)aDecoder{
+-(id) initWithCoder:(NSCoder *)aDecoder
+{
     if (self = [super init]) {
         self.label = [aDecoder decodeObjectForKey:@"label"];
         self.color = [aDecoder decodeObjectForKey:@"color"];
@@ -244,7 +244,8 @@ static float LINEWIDTH = 6;
     return self;
 }
 
-- (void) encodeWithCoder:(NSCoder *)aCoder{
+- (void) encodeWithCoder:(NSCoder *)aCoder
+{
     [aCoder encodeObject: self.label forKey:@"label"];
     [aCoder encodeObject:self.color forKey:@"color"];
     [aCoder encodeObject:self.date forKey:@"date"];
@@ -261,28 +262,24 @@ static float LINEWIDTH = 6;
 }
 
 
--(void)setSent:(BOOL)value{
+-(void)setSent:(BOOL)value
+{
     sent = value;
 }
 
--(BOOL)sent{
+-(BOOL)sent
+{
     return sent;
 }
--(CGPoint)bounds{
+
+-(CGPoint)bounds
+{
     return CGPointMake(RIGHTBOUND, LOWERBOUND);
 }
-+(void)setLINEWIDTH:(float)value{
+
++(void)setLINEWIDTH:(float)value
+{
     LINEWIDTH = value;
 }
--(void) dealloc{
-
-    self.color;
-    self.label;
-    self.date;
-
-    
-    
-}
-
 
 @end

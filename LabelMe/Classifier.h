@@ -9,12 +9,18 @@
 #import <Foundation/Foundation.h>
 
 
+//////////////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark TrainingSet
+//////////////////////////////////////////////////////////////////////////
+
+
 @interface TrainingSet : NSObject
 
 @property (strong, nonatomic) NSMutableArray *images; //UIImage
 @property (strong, nonatomic) NSMutableArray *groundTruthBoundingBoxes; //ConvolutionPoint
-
 @property (strong, nonatomic) NSMutableArray *boundingBoxes; //ConvolutionPoints
+@property CGSize templateSize;
 
 @property float *imageFeatures; //the features for the wole trainingset
 @property float *labels; //the corresponding labels
@@ -30,6 +36,11 @@
 @end
 
 
+
+//////////////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark Classifier
+//////////////////////////////////////////////////////////////////////////
 
 @interface Classifier : NSObject
 

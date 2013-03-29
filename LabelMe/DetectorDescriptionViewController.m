@@ -10,7 +10,7 @@
 #import "Classifier.h"
 #import "Box.h"
 #import "ConvolutionHelper.h"
-
+#import "UIImage+Resize.h"
 
 @interface DetectorDescriptionViewController()
 
@@ -27,7 +27,7 @@
 @synthesize svmClassifier = _svmClassifier;
 @synthesize classToLearn = _classToLearn;
 @synthesize executeButton = _executeButton;
-
+@synthesize trainingSetController = _trainingSetController;
 
 
 - (void)viewDidLoad
@@ -49,6 +49,8 @@
     }
     
     NSLog(@"VIEW DID LOAD!!!");
+    
+    self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
 }
 
 
@@ -90,14 +92,14 @@
 
     //get items
     NSFileManager * filemng = [NSFileManager defaultManager];
-    NSArray *selfItems = [filemng contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[resourcesPaths objectAtIndex:THUMB]] error:NULL];
+    NSArray *imagesList = [filemng contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[resourcesPaths objectAtIndex:THUMB]] error:NULL];
     
-    for(int i=0; i<selfItems.count; i++){
+    for(int i=0; i<imagesList.count; i++){
         NSLog(@"IMAGE %d", i);
-        NSString *path = [[resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[selfItems objectAtIndex:i]];
+        NSString *path = [[resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[imagesList objectAtIndex:i]];
         
         //image
-        UIImage *img = [[UIImage alloc]initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[resourcesPaths objectAtIndex:IMAGES],[selfItems objectAtIndex:i]]];
+        UIImage *img = [[UIImage alloc]initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[resourcesPaths objectAtIndex:IMAGES],[imagesList objectAtIndex:i]]];
 
         //dictionaries
         BOOL containClass = NO;
@@ -107,11 +109,12 @@
             if([box.label isEqualToString:selectedClass]){
                 containClass = YES;
                 ConvolutionPoint *cp = [[ConvolutionPoint alloc] init];
-                cp.xmin = box.upperLeft.x/img.size.width;
-                cp.ymin = box.upperLeft.y/img.size.height;
-                cp.xmax = box.lowerRight.x/img.size.width;
-                cp.ymax = box.lowerRight.y/img.size.height;
-                cp.imageIndex = i;
+                cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
+                cp.ymin = box.upperLeft.y/box->LOWERBOUND;
+                cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
+                cp.ymax = box.lowerRight.y/box->LOWERBOUND;
+                NSLog(@"Box located at: (%f,%f) (%f,%f)", box.upperLeft.x, box.upperLeft.y, box.lowerRight.x, box.lowerRight.y);
+                cp.imageIndex = trainingSet.images.count;
                 [trainingSet.groundTruthBoundingBoxes addObject:cp];
             }
         }
@@ -124,7 +127,30 @@
     
     //initial fill
     [trainingSet initialFill];
-    NSLog(@"Number of instances generated in training set: %d", trainingSet.images.count);
+    NSLog(@"Number of training examples and bounding boxes (have to concide)!: %d %d", trainingSet.numberOfTrainingExamples, trainingSet.boundingBoxes.count);
+    NSLog(@"caca");
+    
+    
+    
+    
+    //VISUALIZE IMAGES GENERATED
+    
+    NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
+    
+    for(int i=0; i<trainingSet.boundingBoxes.count; i++)
+    {
+        ConvolutionPoint *cp = [trainingSet.boundingBoxes objectAtIndex:i];
+        UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
+        UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
+        [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
+    }
+    
+    
+    self.trainingSetController.listOfImages = listOfImages;
+    //    self.trainingSetController.listOfImages = self.trainingSet.images;
+    
+    [self.navigationController pushViewController:self.trainingSetController animated:YES];
+    
     
     
 //    //learn

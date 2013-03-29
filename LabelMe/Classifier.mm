@@ -33,6 +33,40 @@ using namespace cv;
 @synthesize boundingBoxes = _boundingBoxes;
 @synthesize imageFeatures = _imageFeatures;
 @synthesize labels = _labels;
+@synthesize templateSize = _templateSize;
+
+- (void) setTemplateSize:(CGSize)templateSize
+{
+    _templateSize = templateSize;
+}
+
+
+- (CGSize) templateSize
+{
+    //compute template size in case it is not set (lazy instantiation)
+    if(_templateSize.height == 0.0){
+        NSLog(@"Computing template size...");
+        CGSize averageSize;
+        averageSize.height = 0;
+        averageSize.width = 0;
+        
+        for(ConvolutionPoint* groundTruthBB in self.groundTruthBoundingBoxes){
+            averageSize.height += groundTruthBB.ymax - groundTruthBB.ymin;
+            averageSize.width += groundTruthBB.xmax - groundTruthBB.xmin;
+        }
+        
+        //compute the average and get the average size in the image dimensions
+        CGSize imgSize = [[self.images objectAtIndex:0] size];
+        averageSize.height = averageSize.height*imgSize.height/self.groundTruthBoundingBoxes.count;
+        averageSize.width = averageSize.width*imgSize.width/self.groundTruthBoundingBoxes.count;
+        
+        _templateSize = averageSize;
+        
+        NSLog(@"Template size setted: h:%f, w:%f", _templateSize.height, _templateSize.width);
+        
+    }
+    return _templateSize;
+}
 
 
 -(id) init
@@ -49,25 +83,26 @@ using namespace cv;
 - (void) initialFill
 {
     // Create a initial set of positive and negative bounding boxes from ground truth labeled images
-    
     self.boundingBoxes = [[NSMutableArray alloc] initWithArray:self.groundTruthBoundingBoxes];
     
-    ConvolutionPoint *referenceConvPoint = [self.groundTruthBoundingBoxes objectAtIndex:0];
-    float height = referenceConvPoint.xmax - referenceConvPoint.xmin;
-    float width = referenceConvPoint.ymax - referenceConvPoint.ymin;
-    
-    double randomX;
-    double randomY;
-    
-    for(int i=0; i<[self.images count]; i++)
-    {
+    for(int i=0; i<self.groundTruthBoundingBoxes.count; i++){
+        
+        //Ground truth for the image
+        //TODO: suposing one ground truth per image
         ConvolutionPoint *groundTruth = [self.groundTruthBoundingBoxes objectAtIndex:i];
+        UIImage *image = [self.images objectAtIndex:groundTruth.imageIndex];
+        
+        //the new box will have the size of the template size (not necessary though)
+        float height = self.templateSize.height/image.size.height;
+        float width = self.templateSize.width/image.size.width;
+        
+        double randomX;
+        double randomY;
         
         int num=20;
-        for(int j=0; j<num/2;j++)
-        {
-            if(j%4==0)
-            {
+        for(int j=0; j<num/2;j++){
+            
+            if(j%4==0){
                 randomX = 0;
                 randomY = j*1.0/num;
             }else if(j%4==1){
@@ -81,14 +116,15 @@ using namespace cv;
                 randomY = 1-height;
             }
             
-            ConvolutionPoint *negativeExample = [[ConvolutionPoint alloc] initWithRect:CGRectMake(randomX, randomY, width, height) label:-1 imageIndex:i];
+            ConvolutionPoint *negativeExample = [[ConvolutionPoint alloc] initWithRect:CGRectMake(randomX, randomY, width, height) label:-1 imageIndex:groundTruth.imageIndex];
             
             if([negativeExample fractionOfAreaOverlappingWith:groundTruth]<0.1)
                 [self.boundingBoxes addObject:negativeExample];
         }
+        
+        
+        self.numberOfTrainingExamples = self.boundingBoxes.count;
     }
-    
-    self.numberOfTrainingExamples = [self.boundingBoxes count];
 }
 
 
@@ -97,7 +133,7 @@ using namespace cv;
 {
     // transform each bounding box into hog feature space
     int i;
-    for(i=0; i<[self.boundingBoxes count]; i++)
+    for(i=0; i<self.boundingBoxes.count; i++)
     {
         @autoreleasepool
         {
@@ -106,7 +142,7 @@ using namespace cv;
             //get the image contained in the bounding box and resized it with the template size
             //TODO: From cut -> HOG to HOG -> cut
             UIImage *wholeImage = [self.images objectAtIndex:boundingBox.imageIndex];
-            UIImage *resizedImage = [[wholeImage croppedImage:[boundingBox rectangleForImage:wholeImage]] resizedImage:templateSize interpolationQuality:kCGInterpolationDefault];
+            UIImage *resizedImage = [[wholeImage croppedImage:[boundingBox rectangleForImage:wholeImage]] resizedImage:self.templateSize interpolationQuality:kCGInterpolationDefault];
             
             //calculate the hogfeatures of the image
             HogFeature *hogFeature = [resizedImage obtainHogFeatures];
@@ -130,10 +166,9 @@ using namespace cv;
     self.numberOfTrainingExamples = numSV + i;
 }
 
-
-
-
 @end
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark -
@@ -142,12 +177,12 @@ using namespace cv;
 
 
 @interface Classifier ()
-{
-    CGSize templateSize;
-}
-
-//Sets the size of the template and obtain the dimension of the features from it.
-- (void) obtainTemplateSize:(TrainingSet *) trainingSet;
+//{
+//    CGSize templateSize;
+//}
+//
+////Sets the size of the template and obtain the dimension of the features from it.
+//- (void) obtainTemplateSize:(TrainingSet *) trainingSet;
 
 //Show just the histogram features for debugging purposes
 - (void) showOrientationHistogram;
@@ -224,7 +259,9 @@ using namespace cv;
 {
     
     // Get the template size and get hog feautures dimension
-    [self obtainTemplateSize:trainingSet];
+    CGSize templateSize = trainingSet.templateSize;
+    [trainingSet initialFill];
+    self.weightsDimensions = [[[trainingSet.images objectAtIndex:0] resizedImage:templateSize interpolationQuality:kCGInterpolationDefault] obtainDimensionsOfHogFeatures];
     int numOfFeatures = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2];
     
     if(debugging){
@@ -448,7 +485,7 @@ using namespace cv;
     UIImage *wholeImage = [trainingSet.images objectAtIndex:0];
     // BE CAREFUL!!! Intrinsic change of UIImage Orientation!! (from right to up)
     UIImage *img = [wholeImage croppedImage:[[trainingSet.boundingBoxes objectAtIndex:0] rectangleForImage:wholeImage]];
-    UIImage *resizedImage = [img resizedImage:templateSize interpolationQuality:kCGInterpolationDefault];
+    UIImage *resizedImage = [img resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault];
 
     hogFeature = [resizedImage obtainHogFeatures];
     [hogFeature printFeaturesOnScreen];
@@ -459,28 +496,6 @@ using namespace cv;
     //bias term as 0
     self.svmWeights[hogFeature.totalNumberOfFeatures] = 0;
 }
-
-#pragma mark -
-#pragma mark Classifier Private Methods
-
-- (void) obtainTemplateSize:(TrainingSet *) trainingSet
-{
-    
-    //select first groundtruth bounding box
-    ConvolutionPoint *sampleBoundingBox = [trainingSet.groundTruthBoundingBoxes objectAtIndex:0];
-    
-    UIImage *wholeImage = [trainingSet.images objectAtIndex:sampleBoundingBox.imageIndex];
-    UIImage *img = [wholeImage croppedImage:[sampleBoundingBox rectangleForImage:wholeImage]];
-    NSLog(@"whole image sizes: w:%f, h:%f",wholeImage.size.width, wholeImage.size.height);
-    NSLog(@"cropped image sizes: w:%f, h:%f",img.size.width, img.size.height);
-    
-    templateSize.height = img.size.height*0.6; 
-    templateSize.width = img.size.width*0.6;
-    
-    // And store dimension of hog features for it
-    self.weightsDimensions = [[img resizedImage:templateSize interpolationQuality:kCGInterpolationDefault] obtainDimensionsOfHogFeatures];
-}
-
 
 
 @end

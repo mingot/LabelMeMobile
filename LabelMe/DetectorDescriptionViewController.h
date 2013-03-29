@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "TrainDetectorViewController.h"
 #import "ExecuteDetectorViewController.h"
+#import "ShowTrainingSetViewController.h"
 
 @interface DetectorDescriptionViewController : UIViewController
 
@@ -22,6 +23,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *classifierNameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *classToLearnLabel;
 
+@property (strong, nonatomic) ShowTrainingSetViewController *trainingSetController;
 
 
 - (IBAction)trainAction:(id)sender;

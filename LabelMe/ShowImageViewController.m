@@ -10,5 +10,6 @@
 
 @implementation ShowImageViewController
 
+@synthesize imageView = _imageView;
 
 @end
