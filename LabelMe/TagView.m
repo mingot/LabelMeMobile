@@ -87,7 +87,8 @@
     
     
 }
--(void) drawSelectedBox:(CGContextRef ) context:(Box *) box1{
+-(void) drawSelectedBox:(CGContextRef )context :(Box *) box1
+{
     
     CGPoint upperRight = CGPointMake([box1 lowerRight].x, [box1 upperLeft].y);
     CGPoint lowerLeft = CGPointMake([box1 upperLeft].x, [box1 lowerRight].y);
@@ -110,7 +111,8 @@
     
 }
 
--(void) drawBox:(CGContextRef ) context:(Box *) box1:(CGFloat) alpha{
+-(void) drawBox:(CGContextRef )context :(Box *)box1 :(CGFloat) alpha
+{
     
     const CGFloat *components = CGColorGetComponents(box1.color.CGColor);
     CGContextBeginPath(context);
@@ -280,7 +282,8 @@
 }
 #pragma mark -
 #pragma mark Search Box
--(int)boxInterior:(int) i:(CGPoint) point{
+-(int)boxInterior:(int)i :(CGPoint)point
+{
 
     int num = [self.objects count];
     for (int j=i+1; j<num; j++) {
@@ -455,15 +458,6 @@
     [self setNeedsDisplay];
 }
 
-#pragma mark -
-#pragma mark Memory Management
--(void) dealloc{
 
-    self.objects, self.objects = nil;
-    //[self.label release], self.label = nil;
-    self.colorArray, self.colorArray = nil;
-    
-   
-}
 
 @end

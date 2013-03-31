@@ -189,7 +189,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     NSLog(@"learn went great");
     
     // write the template to a file
-    [self.svmClassifier storeSvmWeightsAsTemplateWithName:@"prova5.txt"];
+//    [self.svmClassifier storeSvmWeightsAsTemplateWithName:@"prova5.txt"];
     
     //Learn creating a new queue
     

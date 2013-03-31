@@ -20,7 +20,8 @@
 -(void)correctOrientation:(CGPoint)upperLeft : (CGPoint)lowerRight SuperviewFrame:(CGRect)viewSize;
 
 @end
-@interface TagView : UIView{
+@interface TagView : UIView
+{
     NSMutableArray *   _objects;
     //UITextField *           _label;
     CGPoint                  firstLocation;
@@ -43,24 +44,20 @@
 }
 @property (nonatomic, weak) id <TagViewDelegate> delegate;
 @property (nonatomic, strong) NSMutableArray *objects;
-//@property (nonatomic, retain) UITextField *label;
 @property (nonatomic, strong) NSArray *colorArray;
 
 
 
 -(void) setSelectedBox:(int) i;
 -(int) SelectedBox;
-/*-(void) setNumLabels:(int) i;
--(int) numLabels;*/
--(void) drawBox:(CGContextRef ) context:(Box *) box1:(CGFloat) alpha;
--(void) drawSelectedBox:(CGContextRef ) context:(Box *) box;
+-(void) drawBox:(CGContextRef )context :(Box *)box1 :(CGFloat)alpha;
+-(void) drawSelectedBox:(CGContextRef )context :(Box *) box;
 -(void) reset;
 -(void)setLINEWIDTH:(float)factor;
 -(int)whereIs:(CGPoint) point;
--(int)boxInterior:(int) i:(CGPoint) point;
+-(int)boxInterior:(int)i :(CGPoint)point;
 -(void)setVisibleFrame:(CGRect)rect;
 -(CGRect)visibleFrame;
-//-(void)copyDictionary:(NSDictionary *)dict;
 
 
 @end

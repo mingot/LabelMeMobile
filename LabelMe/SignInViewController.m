@@ -7,18 +7,17 @@
 //
 
 #import "SignInViewController.h"
+#import "GalleryViewController.h"
+#import "ServerConnection.h"
+#import "Constants.h"
+#import "Reachability.h"
+
+#import "UIImage+Resize.h"
 #import "NSObject+ShowAlert.h"
 #import "NSObject+Folders.h"
 #import "NSString+checkValidity.h"
-#import "ServerConnection.h"
-#import "GalleryViewController.h"
-#import "Constants.h"
-#import "UIImage+Resize.h"
-#import "Reachability.h"
 
-@interface SignInViewController ()
 
-@end
 
 @implementation SignInViewController
 
@@ -39,13 +38,13 @@
 @synthesize detectorGalleryController = _detectorGalleryController;
 
 
-#pragma mark Initialization
+#pragma mark 
+#pragma mark - lifecycle
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
         [self createRememberMeFolder];
         locationMng = [[CLLocationManager alloc] init];
         locationMng.desiredAccuracy = kCLLocationAccuracyKilometer;
@@ -57,8 +56,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    // Do any additional setup after loading the view from its nib.
    
     self.keyboardToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
     [self.keyboardToolbar setBarStyle:UIBarStyleBlackOpaque];
@@ -93,9 +90,6 @@
     
    
 }
-
-#pragma mark -
-#pragma mark Views Appear
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
@@ -140,9 +134,12 @@
     self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, self.scrollView.frame.size.width, self.view.frame.size.height);
     keyboardVisible = NO;
 }
+
+
 #pragma mark -
 #pragma mark Keyboard Events
--(void)keyboardDidShow:(NSNotification *)notif{
+-(void)keyboardDidShow:(NSNotification *)notif
+{
     if (keyboardVisible) {
 		return;
 	}
@@ -166,41 +163,44 @@
 	self.scrollView.frame = viewFrame;
 	keyboardVisible = YES;
     [self.scrollView scrollRectToVisible:self.passwordField.frame animated:YES];
-
-    
-    
     
 }
--(void)keyboardDidHide:(NSNotification *)notif{
-    
+
+
+-(void)keyboardDidHide:(NSNotification *)notif
+{
     if (!keyboardVisible) {
         return;
     }
     self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, self.scrollView.frame.size.width, self.view.frame.size.height);
     keyboardVisible = NO;
 }
+
+
 #pragma mark -
 #pragma mark IBActions 
--(IBAction)signInAction:(id)sender{
-    
-    //[self.signInButton setEnabled:NO];
+-(IBAction)signInAction:(id)sender
+{
+
     [self cancelAction:nil];
     [sendingView setHidden:NO];
     [sendingView.activityIndicator startAnimating];
 
     [sConnection checkLoginForUsername:self.usernameField.text andPassword:self.passwordField.text];
-    
-
-    
 }
--(IBAction)nextFieldAction:(id)sender{
+
+
+-(IBAction)nextFieldAction:(id)sender
+{
     UIBarButtonItem * previousButton = [[self.keyboardToolbar items] objectAtIndex:0];
     UIBarButtonItem * nextButton =[[self.keyboardToolbar items] objectAtIndex:1];
     nextButton.enabled = NO;
     previousButton.enabled = YES;
     [self.passwordField becomeFirstResponder];
 }
--(IBAction)previousAction:(id)sender{
+
+-(IBAction)previousAction:(id)sender
+{
     UIBarButtonItem * nextButton = [[self.keyboardToolbar items] objectAtIndex:1];
     UIBarButtonItem * previousButton = [[self.keyboardToolbar items] objectAtIndex:0];
     nextButton.enabled = YES;
@@ -208,26 +208,23 @@
     [self.usernameField becomeFirstResponder];
     
 }
--(IBAction)cancelAction:(id)sender{
+
+-(IBAction)cancelAction:(id)sender
+{
     [self.usernameField resignFirstResponder];
     [self.passwordField resignFirstResponder];
 
 }
--(IBAction)createAccountAction:(id)sender{
+-(IBAction)createAccountAction:(id)sender
+{
     CreateAccountViewController *createAccountViewController = nil;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
        
-        CGRect screenSize = [[UIScreen mainScreen] bounds];
-        
-        if (screenSize.size.height == 568) {
+        if ([UIScreen mainScreen].bounds.size.height == 568) {
             createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPhone5" bundle:nil];
-            
-            
         }
-        else if (screenSize.size.height == 480){
+        else if ([UIScreen mainScreen].bounds.size.height == 480){
             createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPhone" bundle:nil];
-            
-            
         }
     }
     else{
@@ -236,18 +233,19 @@
     }
     createAccountViewController.delegate = self;
 
-    //[createAccountViewController setModalTransitionStyle:UIModalTransitionStylePartialCurl];
     [self presentViewController:createAccountViewController animated:YES completion:NULL ];
-    //[self.navigationController pushViewController:createAccountViewController animated:YES];
-
-
 }
--(IBAction)forgotPassword:(id)sender{
+
+
+-(IBAction)forgotPassword:(id)sender
+{
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Forgot Password" message:@"Please, enter your email address." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
     [alert setAlertViewStyle:UIAlertViewStylePlainTextInput];
     [alert show];
 }
--(IBAction)valueChanged:(id)sender{
+
+-(IBAction)valueChanged:(id)sender
+{
     UIBarButtonItem * doneButton = [[self.keyboardToolbar items] objectAtIndex:4];
     
     if ((self.passwordField.text.length*self.usernameField.text.length)==0) {
@@ -256,13 +254,14 @@
     else{
         [doneButton setEnabled:YES];
     }
-    
 }
+
 
 #pragma mark -
 #pragma mark Previous Session Methods
 
--(void)createRememberMeFolder{
+-(void)createRememberMeFolder
+{
     NSFileManager * filemng = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSError *error;
@@ -273,7 +272,8 @@
     }
 }
 
--(BOOL)saveSessionWithUsername:(NSString *) username andPassword:(NSString *) password{
+-(BOOL)saveSessionWithUsername:(NSString *) username andPassword:(NSString *) password
+{
     NSError *error;
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     if([username writeToFile:[[documentsDirectory stringByAppendingPathComponent:@"RememberMe"] stringByAppendingPathComponent:@"username.txt"] atomically:NO encoding:NSUTF8StringEncoding error:&error]){
@@ -283,7 +283,9 @@
     }
     return NO;
 }
--(BOOL)rememberMe{
+
+-(BOOL)rememberMe
+{
     NSFileManager * filemng = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSError *error;
@@ -309,9 +311,14 @@
     }
     return NO;
 }
+
+
+
 #pragma mark -
 #pragma mark UIAlertView Delegate Methods
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
     if (buttonIndex == 1) {
         ServerConnection *sconnecton = [[ServerConnection alloc]init];
         if ([[alertView textFieldAtIndex:0].text checkEmailFormat] ) {
@@ -321,16 +328,15 @@
         else{
             [self errorWithTitle:@"Email format is not valid" andDescription:@"Enter a valid email."];
         }
-        
     }
-    
-    
 }
+
 
 #pragma mark -
 #pragma mark Text Field Delegate Methods
--(void)textFieldDidBeginEditing:(UITextField *)textField{
-    
+
+-(void)textFieldDidBeginEditing:(UITextField *)textField
+{
     if (textField == self.passwordField) {
         [self nextFieldAction:nil];
     }
@@ -340,26 +346,32 @@
     
     [self.scrollView scrollRectToVisible:textField.frame animated:YES];
 }
+
+
 #pragma mark -
 #pragma mark CreateAccountDelegate Methods
--(void)signIn{
+-(void)signIn
+{
     previousSession = [self rememberMe];
-    
-    
 }
+
+
 #pragma mark -
 #pragma mark ServerConnectionDelegate Methods
--(void)cancel{
+
+-(void)cancel
+{
     [sConnection cancelRequestFor:0];
     [sendingView setHidden:YES];
     [sendingView.activityIndicator stopAnimating];
-
 }
+
+
 #pragma mark -
 #pragma mark ServerConnectionDelegate Methods
 
-
--(void)signInComplete{
+-(void)signInComplete
+{
     if (!previousSession)
         [self saveSessionWithUsername:self.usernameField.text andPassword:self.passwordField.text];
             
@@ -368,14 +380,13 @@
     self.tabBarController =[[UITabBarController alloc]init];
     self.tabBarController.delegate = self;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        CGRect screenSize = [[UIScreen mainScreen] bounds];
         
-        if (screenSize.size.height == 568) {
+        if ([UIScreen mainScreen].bounds.size.height == 568) {
             self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone5" bundle:nil];
             self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone5" bundle:nil];
             self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
             
-        }else if (screenSize.size.height == 480){
+        }else if ([UIScreen mainScreen].bounds.size.height == 480){
             self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone" bundle:nil];
             self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone" bundle:nil];
             self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
@@ -425,13 +436,10 @@
     [sendingView.activityIndicator stopAnimating];
     [self presentViewController:self.tabBarController animated:YES completion:NULL];
 
-
-    
-
-
-    //ir a la galeria del usuario
 }
--(void)profilePictureReceived:(UIImage *)ppicture{
+
+-(void)profilePictureReceived:(UIImage *)ppicture
+{
     NSFileManager * filemng = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSString *path = [[NSString alloc] initWithString:[[documentsDirectory stringByAppendingPathComponent:self.usernameField.text] stringByAppendingPathComponent:@"profilepicture.jpg" ]];
@@ -440,37 +448,35 @@
         [self.galleryViewController.profilePicture setImage:ppicture];
     }
 }
--(void)signInWithoutConnection{
-    //[self.signInButton setEnabled:YES];
-  
+
+-(void)signInWithoutConnection
+{
     if (previousSession) {
         [self signInComplete];
-        //ir a la galeria del usuario
-
     }
     else{
         [self errorWithTitle:@"No internet connection" andDescription:@"The app could not connect."];
         [sendingView setHidden:YES];
         [sendingView.activityIndicator stopAnimating];
-
-
     }
 }
--(void)signInError{
+
+
+-(void)signInError
+{
     //[self.signInButton setEnabled:YES];
     [sendingView setHidden:YES];
 
 
 }
+
+
 #pragma mark -
 #pragma mark TabBarController Delegate
-- (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController{
-    
-    if (tabBarController.selectedIndex == 1) {
-        //[[tabBarController tabBar] setHidden:YES];
 
-        //[self.cameraOverlay.tagViewController setUsername:self.usernameField.text];
-        //[tabBarController presentViewController:self.cameraOverlay.imagePicker animated:NO completion:NULL];
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
+{    
+    if (tabBarController.selectedIndex == 1) {
         UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
         [imagePicker setDelegate:self];
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]){
@@ -536,8 +542,6 @@
 #pragma mark -
 #pragma mark UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
-    //[picker.cameraOverlayView addSubview:sendingView];
-    //[sendingView setHidden:NO];
 
     [locationMng startUpdatingLocation];
     
@@ -555,9 +559,7 @@
 
             
         }
-        
-        
-        
+
     }
     else{
         tagviewController = [[TagViewController alloc] initWithNibName:@"TagViewController_iPad" bundle:nil];
@@ -565,8 +567,6 @@
     }
     UIImage *image = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
         
-                
-   
     [tagviewController setUsername:self.usernameField.text];
     
     NSArray *paths = [self newArrayWithFolders:self.usernameField.text];
@@ -593,22 +593,13 @@
             
         }
     }
-        
-        
-        
-    
-    
-    
-    [tagviewController performSelectorInBackground:@selector(saveImage:) withObject:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
-   /* dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
 
-        [tagviewController saveImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
-    });*/
+    [tagviewController performSelectorInBackground:@selector(saveImage:) withObject:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
 
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
     
-    NSString *location = [[NSString alloc] initWithString:@""];
+    NSString *location = @"";
     
     if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
         location = [[locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
@@ -631,12 +622,8 @@
     }
 
     [locationMng stopUpdatingLocation];
-    
-    
-    
-    
-
 }
+
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
@@ -649,6 +636,8 @@
 
     }
 }
+
+
 #pragma mark -
 #pragma mark Presenting TagviewController
 -(void)presentTagviewControllerWithImage:(UIImage *)image
@@ -657,14 +646,5 @@
 }
 
 
-#pragma mark -
-#pragma mark Memory Management
-
-- (void)didReceiveMemoryWarning
-{
-
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
 @end

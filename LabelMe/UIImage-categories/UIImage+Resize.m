@@ -335,14 +335,6 @@
     newSize.width = scale * self.size.width;
     return [self resizedImage:newSize interpolationQuality:kCGInterpolationDefault];
     
-    //    GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithImage:self];
-    //    GPUImageTransformFilter *cropFilter = [[GPUImageCropFilter alloc] initWithCropRegion:bounds];
-    //
-    //
-    //    [stillImageSource addTarget:cropFilter];
-    //    [stillImageSource processImage];
-    //
-    //    return [cropFilter imageFromCurrentlyProcessedOutput];
 }
 
 

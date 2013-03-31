@@ -35,7 +35,7 @@
     [information setNumberOfLines:0];
     [information setBackgroundColor:[UIColor clearColor]];
     [information setLineBreakMode:UILineBreakModeWordWrap];
-    NSString *informationString = [[NSString alloc]initWithString:@"Version 1.0, 2012\n\nThe goal of LabelMe is to provide an image annotation tool for computer vision research. \n\nImages uploaded to the server will be available at labelme.csail.mit.edu where other people can see your images and annotations.\n\nFor suggestions send email to labelme@csail.mit.edu\n\nDeveloped at the Computer Science and Artificial Intelligence Laboratory at MIT by:\n\nDolores Blanco\nAina Torralba\nDavid Way\nAntonio Torralba\n\n© LabelMe"];
+    NSString *informationString = @"Version 1.0, 2012\n\nThe goal of LabelMe is to provide an image annotation tool for computer vision research. \n\nImages uploaded to the server will be available at labelme.csail.mit.edu where other people can see your images and annotations.\n\nFor suggestions send email to labelme@csail.mit.edu\n\nDeveloped at the Computer Science and Artificial Intelligence Laboratory at MIT by:\n\nDolores Blanco\nAina Torralba\nDavid Way\nAntonio Torralba\n\n© LabelMe";
     [information setText:informationString];
     CGSize expectedLabelSize = [informationString sizeWithFont:information.font constrainedToSize:CGSizeMake(information.frame.size.width, 2000) lineBreakMode:UILineBreakModeWordWrap];
     [information setFrame:CGRectMake(information.frame.origin.x, information.frame.origin.y,expectedLabelSize.width, expectedLabelSize.height)];
@@ -65,8 +65,5 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
--(void)dealloc{
-    self.scrollView;
-    
-}
+
 @end

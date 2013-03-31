@@ -13,19 +13,15 @@
 
 
 @implementation ServerConnection
-//@synthesize loginConnection = _loginConnection;
+
+
 @synthesize checkLoginURL = _checkLoginURL;
-//@synthesize createAccountConnection = _createAccountConnection;
 @synthesize createAccountURL = _createAccountURL;
 @synthesize updateAnnotationURL = _updateAnnotationURL;
-//@synthesize sendPhotoConnection = _sendPhotoConnection;
 @synthesize sendPhotoURL = _sendPhotoURL;
 @synthesize downloadProfilePictureURL = _downloadProfilePictureURL;
 @synthesize uploadProfilePictureURL = _uploadProfilePictureURL;
 @synthesize forgotPasswordURL = _forgotPasswordURL;
-//@synthesize profilePictureConnection = _profilePictureConnection;
-
-
 
 
 static UIImage* rotate(UIImage* src, UIImageOrientation orientation)
@@ -44,16 +40,14 @@ static UIImage* rotate(UIImage* src, UIImageOrientation orientation)
     } else if (orientation == UIImageOrientationUp) {
         // NOTHING
     }
-    /* CGContextDrawImage(UIGraphicsGetCurrentContext(),
-     CGRectMake(0,0,src.size.width, src.size.height),
-     src.CGImage);*/
-    /*UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-     UIGraphicsEndImageContext();*/
+    
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
 }
 static BOOL didSignIn = NO;
+
+
 #pragma mark -
 #pragma mark Initialization Methods
 -(id)init{
@@ -66,32 +60,27 @@ static BOOL didSignIn = NO;
     }
     return self;
 }
--(void)setURLs{
-    
-    /*self.checkLoginURL = [[NSString alloc]initWithString:@"http://labelme2.csail.mit.edu/developers/dolores/LabelMe3.0/iphoneAppTools/checkLoginFromiPhone.php"];
-    self.createAccountURL = [[NSString alloc]initWithString:@"http://labelme2.csail.mit.edu/developers/dolores/LabelMe3.0/iphoneAppTools/addUserFromiPhone2.php"];
-    self.sendPhotoURL = [[NSString alloc] initWithString:@"http://labelme2.csail.mit.edu/developers/dolores/LabelMe3.0/iphoneAppTools/sendPhotoFromiPhone.php"];
-    self.updateAnnotationURL = [[NSString alloc] initWithString:@"http://labelme2.csail.mit.edu/developers/dolores/LabelMe3.0/iphoneAppTools/updateAnnotation.php"];
-    self.downloadProfilePictureURL = [[NSString alloc] initWithString:@"http://labelme2.csail.mit.edu/developers/dolores/LabelMe3.0/iphoneAppTools/downloadProfilePicture.php"];
-    self.uploadProfilePictureURL = [[NSString alloc] initWithString:@"http://labelme2.csail.mit.edu/developers/dolores/LabelMe3.0/iphoneAppTools/uploadProfilePicture.php"];
-    self.forgotPasswordURL = [[NSString alloc] initWithString:@"http://labelme2.csail.mit.edu/developers/dolores/LabelMe3.0/iphoneAppTools/forgot_password.php"];*/
-    self.checkLoginURL = [[NSString alloc]initWithString:@"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/checkLoginFromiPhone.php"];
-    self.createAccountURL = [[NSString alloc]initWithString:@"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/addUserFromiPhone2.php"];
-    self.sendPhotoURL = [[NSString alloc] initWithString:@"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/sendPhotoFromiPhone.php"];
-    self.updateAnnotationURL = [[NSString alloc] initWithString:@"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/updateAnnotation.php"];
-    self.downloadProfilePictureURL = [[NSString alloc] initWithString:@"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/downloadProfilePicture.php"];
-    self.uploadProfilePictureURL = [[NSString alloc] initWithString:@"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/uploadProfilePicture.php"];
-    self.forgotPasswordURL = [[NSString alloc] initWithString:@"http://labelme.csail.mit.edu/Release3.0/browserTools/php/forgot_password.php"];
 
 
+-(void)setURLs
+{
+    self.checkLoginURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/checkLoginFromiPhone.php";
+    self.createAccountURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/addUserFromiPhone2.php";
+    self.sendPhotoURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/sendPhotoFromiPhone.php";
+    self.updateAnnotationURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/updateAnnotation.php";
+    self.downloadProfilePictureURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/downloadProfilePicture.php";
+    self.uploadProfilePictureURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/uploadProfilePicture.php";
+    self.forgotPasswordURL = @"http://labelme.csail.mit.edu/Release3.0/browserTools/php/forgot_password.php";
 }
+
+
 #pragma mark -
 #pragma mark Request Methods
 
 -(void)checkLoginForUsername:(NSString *)username andPassword:(NSString *)password{
     didSignIn = NO;
     
-    NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
+    NSString *boundary = @"AaB03x";
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.checkLoginURL]];
     
     [theRequest setHTTPMethod:@"POST"];
@@ -115,9 +104,6 @@ static BOOL didSignIn = NO;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
     }
-
-    
-    //[NSURLConnection connectionWithRequest:theRequest delegate:self];
 }
 -(void) createAccountWithFields:(NSArray *)fields{
     NSString *name = [fields objectAtIndex:0];
@@ -125,7 +111,7 @@ static BOOL didSignIn = NO;
     NSString *username = [fields objectAtIndex:2];
     NSString *password = [fields objectAtIndex:3];
     NSString *email = [fields objectAtIndex:4];
-    NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
+    NSString *boundary = @"AaB03x";
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.createAccountURL]];
     
     [theRequest setHTTPMethod:@"POST"];
@@ -161,7 +147,7 @@ static BOOL didSignIn = NO;
     
 }
 -(void)forgotPassword:(NSString *)email{
-    NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
+    NSString *boundary = @"AaB03x";
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.forgotPasswordURL]];
     
     [theRequest setHTTPMethod:@"POST"];
@@ -210,7 +196,7 @@ static BOOL didSignIn = NO;
         [self checkLoginForUsername:user andPassword:pass];
         return;
     }
-    NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
+    NSString *boundary = @"AaB03x";
     
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.sendPhotoURL]];
     [theRequest setHTTPMethod:@"POST"];
@@ -218,20 +204,16 @@ static BOOL didSignIn = NO;
     
     [theRequest setValue:contentType forHTTPHeaderField:@"Content-type"];
     [self createHTTPBodyWithImage:photo size:size filename:filename path:objectpath andAnnotation:annotation];
-   // NSArray *arr = [NSArray arrayWithObjects:photo,[NSNumber numberWithFloat:size.x],[NSNumber numberWithFloat:size.y],filename,objectpath,annotation,fields,nil];
-   // [self performSelectorInBackground:@selector(createBodyWithArray:) withObject:arr];
     
     NSFileManager * filemng = [NSFileManager defaultManager];
     
-    //NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(nstem, NSUserDomainMask, YES) objectAtIndex:0];
-   // NSString *tmpPath = [documentsDirectory stringByAppendingPathComponent:@"tmpRequest"];
+
     NSString *tmpPath = NSTemporaryDirectory();
-    //NSInputStream *bodyStream = [NSInputStream inputStreamWithFileAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]]];
     NSInputStream *bodyStream = [[NSInputStream alloc] initWithFileAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]]];
     [theRequest setHTTPBodyStream:bodyStream];
     NSNumber *filesize = [[filemng attributesOfItemAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] error:nil] objectForKey:NSFileSize];
     bytestowrite = [filesize doubleValue];
-    //[theRequest setHTTPBody:postBody];
+
     NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:theRequest delegate:self];
     if (connection == nil) {
         [self errorWithTitle:@"Unknown error" andDescription:@""];
@@ -246,7 +228,7 @@ static BOOL didSignIn = NO;
 -(void)sendPhotoWithFilename:(NSString *)filename{
     cancel = NO;
 
-    NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
+    NSString *boundary = @"AaB03x";
     
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.sendPhotoURL]];
     [theRequest setHTTPMethod:@"POST"];
@@ -254,16 +236,11 @@ static BOOL didSignIn = NO;
     
     [theRequest setValue:contentType forHTTPHeaderField:@"Content-type"];
     NSFileManager * filemng = [NSFileManager defaultManager];
-    
-    //NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(nstem, NSUserDomainMask, YES) objectAtIndex:0];
-    // NSString *tmpPath = [documentsDirectory stringByAppendingPathComponent:@"tmpRequest"];
     NSString *tmpPath = NSTemporaryDirectory();
-    //NSInputStream *bodyStream = [NSInputStream inputStreamWithFileAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]]];
     NSInputStream *bodyStream = [[NSInputStream alloc] initWithFileAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]]];
     [theRequest setHTTPBodyStream:bodyStream];
     NSNumber *filesize = [[filemng attributesOfItemAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] error:nil] objectForKey:NSFileSize];
     bytestowrite = [filesize doubleValue];
-    //[theRequest setHTTPBody:postBody];
     NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:theRequest delegate:self];
     if (connection == nil) {
         [self errorWithTitle:@"Unknown error" andDescription:@""];
@@ -275,22 +252,13 @@ static BOOL didSignIn = NO;
     self.filenamePending = @"";
 
 }
-/*-(void)createBodyWithArray:(NSArray *)info{
-    if(info.count == 7){
-        NSNumber *x = [info objectAtIndex:1];
-        NSNumber *y = [info objectAtIndex:2];
 
-        [self createHTTPBodyWithImage:[info objectAtIndex:0] size:CGPointMake(x.floatValue, y.floatValue) filename:[info objectAtIndex:3] path:[info objectAtIndex:4] andAnnotation:[info objectAtIndex:5] andFields:[info objectAtIndex:6]];
-    }
-}*/
--(void)updateAnnotationFrom: (NSString *)filename withSize:(CGPoint) size: (NSMutableArray *) annotation{
-    // [self.delegateProgress startProgress];
-    //Reachability *networkReachability = [Reachability reachabilityForInternetConnection];
-   // NetworkStatus networkStatus = [networkReachability currentReachabilityStatus];
+-(void)updateAnnotationFrom: (NSString *)filename withSize:(CGPoint)size :(NSMutableArray *)annotation
+{
     cancel = NO;
 
     
-    NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
+    NSString *boundary = @"AaB03x";
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.updateAnnotationURL]];
     NSData *annotationData = [[NSData alloc]initWithData:[self createXMLFromAnnotation:annotation andImageSize:size]];
     [theRequest setHTTPMethod:@"POST"];
@@ -303,17 +271,7 @@ static BOOL didSignIn = NO;
     [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[@"Content-Disposition: form-data; name=\"annotation\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:annotationData];
-   /* [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [postBody appendData:[@"Content-Disposition: form-data; name=\"username\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-    [postBody appendData:[fields objectAtIndex:0]];
-    [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [postBody appendData:[@"Content-Disposition: form-data; name=\"password\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-    [postBody appendData:[fields objectAtIndex:1]];*/
 
-    
-    
-    /*[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-     [postBody appendData:[@"Content-Disposition: hidden; name=\"MAX_FILE_SIZE\"value=\"12000000\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];*/
     [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r \n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
     if (!didSignIn) {
         NSArray *fields = [[NSArray alloc] initWithArray:[self signInAgain]];
@@ -346,7 +304,7 @@ static BOOL didSignIn = NO;
     NSString *tmpPath = NSTemporaryDirectory();
 
     if (![filemng fileExistsAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] isDirectory:&isDir]) {
-        NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
+        NSString *boundary = @"AaB03x";
         UIImage *imageToSend = rotate(image, image.imageOrientation);
         NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(imageToSend, 1.0)];
         NSData *annotationData = [[NSData alloc] initWithData:[self createXMLFromAnnotation:annotation andImageSize:point]];
@@ -375,7 +333,7 @@ static BOOL didSignIn = NO;
 -(void)updateAnnotationWithFilename:(NSString *)filename{
     cancel = NO;
 
-    NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
+    NSString *boundary = @"AaB03x";
     
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.updateAnnotationURL]];
     [theRequest setHTTPMethod:@"POST"];
@@ -454,7 +412,7 @@ static BOOL didSignIn = NO;
 
 -(NSData *)createXMLFromAnnotation:(NSMutableArray *) annotation andImageSize:(CGPoint) point{
     NSMutableData *XMLString = [[NSMutableData alloc] init];
-    NSString *boundary = [[NSString alloc]initWithString:@"--022289--"];
+    NSString *boundary = @"--022289--";
         for (int i=0; i<annotation.count; i++) {
 
             Box *b = [annotation objectAtIndex:i];
@@ -480,6 +438,8 @@ static BOOL didSignIn = NO;
     
     return XMLString;
 }
+
+
 -(void)downloadProfilePictureToUsername:(NSString *) username{
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[documentsDirectory stringByAppendingPathComponent:username] stringByAppendingPathComponent:@"settings.plist"]];
@@ -504,11 +464,13 @@ static BOOL didSignIn = NO;
 
     }
 }
+
+
 -(void)uploadProfilePicture:(UIImage *)ppicture{
     NSArray *fields = [[NSArray alloc] initWithArray:[self signInAgain]];
     
     
-    NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
+    NSString *boundary = @"AaB03x";
     UIImage *imageToSend = rotate(ppicture, ppicture.imageOrientation);
     NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(imageToSend, 1.0)];
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.uploadProfilePictureURL]];
@@ -556,24 +518,25 @@ static BOOL didSignIn = NO;
             }
             
     }
-
-    /* [username release];
-    [password release];*/
     return [NSArray arrayWithObjects:[username dataUsingEncoding:NSUTF8StringEncoding],[password dataUsingEncoding:NSUTF8StringEncoding], nil];
 
 }
+
 #pragma mark -
 #pragma mark NSURLConnectionDelegate Methods
--(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data{
+-(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
      if (cancel) {
-
         [connection cancel];
         cancel = NO;
     }
     [receivedData appendData:data];
 
 }
--(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite{
+
+
+-(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite
+{
     if (cancel) {
         [connection cancel];
         cancel = NO;
@@ -720,15 +683,5 @@ static BOOL didSignIn = NO;
     
 }
 
-
-#pragma mark -
-#pragma mark Memory Management
-
--(void)dealloc{
-    self.checkLoginURL;
-    self.createAccountURL;
-    self.sendPhotoURL;
-    self.filenamePending;
-}
 
 @end

@@ -44,7 +44,7 @@
     self.scrollView.maximumZoomScale = 10.0;
     /*[self.bottomToolbar setBackgroundImage:[[UIImage imageNamed:@"navbarBg"]resizableImageWithCapInsets:UIEdgeInsetsZero  ] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
     [self.bottomToolbar setTintColor:[UIColor colorWithRed:150/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];*/
-    NSString *boundary = [[NSString alloc]initWithString:@"AaB03x"];
+    NSString *boundary = @"AaB03x";
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@"http://labelme.csail.mit.edu/Release3.0/browserTools/php/loginiphone.php"]];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     
@@ -141,20 +141,6 @@
     [activityIndicator setHidden:NO];
     [self.website reload];
 }
-#pragma mark -
-#pragma mark Memory Management Methods
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
--(void)dealloc{
-    self.back;
-    self.forward;
-    self.reload;
-    self.bottomToolbar;
-    self.website;
-    self.scrollView;
-}
+
 
 @end

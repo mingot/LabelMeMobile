@@ -6,23 +6,23 @@
 //  Copyright (c) 2012 CSAIL. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
+#import <QuartzCore/CALayer.h>
+
 #import "GalleryViewController.h"
 #import "Constants.h"
-#import "NSObject+Folders.h"
 #import "Box.h"
 #import "ServerConnection.h"
-#import <QuartzCore/QuartzCore.h>
 #import "CustomBadge.h"
 #import "UIImage+Resize.h"
 #import "NSObject+ShowAlert.h"
-#import "QuartzCore/CALayer.h"
+#import "NSObject+Folders.h"
 
 
-@interface GalleryViewController ()
 
-@end
 
 @implementation GalleryViewController
+
 @synthesize editButton = _editButton;
 @synthesize bottomToolbar = _bottomToolbar;
 @synthesize deleteButton = _deleteButton;
@@ -42,7 +42,8 @@
 
 
 #pragma mark -
-#pragma mark Initialization Method
+#pragma mark lifecycle
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -62,17 +63,16 @@
         self.editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(editAction:)];
         serverConnection.delegate = self;
 
-            }
+    }
     return self;
 }
-#pragma mark -
-#pragma mark View lifecycle
+
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    [self.usernameLabel setText:self.username];
+    self.usernameLabel.text = self.username;
     [self.usernameLabel setTextColor:[UIColor colorWithRed:51/255.0f green:51/255.0f blue:51/255.0f alpha:1.0]];
     //[self.usernameLabel setTextColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
     // TitleView: LabelMe Logo
@@ -80,16 +80,11 @@
     UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
     [titleView setImage:titleImage];
     [self.navigationItem setTitleView:titleView];
-    //[titleImage release];
 
     UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"] ;
-    //[self.view setBackgroundColor:[UIColor colorWithRed:236/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
-    //[self.editButton setTintColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
     [self.editButton setStyle:UIBarButtonItemStyleBordered];
     [self.navigationItem setRightBarButtonItem:self.editButton];
 
-   // self.sendButton = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleBordered target:self action:@selector(sendAction:)];
-    //[self.navigationItem setRightBarButtonItems:[NSArray arrayWithObjects:self.deleteButton,self.sendButton, nil]];
     [self.deleteButton setTintColor:[UIColor redColor]];
     [self.deleteButton setWidth:self.view.frame.size.width/2 - 11];
     [self.sendButton setWidth:self.view.frame.size.width/2 - 11];
@@ -104,14 +99,12 @@
 
     self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        CGRect screenSize = [[UIScreen mainScreen] bounds];
         
-        if (screenSize.size.height == 568) {
+        if ([UIScreen mainScreen].bounds.size.height == 568) {
             self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone5" bundle:nil];
             
-        }else if (screenSize.size.height == 480){
+        }else if ([UIScreen mainScreen].bounds.size.height == 480){
             self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
-            
         }
     }else{
         self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPad" bundle:nil];
@@ -161,7 +154,6 @@
     self.profilePicture.layer.cornerRadius = 6.0;
     [self.profilePicture setContentMode:UIViewContentModeScaleAspectFit];
 
-    //[self.profilePicture setBackgroundColor:[UIColor clearColor]];
     [view1.layer setShadowColor:[UIColor blackColor].CGColor];
     [view1.layer setShadowOffset:CGSizeMake(0, 1)];
     [view1.layer setShadowOpacity:0.9];
@@ -170,7 +162,6 @@
     [view1 addSubview:self.profilePicture];
     [view1 setClipsToBounds:NO];
     
-    // Do any additional setup after loading the view from its nib.
 }
 
 
@@ -178,7 +169,6 @@
 {
     [super viewWillAppear:animated];
 
-    //[[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     NSFileManager * filemng = [NSFileManager defaultManager];
 
     if ([filemng fileExistsAtPath:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]]) {
@@ -195,7 +185,7 @@
 
 - (void) viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
-    if (self.editButton.title == @"Cancel") {
+    if ([self.editButton.title isEqual: @"Cancel"]) {
         [self.editButton setTitle:@"Edit"];
         [self.editButton setStyle:UIBarButtonItemStyleBordered];
         
@@ -207,13 +197,9 @@
         [self.deleteButton setEnabled:NO];
         [self.tableViewGrid setFrame:CGRectMake(self.tableViewGrid.frame.origin.x, self.tableViewGrid.frame.origin.y, self.tableViewGrid.frame.size.width, self.tableViewGrid.frame.size.height + self.navigationController.toolbar.frame.size.height)];
         
-        //[self.tabBarController.tabBar setHidden:NO];
-        
-        //[self.navigationController setToolbarHidden:YES];
-        //[self.view setFrame:CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height -  self.tabBarController.tabBar.frame.size.height)];
         [self.navigationController setToolbarHidden:YES];
     }
-    //[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+    
     [self reloadGallery];
 }
 
@@ -221,7 +207,8 @@
 #pragma mark -
 #pragma mark Gallery Management
 
--(void) reloadGallery{
+-(void) reloadGallery
+{
     NSFileManager * filemng = [NSFileManager defaultManager];
     [self setItems:[filemng contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.paths objectAtIndex:THUMB]] error:NULL]];
     [self.tableViewGrid setRowHeight:(0.225*self.view.frame.size.width*ceil((float)self.items.count/4) +0.0375*self.view.frame.size.width)];
@@ -233,9 +220,11 @@
     else{
         [noImages setHidden:YES];
     }
-
 }
--(UIView *)correctAccessoryAtIndex:(int)i withNum:(NSNumber *)num withSize:(CGSize)size{
+
+
+-(UIView *)correctAccessoryAtIndex:(int)i withNum:(NSNumber *)num withSize:(CGSize)size
+{
     UIView *ret = nil;
     CGSize size2 = size;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -264,7 +253,8 @@
 }
 
 
--(UIImage * ) addBorderTo:(UIImage *)image{
+-(UIImage * ) addBorderTo:(UIImage *)image
+{
     CGImageRef bgimage = [image CGImage];
 	float width = CGImageGetWidth(bgimage);
 	float height = CGImageGetHeight(bgimage);
@@ -288,12 +278,6 @@
 	CGContextSetLineWidth(ctx, borderWidth);
     
 	//Start at 0,0 and draw a square
-	/*CGContextMoveToPoint(ctx, borderWidth/2, 12-borderWidth/2);
-	CGContextAddLineToPoint(ctx, borderWidth/2, 144-borderWidth/2);
-	CGContextAddLineToPoint(ctx, 132-borderWidth/2, 144-borderWidth/2);
-	CGContextAddLineToPoint(ctx, 132-borderWidth/2,12-borderWidth/2);
-	CGContextAddLineToPoint(ctx, borderWidth/2, 12-borderWidth/2);
-    */
     CGContextMoveToPoint(ctx, borderWidth/2, borderWidth/2);
 	CGContextAddLineToPoint(ctx, self.view.frame.size.width*0.4125-borderWidth/2, borderWidth/2);
 	CGContextAddLineToPoint(ctx, self.view.frame.size.width*0.4125-borderWidth/2, self.view.frame.size.width*0.4125-borderWidth/2);
@@ -309,14 +293,17 @@
 	CGContextRelease(ctx);
     free(data);
     
-    // auto-released
 	return newImage;
 }
+
+
 #pragma mark -
 #pragma mark IBActions
--(IBAction)editAction:(id)sender{
+
+-(IBAction)editAction:(id)sender
+{
     if (!self.listButton.isSelected) {
-        if (self.editButton.title == @"Edit") {
+        if ([self.editButton.title isEqual: @"Edit"]) {
             [self.listButton setHidden:YES];
             //[self.view setFrame:CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height +  49)];
             //[self.tabBarController.tabBar setHidden:YES];
@@ -344,7 +331,7 @@
         }
     }
     else{
-        if (self.editButton.title == @"Edit") {
+        if ([self.editButton.title isEqual: @"Edit"]) {
             [self.tableView setEditing:YES animated:YES];
             [self.listButton setHidden:YES];
             [self.editButton setTitle:@"Done"];
@@ -363,11 +350,12 @@
     
 }
 
--(IBAction)buttonClicked:(id)sender{
+-(IBAction)buttonClicked:(id)sender
+{
     
     UIButton *button = (UIButton *)sender;
     
-    if (self.editButton.title == @"Cancel") {
+    if ([self.editButton.title isEqual: @"Cancel"]) {
         if ([self.selectedItems containsObject:[self.items objectAtIndex:abs(button.tag)-1]]) {
             [self.selectedItems removeObject:[self.items objectAtIndex:abs(button.tag)-1]];
             [button setSelected:NO];
@@ -392,20 +380,17 @@
 
     
     else{
-        
         [self imageDidSelectedWithIndex:(button.tag -1)];
-
-        
-
     }
 }
+
+
 -(void)imageDidSelectedWithIndex:(int)selectedImage
 {
     NSString *path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.items objectAtIndex:selectedImage]   ];
     
-    //NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+
     NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
-    //UIImage *img =  [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:IMAGES],[self.items                                             objectAtIndex:button.tag-1]]];
     NSLog(@"image: %@",[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:IMAGES],[self.items objectAtIndex:selectedImage]]);
     UIImage *img = [[UIImage alloc]initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:IMAGES],[self.items objectAtIndex:selectedImage]]];
     NSLog(@"size: %f x %f",img.size.width,img.size.height);
@@ -416,8 +401,6 @@
     [self.tagViewController setUsername:user];
     [self.tagViewController.annotationView reset];
     [self.tagViewController.annotationView.objects setArray:objects];
-    //[self.tagViewController.annotationView.objects release];
-    //[self.tagViewController.annotationView setNumLabels:self.tagViewController.annotationView.objects.count];
     [self.tagViewController setFilename:filename];
     self.tagViewController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.tagViewController animated:YES];
@@ -425,10 +408,8 @@
 }
 
 
--(IBAction)listSendAction:(id)sender{
-    /*[self.usernameLabel setHidden:YES];
-    [self.progressView setHidden:NO];
-    [self.XButton setHidden:NO];*/
+-(IBAction)listSendAction:(id)sender
+{
     [sendingView setHidden:NO];
     [self.tabBarController.tabBar setUserInteractionEnabled:NO];
     photosWithErrors = 0;
@@ -454,15 +435,11 @@
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:str otherButtonTitles:nil, nil];
     actionSheet.actionSheetStyle = UIBarStyleBlackTranslucent;
     actionSheet.tag = 0;
-    //[actionSheet showFromTabBar:self.tabBarController.tabBar];
     [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
 }
 
 -(IBAction)sendAction:(id)sender{
     [self.selectedItemsSend addObjectsFromArray:self.selectedItems];
-    /*[self.usernameLabel setHidden:YES];
-    [self.progressView setHidden:NO];
-    [self.XButton setHidden:NO];*/
     [sendingView.activityIndicator startAnimating];
 
     [sendingView setHidden:NO];
@@ -472,12 +449,14 @@
     [sendingView setTotal:self.selectedItemsSend.count];
     photosWithErrors = 0;
     [self sendPhoto];
-    //[self performSelectorInBackground:@selector(sendPhoto) withObject:nil];
     [self.selectedItems removeAllObjects];
     [self editAction:self.editButton];
     
 }
--(IBAction)listAction:(id)sender{
+
+
+-(IBAction)listAction:(id)sender
+{
     UIButton *button = (UIButton *)sender;
     if (!button.isSelected) {
         self.tableViewGrid.hidden = YES;
@@ -495,7 +474,8 @@
     
 }
 
--(IBAction)cancelAction:(id)sender{
+-(IBAction)cancelAction:(id)sender
+{
     [serverConnection cancelRequestFor:0];
 
     [self.selectedItemsSend removeAllObjects];
@@ -504,7 +484,9 @@
 }
 #pragma mark -
 #pragma mark UIActionSheetDelegate Methods
--(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
+
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
     if (actionSheet.tag == 0) {
         if (buttonIndex==0) {
             
@@ -514,16 +496,20 @@
       
         }
         [self.selectedItems removeAllObjects];
-        //
 
     }
    
     [self editAction:self.editButton];
     [self reloadGallery];
 
+    
 }
+
+
+
 #pragma mark -
 #pragma mark Deleting Methods
+
 -(void)deletePhotoAndAnnotation
 {
     int index = 0;
@@ -569,6 +555,7 @@
 
 #pragma mark -
 #pragma mark Sending Methods
+
 -(void)sendPhoto
 {
    /* ServerConnection * sConnection = [[ServerConnection alloc] init];
@@ -587,17 +574,10 @@
         if (f>1) {
             //self.scrollView.frame.size.width-self.scrollView.frame.size.height /f)/2
             point = CGPointMake(image.size.height/([box bounds].x*f), image.size.height/[box bounds].y);
-            
-            
-            
         }
         else {
             point = CGPointMake(image.size.width/([box bounds].x), image.size.width*f/([box bounds].y));
-            
         }
-        
-
-
     }
     
     if (num.intValue <0) {
@@ -608,13 +588,13 @@
         // Photo is in the server, overwrite the annotation
         [serverConnection updateAnnotationFrom:[self.selectedItemsSend objectAtIndex:0] withSize:point :annotation];
     }
-    //[sConnection release];
     
 }
 
 
 #pragma mark -
 #pragma mark ServerConnectionDelegate Methods
+
 -(void)photoSentCorrectly:(NSString *)filename
 {
     [self.selectedItemsSend removeObject:filename];
@@ -637,10 +617,6 @@
         [self sendPhoto];
     }
     else{
-        /*[self.usernameLabel setHidden:NO];
-        [self.progressView setHidden:YES];
-        [self.XButton setHidden:YES];
-        [self.progressView setProgress:0];*/
         if (photosWithErrors >0) {
             if (photosWithErrors == 1) {
                 [self errorWithTitle:@"An image could not be sent" andDescription:@"Please, try again."];
@@ -691,18 +667,10 @@
         [self.tabBarController.tabBar setUserInteractionEnabled:YES];
         [self.editButton setEnabled:YES];
     }
-    
-     /*[sendingView reset];
-    
-     [sendingView setHidden:YES];
-     [self.editButton setEnabled:YES];
-     [sendingView.activityIndicator stopAnimating];
-     [self.selectedItemsSend removeAllObjects];*/
 
 }
                  
 -(void)photoNotOnServer:(NSString *)filename{
-    //[self.selectedItemsSend removeObject:filename];
     NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
     if (objects != nil) {
         for (int i=0; i<objects.count; i++) {
@@ -740,17 +708,10 @@
 #pragma mark -
 #pragma mark TableView Delegate&Datasource
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    //#warning Potentially incomplete method implementation.
-    // Return the number of sections.
-    return 1;
-}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    //#warning Incomplete method implementation.
-    // Return the number of rows in the section.
+
     NSInteger ret = 0;
     if (tableView.tag == 0 && (self.items.count>0)) {
         ret = 1;
@@ -769,13 +730,6 @@
                 [self deletePhotoAndAnnotation];
 
             }
-           // [self reloadGallery];
-            
-            /*UITableViewCell *cell =  [tableView cellForRowAtIndexPath:indexPath];
-             UIButton *button =  (UIButton *)[cell.contentView viewWithTag:22];
-             button.hidden = NO;*/
-            
-            
         }
 
     }
@@ -817,7 +771,7 @@
                 UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0.0375*self.view.frame.size.width,0.4125*self.view.frame.size.width, 0.4125*self.view.frame.size.width)];
                 imageView.image = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:THUMB],[self.items objectAtIndex:i]]];
                 UIView *imview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width)];
-                //[ imview setBackgroundColor:[UIColor colorWithRed:(237.0/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0] ];
+
                 
                 [imview addSubview:imageView];
                 UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width,0.45*self.view.frame.size.width));
@@ -836,9 +790,7 @@
 
                 UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
                 button.tag = i+1;
-                // [button setImage:image forState:UIControlStateNormal];
-                //button.frame = CGRectMake(width/80+width/4*(i%4), width/80+width/4*(floor((i/4))), 15*width/64, 15*width/64);
-                // button.frame = CGRectMake(width/4*(i%4), width/80+width/4*(floor((i/4))), width/4, width/4);
+
                 if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 
                     button.frame = CGRectMake(0.05*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.225*self.view.frame.size.width, 0.225*self.view.frame.size.width);
@@ -853,11 +805,7 @@
                 [button setImage:image forState:UIControlStateNormal];
                 [button setImage:[self addBorderTo:image2] forState:UIControlStateSelected];
                 [button addSubview:[self correctAccessoryAtIndex:i withNum:num withSize:button.frame.size]];
-                /*[button.layer setShadowColor:[UIColor blackColor].CGColor];
-                [button.layer setShadowOffset:CGSizeMake(0, 1)];
-                [button.layer setShadowOpacity:0.9];
-                [button.layer setShadowRadius:3.0];
-                [button setClipsToBounds:NO];*/
+
                
                 [cell addSubview:button];
             }
@@ -888,48 +836,22 @@
             
             [button setTitle:@"Update" forState:UIControlStateNormal];
             [button setTitleColor:[UIColor colorWithRed:(237.0/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0] forState:UIControlStateNormal];
-            
-            
+
         }
-       // [cell setEditing:YES animated:YES];
         [button setFrame:CGRectMake(self.view.frame.size.width-0.40625*self.view.frame.size.width, 0.0625*self.view.frame.size.width, 0.234375*self.view.frame.size.width, 0.109375*self.view.frame.size.width)];
         [button setTag:indexPath.row+10];
         [button addTarget:self action:@selector(listSendAction:) forControlEvents:UIControlEventTouchUpInside];
         [cell.contentView addSubview:button];
-        if (self.editButton.title == @"Done") {
+        if ([self.editButton.title isEqual: @"Done"]) {
             [button setHidden:YES];
-
         }
-        // Configure the cell...
-        /*[sendTable setFrame:CGRectMake(cell.frame.size.width-40-cell.frame.size.height, cell.frame.size.height/3, cell.frame.size.height, cell.frame.size.height/3)];*/
-        /* button =  (UIButton *)[cell.contentView viewWithTag:indexPath.row+10];
-         if (button == nil) {
-         button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-         [button setTitle:@"Send" forState:UIControlStateNormal];
-         [cell setEditing:YES animated:YES];
-         [button setFrame:CGRectMake(self.view.frame.size.width-40-75, 20, 75, 35)];
-         [button setTag:indexPath.row+10];
-         [button addTarget:self action:@selector(listSendAction:) forControlEvents:UIControlEventTouchUpInside];
-         [cell.contentView addSubview:button];
-         
-         
-         }
-         [button setTag:indexPath.row + 10];*/
+
         
-        
-        NSString *path = [[NSString alloc]initWithFormat:@"%@/%@",[self.paths objectAtIndex:THUMB],[self.items objectAtIndex:indexPath.row] ];
         NSMutableArray *annotation = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.items objectAtIndex:indexPath.row] ] ];
         UIImage *newimage = [[UIImage alloc]initWithContentsOfFile:[[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:[self.items objectAtIndex:indexPath.row]] ];
         [cell.detailTextLabel setNumberOfLines:2];
         NSString *detailText = [[NSString alloc]initWithFormat:@"%d objects\n%d x %d",annotation.count,(int)newimage.size.width,(int)newimage.size.height];
-        //    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 10, 90, 90)];
-        //    imageView.image = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:THUMB],[self.items objectAtIndex:indexPath.row]]];
-        //    UIGraphicsBeginImageContext(CGSizeMake(100, 100));
-                           
-        //
-        //    [imageView.layer  renderInContext:UIGraphicsGetCurrentContext()];
-        //    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-        //    UIGraphicsEndImageContext();
+
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0375*self.view.frame.size.width, 0.0375*self.view.frame.size.width, 0.425*self.view.frame.size.width, 0.425*self.view.frame.size.width)];
         imageView.image = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:THUMB],[self.items objectAtIndex:indexPath.row]]];
         UIView *imview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0.5*self.view.frame.size.width,  0.5*self.view.frame.size.width)];
@@ -940,26 +862,17 @@
         UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         [cell.imageView setImage:image];
-        // [cell.imageView setImage:[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:THUMB],[self.items objectAtIndex:indexPath.row]]]];
         [cell.imageView addSubview:[self correctAccessoryAtIndex:indexPath.row withNum:num withSize:CGSizeMake(tableView.rowHeight , tableView.rowHeight)]];
         [cell.detailTextLabel setText:detailText];
         cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
         NSString *date = [[NSString alloc]initWithFormat:@"%@-%@-%@",[[self.items objectAtIndex:indexPath.row] substringWithRange:NSMakeRange(4, 2)],[[self.items objectAtIndex:indexPath.row] substringWithRange:NSMakeRange(6, 2)],[[self.items objectAtIndex:indexPath.row] substringToIndex:4] ];
         
         [cell.textLabel setText:date];
-        /*[cell.imageView.layer setShadowColor:[UIColor blackColor].CGColor];
-        [cell.imageView.layer setShadowOffset:CGSizeMake(0, 1)];
-        [cell.imageView.layer setShadowOpacity:0.9];
-        [cell.imageView.layer setShadowRadius:3.0];
-        [cell.imageView.layer setCornerRadius:6.0];
-        [cell.imageView setClipsToBounds:NO];*/
-        // [img release];
     }
    
 
     return cell;
     
-    // Configure the cell...
     
 }
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -978,8 +891,6 @@
 
         }
         return YES;
-        
-        
     }
 }
 
@@ -987,10 +898,7 @@
 {
     if (tableView.tag == 1) {
         [self imageDidSelectedWithIndex:indexPath.row];
-
     }
-    
-    
     
 }
 #pragma mark -
@@ -1008,14 +916,6 @@
     [sendingView.activityIndicator stopAnimating];
 
     
-}
-#pragma mark -
-#pragma mark Memory Managemente Methods
-
-- (void)didReceiveMemoryWarning
-{
-
-    [super didReceiveMemoryWarning];
 }
 
 

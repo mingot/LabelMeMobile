@@ -311,26 +311,6 @@
 }
 -(void)createAccountError{
 }
-#pragma mark -
-#pragma mark Memory Management
 
-
--(void)dealloc{
-    self.usernameField;
-    self.passwordField;
-    self.biologicalNameField;
-    self.emailField;
-    self.institutionField;
-    self.keyboardToolbar;
-    self.topToolbar;
-    self.scrollView;
-    self.tabBarController;
-}
-- (void)didReceiveMemoryWarning
-{
-
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
 @end

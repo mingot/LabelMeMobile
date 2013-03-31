@@ -10,58 +10,99 @@
 #import "Classifier.h"
 #import "Box.h"
 #import "ConvolutionHelper.h"
+
 #import "UIImage+Resize.h"
+#import "UIImage+HOG.h"
+
+
+@protocol DetectorDescriptionViewControllerDelegate <NSObject>
+
+- (void) updateDetector;
+
+@end
+
+
 
 @interface DetectorDescriptionViewController()
 
 //return pointer to template from filename
-- (double *) readTemplate:(NSString *)filename;
+- (double *) readClassifier;
+
+//save the current classifier to the disk
+- (void) storeClassifier;
 
 @end
 
 
 @implementation DetectorDescriptionViewController
 
-@synthesize trainController = _trainController;
 @synthesize executeController = _executeController;
+@synthesize trainingSetController = _trainingSetController;
 @synthesize svmClassifier = _svmClassifier;
+@synthesize classifierName = _classifierName;
 @synthesize classToLearn = _classToLearn;
 @synthesize executeButton = _executeButton;
-@synthesize trainingSetController = _trainingSetController;
+@synthesize userPath = _userPath;
+@synthesize classTextField = _classTextField;
+@synthesize delegate = _delegate;
+
+
+#pragma mark
+#pragma mark - Life cycle
 
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.trainController = [[TrainDetectorViewController alloc] initWithNibName:@"TrainDetectorViewController" bundle:nil];
+    
+    //load views
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
+    self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
     
     //set labels
-    self.classifierNameLabel.text = self.classifierName;
-    self.classToLearnLabel.text = self.classToLearn;
+    self.classTextField.text = self.classToLearn;
+    self.nameTextField.text = self.classifierName;
+    
+    
     
     //Check if the classifier exists.
-    if([self readTemplate:self.classifierName])
-        self.svmClassifier = [[Classifier alloc] initWithTemplateWeights:[self readTemplate:self.classifierName]];
-    else{
-        [self.executeButton setEnabled:NO];
+    if([self readClassifier]){
+        NSLog(@"Loading classifier");
+        self.svmClassifier = [[Classifier alloc] initWithTemplateWeights:[self readClassifier]];
+        self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
+        self.saveButton.enabled = NO;
+        self.saveButton.alpha = 0.6f;
+        
+    }else{
         NSLog(@"No classifier");
+        self.executeButton.enabled = NO;
+        self.executeButton.alpha = 0.6f;
+        self.svmClassifier = [[Classifier alloc] init];
     }
     
-    NSLog(@"VIEW DID LOAD!!!");
+    //set editing button
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.nameTextField.enabled = NO;
+    self.classTextField.enabled = NO;
+    self.saveButton.enabled = NO;
+    self.saveButton.alpha = 0.6f;
     
-    self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
 }
 
 
-- (IBAction)trainAction:(id)sender
+- (void)viewDidUnload
 {
-    NSLog(@"Train detector");
-    //SET THE DELEGATE TO RETURN THE TRAINED CLASSIFIER
-    self.trainController.trainingSet = [[TrainingSet alloc] init];
-    [self.navigationController pushViewController:self.trainController animated:YES];
-    
+    [self setExecuteButton:nil];
+    [self setDetectorView:nil];
+    [self setTrainButton:nil];
+    [self setSaveButton:nil];
+    [self setClassTextField:nil];
+    [self setNameTextField:nil];
+    [super viewDidUnload];
 }
+
+#pragma mark
+#pragma mark - Actions
 
 - (IBAction)executeAction:(id)sender
 {
@@ -77,18 +118,15 @@
 #define THUMB 1
 #define OBJECTS 2
 
-- (IBAction)trainFromSetAction:(id)sender
+- (IBAction)trianAction:(id)sender
 {
     //retrive all images containing classToLearn
-    NSString *username = @"mingot";
-    NSString *selectedClass = @"bottle";
+    NSString *selectedClass = self.classToLearn;//@"bottle";
     
     TrainingSet *trainingSet = [[TrainingSet alloc] init];
     
     //get the path
-    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *userPath = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,username ];
-    NSArray *resourcesPaths = [NSArray arrayWithObjects:[userPath stringByAppendingPathComponent:@"images"],[userPath stringByAppendingPathComponent:@"thumbnail"],[userPath stringByAppendingPathComponent:@"annotations"],userPath, nil];
+    NSArray *resourcesPaths = [NSArray arrayWithObjects:[self.userPath stringByAppendingPathComponent:@"images"],[self.userPath stringByAppendingPathComponent:@"thumbnail"],[self.userPath stringByAppendingPathComponent:@"annotations"],self.userPath, nil];
 
     //get items
     NSFileManager * filemng = [NSFileManager defaultManager];
@@ -113,8 +151,8 @@
                 cp.ymin = box.upperLeft.y/box->LOWERBOUND;
                 cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
                 cp.ymax = box.lowerRight.y/box->LOWERBOUND;
-                NSLog(@"Box located at: (%f,%f) (%f,%f)", box.upperLeft.x, box.upperLeft.y, box.lowerRight.x, box.lowerRight.y);
                 cp.imageIndex = trainingSet.images.count;
+                cp.label = 1;
                 [trainingSet.groundTruthBoundingBoxes addObject:cp];
             }
         }
@@ -122,54 +160,84 @@
         
     }
     
+    
     NSLog(@"Number of images in the training set: %d",trainingSet.images.count);
     NSLog(@"Number of boxes: %d", trainingSet.groundTruthBoundingBoxes.count);
     
-    //initial fill
-    [trainingSet initialFill];
-    NSLog(@"Number of training examples and bounding boxes (have to concide)!: %d %d", trainingSet.numberOfTrainingExamples, trainingSet.boundingBoxes.count);
-    NSLog(@"caca");
+ 
+//    //INITIAL FILL AND VISUALIZE IMAGES GENERATED
+//
+//    [trainingSet initialFill];
+//    
+//    NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
+//    
+//    for(int i=0; i<trainingSet.boundingBoxes.count; i++)
+//    {
+//        ConvolutionPoint *cp = [trainingSet.boundingBoxes objectAtIndex:i];
+//        UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
+//        UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
+//        [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
+//    }
+//    
+//    
+//    self.trainingSetController.listOfImages = listOfImages;
+//    //    self.trainingSetController.listOfImages = self.trainingSet.images;
+//    
+//    [self.navigationController pushViewController:self.trainingSetController animated:YES];
     
+
+    //learn
+    NSLog(@"Training begins!");
+    [self.svmClassifier train:trainingSet];
+    NSLog(@"Finished training");
     
-    
-    
-    //VISUALIZE IMAGES GENERATED
-    
-    NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
-    
-    for(int i=0; i<trainingSet.boundingBoxes.count; i++)
-    {
-        ConvolutionPoint *cp = [trainingSet.boundingBoxes objectAtIndex:i];
-        UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
-        UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
-        [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
-    }
-    
-    
-    self.trainingSetController.listOfImages = listOfImages;
-    //    self.trainingSetController.listOfImages = self.trainingSet.images;
-    
-    [self.navigationController pushViewController:self.trainingSetController animated:YES];
-    
-    
-    
-//    //learn
-//    [self.svmClassifier train:trainingSet];
-    
-    //store classifier
-    
+    //update view of the detector
+    self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
+    self.executeButton.enabled = YES;
+    self.executeButton.alpha = 1.0f;
+    self.saveButton.enabled = YES;
+    self.saveButton.alpha = 1.0f;
 }
 
+- (IBAction)saveAction:(id)sender
+{
+    [self storeClassifier];
+    [self.delegate updateDetectorName:self.classifierName forClass:self.classToLearn];
+}
+
+
+#pragma mark
+#pragma mark - Editing mode
+
+- (void)setEditing:(BOOL)flag animated:(BOOL)animated
+{
+    [super setEditing:flag animated:animated];
+    if (flag == YES){
+        // Change views to edit mode.
+        NSLog(@"Now editing!");
+        self.classTextField.enabled = YES;
+        self.nameTextField.enabled = YES;
+    }
+    else {
+        // Save the changes if needed and change the views to noneditable.
+        NSLog(@"End editing");
+        self.classifierName = self.nameTextField.text;
+        self.classToLearn = self.classTextField.text;
+        self.title = self.nameTextField.text;
+        self.classTextField.enabled = NO;
+        self.nameTextField.enabled = YES;
+        [self.delegate updateDetectorName:self.classifierName forClass:self.classToLearn];
+    }
+}
 
 
 #pragma mark
 #pragma mark - Private methods
 
-- (double *) readTemplate:(NSString *)filename
+- (double *) readClassifier
 {
-//    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-//    NSString *path = [NSString stringWithFormat:@"%@/Templates/%@",documentsDirectory,filename];
-    NSString *path = [[NSBundle mainBundle] pathForResource:filename ofType:@"txt"];
+    NSString *classifierName = [NSString stringWithFormat:@"%@_%@",self.classifierName, self.classToLearn];
+    NSString *path = [NSString stringWithFormat:@"%@/Detectors/%@",self.userPath,classifierName];
     
     if(!path)
         return nil;
@@ -188,10 +256,22 @@
     return r;
 }
 
-- (void)viewDidUnload {
-    [self setExecuteButton:nil];
-    [self setClassifierNameLabel:nil];
-    [self setClassToLearnLabel:nil];
-    [super viewDidUnload];
+- (void) storeClassifier
+{
+    NSString *classifierName = [NSString stringWithFormat:@"%@_%@",self.classifierName, self.classToLearn];
+    NSString *path = [NSString stringWithFormat:@"%@/Detectors/%@",self.userPath,classifierName];
+    
+    int totalNumFeatures = self.svmClassifier.weightsDimensions[0]*self.svmClassifier.weightsDimensions[1]*self.svmClassifier.weightsDimensions[2];
+    
+    NSMutableString *content = [NSMutableString stringWithCapacity:totalNumFeatures+4];
+    [content appendFormat:@"%d\n",self.svmClassifier.weightsDimensions[0]];
+    [content appendFormat:@"%d\n",self.svmClassifier.weightsDimensions[1]];
+    [content appendFormat:@"%d\n",self.svmClassifier.weightsDimensions[2]];
+    for (int i = 0; i<totalNumFeatures + 1; i++)
+        [content appendFormat:@"%f\n",self.svmClassifier.svmWeights[i]];
+    
+    if([content writeToFile:path atomically:NO encoding:NSUTF8StringEncoding error:NULL])
+        NSLog(@"Write Detector Work!");
 }
+
 @end

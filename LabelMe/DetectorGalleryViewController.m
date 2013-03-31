@@ -19,6 +19,7 @@
 @synthesize detectors = _detectors;
 @synthesize tableView = _tableView;
 @synthesize detectorController = _detectorController;
+@synthesize userPath = _userPath;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -34,7 +35,21 @@
 
 - (void)viewDidLoad
 {
-    self.detectors = [[NSMutableArray alloc] initWithObjects:@"car",@"bottle",@"cat",nil];
+    //Load detectors
+    NSString *username = @"mingot";
+    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    self.userPath = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,username];
+    NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors"];
+    NSLog(@"%@", detectorsPath);
+    
+    //Create directory if it does not exist
+    if(![[NSFileManager defaultManager] fileExistsAtPath:detectorsPath]){
+        [[NSFileManager defaultManager] createDirectoryAtPath:detectorsPath withIntermediateDirectories:YES attributes:nil error:nil];
+        self.detectors = [[NSMutableArray alloc] init];
+        
+    }else self.detectors = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:detectorsPath error:NULL] mutableCopy];
+    
+//    self.detectors = [[NSMutableArray alloc] initWithObjects:@"car",@"bottle",@"cat",nil];
     self.title = @"Detectors Gallery";
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(Edit:)];
     [self.navigationItem setLeftBarButtonItem:addButton];
@@ -44,6 +59,13 @@
     [super viewDidLoad];
 }
 
+
+
+- (void)viewDidUnload
+{
+    [self setTableView:nil];
+    [super viewDidUnload];
+}
 
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
@@ -61,31 +83,22 @@
     static NSString *CellIdentifier = @"Cell";
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     int count = 0;
     if(self.editing && indexPath.row != 0)
         count = 1;
     if(indexPath.row == ([self.detectors count]) && self.editing){
-        cell.textLabel.text = @"Add Data";
+        cell.textLabel.text = @"Add Detector";
         return cell;
     }
-    cell.textLabel.text = [self.detectors objectAtIndex:indexPath.row];
+    NSArray *comp = [[self.detectors objectAtIndex:indexPath.row] componentsSeparatedByString:@"_"];
+    cell.textLabel.text = [comp objectAtIndex:0];
+    cell.detailTextLabel.text = [comp objectAtIndex:1];
     return cell;
 }
 
-- (IBAction)AddButtonAction:(id)sender
-{
-    [self.detectors addObject:@"SaturDay"];
-    [self.tableView reloadData];
-}
-
-- (IBAction)DeleteButtonAction:(id)sender
-{
-    [self.detectors removeLastObject];
-    [self.tableView reloadData];
-}
 
 - (IBAction) Edit:(id)sender
 {
@@ -127,7 +140,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
         [self.detectors removeObjectAtIndex:indexPath.row];
         [self.tableView reloadData];
     } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        [self.detectors insertObject:@"SaturDay" atIndex:[self.detectors count]];
+        [self.detectors insertObject:@"New Detector_Not set" atIndex:[self.detectors count]];
         [self.tableView reloadData];
     }
 }
@@ -151,20 +164,31 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self.editing == NO) {
-        self.detectorController.title = [self.detectors objectAtIndex:indexPath.row];
+        _selectedRow = indexPath.row;
+        
+        NSArray *comp = [[self.detectors objectAtIndex:indexPath.row] componentsSeparatedByString:@"_"];
+        self.detectorController.delegate = self;
+        self.detectorController.title = [comp objectAtIndex:0];
         self.detectorController.classifierName = self.detectorController.title;
-        self.detectorController.classToLearn = self.detectorController.title;
+        self.detectorController.classToLearn = [comp objectAtIndex:1];
         self.detectorController.view = nil; //to reexecute viewDidLoad
+        self.detectorController.userPath = self.userPath;
         [self.navigationController pushViewController:self.detectorController animated:YES];
         
     }
 }
 
 
+#pragma mark
+#pragma mark - Detector Description Delegate
 
-- (void)viewDidUnload {
-    [self setTableView:nil];
-    [super viewDidUnload];
+- (void) updateDetectorName:(NSString *)detectorName forClass:(NSString *)detectorClass
+{
+    //update table
+    [self.detectors replaceObjectAtIndex:_selectedRow withObject:[NSString stringWithFormat:@"%@_%@",detectorName,detectorClass]];
+    [self.tableView reloadData];
+    
+    //save name to disk
 }
 
 

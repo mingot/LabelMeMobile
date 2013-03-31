@@ -399,7 +399,7 @@
     //[self.imagePicker.navigationController pushViewController:self.tagViewController animated:NO];
     
 
-    NSString *location = [[NSString alloc] initWithString:@""];
+    NSString *location = @"";
 
     if (self.imagePicker.sourceType == UIImagePickerControllerSourceTypeCamera) {
         location = [[locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
@@ -417,20 +417,7 @@
     [self.imagePicker pushViewController:self.tagViewController animated:NO];
     [locationMng stopUpdatingLocation];
     
-
-
-   // [paths release];
     
 }
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
--(void)dealloc{
-    self.imagePicker;
-    self.tagViewController;
-    //[self.imageToAnnotate release];
-}
 @end

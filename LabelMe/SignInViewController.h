@@ -19,9 +19,9 @@
 
 {
     
-    SendingView         *sendingView;
-    ServerConnection    *sConnection;
-    CLLocationManager   *locationMng;
+    SendingView *sendingView;
+    ServerConnection *sConnection;
+    CLLocationManager *locationMng;
     BOOL keyboardVisible;
     BOOL previousSession;
 
@@ -42,9 +42,9 @@
 @property (strong,nonatomic) UINavigationController  *navController3;
 @property (strong,nonatomic) UINavigationController  *navController4;
 @property (strong,nonatomic) UIPopoverController     *popover;
-@property (strong,nonatomic) GalleryViewController          *galleryViewController;
-@property (strong,nonatomic) SettingsViewController         *settingsViewController;
-@property (strong,nonatomic) DetectorGalleryViewController  *detectorGalleryController;
+@property (strong,nonatomic) GalleryViewController         *galleryViewController;
+@property (strong,nonatomic) SettingsViewController        *settingsViewController;
+@property (strong,nonatomic) DetectorGalleryViewController *detectorGalleryController;
 
 
 

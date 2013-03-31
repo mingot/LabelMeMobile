@@ -82,20 +82,6 @@
     num = 1;
     total =  0;
 }
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
-}
-*/
--(void)dealloc{
-    self.label;
-    self.progressView;
-    self.activityIndicator;
-    self.filename;
-    self.cancelButton;
-}
+
 
 @end

@@ -42,10 +42,15 @@
 #pragma mark Classifier
 //////////////////////////////////////////////////////////////////////////
 
-@interface Classifier : NSObject
+@interface Classifier : NSObject <NSCoding>
 
 @property double *svmWeights;
 @property int *weightsDimensions;
+
+@property (strong, nonatomic) NSMutableArray *weights;
+@property (strong, nonatomic) NSArray *sizes;
+@property (strong, nonatomic) NSString *name;
+@property (strong, nonatomic) NSString *targetClass;
 
 
 // Initialization of the classifier given the weight vectors of it
@@ -67,9 +72,6 @@
 
 // given a set with ground truth bounding boxes, returns the metric spesified.
 - (void) testOnSet:(TrainingSet *)set atThresHold:(float)detectionThreshold;
-
-// Store the weights of the template to the disk
-- (void) storeSvmWeightsAsTemplateWithName:(NSString *)templateName;
 
 // Safe the hog features of the first positive template as the classifier
 // weights

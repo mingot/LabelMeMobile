@@ -475,7 +475,6 @@
         if (![box.label isEqualToString:self.label.text]) {
             
             box.label= self.label.text;
-            box.label;
             [box.label replaceByUnderscore];
 
             // [str release];
@@ -1182,37 +1181,6 @@
     [self sendAction:self.sendButton];
     
 }
-#pragma mark - MemoryManagement
-- (void)didReceiveMemoryWarning
-{
-       
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
-}
--(void) dealloc{
-    
-    self.scrollView;
 
-    self.label;
-    self.addButton;
-    self.deleteButton;
-    self.sendButton;
-    self.imageView;
-    //[self.colorArray release];
-    self.filename;
-    self.paths;
-    self.annotationView;
-    self.username;
-    self.composeView;
-    self.bottomToolbar;
-    self.labelsView;
-    self.sendingView;
-
-
-
-
-}
 
 @end

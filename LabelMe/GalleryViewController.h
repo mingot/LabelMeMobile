@@ -17,11 +17,12 @@
     SendingView *sendingView;
 
     UILabel *noImages;
-    //UIButton                *sendTable;
     int selectedTableIndex;
     int photosWithErrors;
     IBOutlet UIView *view1;
 }
+
+
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *editButton;
 @property (nonatomic,strong) IBOutlet UIToolbar *bottomToolbar;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *deleteButton;
@@ -46,9 +47,6 @@
 
 
 @property (nonatomic,strong) NSString *username;
-
-
-
 
 
 

@@ -41,6 +41,8 @@ using namespace cv;
 }
 
 
+#define SCALE_FACTOR 0.08 //resize template to obtain a reasonable number of blocks for the hog features
+
 - (CGSize) templateSize
 {
     //compute template size in case it is not set (lazy instantiation)
@@ -57,13 +59,15 @@ using namespace cv;
         
         //compute the average and get the average size in the image dimensions
         CGSize imgSize = [[self.images objectAtIndex:0] size];
-        averageSize.height = averageSize.height*imgSize.height/self.groundTruthBoundingBoxes.count;
-        averageSize.width = averageSize.width*imgSize.width/self.groundTruthBoundingBoxes.count;
+        averageSize.height = averageSize.height*imgSize.height*SCALE_FACTOR/self.groundTruthBoundingBoxes.count;
+        averageSize.width = averageSize.width*imgSize.width*SCALE_FACTOR/self.groundTruthBoundingBoxes.count;
+        
+        HogFeature *hog = [[[self.images objectAtIndex:0] resizedImage:averageSize interpolationQuality:kCGInterpolationDefault] obtainHogFeatures];
         
         _templateSize = averageSize;
         
         NSLog(@"Template size setted: h:%f, w:%f", _templateSize.height, _templateSize.width);
-        
+        NSLog(@"Hog features size: %d, %d, %d", hog.numBlocksX, hog.numBlocksY, hog.numFeaturesPerBlock);
     }
     return _templateSize;
 }
@@ -177,12 +181,6 @@ using namespace cv;
 
 
 @interface Classifier ()
-//{
-//    CGSize templateSize;
-//}
-//
-////Sets the size of the template and obtain the dimension of the features from it.
-//- (void) obtainTemplateSize:(TrainingSet *) trainingSet;
 
 //Show just the histogram features for debugging purposes
 - (void) showOrientationHistogram;
@@ -197,6 +195,10 @@ using namespace cv;
 @synthesize svmWeights = _svmWeights;
 @synthesize weightsDimensions = _weightsDimensions;
 
+@synthesize weights = _weights;
+@synthesize sizes = _sizes;
+@synthesize name = _name;
+@synthesize targetClass = _targetClass;
 
 
 #pragma mark -
@@ -259,22 +261,20 @@ using namespace cv;
 {
     
     // Get the template size and get hog feautures dimension
-    CGSize templateSize = trainingSet.templateSize;
     [trainingSet initialFill];
-    self.weightsDimensions = [[[trainingSet.images objectAtIndex:0] resizedImage:templateSize interpolationQuality:kCGInterpolationDefault] obtainDimensionsOfHogFeatures];
+    self.weightsDimensions = [[[trainingSet.images objectAtIndex:0] resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault] obtainDimensionsOfHogFeatures];
     int numOfFeatures = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2];
     
     if(debugging){
-        NSLog(@"template size: %f, %f", templateSize.height, templateSize.width);
+        NSLog(@"template size: %f, %f", trainingSet.templateSize.height, trainingSet.templateSize.width);
         NSLog(@"dimensions of hog features: %d %d %d", self.weightsDimensions[0],self.weightsDimensions[1],self.weightsDimensions[2]);
     }
-        
-    //Initialization of weights: initial train with initial positives and random negatives
-    [trainingSet initialFill];
+    
+
     //TODO: max size for the buffers
     trainingSet.imageFeatures = (float *) malloc(MAX_NUMBER_EXAMPLES*MAX_NUMBER_FEATURES*sizeof(float));
     trainingSet.labels = (float *) malloc(MAX_NUMBER_EXAMPLES*sizeof(float));
-    [trainingSet generateFeaturesForBoundingBoxesWithTemplateSize: templateSize withNumSV:0];
+    [trainingSet generateFeaturesForBoundingBoxesWithTemplateSize:trainingSet.templateSize withNumSV:0];
     
     // Set up SVM's parameters
     CvSVMParams params;
@@ -283,7 +283,7 @@ using namespace cv;
     params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6);
     
     //convergence loop
-    int numIterations = 2;
+    int numIterations = 1;
     for (int i=0; i<numIterations; i++){
         // Set up training data
         if(debugging){
@@ -374,7 +374,7 @@ using namespace cv;
         printf("total of new bounding boxes: %d\n", trainingSet.boundingBoxes.count);
         
         //generate the hog features for the new bounding boxes
-        [trainingSet generateFeaturesForBoundingBoxesWithTemplateSize:templateSize withNumSV:numSupportVectors];
+//        [trainingSet generateFeaturesForBoundingBoxesWithTemplateSize:trainingSet.templateSize withNumSV:numSupportVectors];
         
         //[self showOrientationHistogram];
         
@@ -460,24 +460,6 @@ using namespace cv;
     NSLog(@"RECALL: %f", tp*1.0/(tp+fn));
 }
 
-
-- (void) storeSvmWeightsAsTemplateWithName:(NSString *)templateName
-{
-    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSString *path = [NSString stringWithFormat:@"%@/Templates/%@",documentsDirectory,templateName];
-    
-    NSMutableString *content = [NSMutableString stringWithCapacity:self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2]+4];
-    [content appendFormat:@"%d\n",self.weightsDimensions[0]];
-    [content appendFormat:@"%d\n",self.weightsDimensions[1]];
-    [content appendFormat:@"%d\n",self.weightsDimensions[2]];
-    for (int i = 0; i<self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2] + 1; i++)
-        [content appendFormat:@"%f\n",self.svmWeights[i]];
-    
-    if([content writeToFile:path atomically:NO encoding:NSUTF8StringEncoding error:NULL])
-        NSLog(@"Write Template Work!");
-}
-
-
 - (void) storeTemplateMatching:(TrainingSet *) trainingSet;
 {
     HogFeature *hogFeature;
@@ -496,6 +478,31 @@ using namespace cv;
     //bias term as 0
     self.svmWeights[hogFeature.totalNumberOfFeatures] = 0;
 }
+
+
+
+#pragma mark
+#pragma mark - Encoding
+
+-(id) initWithCoder:(NSCoder *)aDecoder
+{
+    if (self = [super init]) {
+        self.weights = [aDecoder decodeObjectForKey:@"weights"];
+        self.sizes = [aDecoder decodeObjectForKey:@"sizes"];
+        self.name = [aDecoder decodeObjectForKey:@"name"];
+        self.targetClass = [aDecoder decodeObjectForKey:@"targetClass"];
+    }
+    return self;
+}
+
+- (void) encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder encodeObject:self.weights forKey:@"weights"];
+    [aCoder encodeObject:self.sizes forKey:@"sizes"];
+    [aCoder encodeObject:self.name forKey:@"name"];
+    [aCoder encodeObject:self.targetClass forKey:@"targetClass"];
+}
+
 
 
 @end

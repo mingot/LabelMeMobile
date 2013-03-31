@@ -491,8 +491,6 @@
 		A558D60A16134E0B001DED8C = {
 			isa = PBXGroup;
 			children = (
-				FCED8975170354010027CBE1 /* CoreVideo.framework */,
-				FCED8973170353FB0027CBE1 /* CoreMedia.framework */,
 				A558D61F16134E0C001DED8C /* LabelMe */,
 				A558D61816134E0C001DED8C /* Frameworks */,
 				A558D61616134E0C001DED8C /* Products */,
@@ -511,6 +509,8 @@
 		A558D61816134E0C001DED8C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FCED8975170354010027CBE1 /* CoreVideo.framework */,
+				FCED8973170353FB0027CBE1 /* CoreMedia.framework */,
 				FCED896F17034F980027CBE1 /* opencv2.framework */,
 				A5FAFA0816430D37002B56B4 /* AssetsLibrary.framework */,
 				A5D91D161641ECEF00EA0442 /* QuartzCore.framework */,
@@ -531,18 +531,18 @@
 			children = (
 				FC5C93B816FD017100637B69 /* Labelling */,
 				FC5C93B716FD014200637B69 /* Detector */,
+				A558D63616134F79001DED8C /* SignInViewController.h */,
+				A558D63716134F79001DED8C /* SignInViewController.m */,
+				A564641A1614BA0D007D444E /* CreateAccountViewController.h */,
+				A564641B1614BA0D007D444E /* CreateAccountViewController.m */,
+				A558D6421613927F001DED8C /* ServerConnection.h */,
+				A558D64316139280001DED8C /* ServerConnection.m */,
 				A55A8447162CCFAA00C917DD /* Reachability.h */,
 				A55A8448162CCFAA00C917DD /* Reachability.m */,
 				A5949C7D1625E18500627709 /* CustomBadge.h */,
 				A5949C7E1625E18500627709 /* CustomBadge.m */,
 				A558D62816134E0C001DED8C /* LabelMeAppDelegate.h */,
 				A558D62916134E0C001DED8C /* LabelMeAppDelegate.m */,
-				A558D6421613927F001DED8C /* ServerConnection.h */,
-				A558D64316139280001DED8C /* ServerConnection.m */,
-				A558D63616134F79001DED8C /* SignInViewController.h */,
-				A558D63716134F79001DED8C /* SignInViewController.m */,
-				A564641A1614BA0D007D444E /* CreateAccountViewController.h */,
-				A564641B1614BA0D007D444E /* CreateAccountViewController.m */,
 				A5480D6C16178868009F630D /* XIB files */,
 				A558D64C1613A365001DED8C /* Categories */,
 				A558D64116138D37001DED8C /* Icons */,
@@ -737,12 +737,12 @@
 				A5A567731617D756008AFE2E /* SettingsViewController.m */,
 				A5C8BFCC162F4EC4009A39E0 /* ResolutionViewController.h */,
 				A5C8BFCD162F4EC4009A39E0 /* ResolutionViewController.m */,
-				A52C36761617C99400FEF74D /* TagViewController.h */,
-				A52C36771617C99400FEF74D /* TagViewController.m */,
 				A5817E02165932720061FE67 /* WebsiteViewController.h */,
 				A5817E03165932720061FE67 /* WebsiteViewController.m */,
 				A5377478165C3E9900BF0649 /* CreditsViewController.h */,
 				A5377479165C3E9900BF0649 /* CreditsViewController.m */,
+				A52C36761617C99400FEF74D /* TagViewController.h */,
+				A52C36771617C99400FEF74D /* TagViewController.m */,
 				A5480D721617969A009F630D /* TagView.h */,
 				A5480D731617969A009F630D /* TagView.m */,
 				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
