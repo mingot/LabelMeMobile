@@ -553,12 +553,7 @@
     
     [self.labelsView reloadData];
     if (self.labelsView.hidden) {
-        
-        /* UILabel *numObjects = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, self.view.frame.size.width-10, 20)];
-         [numObjects setText:[NSString stringWithFormat:@"%d objects",self.annotationView.objects.count]];
-         [numObjects setBackgroundColor:[UIColor clearColor]];
-         [numObjects setTextColor:[UIColor whiteColor]];
-         [self.labelsView addSubview:numObjects];*/
+    
         if (self.annotationView.objects.count == 0) {
             [self.labelsView setFrame:CGRectMake(0.015625*self.view.frame.size.width+self.scrollView.contentOffset.x, self.scrollView.frame.size.height-0.19375*self.view.frame.size.width+self.scrollView.contentOffset.y, self.scrollView.frame.size.width-0.03125*self.view.frame.size.width, 0.19375*self.view.frame.size.width)];
         }
@@ -574,11 +569,7 @@
         //  [numObjects release];
         
     }
-    else{
-        /*  for (UIView *subview in [self.labelsView subviews]){
-         [subview removeFromSuperview];
-         }*/
-    }
+    
     [labelsButtonView setSelected:!labelsButtonView.selected];
     [self.labelsView setHidden:!self.labelsView.hidden];
     
@@ -589,8 +580,6 @@
 
     if (buttonIndex==0) {
         int num=[[self.annotationView objects] count];
-        //int numlabels=[self.annotationView numLabels];
-        //int numlabels=self.annotationView.objects.count;
 
         if((num<1)||([self.annotationView SelectedBox]==-1)){
             return;
@@ -628,16 +617,6 @@
         [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
 
         [self.annotationView.objects removeObjectAtIndex:[self.annotationView SelectedBox]];
-       /* Box *b;
-      //  NSLog(@"num = %d",num);
-        for (int i=[self.annotationView SelectedBox]+1; i<num; i++) {
-            b=[[self.annotationView dictionaryBox] objectForKey:[NSString stringWithFormat:@"%d",i]];
-            [[self.annotationView dictionaryBox] setObject:b forKey:[NSString stringWithFormat:@"%d",i-1]];
-            
-        }
-      //  NSLog(@"dictionary count %d",self.annotationView.dictionaryBox.count);
-        [self.annotationView.dictionaryBox removeObjectForKey:[NSString stringWithFormat:@"%d",num-1]];*/
-        //[self.annotationView setNumLabels:numlabels-1];
         [self.annotationView setSelectedBox:-1];
         self.label.hidden=YES;
         [self saveAnnotation];
@@ -671,13 +650,7 @@
     
 }
 
-/*-(void) setGallery:(BOOL)value{
-    if (value) {
-        [self.annotationView setNumLabels:self.annotationView.dictionaryBox.count];
 
-    }
-    gallery=value;
-}*/
 #pragma mark -
 #pragma mark Save State
 -(BOOL)saveThumbnail{
@@ -704,18 +677,13 @@
     CGImageRelease(image);
 
     NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
-    if([filemng createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil]){
-                return YES;
-        
-    }
-    else {
-        
+    if([filemng createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil])
+        return YES;
+    else
         return NO;
-        
-    }
-
-
 }
+
+
 -(void)saveImage:(UIImage *)image{
     @autoreleasepool {
 
@@ -730,54 +698,31 @@
 
         NSFileManager * filemng = [NSFileManager defaultManager];
         
-        
-   
-        
-        
-        
-        
         if([filemng createFileAtPath:[[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil]){
         }
-        else {
-            
-        }
+    
         if([filemng createFileAtPath:[[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil]){
-        }
-        else {
-            
         }
         
         //[self saveThumbnail];
         [self saveDictionary];
     }
-   /* image = nil;
-    [image release];*/
-       
 }
+
+
 -(BOOL)saveDictionary{
-    //NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    
     NSString *path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename ];
     
-    if([NSKeyedArchiver archiveRootObject:self.annotationView.objects toFile:path]){
-       
+    if([NSKeyedArchiver archiveRootObject:self.annotationView.objects toFile:path])
         return YES;
-    }
-    else {
-               return NO;
-        
-    }
+    else
+        return NO;
     
 }
 
 
 -(void)saveAnnotation{
-    /*if (!gallery) {
-        
-        [self createFilename];
-        ret = [self saveImage];
-    }*/
-    
-    
     [self saveThumbnail];
     [self saveDictionary];
 
@@ -785,63 +730,6 @@
 
 
 
-//-(NSString *)generateDateString{
-//    
-//    NSString *originalDate = [[NSString alloc] initWithString:[[[NSDate date] description] substringToIndex:19]];
-//    NSString *time = [[NSString alloc] initWithString:[originalDate substringFromIndex:11]];
-//    NSString *day = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(8, 2)]];
-//    NSString *year = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(0, 4)]];
-//    NSString *month = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(5, 2)]];
-//    int m = [month intValue];
-//    switch (m) {
-//        case 1:
-//            month = @"Jan";
-//            break;
-//        case 2:
-//            month = @"Feb";
-//            break;
-//        case 3:
-//            month = @"Mar";
-//            break;
-//        case 4:
-//            month = @"Apr";
-//            break;
-//        case 5:
-//            month = @"May";
-//            break;
-//        case 6:
-//            month = @"Jun";
-//            break;
-//        case 7:
-//            month = @"Jul";
-//            break;
-//        case 8:
-//            month = @"Aug";
-//            break;
-//        case 9:
-//            month = @"Sep";
-//            break;
-//        case 10:
-//            month = @"Oct";
-//            break;
-//        case 11:
-//            month = @"Nov";
-//            break;
-//        case 12:
-//            month = @"Dec";
-//            break;
-//        default:
-//            break;
-//    }
-//    NSString *ret = [[[NSString alloc] initWithFormat:@"%@-%@-%@-%@",day,month,year,time ] autorelease];
-//    [day release];
-//    [month release];
-//    [year release];
-//    [time release];
-//    [originalDate release];
-//    return ret;
-//    
-//}
 #pragma mark -
 #pragma mark TagViewDelegate Methods
 -(void)objectModified{

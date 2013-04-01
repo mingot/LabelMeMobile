@@ -27,10 +27,10 @@
 @property int numberOfTrainingExamples; // bounding boxes + support vectors added
 
 
-// Given a training set of images and ground truth bounding boxes it generates a set of positive and negative bounding boxes for training
+//Given a training set of images and ground truth bounding boxes it generates a set of positive and negative bounding boxes for training
 - (void) initialFill;
 
-// Generates the hog features given the bounding boxes begining after numSV positions, corresponding to the sv
+//Generates the hog features given the bounding boxes begining after numSV positions, corresponding to the sv
 - (void) generateFeaturesForBoundingBoxesWithTemplateSize:(CGSize) templateSize withNumSV:(int) numSV;
 
 @end
@@ -47,34 +47,30 @@
 @property double *svmWeights;
 @property int *weightsDimensions;
 
+//Encoding properties
 @property (strong, nonatomic) NSMutableArray *weights;
 @property (strong, nonatomic) NSArray *sizes;
 @property (strong, nonatomic) NSString *name;
 @property (strong, nonatomic) NSString *targetClass;
 
 
-// Initialization of the classifier given the weight vectors of it
+//Initialization of the classifier given the weight vectors of it
 - (id) initWithTemplateWeights:(double *)templateWeights;
 
-// Train the classifier given an initial set formed by Images and ground
-// truth bounding boxes containing positive examples
+- (id) initWithCoder:(NSCoder *)aDecoder;
+
+//Train the classifier given an initial set formed by Images and ground truth bounding boxes containing positive examples
 - (void) train:(TrainingSet *) trainingSet;
 
-// Detect object in the image and return array of convolution
-// points for the indicated number of pyramids and detection threshold
+//Detect object in the image and return array of convolution points for the indicated number of pyramids and detection threshold
 - (NSArray *) detect:(UIImage *) image
     minimumThreshold:(double) detectionThreshold
             pyramids:(int) numberPyramids
             usingNms:(BOOL)useNms
    deviceOrientation:(int) orientation;
 
-
-
-// given a set with ground truth bounding boxes, returns the metric spesified.
+//Given a set with ground truth bounding boxes, returns the metric spesified.
 - (void) testOnSet:(TrainingSet *)set atThresHold:(float)detectionThreshold;
 
-// Safe the hog features of the first positive template as the classifier
-// weights
-- (void) storeTemplateMatching:(TrainingSet *)trainingSet;
 
 @end

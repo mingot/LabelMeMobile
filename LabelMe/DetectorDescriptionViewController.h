@@ -14,7 +14,7 @@
 
 @protocol DetectorDescriptionViewControllerDelegate <NSObject>
 
-- (void) updateDetectorName:(NSString *)detectorName forClass:(NSString *)detectorClass;
+- (void) updateDetector:(Classifier *)updatedDetector;
 
 @end
 
@@ -26,8 +26,7 @@
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
 @property (strong, nonatomic) ShowTrainingSetViewController *trainingSetController;
 @property (strong, nonatomic) Classifier *svmClassifier;
-@property (strong, nonatomic) NSString *classifierName;
-@property (strong, nonatomic) NSString *classToLearn;
+
 @property (weak, nonatomic) IBOutlet UIButton *executeButton;
 @property (weak, nonatomic) IBOutlet UIButton *trainButton;
 @property (weak, nonatomic) IBOutlet UIButton *saveButton;
@@ -38,6 +37,7 @@
 
 @property (strong, nonatomic) NSString *userPath;
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
+
 
 
 

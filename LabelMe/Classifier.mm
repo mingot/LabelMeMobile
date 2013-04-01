@@ -224,6 +224,21 @@ using namespace cv;
     return self;
 }
 
+- (id) init
+{
+    if (self = [super init]) {
+        self.weightsDimensions = (int *) malloc(3*sizeof(int));
+        self.weightsDimensions[0] = 1;
+        self.weightsDimensions[1] = 1;
+        self.weightsDimensions[2] = 1;
+        
+        self.svmWeights = (double *) malloc(sizeof(double));
+        self.svmWeights[0] = 0;
+    }
+    
+    return self;
+}
+
 
 
 - (void) printListHogFeatures:(float *) listOfHogFeaturesFloat
@@ -259,6 +274,9 @@ using namespace cv;
 
 - (void) train:(TrainingSet *) trainingSet;
 {
+    //free previous weights
+    free(self.svmWeights);
+    free(self.weightsDimensions);
     
     // Get the template size and get hog feautures dimension
     [trainingSet initialFill];
@@ -460,26 +478,6 @@ using namespace cv;
     NSLog(@"RECALL: %f", tp*1.0/(tp+fn));
 }
 
-- (void) storeTemplateMatching:(TrainingSet *) trainingSet;
-{
-    HogFeature *hogFeature;
-    
-    UIImage *wholeImage = [trainingSet.images objectAtIndex:0];
-    // BE CAREFUL!!! Intrinsic change of UIImage Orientation!! (from right to up)
-    UIImage *img = [wholeImage croppedImage:[[trainingSet.boundingBoxes objectAtIndex:0] rectangleForImage:wholeImage]];
-    UIImage *resizedImage = [img resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault];
-
-    hogFeature = [resizedImage obtainHogFeatures];
-    [hogFeature printFeaturesOnScreen];
-
-    for(int i=0; i<hogFeature.totalNumberOfFeatures;i++)
-        self.svmWeights[i] = hogFeature.features[i];
-    
-    //bias term as 0
-    self.svmWeights[hogFeature.totalNumberOfFeatures] = 0;
-}
-
-
 
 #pragma mark
 #pragma mark - Encoding
@@ -491,12 +489,40 @@ using namespace cv;
         self.sizes = [aDecoder decodeObjectForKey:@"sizes"];
         self.name = [aDecoder decodeObjectForKey:@"name"];
         self.targetClass = [aDecoder decodeObjectForKey:@"targetClass"];
+        
+        self.weightsDimensions = (int *) malloc(3*sizeof(int));
+        self.weightsDimensions[0] = [(NSNumber *) [self.sizes objectAtIndex:0] intValue];
+        self.weightsDimensions[1] = [(NSNumber *) [self.sizes objectAtIndex:1] intValue];
+        self.weightsDimensions[2] = [(NSNumber *) [self.sizes objectAtIndex:2] intValue];
+        
+        NSLog(@"read self.sizes: %@", self.sizes);
+        
+        int numberOfSvmWeights = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2] + 1; //+1 for the bias
+        
+        self.svmWeights = (double *) malloc(numberOfSvmWeights*sizeof(double));
+        for(int i=0; i<numberOfSvmWeights; i++)
+            self.svmWeights[i] = [(NSNumber *) [self.weights objectAtIndex:i] doubleValue];
+        
     }
     return self;
 }
 
 - (void) encodeWithCoder:(NSCoder *)aCoder
 {
+    self.sizes = [[NSArray alloc] initWithObjects:
+                    [NSNumber numberWithInt:self.weightsDimensions[0]],
+                    [NSNumber numberWithInt:self.weightsDimensions[1]],
+                    [NSNumber numberWithInt:self.weightsDimensions[2]], nil];
+    
+    NSLog(@"write self.sizes: %@", self.sizes);
+    
+    int numberOfSvmWeights = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2] + 1; //+1 for the bias
+    
+    self.weights = [[NSMutableArray alloc] initWithCapacity:numberOfSvmWeights];
+    for(int i=0; i<numberOfSvmWeights; i++)
+        [self.weights addObject:[NSNumber numberWithDouble:self.svmWeights[i]]];
+    
+    
     [aCoder encodeObject:self.weights forKey:@"weights"];
     [aCoder encodeObject:self.sizes forKey:@"sizes"];
     [aCoder encodeObject:self.name forKey:@"name"];

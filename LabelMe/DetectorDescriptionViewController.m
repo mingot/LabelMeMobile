@@ -15,32 +15,11 @@
 #import "UIImage+HOG.h"
 
 
-@protocol DetectorDescriptionViewControllerDelegate <NSObject>
-
-- (void) updateDetector;
-
-@end
-
-
-
-@interface DetectorDescriptionViewController()
-
-//return pointer to template from filename
-- (double *) readClassifier;
-
-//save the current classifier to the disk
-- (void) storeClassifier;
-
-@end
-
-
 @implementation DetectorDescriptionViewController
 
 @synthesize executeController = _executeController;
 @synthesize trainingSetController = _trainingSetController;
 @synthesize svmClassifier = _svmClassifier;
-@synthesize classifierName = _classifierName;
-@synthesize classToLearn = _classToLearn;
 @synthesize executeButton = _executeButton;
 @synthesize userPath = _userPath;
 @synthesize classTextField = _classTextField;
@@ -60,24 +39,20 @@
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
     
     //set labels
-    self.classTextField.text = self.classToLearn;
-    self.nameTextField.text = self.classifierName;
-    
-    
+    self.classTextField.text = self.svmClassifier.targetClass;
+    self.nameTextField.text = self.svmClassifier.name;
     
     //Check if the classifier exists.
-    if([self readClassifier]){
-        NSLog(@"Loading classifier");
-        self.svmClassifier = [[Classifier alloc] initWithTemplateWeights:[self readClassifier]];
-        self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
-        self.saveButton.enabled = NO;
-        self.saveButton.alpha = 0.6f;
-        
-    }else{
+    if([self.svmClassifier.targetClass isEqualToString:@"Not Set"]){
         NSLog(@"No classifier");
         self.executeButton.enabled = NO;
         self.executeButton.alpha = 0.6f;
-        self.svmClassifier = [[Classifier alloc] init];
+        
+    }else{
+        NSLog(@"Loading classifier");
+        self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
+        self.saveButton.enabled = NO;
+        self.saveButton.alpha = 0.6f;
     }
     
     //set editing button
@@ -121,7 +96,7 @@
 - (IBAction)trianAction:(id)sender
 {
     //retrive all images containing classToLearn
-    NSString *selectedClass = self.classToLearn;//@"bottle";
+    NSString *selectedClass = self.svmClassifier.targetClass;
     
     TrainingSet *trainingSet = [[TrainingSet alloc] init];
     
@@ -201,8 +176,9 @@
 
 - (IBAction)saveAction:(id)sender
 {
-    [self storeClassifier];
-    [self.delegate updateDetectorName:self.classifierName forClass:self.classToLearn];
+    [self.delegate updateDetector:self.svmClassifier];
+    self.saveButton.enabled = NO;
+    self.saveButton.alpha = 0.6f;
 }
 
 
@@ -221,57 +197,14 @@
     else {
         // Save the changes if needed and change the views to noneditable.
         NSLog(@"End editing");
-        self.classifierName = self.nameTextField.text;
-        self.classToLearn = self.classTextField.text;
+        self.svmClassifier.name = self.nameTextField.text;
+        self.svmClassifier.targetClass = self.classTextField.text;
         self.title = self.nameTextField.text;
         self.classTextField.enabled = NO;
         self.nameTextField.enabled = YES;
-        [self.delegate updateDetectorName:self.classifierName forClass:self.classToLearn];
+        [self.delegate updateDetector:self.svmClassifier];
     }
 }
 
-
-#pragma mark
-#pragma mark - Private methods
-
-- (double *) readClassifier
-{
-    NSString *classifierName = [NSString stringWithFormat:@"%@_%@",self.classifierName, self.classToLearn];
-    NSString *path = [NSString stringWithFormat:@"%@/Detectors/%@",self.userPath,classifierName];
-    
-    if(!path)
-        return nil;
-    
-    NSString *content = [NSString stringWithContentsOfFile:path
-                                                  encoding:NSUTF8StringEncoding
-                                                     error:NULL];
-    NSArray *file = [content componentsSeparatedByString:@"\n"];
-    
-    double *r = malloc((file.count)*sizeof(double));
-    for (int i=0; i<file.count; i++) {
-        NSString *str = [file objectAtIndex:i];
-        *(r+i) = [str doubleValue];
-    }
-    
-    return r;
-}
-
-- (void) storeClassifier
-{
-    NSString *classifierName = [NSString stringWithFormat:@"%@_%@",self.classifierName, self.classToLearn];
-    NSString *path = [NSString stringWithFormat:@"%@/Detectors/%@",self.userPath,classifierName];
-    
-    int totalNumFeatures = self.svmClassifier.weightsDimensions[0]*self.svmClassifier.weightsDimensions[1]*self.svmClassifier.weightsDimensions[2];
-    
-    NSMutableString *content = [NSMutableString stringWithCapacity:totalNumFeatures+4];
-    [content appendFormat:@"%d\n",self.svmClassifier.weightsDimensions[0]];
-    [content appendFormat:@"%d\n",self.svmClassifier.weightsDimensions[1]];
-    [content appendFormat:@"%d\n",self.svmClassifier.weightsDimensions[2]];
-    for (int i = 0; i<totalNumFeatures + 1; i++)
-        [content appendFormat:@"%f\n",self.svmClassifier.svmWeights[i]];
-    
-    if([content writeToFile:path atomically:NO encoding:NSUTF8StringEncoding error:NULL])
-        NSLog(@"Write Detector Work!");
-}
 
 @end
