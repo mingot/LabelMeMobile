@@ -99,7 +99,6 @@
     if([filemng removeItemAtPath:[[documentsDirectory stringByAppendingPathComponent:@"RememberMe"] stringByAppendingPathComponent:@"password.txt"] error:NULL]){
     }
     [self dismissViewControllerAnimated:YES completion:NULL];
-    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"previousTab"];
 }
 
 -(IBAction)profilePictureAction:(id)sender

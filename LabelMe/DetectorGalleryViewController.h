@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) DetectorDescriptionViewController *detectorController;
 @property (nonatomic, strong) NSString *userPath;
+@property (nonatomic, strong) NSString *username;
 
 - (IBAction) Edit:(id)sender;
 

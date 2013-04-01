@@ -42,7 +42,7 @@
 
 
 - (IBAction)executeAction:(id)sender;
-- (IBAction)trianAction:(id)sender;
+- (IBAction)trainAction:(id)sender;
 - (IBAction)saveAction:(id)sender;
 
 @end

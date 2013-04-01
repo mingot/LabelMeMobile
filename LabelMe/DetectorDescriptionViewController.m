@@ -81,9 +81,7 @@
 
 - (IBAction)executeAction:(id)sender
 {
-
     NSLog(@"Execute detector");
-    //load the detector 
     self.executeController.svmClassifier = self.svmClassifier;
     [self.navigationController pushViewController:self.executeController animated:YES];
 }
@@ -93,7 +91,7 @@
 #define THUMB 1
 #define OBJECTS 2
 
-- (IBAction)trianAction:(id)sender
+- (IBAction)trainAction:(id)sender
 {
     //retrive all images containing classToLearn
     NSString *selectedClass = self.svmClassifier.targetClass;

@@ -142,7 +142,7 @@ using namespace cv;
         @autoreleasepool
         {
             ConvolutionPoint *boundingBox = [self.boundingBoxes objectAtIndex:i];
-            
+            NSLog(@"iteation %d",i);
             //get the image contained in the bounding box and resized it with the template size
             //TODO: From cut -> HOG to HOG -> cut
             UIImage *wholeImage = [self.images objectAtIndex:boundingBox.imageIndex];
@@ -392,7 +392,7 @@ using namespace cv;
         printf("total of new bounding boxes: %d\n", trainingSet.boundingBoxes.count);
         
         //generate the hog features for the new bounding boxes
-//        [trainingSet generateFeaturesForBoundingBoxesWithTemplateSize:trainingSet.templateSize withNumSV:numSupportVectors];
+        [trainingSet generateFeaturesForBoundingBoxesWithTemplateSize:trainingSet.templateSize withNumSV:numSupportVectors];
         
         //[self showOrientationHistogram];
         
@@ -495,8 +495,6 @@ using namespace cv;
         self.weightsDimensions[1] = [(NSNumber *) [self.sizes objectAtIndex:1] intValue];
         self.weightsDimensions[2] = [(NSNumber *) [self.sizes objectAtIndex:2] intValue];
         
-        NSLog(@"read self.sizes: %@", self.sizes);
-        
         int numberOfSvmWeights = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2] + 1; //+1 for the bias
         
         self.svmWeights = (double *) malloc(numberOfSvmWeights*sizeof(double));
@@ -513,8 +511,6 @@ using namespace cv;
                     [NSNumber numberWithInt:self.weightsDimensions[0]],
                     [NSNumber numberWithInt:self.weightsDimensions[1]],
                     [NSNumber numberWithInt:self.weightsDimensions[2]], nil];
-    
-    NSLog(@"write self.sizes: %@", self.sizes);
     
     int numberOfSvmWeights = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2] + 1; //+1 for the bias
     

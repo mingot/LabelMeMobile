@@ -20,6 +20,7 @@
 @synthesize tableView = _tableView;
 @synthesize detectorController = _detectorController;
 @synthesize userPath = _userPath;
+@synthesize username = _username;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -27,7 +28,6 @@
     if (self) {
         self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Detector" image:nil tag:2];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"settings.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"settingsActive.png"]];
-        
     }
     return self;
 }
@@ -36,23 +36,14 @@
 - (void)viewDidLoad
 {
     //load detectors
-    //TODO: set the username
-    NSString *username = @"mingot";
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    self.userPath = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,username];
+    self.userPath = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,self.username];
     NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"];
     NSLog(@"detectorsPath: %@", detectorsPath);
     
+    //TODO: create the directory if it does not exist
     self.detectors = [NSKeyedUnarchiver unarchiveObjectWithFile:detectorsPath];
-    
     if(!self.detectors) self.detectors = [[NSMutableArray alloc] init];
-    
-//    //create detectors file if it does not exist
-//    if(![[NSFileManager defaultManager] fileExistsAtPath:detectorsPath]){
-//        [[NSFileManager defaultManager] createDirectoryAtPath:detectorsPath withIntermediateDirectories:YES attributes:nil error:nil];
-//        self.detectors = [[NSMutableArray alloc] init];
-//    }else
-//        
     
     //view controller specifications
     self.title = @"Detectors";
@@ -72,16 +63,9 @@
     [super viewWillDisappear:animated];
 }
 
-- (void)viewDidUnload
-{
-    [self setTableView:nil];
-    [super viewDidUnload];
-}
 
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
-
-
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
 {

@@ -15,36 +15,25 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 
-   
-    //[application setStatusBarStyle:UIStatusBarStyleBlackOpaque];
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-
-    // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
+    
+    //Decide which device it is using it (iphone, iphone5 or ipad)
     SignInViewController *rootViewController;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        CGRect screenSize = [[UIScreen mainScreen] bounds];
-
-        if (screenSize.size.height == 568) {
-
+        if ([UIScreen mainScreen].bounds.size.height == 568)
             rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPhone5" bundle:nil];
-            self.window.rootViewController = rootViewController;
-        }
-        else if (screenSize.size.height == 480){
 
+        else if ([UIScreen mainScreen].bounds.size.height == 480)
             rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPhone" bundle:nil];
-            self.window.rootViewController = rootViewController;
-        }
         
-        
-        
-    }
-    else{
-
+    }else
         rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPad" bundle:nil];
-        self.window.rootViewController = rootViewController;
-        
-    }
+
+    
+    self.window.rootViewController = rootViewController;
+    
     [self.window makeKeyAndVisible];
     return YES;
 }

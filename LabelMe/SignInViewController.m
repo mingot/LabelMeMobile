@@ -7,8 +7,6 @@
 //
 
 #import "SignInViewController.h"
-#import "GalleryViewController.h"
-#import "ServerConnection.h"
 #import "Constants.h"
 #import "Reachability.h"
 
@@ -29,9 +27,6 @@
 @synthesize createAccountButton = _createAccountButton;
 @synthesize keyboardToolbar = _keyboardToolbar;
 @synthesize tabBarController = _tabBarController;
-@synthesize navController1 = _navController1;
-@synthesize navController3 = _navController3;
-@synthesize navController4 = _navController4;
 @synthesize popover = _popover;
 @synthesize galleryViewController = _galleryViewController;
 @synthesize settingsViewController = _settingsViewController;
@@ -46,6 +41,8 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         [self createRememberMeFolder];
+        
+        //GPS settings
         locationMng = [[CLLocationManager alloc] init];
         locationMng.desiredAccuracy = kCLLocationAccuracyKilometer;
 
@@ -57,8 +54,7 @@
 {
     [super viewDidLoad];
    
-    self.keyboardToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
-    [self.keyboardToolbar setBarStyle:UIBarStyleBlackOpaque];
+    //buttons settings
     UIBarButtonItem *nextButton = [[UIBarButtonItem alloc]initWithTitle:@"Next" style:UIBarButtonItemStyleBordered target:self action:@selector(nextFieldAction:)];
     UIBarButtonItem *previousButton = [[UIBarButtonItem alloc]initWithTitle:@"Previous" style:UIBarButtonItemStyleBordered target:self action:@selector(previousAction:)];
     previousButton.enabled = NO;
@@ -67,69 +63,71 @@
     UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleDone target:self action:@selector(cancelAction:)];
     doneButton.enabled = NO;
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    [self.keyboardToolbar setItems:[NSArray arrayWithObjects:previousButton,nextButton,flexibleSpace,cancelButton, doneButton,nil]];
-    [self.usernameField setInputAccessoryView:self.keyboardToolbar];
-    [self.usernameField setDelegate:self];
-    [self.usernameField setKeyboardAppearance:UIKeyboardAppearanceAlert];
-    [self.passwordField setInputAccessoryView:self.keyboardToolbar];
-    [self.passwordField setDelegate:self];
-    [self.passwordField setSecureTextEntry:YES];
-    [self.passwordField setKeyboardAppearance:UIKeyboardAppearanceAlert];
+
+    self.keyboardToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
+    self.keyboardToolbar.barStyle = UIBarStyleBlackOpaque;
+    self.keyboardToolbar.items = [NSArray arrayWithObjects:previousButton,nextButton,flexibleSpace,cancelButton, doneButton,nil];
+    
+    self.usernameField.inputAccessoryView = self.keyboardToolbar;
+    self.usernameField.delegate = self;
+    self.usernameField.keyboardAppearance = UIKeyboardAppearanceAlert;
+    
+    self.passwordField.inputAccessoryView = self.keyboardToolbar;
+    self.passwordField.delegate = self;
+    self.passwordField.secureTextEntry = YES;
+    self.passwordField.keyboardAppearance = UIKeyboardAppearanceAlert;
+    
     sConnection = [[ServerConnection alloc] init];
     sConnection.delegate = self;
 
-    [self.scrollView setContentSize:self.view.frame.size];
-    previousSession = [self rememberMe];
-    sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
-    [sendingView setDelegate:self];
-    [sendingView.label setNumberOfLines:1];
-    [sendingView setHidden:YES];
-    [sendingView.progressView setHidden:YES];
-    [sendingView.label setText:@"Signing in..."];
-    [self.view addSubview:sendingView];
+    self.scrollView.contentSize = self.view.frame.size;
     
-   
+    previousSession = [self rememberMe];
+    
+    sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
+    sendingView.delegate = self;
+    sendingView.label.numberOfLines = 1;
+    sendingView.hidden = YES;
+    sendingView.progressView.hidden = YES;
+    sendingView.label.text = @"Signing in...";
+    
+    [self.view addSubview:sendingView];
 }
 
--(void)viewWillAppear:(BOOL)animated{
+-(void)viewWillAppear:(BOOL)animated
+{
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
 
     // Register keyboard events
     [self.usernameField setText:@""];
     [self.passwordField setText:@""];
-    previousSession = [self rememberMe];
-   /* if (previousSession) {
-        [self signInAction:nil];
-    }*/
-   
+    previousSession = [self rememberMe];   
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
     
-    keyboardVisible = NO;
-    
+    keyboardVisible = NO;    
 }
--(void)viewDidAppear:(BOOL)animated{
+
+-(void)viewDidAppear:(BOOL)animated
+{
     [super viewDidAppear:animated];
     if (previousSession) {
         Reachability *networkReachability = [Reachability reachabilityForInternetConnection];
         NetworkStatus networkStatus = [networkReachability currentReachabilityStatus];
-        if  (networkStatus == NotReachable) {
-            [self signInWithoutConnection];
-        }
-        else{
-            [self signInAction:nil];
-        }
+        
+        if(networkStatus == NotReachable) [self signInWithoutConnection];
+        else [self signInAction:nil];
     }
 }
 
--(void)viewWillDisappear:(BOOL)animated{
+-(void)viewWillDisappear:(BOOL)animated
+{
     [super viewWillDisappear:animated];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationSlide];
 
     // Unregister keyboard events
-    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, self.scrollView.frame.size.width, self.view.frame.size.height);
     keyboardVisible = NO;
@@ -138,11 +136,11 @@
 
 #pragma mark -
 #pragma mark Keyboard Events
+
 -(void)keyboardDidShow:(NSNotification *)notif
 {
-    if (keyboardVisible) {
+    if (keyboardVisible)
 		return;
-	}
 	
 	// The keyboard wasn't visible before
 	
@@ -179,6 +177,7 @@
 
 #pragma mark -
 #pragma mark IBActions 
+
 -(IBAction)signInAction:(id)sender
 {
 
@@ -300,14 +299,11 @@
             if ([filemng fileExistsAtPath:[[documentsDirectory stringByAppendingPathComponent:@"RememberMe"] stringByAppendingPathComponent:@"password.txt"]  isDirectory:&isDir]) {
                 self.passwordField.text = [NSString stringWithContentsOfFile:[[documentsDirectory stringByAppendingPathComponent:@"RememberMe"] stringByAppendingPathComponent:@"password.txt"]  encoding:NSUTF8StringEncoding error:&error];
                 return YES;
-            }
-
-        else{
-            self.passwordField.text = @"";
-        }
+                
+            }else
+                self.passwordField.text = @"";
         }
 
-        //[paths release];
     }
     return NO;
 }
@@ -376,9 +372,9 @@
         [self saveSessionWithUsername:self.usernameField.text andPassword:self.passwordField.text];
             
     [self createUserFolders:self.usernameField.text];
-    //[self.signInButton setEnabled:YES];
-    self.tabBarController =[[UITabBarController alloc]init];
-    self.tabBarController.delegate = self;
+    
+    //select correct layout
+    //TODO: add .xibs for iphone 4 and iPAD
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         
         if ([UIScreen mainScreen].bounds.size.height == 568) {
@@ -390,26 +386,31 @@
             self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone" bundle:nil];
             self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone" bundle:nil];
             self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
-            //TODO: add .xibs for iphone 4 and iPAD
         }
         
     }else{
         self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPad" bundle:nil];
         self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPad" bundle:nil];
-        
+        self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
     }
    
-    [self.galleryViewController setUsername:self.usernameField.text];
-    UIViewController *viewcontroller = [[UIViewController alloc]init];
-    viewcontroller.tabBarItem =[[UITabBarItem alloc]initWithTitle:@"Camera" image:nil tag:1];
-    [viewcontroller.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"camera.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"cameraActive.png"]];
-    self.navController1 = [[UINavigationController alloc] initWithRootViewController:self.galleryViewController];
-    self.navController3 = [[UINavigationController alloc] initWithRootViewController:self.detectorGalleryController];
-    self.navController4 = [[UINavigationController alloc] initWithRootViewController:self.settingsViewController];
-    [self.settingsViewController setUsername:self.usernameField.text];
-
+    //set username
+    self.galleryViewController.username = self.usernameField.text;
+    self.settingsViewController.username = self.usernameField.text;
+    self.detectorGalleryController.username = self.usernameField.text;
     
-    self.tabBarController.viewControllers = @[self.navController1,viewcontroller,self.navController3,self.navController4];
+    //set the tabBar
+    self.tabBarController =[[UITabBarController alloc] init];
+    self.tabBarController.delegate = self;
+    UIViewController *cameraVC = [[UIViewController alloc] init];
+    cameraVC.tabBarItem =[[UITabBarItem alloc]initWithTitle:@"Camera" image:nil tag:1];
+    [cameraVC.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"camera.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"cameraActive.png"]];
+    self.tabBarController.viewControllers = @[[[UINavigationController alloc] initWithRootViewController:self.galleryViewController],
+                                              cameraVC,
+                                              [[UINavigationController alloc] initWithRootViewController:self.detectorGalleryController],
+                                              [[UINavigationController alloc] initWithRootViewController:self.settingsViewController]];
+    
+    
     NSFileManager * filemng = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSString *path = [[NSString alloc] initWithString:[[documentsDirectory stringByAppendingPathComponent:self.usernameField.text] stringByAppendingPathComponent:@"profilepicture.jpg" ]];
@@ -417,22 +418,7 @@
         [sConnection downloadProfilePictureToUsername:self.usernameField.text];
     }
     
-    
-  
-    switch ([[NSUserDefaults standardUserDefaults] integerForKey:@"previousTab"]) {
-        case 0:
-            [self.tabBarController setSelectedViewController:self.navController1];
-            break;
-        case 2:
-            [self.tabBarController setSelectedViewController:self.navController3];
-            break;
-            
-        default:
-            break;
-            
-            
-    }
-    [sendingView setHidden:YES];
+    sendingView.hidden = YES;
     [sendingView.activityIndicator stopAnimating];
     [self presentViewController:self.tabBarController animated:YES completion:NULL];
 
@@ -479,26 +465,22 @@
     if (tabBarController.selectedIndex == 1) {
         UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
         [imagePicker setDelegate:self];
-        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]){
+        
+        //detect if camera is available
+        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
             [imagePicker setSourceType:UIImagePickerControllerSourceTypeCamera];
-            
-        }
-        else{
-            [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
-        }
+        else [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+    
+        //decide how to present the camera depending if it is iphone or ipad
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-
-        //[tabBarController presentViewController:imagePicker animated:NO completion:NULL];
           [tabBarController.selectedViewController presentViewController:imagePicker animated:NO completion:NULL];
 
-        }
-        else{
+        }else{
             if ([imagePicker sourceType] == UIImagePickerControllerSourceTypePhotoLibrary ) {
                 if ([self.popover isPopoverVisible]) {
                     [self.popover dismissPopoverAnimated:YES];
                     
-                }
-                else{
+                }else{
                     UIPopoverController *popover = [[UIPopoverController alloc] initWithContentViewController:imagePicker];
                     [popover presentPopoverFromBarButtonItem:[tabBarController.tabBar.items objectAtIndex:1] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES ];
                     
@@ -506,39 +488,14 @@
                 }
 
             }
-            else{
-                [tabBarController.selectedViewController presentViewController:imagePicker animated:NO completion:NULL];
+            else [tabBarController.selectedViewController presentViewController:imagePicker animated:NO completion:NULL];
 
-                
-            }
-            
         }
-        
-        switch ([[NSUserDefaults standardUserDefaults] integerForKey:@"previousTab"]) {
-            case 0:
-                [tabBarController setSelectedViewController:[[tabBarController viewControllers]objectAtIndex:0]];
-                break;
-            case 2:
-                [tabBarController setSelectedViewController:[[tabBarController viewControllers]objectAtIndex:2]];
-                break;
-                
-            default:
-                break;
-                
-                
-        }
-        
-
     }
-    else{
-        //previousViewController = [tabBarController selectedIndex];
-        [[NSUserDefaults standardUserDefaults] setInteger:[tabBarController selectedIndex] forKey:@"previousTab"];
 
-
-
-
-    }
 }
+
+
 #pragma mark -
 #pragma mark UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
