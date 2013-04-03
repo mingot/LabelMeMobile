@@ -21,7 +21,9 @@
 {
     [super viewDidLoad];
     self.selectedItems = [[NSMutableArray alloc] init];
-
+    
+    self.doneButton.enabled = NO;
+    self.doneButton.alpha = 0.6f;
 }
 
 
@@ -61,6 +63,17 @@
     }
     else [self.selectedItems removeObject:row];
     
+    //Enable done button when at list on item selected
+    if(self.selectedItems.count!=0){
+        self.doneButton.enabled = YES;
+        self.doneButton.alpha = 1.0f;
+    }else{
+        self.doneButton.enabled = NO;
+        self.doneButton.alpha = 0.6f;
+    }
+    
+    
+    
     [tableView reloadData];
 }
 
@@ -68,6 +81,7 @@
 - (void)viewDidUnload
 {
     [self setTableView:nil];
+    [self setDoneButton:nil];
     [super viewDidUnload];
 }
 
@@ -79,7 +93,7 @@
         NSLog(@"%@", num);
     
     //send index of selected rows
-    [self.delegate selected:[[NSArray alloc] initWithArray:self.selectedItems]];
+    [self.delegate userSlection:[[NSArray alloc] initWithArray:self.selectedItems]];
     [self dismissModalViewControllerAnimated:YES];
 }
 

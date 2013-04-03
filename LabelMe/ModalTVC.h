@@ -10,7 +10,8 @@
 
 @protocol ModalTVCDelegate <NSObject>
 
-- (void) selected:(NSArray *)selectedRows;
+//set the items the user selected
+- (void) userSlection:(NSArray *)selectedItems;
 
 @end
 
@@ -23,6 +24,7 @@
 @property (strong, nonatomic) NSArray *data;
 @property (strong, nonatomic) NSMutableArray *selectedItems;
 @property (strong, nonatomic) id<ModalTVCDelegate> delegate;
+@property (weak, nonatomic) IBOutlet UIButton *doneButton;
 @property BOOL multipleChoice;
 
 

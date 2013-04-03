@@ -29,10 +29,10 @@
 @synthesize svmClassifier = _svmClassifier;
 @synthesize executeButton = _executeButton;
 @synthesize userPath = _userPath;
-@synthesize classTextField = _classTextField;
 @synthesize delegate = _delegate;
 @synthesize averageImage = _averageImage;
 @synthesize availableObjectClasses = _availableObjectClasses;
+@synthesize targetClassButton = _targetClassButton;
 
 
 
@@ -78,9 +78,10 @@
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
     
     self.modalTVC = [[ModalTVC alloc] init];
+    self.modalTVC.delegate = self;
     
     //set labels
-    self.classTextField.text = self.svmClassifier.targetClass;
+    self.targetClassButton.titleLabel.text = self.svmClassifier.targetClass;
     self.nameTextField.text = self.svmClassifier.name;
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
     
@@ -89,18 +90,22 @@
         NSLog(@"No classifier");
         self.executeButton.enabled = NO;
         self.executeButton.alpha = 0.6f;
+//        self.targetClassButton.titleLabel.text = @"Not Set";
+        [self.targetClassButton setTitle:@"Not Set" forState:UIControlStateNormal];
         
     }else{
         NSLog(@"Loading classifier");
         self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
         self.saveButton.enabled = NO;
         self.saveButton.alpha = 0.6f;
+//        self.targetClassButton.titleLabel.text = self.svmClassifier.targetClass;
+        [self.targetClassButton setTitle:self.svmClassifier.targetClass forState:UIControlStateNormal];
     }
     
     //set buttons
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.nameTextField.enabled = NO;
-    self.classTextField.enabled = NO;
+    self.targetClassButton.enabled = NO;
     self.saveButton.enabled = NO;
     self.saveButton.alpha = 0.6f;
     
@@ -124,9 +129,9 @@
     [self setDetectorView:nil];
     [self setTrainButton:nil];
     [self setSaveButton:nil];
-    [self setClassTextField:nil];
     [self setNameTextField:nil];
     [self setSendingView:nil];
+    [self setTargetClassButton:nil];
     [super viewDidUnload];
 }
 
@@ -283,16 +288,15 @@
     if (flag == YES){
         // Change views to edit mode.
         NSLog(@"Now editing!");
-        self.classTextField.enabled = YES;
+        self.targetClassButton.enabled = YES;
         self.nameTextField.enabled = YES;
         
     }else {
         // Save the changes if needed and change the views to noneditable.
         NSLog(@"End editing");
         self.svmClassifier.name = self.nameTextField.text;
-        self.svmClassifier.targetClass = self.classTextField.text;
         self.title = self.nameTextField.text;
-        self.classTextField.enabled = NO;
+        self.targetClassButton.enabled = NO;
         self.nameTextField.enabled = YES;
         [self.delegate updateDetector:self.svmClassifier];
     }
@@ -316,5 +320,16 @@
     [self.sendingView showMessage:message];
 }
 
+
+#pragma mark
+#pragma mark - ModalTVCDelegate
+
+- (void) userSlection:(NSArray *)selectedItems;
+{
+    NSNumber *sel = [selectedItems objectAtIndex:0];
+    self.svmClassifier.targetClass = [self.availableObjectClasses objectAtIndex:sel.intValue];
+    NSLog(@"selected class:%@", self.svmClassifier.targetClass);
+    self.targetClassButton.titleLabel.text = self.svmClassifier.targetClass;
+}
 
 @end

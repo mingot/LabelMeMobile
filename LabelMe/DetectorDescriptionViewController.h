@@ -22,7 +22,7 @@
 
 
 
-@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate>
+@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate, ModalTVCDelegate>
 
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
@@ -37,7 +37,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *detectorView;
 
 @property (weak, nonatomic) IBOutlet UITextField *nameTextField;
-@property (weak, nonatomic) IBOutlet UITextField *classTextField;
+@property (weak, nonatomic) IBOutlet UIButton *targetClassButton;
 
 @property (strong, nonatomic) NSString *userPath;
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;

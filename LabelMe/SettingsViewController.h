@@ -9,19 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "WebsiteViewController.h"
 
-@interface SettingsViewController : UIViewController <UITableViewDataSource,UITableViewDelegate, UIActionSheetDelegate, UIImagePickerControllerDelegate,UINavigationControllerDelegate>{
-    UITableView *_tableView;
-    NSString *_username;
-    UIPopoverController *_popover;
-    WebsiteViewController *_website;
-    
-}
+@interface SettingsViewController : UIViewController <UITableViewDataSource,UITableViewDelegate, UIActionSheetDelegate, UIImagePickerControllerDelegate,UINavigationControllerDelegate>
+
 @property (nonatomic,strong)  UITableView *tableView;
 @property (nonatomic,strong) NSString *username;
 @property (nonatomic,strong) UIPopoverController *popover;
 @property (nonatomic,strong) WebsiteViewController *website;
 
 
-
 -(IBAction)logOutAction:(id)sender;
+
 @end
