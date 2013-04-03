@@ -53,9 +53,7 @@
                                             100)];
         self.label.backgroundColor = [UIColor clearColor];
         self.label.textColor = [UIColor whiteColor];
-        self.label.text = @"Uploading to LabelMe server...";
         self.label.textAlignment = NSTextAlignmentCenter;
-        self.label.font = [UIFont fontWithName:@"AmericanTypewriter" size:10];
         self.progressView.progressTintColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
         
         [self addSubview:self.progressView];
@@ -113,5 +111,6 @@
     
     [self.label performSelectorOnMainThread:@selector(setText:) withObject:output waitUntilDone:YES];
 }
+
 
 @end

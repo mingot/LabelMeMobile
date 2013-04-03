@@ -14,10 +14,17 @@
 #import "UIImage+HOG.h"
 
 
+#define IMAGES 0
+#define THUMB 1
+#define OBJECTS 2
+#define MAX_IMAGE_SIZE 300
+#define IMAGE_SCALE_FACTOR 0.6
+
 @implementation DetectorDescriptionViewController
 
 @synthesize executeController = _executeController;
 @synthesize trainingSetController = _trainingSetController;
+@synthesize modalTVC = _modalTVC;
 @synthesize sendingView = _sendingView;
 @synthesize svmClassifier = _svmClassifier;
 @synthesize executeButton = _executeButton;
@@ -25,6 +32,35 @@
 @synthesize classTextField = _classTextField;
 @synthesize delegate = _delegate;
 @synthesize averageImage = _averageImage;
+@synthesize availableObjectClasses = _availableObjectClasses;
+
+
+
+- (NSArray *) availableObjectClasses
+{
+    if(!_availableObjectClasses){
+        
+        NSMutableArray *list = [[NSMutableArray alloc] init];
+        
+        NSArray *resourcesPaths = [NSArray arrayWithObjects:[self.userPath stringByAppendingPathComponent:@"images"],[self.userPath stringByAppendingPathComponent:@"thumbnail"],[self.userPath stringByAppendingPathComponent:@"annotations"],self.userPath, nil];
+        NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[resourcesPaths objectAtIndex:THUMB]] error:NULL];
+        
+        for(int i=0; i<imagesList.count; i++){
+            
+            NSString *path = [[resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[imagesList objectAtIndex:i]];
+            NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
+            for(Box *box in objects)
+                if([list indexOfObject:box.label] == NSNotFound)
+                    [list addObject:box.label];
+
+        }
+        
+        _availableObjectClasses = [[NSArray alloc] initWithArray:list];
+    }
+    
+    return _availableObjectClasses;
+}
+
 
 
 #pragma mark
@@ -40,6 +76,8 @@
     //load views
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
+    
+    self.modalTVC = [[ModalTVC alloc] init];
     
     //set labels
     self.classTextField.text = self.svmClassifier.targetClass;
@@ -59,7 +97,7 @@
         self.saveButton.alpha = 0.6f;
     }
     
-    //set editing button
+    //set buttons
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.nameTextField.enabled = NO;
     self.classTextField.enabled = NO;
@@ -69,12 +107,11 @@
     //sending view, responsible for the waiting view
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     self.sendingView.delegate = self;
-    
     self.sendingView.hidden = YES;
     self.sendingView.progressView.hidden = YES;
     self.sendingView.label.numberOfLines = 0;
-    self.sendingView.label.frame =  CGRectMake(20,20,300,400);
-                                              
+    self.sendingView.label.frame = CGRectMake(20,20,300,400);
+    self.sendingView.label.font = [UIFont fontWithName:@"AmericanTypewriter" size:10];
     [self.view addSubview:self.sendingView];
     
 }
@@ -103,14 +140,6 @@
     [self.navigationController pushViewController:self.executeController animated:YES];
 }
 
-#define IMAGES 0
-#define THUMB 1
-#define OBJECTS 2
-#define MAX_IMAGE_SIZE 300
-#define IMAGE_SCALE_FACTOR 0.6
-
-
-
 
 -(void) train
 {
@@ -123,8 +152,7 @@
     NSArray *resourcesPaths = [NSArray arrayWithObjects:[self.userPath stringByAppendingPathComponent:@"images"],[self.userPath stringByAppendingPathComponent:@"thumbnail"],[self.userPath stringByAppendingPathComponent:@"annotations"],self.userPath, nil];
     
     //get items
-    NSFileManager * filemng = [NSFileManager defaultManager];
-    NSArray *imagesList = [filemng contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[resourcesPaths objectAtIndex:THUMB]] error:NULL];
+    NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[resourcesPaths objectAtIndex:THUMB]] error:NULL];
     
     for(int i=0; i<imagesList.count; i++){
 
@@ -193,16 +221,15 @@
     [self.svmClassifier train:trainingSet];
     [self.sendingView showMessage:@"Finished training"];
 
-    
     //update view of the detector
     //self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
     self.executeButton.enabled = YES;
     self.executeButton.alpha = 1.0f;
     self.saveButton.enabled = YES;
-    self.saveButton.alpha = 1.0f;
-    
+    self.saveButton.alpha = 1.0f;    
     self.sendingView.hidden = YES;
     [self.sendingView.activityIndicator stopAnimating];
+
 }
 
 
@@ -210,6 +237,7 @@
 {
     self.sendingView.hidden = NO;
     [self.sendingView.activityIndicator startAnimating];
+    self.sendingView.cancelButton.hidden = YES;
     dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
     dispatch_async(myQueue, ^{
         [self train];
@@ -222,6 +250,27 @@
     [self.delegate updateDetector:self.svmClassifier];
     self.saveButton.enabled = NO;
     self.saveButton.alpha = 0.6f;
+}
+
+- (IBAction)infoAction:(id)sender
+{
+    self.sendingView.hidden = NO;
+    self.sendingView.cancelButton.hidden = NO;
+    self.sendingView.cancelButton.titleLabel.text = @"Done";
+    [self.sendingView.messagesStack removeAllObjects];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Detector %@ for class %@", self.svmClassifier.name, self.svmClassifier.targetClass]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of Support Vectors:%@", self.svmClassifier.numberSV]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of positives %@", self.svmClassifier.numberOfPositives]];
+    [self.sendingView showMessage:@"**** Results on the training set ****"];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Precision:%@",[self.svmClassifier.precisionRecall objectAtIndex:0]]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Recall:%@", [self.svmClassifier.precisionRecall objectAtIndex:1]]];
+}
+
+- (IBAction)showClass:(id)sender
+{
+    self.modalTVC.multipleChoice = NO;
+    self.modalTVC.data = self.availableObjectClasses;
+    [self presentModalViewController:self.modalTVC animated:YES];
 }
 
 
@@ -255,7 +304,7 @@
 
 - (void) cancel
 {
-    
+    self.sendingView.hidden = YES;
 }
 
 #pragma mark

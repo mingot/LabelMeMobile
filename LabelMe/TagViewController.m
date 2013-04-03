@@ -42,23 +42,17 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-        //self.imageView.image = nil;
         self.username = [[NSString alloc] init];
-
         self.filename = [[NSString alloc] init];
         self.annotationView = [[TagView alloc] initWithFrame:CGRectZero];
         self.composeView = [[UIView alloc] initWithFrame:CGRectZero];
         self.labelsView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
 
-       // gallery = NO;
         sConnection = [[ServerConnection alloc] init];
         sConnection.delegate = self;
-        
-
     }
     return self;
 }
-
 
 
 #pragma mark -
@@ -69,26 +63,17 @@
 
     [super viewDidLoad];
 
-      UIImage *titleImage = [UIImage imageNamed:@"logo-title.png"];
+    UIImage *titleImage = [UIImage imageNamed:@"logo-title.png"];
     UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
-    [titleView setImage:titleImage];
-    [self.navigationItem setTitleView:titleView];
-    //[titleImage release];
+    titleView.image = titleImage;
+    self.navigationItem.titleView = titleView;
 
     [self.navigationController.navigationBar setTintColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
-   // [self.bottomToolbar setTintColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
-    //[self.bottomToolbar setTintColor:[UIColor yellowColor]];
-    [self setTitle:@"Annotation Tool"];
-   // UIImage *addImage = [UIImage imageNamed:@"newLabel.png"];
 
-    /*UIButton *addButton2 = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 44, 44)];
-    [addButton2 setImage:[UIImage imageNamed:@"label_btn.png"] forState:UIControlStateNormal];
-    [addButton2 addTarget:self action:@selector(addAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.addButton = [[UIBarButtonItem alloc] initWithCustomView:addButton2];
-    [addButton2 release];*/
-        UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"] ;
-   // barImage = [barImage resizedImage:CGSizeMake(barImage.size.width, barImage.size.height/2) interpolationQuality:kCGInterpolationHigh];
+    self.title = @"Annotation Tool";
+
+    UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"] ;
     UIButton *addButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [addButtonView setImage:[UIImage imageNamed:@"newLabel.png"] forState:UIControlStateNormal];
     [addButtonView addTarget:self action:@selector(addAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -103,9 +88,6 @@
     [sendButtonView addTarget:self action:@selector(sendAction:) forControlEvents:UIControlEventTouchUpInside];
     self.sendButton = [[UIBarButtonItem alloc] initWithCustomView:sendButtonView];
 
-    /*self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:@selector(deleteAction:)];
-    [self.deleteButton setImage:[UIImage imageNamed:@"delete.png"]];*/
-    //[self.deleteButton setStyle:UIBarButtonItemStyleBordered];
     labelsButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [labelsButtonView setImage:[UIImage imageNamed:@"labelsList.png"] forState:UIControlStateNormal];
     [labelsButtonView setImage:[UIImage imageNamed:@"labelsList-white.png"] forState:UIControlStateSelected];
@@ -113,11 +95,6 @@
     [labelsButtonView addTarget:self action:@selector(listAction:) forControlEvents:UIControlEventTouchUpInside];
     self.labelsButton = [[UIBarButtonItem alloc] initWithCustomView:labelsButtonView];
  
-    /*[self.labelsButton setWidth:self.bottomToolbar.frame.size.height];
-    [self.sendButton setWidth:self.bottomToolbar.frame.size.height];
-    [self.deleteButton setWidth:self.bottomToolbar.frame.size.height];
-    [self.addButton setWidth:self.bottomToolbar.frame.size.height];*/
-
     [self.navigationController.navigationBar setBackgroundImage:barImage forBarMetrics:UIBarMetricsDefault];
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
     _flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -125,7 +102,7 @@
     
     [self.view setBackgroundColor:[UIColor blackColor]];
     [self.label setBorderStyle:UITextBorderStyleNone];
-    //[self.label setBackground:balloon];
+
     [self.scrollView setBackgroundColor:[UIColor blackColor]];
 	[self.scrollView setCanCancelContentTouches:NO];
 	self.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
@@ -139,9 +116,7 @@
     // TAGVIEW INIT
 
     self.annotationView.delegate = self;
-    //self.annotationView.label=self.label;
     [self.scrollView setContentSize:self.scrollView.frame.size];
-    //self.imageView.frame = CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height);
     
     
     labelSize = self.label.frame.size;
@@ -151,12 +126,12 @@
     [self.scrollView addSubview:self.label];
 
     [self.deleteButton setStyle:UIBarButtonItemStyleBordered];
-    //[self.labelsView setBackgroundColor:[UIColor colorWithRed:(160/255.0) green:(32/255.0) blue:(28/255.0) alpha:1.0]];
+
     [self.labelsView setBackgroundColor:[UIColor clearColor]];
     UIImage *globo = [[UIImage imageNamed:@"globo4.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )  ];
     UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.scrollView.frame];
     [backgroundView setImage:globo];
-   // [self.labelsView setBackgroundView:backgroundView];
+
     
     [self.labelsView setHidden:YES];
     [self.labelsView setDelegate:self];
@@ -167,116 +142,82 @@
     [self.sendingView setHidden:YES];
     [self.scrollView addSubview:self.label];
     [self.scrollView addSubview:self.labelsView];
-
     [self.scrollView addSubview:self.sendingView];
 
     self.sendingView.delegate = self;
-    //[self.view addSubview:self.label];
-    //self.label.hidden=YES;
-    [self.label setKeyboardAppearance:UIKeyboardAppearanceAlert];
-    //[self.label setDelegate:self];
-    /*if (self.paths == nil) {
-        self.paths = [self newArrayWithFolders:self.username];
-        NSLog(@"paths  created viewdidload");
-    }*/
-    //NSArray *tmp = [self newArrayWithFolders:self.username];
-    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
-    [self setImage:self.imageView.image];
-    //[tmp release];
-    //[self setImage:self.imageView.image];
-   /* NSFileManager *filemng = [NSFileManager defaultManager];
-    NSString *path = [[NSString alloc]initWithFormat:@"%@/%@",[self.paths objectAtIndex:OBJECTS],self.filename ];
-    if ([filemng fileExistsAtPath:path]) {
-        NSLog(@"exists %@",path);
-        [self.annotationView.objects setArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
-        [self.annotationView setNumLabels:self.annotationView.objects.count];
-    }
-    [path release];*/
 
+    [self.label setKeyboardAppearance:UIKeyboardAppearanceAlert];
+
+    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
+    self.image = self.imageView.image;
     
     tip = [[UIButton alloc] initWithFrame:CGRectMake(25, 2*self.scrollView.frame.size.height/3, self.scrollView.frame.size.width/2, self.scrollView.frame.size.height/3)];
     [tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )  ] forState:UIControlStateNormal];
     UILabel *tiplabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 12, tip.frame.size.width-24, tip.frame.size.height-24)];
-    [tiplabel setNumberOfLines:4];
-    [tiplabel setText:@"Tip:\nPress this button \nto add a bounding box!"];
-    [tiplabel setTextColor:[UIColor redColor]];
-    [tiplabel setBackgroundColor:[UIColor clearColor]];
+    tiplabel.numberOfLines = 4;
+    tiplabel.text = @"Tip:\nPress this button \nto add a bounding box!";
+    tiplabel.textColor = [UIColor redColor];
+    tiplabel.backgroundColor = [UIColor clearColor];
+    
     [tip addSubview:tiplabel];
-    [tip addTarget:self
-            action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
+    [tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
     [self.scrollView addSubview:tip];
-    NSFileManager * filemng = [NSFileManager defaultManager];
-    numImages = [filemng contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.paths objectAtIndex:IMAGES]] error:NULL].count;
-       if ((numImages>1) || (self.annotationView.objects.count != 0)) {
-        [tip setHidden:YES];
-    }
+    numImages = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.paths objectAtIndex:IMAGES]] error:NULL].count;
+    if ((numImages>1) || (self.annotationView.objects.count != 0))
+        tip.hidden = YES;
+
     [self.labelsView setBackgroundView:backgroundView];
-    
-    
 }
-- (void) viewWillAppear:(BOOL)animated {
+
+
+- (void) viewWillAppear:(BOOL)animated
+{
 	[super viewWillAppear:animated];
     
-    
-    
-    //[self.tabBarController.tabBar setHidden:YES];
     [self selectedAnObject:NO];
-    //[self.labelsView setHidden:YES];
-    
-    if (self.annotationView.objects.count >0) {
+
+    if (self.annotationView.objects.count >0)
         [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
         
-    }
+
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     NSNumber *dictnum  = [dict objectForKey:self.filename];
-    if (dictnum.intValue == 0){
+    if (dictnum.intValue == 0)
         [self.sendButton setEnabled:NO];
-    }
-    
     
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
-    // [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
-    // [self saveThumbnail];
+
     [self.annotationView setNeedsDisplay];
 	keyboardVisible = NO;
-    
-    
-    
 }
 
-- (void) viewWillDisappear:(BOOL)animated {
-    
+- (void) viewWillDisappear:(BOOL)animated
+{    
 	[super viewWillDisappear:animated];
     if (!self.annotationView.userInteractionEnabled) {
         self.annotationView.userInteractionEnabled=YES;
         //self.scrollView.frame = CGRectMake(self.view.frame.origin.x , self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
         self.scrollView.frame = CGRectMake(0 , 0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
         [self.label resignFirstResponder];
-        
     }
     
     [self.labelsView setHidden:YES];
     [labelsButtonView setSelected:NO];
-    if (![self.sendingView isHidden]) {
+    if (![self.sendingView isHidden])
         [self.sendingView setHidden:YES];
-    }
+    
     [self.scrollView setZoomScale:1.0 animated:NO];
-    //[self.label setFrame:CGRectMake(self.label.frame.origin.x, self.label.frame.origin.y, labelSize.width, labelSize.height)];
-    // [self.label setFont:[UIFont systemFontOfSize:14]];
+
     [self.annotationView setLINEWIDTH:1.0];
     [self saveThumbnail];
     [self saveDictionary];
     [self.imageView setImage:nil];
     self.label.hidden=YES;
     
-    // [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
-    
-    
-    //[self saveAnnotation];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
 }
+
 
 #pragma mark -
 #pragma mark Tip View
@@ -319,29 +260,17 @@
     [self.scrollView scrollRectToVisible:self.label.frame animated:YES];
 	keyboardVisible = YES;
 }
-- (void) keyboardDidHide:(NSNotification *)notif {
-	//NSLog(@"%@", @"Received UIKeyboardDidHideNotification");
+- (void) keyboardDidHide:(NSNotification *)notif
+{
     [self.scrollView setScrollEnabled:NO];
 
-	if (!keyboardVisible) {
+	if (!keyboardVisible)
 		return;
-	}
-  
 	
-	// The keyboard was visible
-	//NSLog(@"%@", @"Resizing bigger with no keyboard");
-    
-	// Resize the scroll view back to the full size of our view
-   
-
-      //  self.scrollView.frame = CGRectMake(self.view.frame.origin.x , self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
     self.scrollView.frame = CGRectMake(0,0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
 
-	
-    //[self.scrollView scrollRectToVisible:CGRectMake(0, 0, 320, 372) animated:YES];
 	keyboardVisible = NO;
     self.annotationView.userInteractionEnabled=YES;
-
 }
 
 
@@ -349,70 +278,45 @@
 #pragma mark -
 #pragma mark Set Image/Filename
 
--(void)setImage:(UIImage *)image{
+-(void)setImage:(UIImage *)image
+{
+    NSLog(@"setting the image!");
     
-    //self.imageView.image = nil;
-   double f =image.size.height/image.size.width;
-    double f2 = self.scrollView.frame.size.height / self.scrollView.frame.size.width;
+   double f = image.size.height/image.size.width;
+   double f2 = self.scrollView.frame.size.height / self.scrollView.frame.size.width;
    if (f>f2) {
-        //self.scrollView.frame.size.width-self.scrollView.frame.size.height /f)/2
         [self.imageView setFrame:CGRectMake((self.scrollView.frame.size.width-self.scrollView.frame.size.height/f)/2, 0, self.scrollView.frame.size.height/f, self.scrollView.frame.size.height)];
         [self.annotationView setFrame:CGRectMake((self.scrollView.frame.size.width-self.scrollView.frame.size.height/f)/2,  0, self.scrollView.frame.size.height/f, self.scrollView.frame.size.height)];
-        /*[self.imageView setFrame:CGRectMake(0, 0, self.scrollView.frame.size.height/f, self.scrollView.frame.size.height)];
-        [self.annotationView setFrame:CGRectMake(0, 0, self.scrollView.frame.size.height/f, self.scrollView.frame.size.height)];
-        [self.composeView setFrame:CGRectMake((self.scrollView.frame.size.width-self.scrollView.frame.size.height /f)/2, 0, self.scrollView.frame.size.height/f, self.scrollView.frame.size.height)];*/
-       /* 
-        PARA QUE LA SCROLLVIEW NO INCLUYA LOS MARGENES
-        [self.scrollView setFrame:CGRectMake((self.view.frame.size.width-(self.view.frame.size.height -self.topToolbar.frame.size.height-self.bottomToolbar.frame.size.height) /f)/2,self.topToolbar.frame.size.height, (self.view.frame.size.height -self.topToolbar.frame.size.height-self.bottomToolbar.frame.size.height)/f, self.view.frame.size.height -self.topToolbar.frame.size.height-self.bottomToolbar.frame.size.height)];
-        [self.annotationView setFrame:CGRectMake(0,0, (self.view.frame.size.height -self.topToolbar.frame.size.height-self.bottomToolbar.frame.size.height)/f, self.view.frame.size.height -self.topToolbar.frame.size.height-self.bottomToolbar.frame.size.height)];
-        [self.imageView setFrame:CGRectMake(0,0, (self.view.frame.size.height -self.topToolbar.frame.size.height-self.bottomToolbar.frame.size.height)/f, self.view.frame.size.height -self.topToolbar.frame.size.height-self.bottomToolbar.frame.size.height)];
-        [self.composeView setFrame:CGRectMake(0,0, (self.view.frame.size.height -self.topToolbar.frame.size.height-self.bottomToolbar.frame.size.height)/f, self.view.frame.size.height -self.topToolbar.frame.size.height-self.bottomToolbar.frame.size.height)];*/
-       
-
-
-      }
-    else {
+    }else{
         [self.imageView setFrame:CGRectMake(0.0, (self.scrollView.frame.size.height-self.scrollView.frame.size.width*f)/2,self.scrollView.frame.size.width , self.scrollView.frame.size.width*f)];
         [self.annotationView setFrame:CGRectMake(0.0, (self.scrollView.frame.size.height-self.scrollView.frame.size.width*f)/2,self.scrollView.frame.size.width , self.scrollView.frame.size.width*f)];
-        /*[self.imageView setFrame:CGRectMake(0, 0,self.scrollView.frame.size.width , self.scrollView.frame.size.width*f)];
-        [self.annotationView setFrame:CGRectMake(0, 0,self.scrollView.frame.size.width , self.scrollView.frame.size.width*f)];*/                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-        /*
-         PARA QUE LA SCROLLVIEW NO INCLUYA LOS MARGENES
-         [self.scrollView setFrame:CGRectMake(0, (self.view.frame.size.height -self.topToolbar.frame.size.height-self.bottomToolbar.frame.size.height-self.view.frame.size.width*f)/2+self.topToolbar.frame.size.height,self.view.frame.size.width , self.view.frame.size.width*f)];
-        [self.annotationView setFrame:CGRectMake(0, 0,self.view.frame.size.width , self.view.frame.size.width*f)];
-        [self.imageView setFrame:CGRectMake(0, 0,self.view.frame.size.width , self.view.frame.size.width*f)];
-        [self.composeView setFrame:CGRectMake(0, 0,self.view.frame.size.width , self.view.frame.size.width*f)];*/
-
-        //[self.composeView setFrame:CGRectMake(0, (self.scrollView.frame.size.height-self.scrollView.frame.size.width*f)/2,self.scrollView.frame.size.width , self.scrollView.frame.size.width*f)];
-
-      
-        
     }
+    
     [self.annotationView setVisibleFrame:CGRectMake(0, 0, self.annotationView.frame.size.width, self.annotationView.frame.size.height)];
    
-    [self.imageView setImage:image];    //self.imageView.image = image;
-// faltaria poner el aspect size
+    self.imageView.image = image;
+    // faltaria poner el aspect size
 }
--(void)createPlistEntry:(NSString *)filename{
+
+-(void)createPlistEntry:(NSString *)filename
+{
     [self.sendButton setTitle:@"Send"];
-    NSString *plistPath = [[NSString alloc] initWithFormat:@"%@/%@.plist",[self.paths objectAtIndex:USER],self.username ];
+    NSString *plistPath = [[NSString alloc] initWithFormat:@"%@/%@.plist",[self.paths objectAtIndex:USER],self.username];
       NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:plistPath];
     NSNumber *num = [[NSNumber alloc] initWithInt:-1];
     [dict setObject:num forKey:filename];
     [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
-    
-    
 }
 
 
--(void)createFilename{
-    NSString *date = [[NSString alloc]initWithString:[[[NSDate date] description] substringToIndex:19]]  ;
+-(void)createFilename
+{
+    NSString *date = [[NSString alloc]initWithString:[[[NSDate date] description] substringToIndex:19]];
     date = [date stringByReplacingOccurrencesOfString:@" " withString:@""];
     date = [date stringByReplacingOccurrencesOfString:@"-" withString:@""];
     date = [date stringByReplacingOccurrencesOfString:@":" withString:@""];
-    
-    
-    self.filename =   [date stringByAppendingFormat:@"%@.jpg",self.username ];
+
+    self.filename = [date stringByAppendingFormat:@"%@.jpg",self.username];
 }
 
 #pragma mark -
@@ -549,7 +453,8 @@
     
     
 }
--(IBAction)listAction:(id)sender{
+-(IBAction)listAction:(id)sender
+{
     
     [self.labelsView reloadData];
     if (self.labelsView.hidden) {
@@ -574,9 +479,12 @@
     [self.labelsView setHidden:!self.labelsView.hidden];
     
 }
+
 #pragma mark -
 #pragma mark ActionSheetDelegate Methods
--(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
+
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
 
     if (buttonIndex==0) {
         int num=[[self.annotationView objects] count];
@@ -626,7 +534,8 @@
 }
 #pragma mark -
 #pragma mark Buttons Management
--(void)barButtonsEnabled:(BOOL)value{
+-(void)barButtonsEnabled:(BOOL)value
+{
     [self.addButton setEnabled:value];
     [self.sendButton setEnabled:value];
     [self.labelsButton setEnabled:value];
@@ -635,7 +544,8 @@
 
 }
 
--(void)sendPhoto{
+-(void)sendPhoto
+{
     NSDictionary *dict = [[NSDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     NSNumber *num = [dict objectForKey:self.filename];
     
@@ -653,7 +563,8 @@
 
 #pragma mark -
 #pragma mark Save State
--(BOOL)saveThumbnail{
+-(BOOL)saveThumbnail
+{
     NSFileManager * filemng = [NSFileManager defaultManager];
     [self.annotationView setSelectedBox:-1];
     [self.annotationView setNeedsDisplay];
@@ -684,48 +595,40 @@
 }
 
 
--(void)saveImage:(UIImage *)image{
-    @autoreleasepool {
-
-        if (self.paths == nil) {
-            //NSArray *tmp = [self newArrayWithFolders:self.username];
+-(void)saveImage:(UIImage *)image
+{
+    @autoreleasepool
+    {
+        if (self.paths == nil)
             self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
-            //[tmp release];
 
-        }
         [self createFilename];
         [self createPlistEntry:self.filename];
 
         NSFileManager * filemng = [NSFileManager defaultManager];
         
-        if([filemng createFileAtPath:[[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil]){
-        }
+        [filemng createFileAtPath:[[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
     
-        if([filemng createFileAtPath:[[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil]){
-        }
-        
-        //[self saveThumbnail];
+        [filemng createFileAtPath:[[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
+
         [self saveDictionary];
     }
 }
 
 
--(BOOL)saveDictionary{
-    
+-(BOOL)saveDictionary
+{
     NSString *path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename ];
     
-    if([NSKeyedArchiver archiveRootObject:self.annotationView.objects toFile:path])
-        return YES;
-    else
-        return NO;
-    
+    if([NSKeyedArchiver archiveRootObject:self.annotationView.objects toFile:path]) return YES;
+    else return NO;
 }
 
 
--(void)saveAnnotation{
+-(void)saveAnnotation
+{
     [self saveThumbnail];
     [self saveDictionary];
-
 }
 
 
@@ -734,9 +637,9 @@
 #pragma mark TagViewDelegate Methods
 -(void)objectModified{
    
-    if ([self.annotationView SelectedBox] == -1) {
+    if ([self.annotationView SelectedBox] == -1)
         return;
-    }
+
     if ([[self.annotationView.objects objectAtIndex:[self.annotationView SelectedBox]] sent]) {
         [[self.annotationView.objects objectAtIndex:[self.annotationView SelectedBox]] setSent:NO];
         NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
@@ -752,12 +655,10 @@
             [dict removeObjectForKey:self.filename];
             [dict setObject:newdictnum forKey:self.filename];
 
-        }
-        else{
+        }else{
             NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
             [dict removeObjectForKey:self.filename];
             [dict setObject:newdictnum forKey:self.filename];
-
         }
         
         // ya la cambia??
@@ -768,33 +669,36 @@
     [self saveDictionary];
     //[self saveThumbnail];
 }
--(void)stringLabel:(NSString *)string{
+
+-(void)stringLabel:(NSString *)string
+{
     [self.label setText:string];
 }
--(void)hiddenTextField:(BOOL)value{
+
+-(void)hiddenTextField:(BOOL)value
+{
     [self.label setHidden:value];
 }
--(void)correctOrientation:(CGPoint)upperLeft :(CGPoint)lowerRight SuperviewFrame:(CGRect)viewSize{
+
+-(void)correctOrientation:(CGPoint)upperLeft :(CGPoint)lowerRight SuperviewFrame:(CGRect)viewSize
+{
     [self.label setCorrectOrientationWithCorners:upperLeft :lowerRight subviewFrame:viewSize andViewSize:self.scrollView.frame.size andScale:self.scrollView.zoomScale];
     //[self.label setFrame:CGRectMake(self.label.frame.origin.x, self.label.frame.origin.y+self.scrollView.contentOffset.y, self.label.frame.size.width, self.label.frame.size.height)];
 }
--(void)selectedAnObject:(BOOL)value{
+
+-(void)selectedAnObject:(BOOL)value
+{
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
-    NSNumber *dictnum  = [dict objectForKey:self.filename];
-    [self.deleteButton setEnabled:value];
+    
+    int dictnum  = [[dict objectForKey:self.filename] intValue];
+    self.deleteButton.enabled = value;
     self.scrollView.scrollEnabled = !value;
-    if (dictnum.intValue != 0) {
-            [self.sendButton setEnabled:YES];
-    }
-    else{
-            [self.sendButton setEnabled:NO];
-
-    }
-
+    self.sendButton.enabled = dictnum!=0 ?  YES : NO;
     
     [self.labelsView reloadData];
-
 }
+
+
 #pragma mark -
 #pragma mark ScrollViewDelegate Method
 - (UIView*)viewForZoomingInScrollView:(UIScrollView *)aScrollView {
@@ -878,22 +782,20 @@
     
     return ret;
 }
-/*- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
-    NSString * ret = [[NSString alloc] init];
-    if (section == 0) {
-        ret = [NSString stringWithFormat:@"%d objects",self.annotationView.objects.count];
-    }
-    return  ret;
-}*/
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section{
-    NSString * ret = [[NSString alloc] init];
-    if (section == 0) {
-        ret = [NSString stringWithFormat:@"%d objects",self.annotationView.objects.count];
-    }
-    return  ret;
 
+
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
+{
+    NSString * ret = [[NSString alloc] init];
+    if (section == 0)
+        ret = [NSString stringWithFormat:@"%d objects",self.annotationView.objects.count];
+    
+    return  ret;
 }
--(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section{
+
+
+-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
     NSString *sectionTitle = [self tableView:tableView titleForFooterInSection:section];
     if (sectionTitle == nil) {
         return nil;
@@ -911,17 +813,14 @@
     
     // Create header view and add label as a subview
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 42)];
-//    [view autorelease];
     [view addSubview:label];
     
     return view;
 }
 
 
-
-
-
-- (UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+- (UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
      static NSString *CellIdentifier = @"Cell";
      UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
      //

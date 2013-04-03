@@ -176,6 +176,8 @@
 		FC5C93B516FCFEAB00637B69 /* ExecuteDetectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */; };
 		FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */; };
 		FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC610AF3170A36D800851AC2 /* CoreImage.framework */; };
+		FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */; };
+		FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */; };
 		FCED895D17034CAF0027CBE1 /* DetectView.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED895C17034CAF0027CBE1 /* DetectView.m */; };
 		FCED896017034CCA0027CBE1 /* Classifier.mm in Sources */ = {isa = PBXBuildFile; fileRef = FCED895F17034CCA0027CBE1 /* Classifier.mm */; };
 		FCED896317034CD70027CBE1 /* ConvolutionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED896217034CD70027CBE1 /* ConvolutionHelper.m */; };
@@ -398,6 +400,9 @@
 		FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExecuteDetectorViewController.m; sourceTree = "<group>"; };
 		FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ExecuteDetectorViewController.xib; sourceTree = "<group>"; };
 		FC610AF3170A36D800851AC2 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
+		FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalTVC.h; sourceTree = "<group>"; };
+		FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalTVC.m; sourceTree = "<group>"; };
+		FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ModalTVC.xib; sourceTree = "<group>"; };
 		FCED895B17034CAF0027CBE1 /* DetectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectView.h; sourceTree = "<group>"; };
 		FCED895C17034CAF0027CBE1 /* DetectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectView.m; sourceTree = "<group>"; };
 		FCED895E17034CCA0027CBE1 /* Classifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Classifier.h; sourceTree = "<group>"; };
@@ -720,6 +725,8 @@
 				FCED897C170375050027CBE1 /* ShowTrainingSetViewController.m */,
 				FCED898017037A5F0027CBE1 /* ShowImageViewController.h */,
 				FCED898117037A5F0027CBE1 /* ShowImageViewController.m */,
+				FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */,
+				FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */,
 				FCED895B17034CAF0027CBE1 /* DetectView.h */,
 				FCED895C17034CAF0027CBE1 /* DetectView.m */,
 				FCED896117034CD70027CBE1 /* ConvolutionHelper.h */,
@@ -766,6 +773,7 @@
 				FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */,
 				FCED897D170375050027CBE1 /* ShowTrainingSetViewController.xib */,
 				FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */,
+				FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */,
 			);
 			name = Detector;
 			sourceTree = "<group>";
@@ -955,6 +963,7 @@
 				FCED8972170350F80027CBE1 /* bottle.txt in Resources */,
 				FCED897F170375050027CBE1 /* ShowTrainingSetViewController.xib in Resources */,
 				FCED898417037A5F0027CBE1 /* ShowImageViewController.xib in Resources */,
+				FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -999,6 +1008,7 @@
 				FCED896817034D350027CBE1 /* UIImage+HOG.m in Sources */,
 				FCED897E170375050027CBE1 /* ShowTrainingSetViewController.m in Sources */,
 				FCED898317037A5F0027CBE1 /* ShowImageViewController.m in Sources */,
+				FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

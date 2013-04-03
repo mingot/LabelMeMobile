@@ -39,7 +39,8 @@
 @property (strong,nonatomic) GalleryViewController *galleryViewController;
 @property (strong,nonatomic) SettingsViewController *settingsViewController;
 @property (strong,nonatomic) DetectorGalleryViewController *detectorGalleryController;
-
+@property (strong,nonatomic) NSDictionary *userDictionary;
+@property (strong,nonatomic) NSArray *userPaths;
 
 
 -(void)keyboardDidShow:(NSNotification *)notif;

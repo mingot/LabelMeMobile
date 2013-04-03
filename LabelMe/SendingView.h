@@ -42,5 +42,4 @@
 -(void)reset;
 -(void)showMessage:(NSString *)message;
 
-
 @end

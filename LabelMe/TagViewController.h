@@ -13,7 +13,8 @@
 #import "SendingView.h"
 
 
-@interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, UIScrollViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate,UITextFieldDelegate>{
+@interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, UIScrollViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate,UITextFieldDelegate>
+{
     
      UIScrollView *         _scrollView;
      UITextField *          _label;
@@ -42,6 +43,7 @@
     UIButton *tip;
   
 }
+
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (strong, nonatomic) IBOutlet UITextField *label;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *addButton;
@@ -52,19 +54,12 @@
 @property (nonatomic, strong) UIImageView *imageView;
 @property (strong, nonatomic)  UITableView *labelsView;
 
-//@property (retain, nonatomic) NSArray *colorArray;
 @property (nonatomic, strong) NSString *filename;
 @property (nonatomic, strong) NSArray *paths;
 @property (strong, nonatomic)  TagView *annotationView;
 @property (strong,nonatomic) NSString *username;
 @property (strong,nonatomic) UIView *composeView;
 @property (strong,nonatomic) SendingView *sendingView;
-
-
-
-
-
-//@property (nonatomic, retain) IBOutlet UIActivityIndicatorView *spinner;
 
 
 - (void) keyboardDidShow:(NSNotification *)notif;
@@ -78,8 +73,6 @@
 -(IBAction)doneAction:(id)sender;
 -(IBAction)listAction:(id)sender;
 
-
-//-(void) setGallery:(BOOL)value;
 -(void)setImage:(UIImage *)image;
 -(BOOL)saveThumbnail;
 -(void)saveImage:(UIImage *)image;

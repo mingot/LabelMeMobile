@@ -10,6 +10,7 @@
 #import "TrainDetectorViewController.h"
 #import "ExecuteDetectorViewController.h"
 #import "ShowTrainingSetViewController.h"
+#import "ModalTVC.h"
 #import "SendingView.h"
 #import "Classifier.h"
 
@@ -26,9 +27,9 @@
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
 @property (strong, nonatomic) ShowTrainingSetViewController *trainingSetController;
+@property (strong, nonatomic) ModalTVC *modalTVC;
 @property (strong, nonatomic) SendingView *sendingView;
 @property (strong, nonatomic) Classifier *svmClassifier;
-
 
 @property (weak, nonatomic) IBOutlet UIButton *executeButton;
 @property (weak, nonatomic) IBOutlet UIButton *trainButton;
@@ -42,12 +43,13 @@
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
 
 @property (nonatomic, strong) UIImage *averageImage;
-
-
+@property (nonatomic, strong) NSArray *availableObjectClasses;
 
 
 - (IBAction)executeAction:(id)sender;
 - (IBAction)trainAction:(id)sender;
 - (IBAction)saveAction:(id)sender;
+- (IBAction)infoAction:(id)sender;
+- (IBAction)showClass:(id)sender;
 
 @end

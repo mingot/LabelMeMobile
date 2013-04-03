@@ -31,6 +31,8 @@
 @synthesize galleryViewController = _galleryViewController;
 @synthesize settingsViewController = _settingsViewController;
 @synthesize detectorGalleryController = _detectorGalleryController;
+@synthesize userDictionary = _userDictionary;
+@synthesize userPaths = _userPaths;
 
 
 #pragma mark 
@@ -218,18 +220,12 @@
 {
     CreateAccountViewController *createAccountViewController = nil;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-       
-        if ([UIScreen mainScreen].bounds.size.height == 568) {
+        if ([UIScreen mainScreen].bounds.size.height == 568)
             createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPhone5" bundle:nil];
-        }
-        else if ([UIScreen mainScreen].bounds.size.height == 480){
+        else if ([UIScreen mainScreen].bounds.size.height == 480)
             createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPhone" bundle:nil];
-        }
-    }
-    else{
-        createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPad" bundle:nil];
+    }else createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPad" bundle:nil];
 
-    }
     createAccountViewController.delegate = self;
 
     [self presentViewController:createAccountViewController animated:YES completion:NULL ];
@@ -247,12 +243,11 @@
 {
     UIBarButtonItem * doneButton = [[self.keyboardToolbar items] objectAtIndex:4];
     
-    if ((self.passwordField.text.length*self.usernameField.text.length)==0) {
+    if ((self.passwordField.text.length*self.usernameField.text.length)==0)
         [doneButton setEnabled:NO];
-    }
-    else{
-        [doneButton setEnabled:YES];
-    }
+    
+    else [doneButton setEnabled:YES];
+    
 }
 
 
@@ -300,8 +295,7 @@
                 self.passwordField.text = [NSString stringWithContentsOfFile:[[documentsDirectory stringByAppendingPathComponent:@"RememberMe"] stringByAppendingPathComponent:@"password.txt"]  encoding:NSUTF8StringEncoding error:&error];
                 return YES;
                 
-            }else
-                self.passwordField.text = @"";
+            }else self.passwordField.text = @"";
         }
 
     }
@@ -320,10 +314,8 @@
         if ([[alertView textFieldAtIndex:0].text checkEmailFormat] ) {
             [sconnecton forgotPassword:[alertView textFieldAtIndex:0].text];
             [self errorWithTitle:@"Forgot Password" andDescription:@"An email will be sent to you with your username and a new password."];
-        }
-        else{
-            [self errorWithTitle:@"Email format is not valid" andDescription:@"Enter a valid email."];
-        }
+            
+        } else [self errorWithTitle:@"Email format is not valid" andDescription:@"Enter a valid email."];
     }
 }
 
@@ -333,12 +325,10 @@
 
 -(void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    if (textField == self.passwordField) {
+    if (textField == self.passwordField)
         [self nextFieldAction:nil];
-    }
-    else if (textField == self.usernameField){
+    else if (textField == self.usernameField)
         [self previousAction:nil];
-    }
     
     [self.scrollView scrollRectToVisible:textField.frame animated:YES];
 }
@@ -421,6 +411,9 @@
     sendingView.hidden = YES;
     [sendingView.activityIndicator stopAnimating];
     [self presentViewController:self.tabBarController animated:YES completion:NULL];
+    
+    self.userPaths = [self newArrayWithFolders:self.usernameField.text];
+    self.userDictionary = [[NSDictionary alloc] initWithContentsOfFile:[[self.userPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
 
 }
 
@@ -439,8 +432,8 @@
 {
     if (previousSession) {
         [self signInComplete];
-    }
-    else{
+        
+    }else{
         [self errorWithTitle:@"No internet connection" andDescription:@"The app could not connect."];
         [sendingView setHidden:YES];
         [sendingView.activityIndicator stopAnimating];
@@ -462,7 +455,7 @@
 {    
     if (tabBarController.selectedIndex == 1) {
         UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
-        [imagePicker setDelegate:self];
+        imagePicker.delegate = self;
         
         //detect if camera is available
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
@@ -496,100 +489,76 @@
 
 #pragma mark -
 #pragma mark UIImagePickerControllerDelegate
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
-
-    [locationMng startUpdatingLocation];
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
     
+    
+    UIImage *image = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
+    
+    //select the xib file to present in function of the device
     TagViewController *tagviewController = nil;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        CGRect screenSize = [[UIScreen mainScreen] bounds];
-        
-        if (screenSize.size.height == 568) {
+        if ([UIScreen mainScreen].bounds.size.height == 568)
             tagviewController = [[TagViewController alloc] initWithNibName:@"TagViewController_iPhone5" bundle:nil];
             
-            
-        }
-        else if (screenSize.size.height == 480){
+        else if ([UIScreen mainScreen].bounds.size.height == 480)
             tagviewController = [[TagViewController alloc] initWithNibName:@"TagViewController_iPhone" bundle:nil];
 
-            
-        }
-
-    }
-    else{
-        tagviewController = [[TagViewController alloc] initWithNibName:@"TagViewController_iPad" bundle:nil];
-
-    }
-    UIImage *image = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
-        
-    [tagviewController setUsername:self.usernameField.text];
+    } else tagviewController = [[TagViewController alloc] initWithNibName:@"TagViewController_iPad" bundle:nil];
     
-    NSArray *paths = [self newArrayWithFolders:self.usernameField.text];
-    NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
-    NSNumber *camerarollnum = [dict objectForKey:@"cameraroll"];
-    NSNumber *resolutionnum = [dict objectForKey:@"resolution"];
-    CGSize newSize = image.size;
-    if ((camerarollnum.boolValue)&& (picker.sourceType == UIImagePickerControllerSourceTypeCamera )) {
-        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
-    }
-    float max;
-    if (newSize.width>newSize.height) {
-        max = newSize.width;
-    }
-    else{
-            max = newSize.height;
-    }
-    if ((resolutionnum.floatValue != 0.0) && (resolutionnum.floatValue < max)) {
-        if (image.size.height > image.size.width) {
-            newSize = CGSizeMake(resolutionnum.floatValue*0.75, resolutionnum.floatValue);
-        }
-        else{
-            newSize = CGSizeMake(resolutionnum.floatValue, resolutionnum.floatValue*0.75);
-            
-        }
-    }
-
-    [tagviewController performSelectorInBackground:@selector(saveImage:) withObject:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
-
+    tagviewController.username = self.usernameField.text;
+    tagviewController.image = image; //[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh];
+    
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
     
-    NSString *location = @"";
-    
-    if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
-        location = [[locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
-    }
-    [location writeToFile:[[paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[tagviewController.filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
-   
     [picker setNavigationBarHidden:NO animated:NO];
-    [tagviewController setImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
-
+    
     if (([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) && (picker.sourceType == UIImagePickerControllerSourceTypePhotoLibrary)) {
         [self.popover dismissPopoverAnimated:NO];
         [tagviewController setHidesBottomBarWhenPushed:YES];
         [self.galleryViewController.navigationController pushViewController:tagviewController animated:YES];
         
-    }
-    else{
-        [picker pushViewController:tagviewController animated:YES];
-
+    }else [picker pushViewController:tagviewController animated:YES];
+    
+    //create a new thread to store image and location information
+    dispatch_queue_t myQueue = dispatch_queue_create("saving_image", 0);
+    dispatch_async(myQueue, ^{
+        [locationMng startUpdatingLocation];
         
-    }
-
-    [locationMng stopUpdatingLocation];
+        //get the new size of the image according to the defined resolution and save image
+        CGSize newSize = image.size;
+        BOOL cameraroll = [[self.userDictionary objectForKey:@"cameraroll"] boolValue];
+        float resolution = [[self.userDictionary objectForKey:@"resolution"] floatValue];
+        float max = newSize.width > newSize.height ? newSize.width : newSize.height;
+        if ((resolution != 0.0) && (resolution < max))
+            newSize = image.size.height > image.size.width ? CGSizeMake(resolution*0.75, resolution) : CGSizeMake(resolution, resolution*0.75);
+        [tagviewController saveImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
+        
+        if (cameraroll && (picker.sourceType == UIImagePickerControllerSourceTypeCamera ))
+            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
+        
+        //save location information
+        NSString *location = @"";
+        if (picker.sourceType == UIImagePickerControllerSourceTypeCamera)
+            location = [[locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
+        [location writeToFile:[[self.userPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[tagviewController.filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+        
+        [locationMng stopUpdatingLocation];
+    });
+        
 }
 
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
-    if (([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) && (picker.sourceType == UIImagePickerControllerSourceTypePhotoLibrary)) {
+    
+    if (([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) && (picker.sourceType == UIImagePickerControllerSourceTypePhotoLibrary))
         [self.popover dismissPopoverAnimated:YES];
+        
+    else [picker dismissViewControllerAnimated:YES completion:NULL];
 
-    }
-    else{
-        [picker dismissViewControllerAnimated:YES completion:NULL];
-
-    }
 }
 
 

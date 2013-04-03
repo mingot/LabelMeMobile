@@ -202,6 +202,9 @@ using namespace cv;
 @synthesize sizes = _sizes;
 @synthesize name = _name;
 @synthesize targetClass = _targetClass;
+@synthesize numberSV = _numberSV;
+@synthesize numberOfPositives = _numberOfPositives;
+@synthesize precisionRecall = _precisionRecall;
 
 
 #pragma mark -
@@ -410,6 +413,9 @@ using namespace cv;
         
         //[self showOrientationHistogram];
         
+        //update information about the classifier
+        self.numberOfPositives = [NSNumber numberWithInt:positives];
+        self.numberSV = [NSNumber numberWithInt:numSupportVectors];
     }
     
     //See the results on training set
@@ -488,8 +494,11 @@ using namespace cv;
         NSLog(@"fn at image %d: %d", groundTruthBoundingBox.imageIndex, fn);
         
     }
-    NSLog(@"PRECISION: %f", tp*1.0/(tp+fp));
-    NSLog(@"RECALL: %f", tp*1.0/(tp+fn));
+
+    [self.delegate sendMessage:[NSString stringWithFormat:@"PRECISION: %f", tp*1.0/(tp+fp)]];
+    [self.delegate sendMessage:[NSString stringWithFormat:@"RECALL: %f", tp*1.0/(tp+fn)]];
+    self.precisionRecall = [[NSArray alloc] initWithObjects:[NSNumber numberWithDouble:tp*1.0/(tp+fp)],[NSNumber numberWithDouble:tp*1.0/(tp+fn)] ,nil];
+    
 }
 
 
@@ -503,6 +512,9 @@ using namespace cv;
         self.sizes = [aDecoder decodeObjectForKey:@"sizes"];
         self.name = [aDecoder decodeObjectForKey:@"name"];
         self.targetClass = [aDecoder decodeObjectForKey:@"targetClass"];
+        self.numberSV = [aDecoder decodeObjectForKey:@"numberSV"];
+        self.numberOfPositives = [aDecoder decodeObjectForKey:@"numberOfPositives"];
+        self.precisionRecall = [aDecoder decodeObjectForKey:@"precisionRecall"];
         
         self.weightsDimensions = (int *) malloc(3*sizeof(int));
         self.weightsDimensions[0] = [(NSNumber *) [self.sizes objectAtIndex:0] intValue];
@@ -537,6 +549,9 @@ using namespace cv;
     [aCoder encodeObject:self.sizes forKey:@"sizes"];
     [aCoder encodeObject:self.name forKey:@"name"];
     [aCoder encodeObject:self.targetClass forKey:@"targetClass"];
+    [aCoder encodeObject:self.numberSV forKey:@"numberSV"];
+    [aCoder encodeObject:self.numberOfPositives forKey:@"numberOfPositives"];
+    [aCoder encodeObject:self.precisionRecall forKey:@"precisionRecall"];
 }
 
 

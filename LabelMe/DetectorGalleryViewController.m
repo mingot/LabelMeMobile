@@ -35,15 +35,16 @@
 
 - (void)viewDidLoad
 {
-    //load detectors
+    //load detectors and create directory if it does not exist
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     self.userPath = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,self.username];
     NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"];
-    NSLog(@"detectorsPath: %@", detectorsPath);
-    
-    //TODO: create the directory if it does not exist
     self.detectors = [NSKeyedUnarchiver unarchiveObjectWithFile:detectorsPath];
-    if(!self.detectors) self.detectors = [[NSMutableArray alloc] init];
+    if(!self.detectors) {
+        //create directory
+        [[NSFileManager defaultManager] createDirectoryAtPath:[self.userPath stringByAppendingPathComponent:@"Detectors"] withIntermediateDirectories:YES attributes:nil error:nil];
+        self.detectors = [[NSMutableArray alloc] init];
+    }
     
     //view controller specifications
     self.title = @"Detectors";
@@ -55,21 +56,13 @@
 }
 
 
-- (void) viewWillDisappear:(BOOL)animated
-{
-    //save data to disk
-    [NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"]];
-    
-    [super viewWillDisappear:animated];
-}
-
 
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
 {
-    return self.editing ? self.detectors.count +1 : self.detectors.count;
+    return self.editing ? self.detectors.count + 1 : self.detectors.count;
 }
 
 
@@ -180,6 +173,11 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     //update table
     [self.detectors replaceObjectAtIndex:_selectedRow withObject:updatedDetector];
+    NSLog(@"updating detector at position: %d", _selectedRow);
+    if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"]]){
+        NSLog(@"Unable to save the classifier");
+    }
+    
     [self.tableView reloadData];
 }
 

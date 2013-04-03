@@ -165,22 +165,14 @@
     
     
 }
-- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
-    if (viewController == self.tagViewController) {
-        //[self.tagViewController setImage:self.imageToAnnotate];
+- (void)navigationController:(UINavigationController *)navigationController
+       didShowViewController:(UIViewController *)viewController
+                    animated:(BOOL)animated
+{
+    if (viewController == self.tagViewController)
         [self.tagViewController setImage:self.tagViewController.imageView.image];
-        //[self.tagViewController performSelectorInBackground:@selector(saveImage) withObject:nil];
-    
-        //[self.tagViewController saveImage];
-        //[self setImageToAnnotate:nil];
-    }
-    else {
-        //[self.view setHidden:NO];
-        
-    }
-
-    
 }
+
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
 
     if (viewController == self.tagViewController) {
