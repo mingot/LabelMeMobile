@@ -11,7 +11,7 @@
 #import "ExecuteDetectorViewController.h"
 #import "ShowTrainingSetViewController.h"
 #import "SendingView.h"
-
+#import "Classifier.h"
 
 @protocol DetectorDescriptionViewControllerDelegate <NSObject>
 
@@ -21,7 +21,7 @@
 
 
 
-@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate>
+@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate>
 
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;

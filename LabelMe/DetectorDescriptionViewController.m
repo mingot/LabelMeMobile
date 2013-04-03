@@ -7,7 +7,6 @@
 //
 
 #import "DetectorDescriptionViewController.h"
-#import "Classifier.h"
 #import "Box.h"
 #import "ConvolutionHelper.h"
 
@@ -35,6 +34,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.svmClassifier.delegate = self;
     
     //load views
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
@@ -72,11 +73,8 @@
     self.sendingView.hidden = YES;
     self.sendingView.progressView.hidden = YES;
     self.sendingView.label.numberOfLines = 0;
-    self.sendingView.label.frame =  CGRectMake(20,100,300,200);
+    self.sendingView.label.frame =  CGRectMake(20,20,300,400);
                                               
-    NSLog(@"%f, %f, %f",self.sendingView.activityIndicator.frame.origin.x + self.sendingView.activityIndicator.frame.size.width + 10,
-          self.sendingView.activityIndicator.frame.origin.y-100,
-          (self.sendingView.progressView.frame.size.width - self.sendingView.activityIndicator.frame.size.width));
     [self.view addSubview:self.sendingView];
     
 }
@@ -258,6 +256,15 @@
 - (void) cancel
 {
     
+}
+
+#pragma mark
+#pragma mark - ClassifierDelegate
+
+
+-(void) sendMessage:(NSString *)message
+{
+    [self.sendingView showMessage:message];
 }
 
 

@@ -285,8 +285,10 @@ using namespace cv;
     int numOfFeatures = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2];
     
     if(debugging){
-        NSLog(@"template size: %f, %f", trainingSet.templateSize.height, trainingSet.templateSize.width);
-        NSLog(@"dimensions of hog features: %d %d %d", self.weightsDimensions[0],self.weightsDimensions[1],self.weightsDimensions[2]);
+        //NSLog(@"template size: %f, %f", trainingSet.templateSize.height, trainingSet.templateSize.width);
+        //NSLog(@"dimensions of hog features: %d %d %d", self.weightsDimensions[0],self.weightsDimensions[1],self.weightsDimensions[2]);
+        [self.delegate sendMessage:[NSString stringWithFormat:@"template size: %f, %f", trainingSet.templateSize.height, trainingSet.templateSize.width]];
+        [self.delegate sendMessage:[NSString stringWithFormat:@"dimensions of hog features: %d %d %d", self.weightsDimensions[0],self.weightsDimensions[1],self.weightsDimensions[2]]];
     }
     
 
@@ -306,9 +308,11 @@ using namespace cv;
     for (int iter=0; iter<numIterations; iter++){
         // Set up training data
         if(debugging){
-            NSLog(@"\n\n ************************ Iteration %d ********************************", iter);
-            NSLog(@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples);
-            
+            //NSLog(@"\n\n ************************ Iteration %d ********************************", iter);
+            //NSLog(@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples);
+
+            [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter]];
+            [self.delegate sendMessage:[NSString stringWithFormat:@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples]];
         }
         
         Mat labelsMat(trainingSet.numberOfTrainingExamples,1,CV_32FC1, trainingSet.labels);
@@ -352,7 +356,8 @@ using namespace cv;
         self.svmWeights[numOfFeatures] = - (double) dec[0].rho; // The sign of the bias and rho have opposed signs.
         
         if(debugging){
-            NSLog(@"bias: %f", self.svmWeights[numOfFeatures]);
+            //NSLog(@"bias: %f", self.svmWeights[numOfFeatures]);
+            [self.delegate sendMessage:[NSString stringWithFormat:@"bias: %f", self.svmWeights[numOfFeatures]]];
         }
         
         
@@ -390,10 +395,17 @@ using namespace cv;
                 
             }
         }
-        printf("added:%d positives\n", positives);
-        printf("total of new bounding boxes: %d\n", trainingSet.boundingBoxes.count);
+        if(debugging){
+            //NSLog(@"added:%d positives", positives);
+            //NSLog(@"total of new bounding boxes: %d",trainingSet.boundingBoxes.count);
+            [self.delegate sendMessage:[NSString stringWithFormat:@"added:%d positives", positives]];
+            [self.delegate sendMessage:[NSString stringWithFormat:@"total of new bounding boxes: %d",trainingSet.boundingBoxes.count]];
+            [self.delegate sendMessage:@"Computing HOG features for the Bounding boxes..."];
+        }
+        
         
         //generate the hog features for the new bounding boxes
+        
         [trainingSet generateFeaturesForBoundingBoxesWithNumSV:numSupportVectors];
         
         //[self showOrientationHistogram];

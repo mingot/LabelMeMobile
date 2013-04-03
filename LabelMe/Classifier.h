@@ -42,16 +42,26 @@
 #pragma mark Classifier
 //////////////////////////////////////////////////////////////////////////
 
+@protocol ClassifierDelegate <NSObject>
+
+//Send a message to the delegate (to output as a debug during the traingnin)
+- (void) sendMessage:(NSString *) message;
+
+@end
+
+
 @interface Classifier : NSObject <NSCoding>
 
 @property double *svmWeights;
 @property int *weightsDimensions;
+@property (strong, nonatomic) id<ClassifierDelegate> delegate;
 
 //Encoding properties
 @property (strong, nonatomic) NSMutableArray *weights;
 @property (strong, nonatomic) NSArray *sizes;
 @property (strong, nonatomic) NSString *name;
 @property (strong, nonatomic) NSString *targetClass;
+
 
 
 //Initialization of the classifier given the weight vectors of it

@@ -55,6 +55,7 @@
         self.label.textColor = [UIColor whiteColor];
         self.label.text = @"Uploading to LabelMe server...";
         self.label.textAlignment = NSTextAlignmentCenter;
+        self.label.font = [UIFont fontWithName:@"AmericanTypewriter" size:10];
         self.progressView.progressTintColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
         
         [self addSubview:self.progressView];
@@ -103,7 +104,7 @@
     NSLog(@"LOG: %@",message);
     
     //messages stack
-    if(self.messagesStack.count > 5) [self.messagesStack removeObjectAtIndex:0];
+    if(self.messagesStack.count > 15) [self.messagesStack removeObjectAtIndex:0];
     [self.messagesStack addObject:message];
     
     NSString *output = @"";
