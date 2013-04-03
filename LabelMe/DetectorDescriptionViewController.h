@@ -10,6 +10,7 @@
 #import "TrainDetectorViewController.h"
 #import "ExecuteDetectorViewController.h"
 #import "ShowTrainingSetViewController.h"
+#import "SendingView.h"
 
 
 @protocol DetectorDescriptionViewControllerDelegate <NSObject>
@@ -20,12 +21,14 @@
 
 
 
-@interface DetectorDescriptionViewController : UIViewController
+@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate>
 
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
 @property (strong, nonatomic) ShowTrainingSetViewController *trainingSetController;
+@property (strong, nonatomic) SendingView *sendingView;
 @property (strong, nonatomic) Classifier *svmClassifier;
+
 
 @property (weak, nonatomic) IBOutlet UIButton *executeButton;
 @property (weak, nonatomic) IBOutlet UIButton *trainButton;
@@ -37,6 +40,8 @@
 
 @property (strong, nonatomic) NSString *userPath;
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
+
+@property (nonatomic, strong) UIImage *averageImage;
 
 
 

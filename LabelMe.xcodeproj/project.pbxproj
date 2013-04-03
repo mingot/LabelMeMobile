@@ -175,6 +175,7 @@
 		FC5C93B116FCFE8F00637B69 /* TrainDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */; };
 		FC5C93B516FCFEAB00637B69 /* ExecuteDetectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */; };
 		FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */; };
+		FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC610AF3170A36D800851AC2 /* CoreImage.framework */; };
 		FCED895D17034CAF0027CBE1 /* DetectView.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED895C17034CAF0027CBE1 /* DetectView.m */; };
 		FCED896017034CCA0027CBE1 /* Classifier.mm in Sources */ = {isa = PBXBuildFile; fileRef = FCED895F17034CCA0027CBE1 /* Classifier.mm */; };
 		FCED896317034CD70027CBE1 /* ConvolutionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED896217034CD70027CBE1 /* ConvolutionHelper.m */; };
@@ -396,6 +397,7 @@
 		FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExecuteDetectorViewController.h; sourceTree = "<group>"; };
 		FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExecuteDetectorViewController.m; sourceTree = "<group>"; };
 		FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ExecuteDetectorViewController.xib; sourceTree = "<group>"; };
+		FC610AF3170A36D800851AC2 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		FCED895B17034CAF0027CBE1 /* DetectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectView.h; sourceTree = "<group>"; };
 		FCED895C17034CAF0027CBE1 /* DetectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectView.m; sourceTree = "<group>"; };
 		FCED895E17034CCA0027CBE1 /* Classifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Classifier.h; sourceTree = "<group>"; };
@@ -421,6 +423,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */,
 				FCED8976170354010027CBE1 /* CoreVideo.framework in Frameworks */,
 				FCED8974170353FB0027CBE1 /* CoreMedia.framework in Frameworks */,
 				FCED897017034F980027CBE1 /* opencv2.framework in Frameworks */,
@@ -491,6 +494,7 @@
 		A558D60A16134E0B001DED8C = {
 			isa = PBXGroup;
 			children = (
+				FC610AF3170A36D800851AC2 /* CoreImage.framework */,
 				A558D61F16134E0C001DED8C /* LabelMe */,
 				A558D61816134E0C001DED8C /* Frameworks */,
 				A558D61616134E0C001DED8C /* Products */,
@@ -731,6 +735,8 @@
 			children = (
 				A5CAAF4E16163A870095D703 /* GalleryViewController.h */,
 				A5CAAF4F16163A870095D703 /* GalleryViewController.m */,
+				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
+				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
 				A5480D6716176CEB009F630D /* CameraOverlayViewController.h */,
 				A5480D6816176CEB009F630D /* CameraOverlayViewController.m */,
 				A5A567721617D756008AFE2E /* SettingsViewController.h */,
@@ -745,8 +751,6 @@
 				A52C36771617C99400FEF74D /* TagViewController.m */,
 				A5480D721617969A009F630D /* TagView.h */,
 				A5480D731617969A009F630D /* TagView.m */,
-				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
-				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
 				A5480D7516179D8E009F630D /* Box.h */,
 				A5480D7616179D8E009F630D /* Box.m */,
 			);
@@ -1033,7 +1037,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PROVISIONING_PROFILE = "103134EA-A0E0-4A06-84A5-B422CB9706BE";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1054,7 +1058,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PROVISIONING_PROFILE = "103134EA-A0E0-4A06-84A5-B422CB9706BE";
 				SDKROOT = iphoneos;
@@ -1077,7 +1081,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PROVISIONING_PROFILE = "103134EA-A0E0-4A06-84A5-B422CB9706BE";
 				SDKROOT = iphoneos;

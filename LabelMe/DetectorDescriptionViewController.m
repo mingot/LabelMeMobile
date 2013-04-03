@@ -19,11 +19,13 @@
 
 @synthesize executeController = _executeController;
 @synthesize trainingSetController = _trainingSetController;
+@synthesize sendingView = _sendingView;
 @synthesize svmClassifier = _svmClassifier;
 @synthesize executeButton = _executeButton;
 @synthesize userPath = _userPath;
 @synthesize classTextField = _classTextField;
 @synthesize delegate = _delegate;
+@synthesize averageImage = _averageImage;
 
 
 #pragma mark
@@ -41,6 +43,7 @@
     //set labels
     self.classTextField.text = self.svmClassifier.targetClass;
     self.nameTextField.text = self.svmClassifier.name;
+    self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
     
     //Check if the classifier exists.
     if([self.svmClassifier.targetClass isEqualToString:@"Not Set"]){
@@ -62,7 +65,22 @@
     self.saveButton.enabled = NO;
     self.saveButton.alpha = 0.6f;
     
+    //sending view, responsible for the waiting view
+    self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
+    self.sendingView.delegate = self;
+    
+    self.sendingView.hidden = YES;
+    self.sendingView.progressView.hidden = YES;
+    self.sendingView.label.numberOfLines = 0;
+    self.sendingView.label.frame =  CGRectMake(20,100,300,200);
+                                              
+    NSLog(@"%f, %f, %f",self.sendingView.activityIndicator.frame.origin.x + self.sendingView.activityIndicator.frame.size.width + 10,
+          self.sendingView.activityIndicator.frame.origin.y-100,
+          (self.sendingView.progressView.frame.size.width - self.sendingView.activityIndicator.frame.size.width));
+    [self.view addSubview:self.sendingView];
+    
 }
+
 
 
 - (void)viewDidUnload
@@ -73,6 +91,7 @@
     [self setSaveButton:nil];
     [self setClassTextField:nil];
     [self setNameTextField:nil];
+    [self setSendingView:nil];
     [super viewDidUnload];
 }
 
@@ -86,12 +105,16 @@
     [self.navigationController pushViewController:self.executeController animated:YES];
 }
 
-
 #define IMAGES 0
 #define THUMB 1
 #define OBJECTS 2
+#define MAX_IMAGE_SIZE 300
+#define IMAGE_SCALE_FACTOR 0.6
 
-- (IBAction)trainAction:(id)sender
+
+
+
+-(void) train
 {
     //retrive all images containing classToLearn
     NSString *selectedClass = self.svmClassifier.targetClass;
@@ -100,23 +123,24 @@
     
     //get the path
     NSArray *resourcesPaths = [NSArray arrayWithObjects:[self.userPath stringByAppendingPathComponent:@"images"],[self.userPath stringByAppendingPathComponent:@"thumbnail"],[self.userPath stringByAppendingPathComponent:@"annotations"],self.userPath, nil];
-
+    
     //get items
     NSFileManager * filemng = [NSFileManager defaultManager];
     NSArray *imagesList = [filemng contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[resourcesPaths objectAtIndex:THUMB]] error:NULL];
     
     for(int i=0; i<imagesList.count; i++){
-        NSLog(@"IMAGE %d", i);
+
+        [self.sendingView showMessage:[NSString stringWithFormat:@"IMAGE %d",i]];
+    
         NSString *path = [[resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[imagesList objectAtIndex:i]];
         
         //image
         UIImage *img = [[UIImage alloc]initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[resourcesPaths objectAtIndex:IMAGES],[imagesList objectAtIndex:i]]];
-
+        
         //dictionaries
         BOOL containClass = NO;
         NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
         for(Box *box in objects){
-            NSLog(@"label:%@", box.label);
             if([box.label isEqualToString:selectedClass]){
                 containClass = YES;
                 ConvolutionPoint *cp = [[ConvolutionPoint alloc] init];
@@ -129,48 +153,71 @@
                 [trainingSet.groundTruthBoundingBoxes addObject:cp];
             }
         }
-        if(containClass) [trainingSet.images addObject:img];
+        if(containClass) [trainingSet.images addObject:[img scaleImageTo:IMAGE_SCALE_FACTOR]];
         
     }
     
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of boxes: %d", trainingSet.groundTruthBoundingBoxes.count]];
     
-    NSLog(@"Number of images in the training set: %d",trainingSet.images.count);
-    NSLog(@"Number of boxes: %d", trainingSet.groundTruthBoundingBoxes.count);
     
- 
-//    //INITIAL FILL AND VISUALIZE IMAGES GENERATED
-//
-//    [trainingSet initialFill];
-//    
-//    NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
-//    
-//    for(int i=0; i<trainingSet.boundingBoxes.count; i++)
-//    {
-//        ConvolutionPoint *cp = [trainingSet.boundingBoxes objectAtIndex:i];
-//        UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
-//        UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
-//        [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
-//    }
-//    
-//    
-//    self.trainingSetController.listOfImages = listOfImages;
-//    //    self.trainingSetController.listOfImages = self.trainingSet.images;
-//    
-//    [self.navigationController pushViewController:self.trainingSetController animated:YES];
+    [trainingSet initialFill];
     
-
+    NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
+    
+    for(int i=0; i<trainingSet.boundingBoxes.count; i++){
+        ConvolutionPoint *cp = [trainingSet.boundingBoxes objectAtIndex:i];
+        UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
+        UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
+        [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
+    }
+    
+    
+    //Image averaging
+    CIFilter *filter = [CIFilter filterWithName:@"CIOverlayBlendMode"];
+    CIImage *result = [[CIImage alloc] initWithImage:[listOfImages objectAtIndex:0]];
+    for(int i=1;i<trainingSet.groundTruthBoundingBoxes.count;i++){
+        CIImage *image = [[CIImage alloc] initWithImage:[listOfImages objectAtIndex:i]];
+        [filter setValue:image forKey:@"inputImage"];
+        [filter setValue:result forKey:@"inputBackgroundImage"];
+        result = [filter valueForKey:kCIOutputImageKey];
+    }
+    self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
+    self.detectorView.image = [UIImage imageWithCIImage:result];
+    
+    //output the initial training images
+    //self.trainingSetController.listOfImages = listOfImages;
+    //self.trainingSetController.listOfImages = trainingSet.images;
+    //[self.navigationController pushViewController:self.trainingSetController animated:YES];
+    
     //learn
-    NSLog(@"Training begins!");
+    [self.sendingView showMessage:@"Training begins!"];
     [self.svmClassifier train:trainingSet];
-    NSLog(@"Finished training");
+    [self.sendingView showMessage:@"Finished training"];
+
     
     //update view of the detector
-    self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
+    //self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
     self.executeButton.enabled = YES;
     self.executeButton.alpha = 1.0f;
     self.saveButton.enabled = YES;
     self.saveButton.alpha = 1.0f;
+    
+    self.sendingView.hidden = YES;
+    [self.sendingView.activityIndicator stopAnimating];
 }
+
+
+- (IBAction)trainAction:(id)sender
+{
+    self.sendingView.hidden = NO;
+    [self.sendingView.activityIndicator startAnimating];
+    dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
+    dispatch_async(myQueue, ^{
+        [self train];
+    });
+}
+
 
 - (IBAction)saveAction:(id)sender
 {
@@ -191,8 +238,8 @@
         NSLog(@"Now editing!");
         self.classTextField.enabled = YES;
         self.nameTextField.enabled = YES;
-    }
-    else {
+        
+    }else {
         // Save the changes if needed and change the views to noneditable.
         NSLog(@"End editing");
         self.svmClassifier.name = self.nameTextField.text;
@@ -202,6 +249,15 @@
         self.nameTextField.enabled = YES;
         [self.delegate updateDetector:self.svmClassifier];
     }
+}
+
+
+#pragma mark
+#pragma mark - SendingViewDelegate
+
+- (void) cancel
+{
+    
 }
 
 

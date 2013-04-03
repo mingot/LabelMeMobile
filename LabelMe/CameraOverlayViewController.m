@@ -344,61 +344,19 @@
     
     
 }
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
-    //[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent];
-    //[[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationSlide];
-   // [self.imagePicker dismissViewControllerAnimated:YES completion:nil];
-    //[self.tagViewController setGallery:NO];
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+
     [self.tagViewController.annotationView reset];
     UIImage *image = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
-    [self.tagViewController setImage:image];
+    self.tagViewController.image = image;
     [self.tagViewController performSelectorInBackground:@selector(saveImage) withObject:nil];
  
     NSArray *paths = [self newArrayWithFolders:self.tagViewController.username];
-    NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
-    NSNumber *camerarollnum = [dict objectForKey:@"cameraroll"];
-    NSNumber *resolutionnum = [dict objectForKey:@"resolution"];
-    CGSize newSize = image.size;
-    if  (self.imagePicker.sourceType == UIImagePickerControllerSourceTypeCamera ) {
-        if (camerarollnum.boolValue) {
-             UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
-        }
-        if (image.size.height > image.size.width) {
-                newSize = CGSizeMake(resolutionnum.floatValue*0.75, resolutionnum.floatValue);
-        }
-        else{
-                newSize = CGSizeMake(resolutionnum.floatValue, resolutionnum.floatValue*0.75);
-                
-        }
 
-
-
-    }
-    else{
-        if (image.size.height > image.size.width) {
-            if (image.size.height > resolutionnum.floatValue) {
-                newSize = CGSizeMake(resolutionnum.floatValue*image.size.width/image.size.height, resolutionnum.floatValue);
-            }
-            
-        }
-        else{
-            if (image.size.width > resolutionnum.floatValue) {
-                newSize = CGSizeMake(resolutionnum.floatValue, resolutionnum.floatValue*image.size.height/image.size.width);
-            }
-
-            
-        }
-        
-    }
-
-    //[self.imagePicker presentModalViewController:self.tagViewController animated:YES];
-    //[self setImageToAnnotate:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
 
     
-    //[self.imagePicker.navigationController pushViewController:self.tagViewController animated:NO];
-    
-
     NSString *location = @"";
 
     if (self.imagePicker.sourceType == UIImagePickerControllerSourceTypeCamera) {

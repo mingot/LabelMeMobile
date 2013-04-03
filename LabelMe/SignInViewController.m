@@ -452,8 +452,6 @@
 {
     //[self.signInButton setEnabled:YES];
     [sendingView setHidden:YES];
-
-
 }
 
 

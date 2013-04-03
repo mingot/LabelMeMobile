@@ -31,7 +31,7 @@
 - (void) initialFill;
 
 //Generates the hog features given the bounding boxes begining after numSV positions, corresponding to the sv
-- (void) generateFeaturesForBoundingBoxesWithTemplateSize:(CGSize) templateSize withNumSV:(int) numSV;
+- (void) generateFeaturesForBoundingBoxesWithNumSV:(int)numSV;
 
 @end
 

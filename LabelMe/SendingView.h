@@ -7,33 +7,40 @@
 //
 
 #import <UIKit/UIKit.h>
+
+
 @protocol SendingViewDelegate <NSObject>
 
 @optional
 -(void)cancel;
 
 @end
-@interface SendingView : UIView{
-    
-    UIProgressView *_progressView;
-    UIActivityIndicatorView *_activityIndicator;
-    UILabel *_label;
-    NSString *_filename;
-    UIButton *_cancelButton;
+
+
+
+@interface SendingView : UIView
+{
     int total;
     int num;
     
 }
-@property (nonatomic, weak) id <SendingViewDelegate> delegate;
 
+
+@property (nonatomic, weak) id <SendingViewDelegate> delegate;
 @property (nonatomic, strong) UIProgressView *progressView;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
+@property (nonatomic, strong) UITextView *textView;
 @property (nonatomic, strong) UILabel *label;
 @property (nonatomic, strong) UIButton *cancelButton;
-
 @property (nonatomic, strong) NSString *filename;
+//stack of messages to ouput in the sending view
+@property (nonatomic, strong) NSMutableArray *messagesStack;
+
 
 -(void)setTotal:(int) i;
 -(void)incrementNum;
 -(void)reset;
+-(void)showMessage:(NSString *)message;
+
+
 @end

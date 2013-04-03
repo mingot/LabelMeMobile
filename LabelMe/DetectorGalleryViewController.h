@@ -21,6 +21,8 @@
 @property (nonatomic, strong) NSString *userPath;
 @property (nonatomic, strong) NSString *username;
 
+
+
 - (IBAction) Edit:(id)sender;
 
 @end

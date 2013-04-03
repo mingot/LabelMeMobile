@@ -12,23 +12,15 @@
 
 #import "TagViewController.h"
 
-@interface CameraOverlayViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>{
-    UIImagePickerController *_imagePicker;
-    TagViewController *_tagViewController;
+@interface CameraOverlayViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+{
     IBOutlet UIBarButtonItem *cameraRollButton;
     UIButton *lastPhotoButton;
-    UIButton *_flashButton;
-    UIButton *_autoButton;
-    UIButton *_onButton;
-    UIButton *_offButton;
-    UIButton *_cameraButton;
     CLLocationManager *locationMng;
-   // UIImage *_imageToAnnotate;
-
 }
+
 @property (nonatomic,strong) UIImagePickerController *imagePicker;
 @property (nonatomic,strong) TagViewController *tagViewController;
-//@property (nonatomic,retain) UIImage *imageToAnnotate;
 @property (nonatomic,strong) IBOutlet UIButton *flashButton;
 @property (nonatomic,strong) IBOutlet UIButton *autoButton;
 @property (nonatomic,strong) IBOutlet UIButton *onButton;

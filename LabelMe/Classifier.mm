@@ -21,6 +21,9 @@ using namespace cv;
 #define MAX_NUMBER_EXAMPLES 20000
 #define MAX_NUMBER_FEATURES 2000
 
+#define TEMPLATE_SCALE_FACTOR 0.1 //resize template to obtain a reasonable number of blocks for the hog features
+#define MAX_IMAGE_SIZE 300.0
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark -
 #pragma mark TrainingSet
@@ -41,8 +44,6 @@ using namespace cv;
 }
 
 
-#define SCALE_FACTOR 0.08 //resize template to obtain a reasonable number of blocks for the hog features
-
 - (CGSize) templateSize
 {
     //compute template size in case it is not set (lazy instantiation)
@@ -59,8 +60,8 @@ using namespace cv;
         
         //compute the average and get the average size in the image dimensions
         CGSize imgSize = [[self.images objectAtIndex:0] size];
-        averageSize.height = averageSize.height*imgSize.height*SCALE_FACTOR/self.groundTruthBoundingBoxes.count;
-        averageSize.width = averageSize.width*imgSize.width*SCALE_FACTOR/self.groundTruthBoundingBoxes.count;
+        averageSize.height = averageSize.height*imgSize.height*TEMPLATE_SCALE_FACTOR/self.groundTruthBoundingBoxes.count;
+        averageSize.width = averageSize.width*imgSize.width*TEMPLATE_SCALE_FACTOR/self.groundTruthBoundingBoxes.count;
         
         HogFeature *hog = [[[self.images objectAtIndex:0] resizedImage:averageSize interpolationQuality:kCGInterpolationDefault] obtainHogFeatures];
         
@@ -133,20 +134,22 @@ using namespace cv;
 
 
 
-- (void) generateFeaturesForBoundingBoxesWithTemplateSize:(CGSize)templateSize withNumSV:(int)numSV
+- (void) generateFeaturesForBoundingBoxesWithNumSV:(int)numSV
 {
     // transform each bounding box into hog feature space
     int i;
+    CGSize currentTemplateSize = self.templateSize;
+    
     for(i=0; i<self.boundingBoxes.count; i++)
     {
         @autoreleasepool
         {
             ConvolutionPoint *boundingBox = [self.boundingBoxes objectAtIndex:i];
-            NSLog(@"iteation %d",i);
+            if(i%1000 == 0) NSLog(@"evolution %.1f",i*100.0/self.boundingBoxes.count);
             //get the image contained in the bounding box and resized it with the template size
             //TODO: From cut -> HOG to HOG -> cut
             UIImage *wholeImage = [self.images objectAtIndex:boundingBox.imageIndex];
-            UIImage *resizedImage = [[wholeImage croppedImage:[boundingBox rectangleForImage:wholeImage]] resizedImage:self.templateSize interpolationQuality:kCGInterpolationDefault];
+            UIImage *resizedImage = [[wholeImage croppedImage:[boundingBox rectangleForImage:wholeImage]] resizedImage:currentTemplateSize interpolationQuality:kCGInterpolationDefault];
             
             //calculate the hogfeatures of the image
             HogFeature *hogFeature = [resizedImage obtainHogFeatures];
@@ -240,7 +243,6 @@ using namespace cv;
 }
 
 
-
 - (void) printListHogFeatures:(float *) listOfHogFeaturesFloat
 {
     //Print unoriented hog features for debugging purposes
@@ -279,7 +281,6 @@ using namespace cv;
     free(self.weightsDimensions);
     
     // Get the template size and get hog feautures dimension
-    [trainingSet initialFill];
     self.weightsDimensions = [[[trainingSet.images objectAtIndex:0] resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault] obtainDimensionsOfHogFeatures];
     int numOfFeatures = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2];
     
@@ -292,7 +293,7 @@ using namespace cv;
     //TODO: max size for the buffers
     trainingSet.imageFeatures = (float *) malloc(MAX_NUMBER_EXAMPLES*MAX_NUMBER_FEATURES*sizeof(float));
     trainingSet.labels = (float *) malloc(MAX_NUMBER_EXAMPLES*sizeof(float));
-    [trainingSet generateFeaturesForBoundingBoxesWithTemplateSize:trainingSet.templateSize withNumSV:0];
+    [trainingSet generateFeaturesForBoundingBoxesWithNumSV:0];
     
     // Set up SVM's parameters
     CvSVMParams params;
@@ -301,15 +302,14 @@ using namespace cv;
     params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6);
     
     //convergence loop
-    int numIterations = 1;
-    for (int i=0; i<numIterations; i++){
+    int numIterations = 2;
+    for (int iter=0; iter<numIterations; iter++){
         // Set up training data
         if(debugging){
-            NSLog(@"\n\n ************************ Iteration %d ********************************", i);
+            NSLog(@"\n\n ************************ Iteration %d ********************************", iter);
             NSLog(@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples);
             
         }
-        
         
         Mat labelsMat(trainingSet.numberOfTrainingExamples,1,CV_32FC1, trainingSet.labels);
         Mat trainingDataMat(trainingSet.numberOfTrainingExamples, numOfFeatures, CV_32FC1, trainingSet.imageFeatures);
@@ -346,7 +346,7 @@ using namespace cv;
                 self.svmWeights[j] -= (double) alpha * supportVector[j];
                 
                 //store the support vector as the first features
-                trainingSet.imageFeatures[i*numOfFeatures +j] = supportVector[j];
+                trainingSet.imageFeatures[i*numOfFeatures + j] = supportVector[j];
             }
         }
         self.svmWeights[numOfFeatures] = - (double) dec[0].rho; // The sign of the bias and rho have opposed signs.
@@ -364,16 +364,18 @@ using namespace cv;
         [trainingSet.boundingBoxes removeAllObjects];
         int positives = 0;
         
-        for(int imageIndex=0; imageIndex<trainingSet.images.count; imageIndex++){
+        for(ConvolutionPoint *groundTruthBoundingBox in trainingSet.groundTruthBoundingBoxes){
+        
             // Get new bounding boxes by running the detector
-            NSArray *newBoundingBoxes = [self detect:[trainingSet.images objectAtIndex:imageIndex] minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp];
-            if(debugging) NSLog(@"Number of new bb obtained: %d", [newBoundingBoxes count]);
-            
+            NSArray *newBoundingBoxes = [self detect:[trainingSet.images objectAtIndex:groundTruthBoundingBox.imageIndex] minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp];
+            if(debugging){
+                NSLog(@"Number of new bb obtained for image %d: %d", groundTruthBoundingBox.imageIndex, newBoundingBoxes.count);
+            }
+                
             //the rest that are less than an overlap threshold are considered negatives
-            ConvolutionPoint *groundTruthBoundingBox = [trainingSet.groundTruthBoundingBoxes objectAtIndex:0];
             for(int j=0; j<[newBoundingBoxes count]; j++){
                 ConvolutionPoint *boundingBox = [newBoundingBoxes objectAtIndex:j];
-                boundingBox.imageIndex = imageIndex;
+                boundingBox.imageIndex = groundTruthBoundingBox.imageIndex;
                 double overlapArea = [boundingBox fractionOfAreaOverlappingWith:groundTruthBoundingBox];
                 
                 if (overlapArea < 0.25){
@@ -392,7 +394,7 @@ using namespace cv;
         printf("total of new bounding boxes: %d\n", trainingSet.boundingBoxes.count);
         
         //generate the hog features for the new bounding boxes
-        [trainingSet generateFeaturesForBoundingBoxesWithTemplateSize:trainingSet.templateSize withNumSV:numSupportVectors];
+        [trainingSet generateFeaturesForBoundingBoxesWithNumSV:numSupportVectors];
         
         //[self showOrientationHistogram];
         
@@ -402,7 +404,7 @@ using namespace cv;
     [self testOnSet:trainingSet atThresHold:0];
 }
 
-#define MAX_IMAGE_SIZE 300.0
+
 
 
 - (NSArray *) detect:(UIImage *)image

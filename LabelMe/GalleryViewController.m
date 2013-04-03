@@ -139,11 +139,12 @@
     noImages.shadowOffset = CGSizeMake(0.0, 1.0);
     noImages.text = @"You do not have images, \nstart taking pics and labeling!";
     [noImages setTextAlignment:NSTextAlignmentCenter];
+    
     sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     [sendingView setHidden:YES];
     [self.tabBarController.tabBar setUserInteractionEnabled:YES];
-
     sendingView.delegate = self;
+    
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.tableViewGrid];
     [self.view addSubview:noImages];
@@ -410,13 +411,13 @@
 
 -(IBAction)listSendAction:(id)sender
 {
+    sendingView.total = self.selectedItemsSend.count;
     [sendingView setHidden:NO];
+    [sendingView.activityIndicator startAnimating];
+    
     [self.tabBarController.tabBar setUserInteractionEnabled:NO];
     photosWithErrors = 0;
     [self.editButton setEnabled:NO];
-                                
-    [sendingView.activityIndicator startAnimating];
-    [sendingView setTotal:self.selectedItemsSend.count];
     UIButton *button = (UIButton *)sender;
     [self.selectedItemsSend addObject:[self.items objectAtIndex:button.tag-10]];
     if (self.selectedItemsSend.count == 1) {
@@ -424,7 +425,8 @@
     }
 }
 
--(IBAction)deleteAction:(id)sender{
+-(IBAction)deleteAction:(id)sender
+{
     NSString *str = nil;
     if (self.selectedItems.count == 1) {
         str = [[NSString alloc] initWithFormat:@"Delete Selected Photo"];
@@ -438,11 +440,13 @@
     [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
 }
 
--(IBAction)sendAction:(id)sender{
+-(IBAction)sendAction:(id)sender
+{
     [self.selectedItemsSend addObjectsFromArray:self.selectedItems];
+    
     [sendingView.activityIndicator startAnimating];
-
     [sendingView setHidden:NO];
+    
     [self.tabBarController.tabBar setUserInteractionEnabled:NO];
 
     [self.editButton setEnabled:NO];
