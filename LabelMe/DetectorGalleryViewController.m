@@ -127,6 +127,9 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [self.detectors removeObjectAtIndex:indexPath.row];
         [self.tableView reloadData];
+        if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"]]){
+            NSLog(@"Unable to save the classifiers");
+        }
     } else if (editingStyle == UITableViewCellEditingStyleInsert) {
         Classifier *newDetector = [[Classifier alloc] init];
         newDetector.name = @"New Detector";
@@ -158,6 +161,10 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
         _selectedRow = indexPath.row;
         self.detectorController.delegate = self;
         self.detectorController.svmClassifier = [self.detectors objectAtIndex:indexPath.row];
+        if([self.detectorController.svmClassifier.targetClass isEqualToString:@"Not Set"])
+        {
+        
+        }
         self.detectorController.view = nil; //to reexecute viewDidLoad
         self.detectorController.userPath = self.userPath;
         [self.navigationController pushViewController:self.detectorController animated:YES];
@@ -175,7 +182,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     [self.detectors replaceObjectAtIndex:_selectedRow withObject:updatedDetector];
     NSLog(@"updating detector at position: %d", _selectedRow);
     if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"]]){
-        NSLog(@"Unable to save the classifier");
+        NSLog(@"Unable to save the classifiers");
     }
     
     [self.tableView reloadData];

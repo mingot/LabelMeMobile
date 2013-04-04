@@ -32,7 +32,7 @@
 @synthesize delegate = _delegate;
 @synthesize averageImage = _averageImage;
 @synthesize availableObjectClasses = _availableObjectClasses;
-@synthesize targetClassButton = _targetClassButton;
+
 
 
 
@@ -81,7 +81,7 @@
     self.modalTVC.delegate = self;
     
     //set labels
-    self.targetClassButton.titleLabel.text = self.svmClassifier.targetClass;
+    self.targeClassLabel.text = self.svmClassifier.targetClass;
     self.nameTextField.text = self.svmClassifier.name;
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
     
@@ -90,22 +90,19 @@
         NSLog(@"No classifier");
         self.executeButton.enabled = NO;
         self.executeButton.alpha = 0.6f;
-//        self.targetClassButton.titleLabel.text = @"Not Set";
-        [self.targetClassButton setTitle:@"Not Set" forState:UIControlStateNormal];
+        [self showClass:nil];
+        
         
     }else{
         NSLog(@"Loading classifier");
         self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
         self.saveButton.enabled = NO;
         self.saveButton.alpha = 0.6f;
-//        self.targetClassButton.titleLabel.text = self.svmClassifier.targetClass;
-        [self.targetClassButton setTitle:self.svmClassifier.targetClass forState:UIControlStateNormal];
     }
     
     //set buttons
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.nameTextField.enabled = NO;
-    self.targetClassButton.enabled = NO;
     self.saveButton.enabled = NO;
     self.saveButton.alpha = 0.6f;
     
@@ -131,7 +128,7 @@
     [self setSaveButton:nil];
     [self setNameTextField:nil];
     [self setSendingView:nil];
-    [self setTargetClassButton:nil];
+    [self setTargeClassLabel:nil];
     [super viewDidUnload];
 }
 
@@ -275,6 +272,15 @@
 {
     self.modalTVC.multipleChoice = NO;
     self.modalTVC.data = self.availableObjectClasses;
+    
+    NSMutableArray *images = [[NSMutableArray alloc] init];
+    NSString *path = [self.userPath stringByAppendingPathComponent:@"thumbnail"];
+    NSArray *directoryContent = [NSBundle pathsForResourcesOfType:@".jpg" inDirectory:path];
+    for(NSString *imagePath in directoryContent){
+        NSLog(@"%@", imagePath);
+        [images addObject:[UIImage imageWithContentsOfFile:imagePath]];
+    }
+    self.modalTVC.data = [[NSArray alloc] initWithArray:images];
     [self presentModalViewController:self.modalTVC animated:YES];
 }
 
@@ -288,7 +294,6 @@
     if (flag == YES){
         // Change views to edit mode.
         NSLog(@"Now editing!");
-        self.targetClassButton.enabled = YES;
         self.nameTextField.enabled = YES;
         
     }else {
@@ -296,9 +301,8 @@
         NSLog(@"End editing");
         self.svmClassifier.name = self.nameTextField.text;
         self.title = self.nameTextField.text;
-        self.targetClassButton.enabled = NO;
         self.nameTextField.enabled = YES;
-        [self.delegate updateDetector:self.svmClassifier];
+        [self.view endEditing:YES];
     }
 }
 
@@ -329,7 +333,7 @@
     NSNumber *sel = [selectedItems objectAtIndex:0];
     self.svmClassifier.targetClass = [self.availableObjectClasses objectAtIndex:sel.intValue];
     NSLog(@"selected class:%@", self.svmClassifier.targetClass);
-    self.targetClassButton.titleLabel.text = self.svmClassifier.targetClass;
+    self.targeClassLabel.text = self.svmClassifier.targetClass;
 }
 
 @end

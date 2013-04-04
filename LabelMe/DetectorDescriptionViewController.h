@@ -37,7 +37,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *detectorView;
 
 @property (weak, nonatomic) IBOutlet UITextField *nameTextField;
-@property (weak, nonatomic) IBOutlet UIButton *targetClassButton;
+@property (weak, nonatomic) IBOutlet UILabel *targeClassLabel;
 
 @property (strong, nonatomic) NSString *userPath;
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;

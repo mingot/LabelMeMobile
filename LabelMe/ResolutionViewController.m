@@ -8,13 +8,14 @@
 
 #import "ResolutionViewController.h"
 
-@interface ResolutionViewController ()
 
-@end
 
 @implementation ResolutionViewController
+
 @synthesize tableView = _tableView;
 @synthesize username = _username;
+
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -34,45 +35,29 @@
 
     [self.tableView setDelegate:self];
     [self.tableView setDataSource:self];
-    //self.tableView.backgroundColor = [UIColor colorWithRed:(200/255.0) green:(200/255.0) blue:(200/255.0) alpha:1.0];
     self.view.backgroundColor = [UIColor colorWithRed:(200/255.0) green:(200/255.0) blue:(200/255.0) alpha:1.0];
-    //self.view.backgroundColor = [UIColor colorWithRed:(236/255.0) green:(32/255.0) blue:(28/255.0) alpha:1.0];
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
 
     self.tableView.backgroundColor = [UIColor clearColor];
     [self.tableView setBackgroundView:nil];
     [self setTitle:@"Image Resolution"];
     [self.view addSubview:self.tableView];
-    // Do any additional setup after loading the view from its nib.
+
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    //#warning Potentially incomplete method implementation.
-    // Return the number of sections.
-    return 1;
-}
+
+
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    //#warning Incomplete method implementation.
-    // Return the number of rows in the section.
        return 9;
 }
 
 
-
-
-
-- (UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+- (UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
      static NSString *CellIdentifier = @"Cell";
      UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-     //
      if (cell == nil) {
      cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
      }
@@ -124,20 +109,22 @@
             break;
     }
     
-    if (cell.tag == dictnum.intValue) {
+    
+    if (cell.tag == dictnum.intValue)
         [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
-    }
-    else{
-        [cell setAccessoryType:UITableViewCellAccessoryNone];
-    }
+    else [cell setAccessoryType:UITableViewCellAccessoryNone];
+    
     [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
     
     return cell;
     
 }
+
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    
     // change to accomodate user
     NSString *path = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,self.username ];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[path stringByAppendingPathComponent:@"settings.plist"]];
@@ -145,7 +132,10 @@
     [dict removeObjectForKey:@"resolution"];
     [dict setObject:dictnum forKey:@"resolution"];
     [dict writeToFile:[path stringByAppendingPathComponent:@"settings.plist"] atomically:YES];
+    
     [self.tableView reloadData];
     
 }
+
+
 @end

@@ -19,9 +19,10 @@
 
 @interface ModalTVC : UIViewController <UITableViewDelegate,UITableViewDataSource>
 
+//model
+@property (strong, nonatomic) NSArray *data;
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (strong, nonatomic) NSArray *data;
 @property (strong, nonatomic) NSMutableArray *selectedItems;
 @property (strong, nonatomic) id<ModalTVCDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
@@ -29,5 +30,6 @@
 
 
 - (IBAction)doneAction:(id)sender;
+- (IBAction)imageSelectedAction:(UIButton *)button;
 
 @end
