@@ -21,166 +21,9 @@ using namespace cv;
 #define MAX_NUMBER_EXAMPLES 20000
 #define MAX_NUMBER_FEATURES 2000
 
-#define TEMPLATE_SCALE_FACTOR 0.1 //resize template to obtain a reasonable number of blocks for the hog features
+
 #define MAX_IMAGE_SIZE 300.0
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark TrainingSet
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-@implementation TrainingSet
-
-@synthesize images = _images;
-@synthesize groundTruthBoundingBoxes = _groundTruthBoundingBoxes;
-@synthesize boundingBoxes = _boundingBoxes;
-@synthesize imageFeatures = _imageFeatures;
-@synthesize labels = _labels;
-@synthesize templateSize = _templateSize;
-
-- (void) setTemplateSize:(CGSize)templateSize
-{
-    _templateSize = templateSize;
-}
-
-
-- (CGSize) templateSize
-{
-    //compute template size in case it is not set (lazy instantiation)
-    if(_templateSize.height == 0.0){
-        NSLog(@"Computing template size...");
-        CGSize averageSize;
-        averageSize.height = 0;
-        averageSize.width = 0;
-        
-        for(ConvolutionPoint* groundTruthBB in self.groundTruthBoundingBoxes){
-            averageSize.height += groundTruthBB.ymax - groundTruthBB.ymin;
-            averageSize.width += groundTruthBB.xmax - groundTruthBB.xmin;
-        }
-        
-        //compute the average and get the average size in the image dimensions
-        CGSize imgSize = [[self.images objectAtIndex:0] size];
-        averageSize.height = averageSize.height*imgSize.height*TEMPLATE_SCALE_FACTOR/self.groundTruthBoundingBoxes.count;
-        averageSize.width = averageSize.width*imgSize.width*TEMPLATE_SCALE_FACTOR/self.groundTruthBoundingBoxes.count;
-        
-        HogFeature *hog = [[[self.images objectAtIndex:0] resizedImage:averageSize interpolationQuality:kCGInterpolationDefault] obtainHogFeatures];
-        
-        _templateSize = averageSize;
-        
-        NSLog(@"Template size setted: h:%f, w:%f", _templateSize.height, _templateSize.width);
-        NSLog(@"Hog features size: %d, %d, %d", hog.numBlocksX, hog.numBlocksY, hog.numFeaturesPerBlock);
-    }
-    return _templateSize;
-}
-
-
--(id) init
-{
-    self = [super init];
-    if (self) {
-        self.images = [[NSMutableArray alloc] init];
-        self.groundTruthBoundingBoxes = [[NSMutableArray alloc] init];
-        self.boundingBoxes = [[NSMutableArray alloc] init];
-    }
-    return self;
-}
-
-- (void) initialFill
-{
-    // Create a initial set of positive and negative bounding boxes from ground truth labeled images
-    self.boundingBoxes = [[NSMutableArray alloc] initWithArray:self.groundTruthBoundingBoxes];
-    
-    for(int i=0; i<self.groundTruthBoundingBoxes.count; i++){
-        
-        //Ground truth for the image
-        //TODO: suposing one ground truth per image
-        ConvolutionPoint *groundTruth = [self.groundTruthBoundingBoxes objectAtIndex:i];
-        UIImage *image = [self.images objectAtIndex:groundTruth.imageIndex];
-        
-        //the new box will have the size of the template size (not necessary though)
-        float height = self.templateSize.height/image.size.height;
-        float width = self.templateSize.width/image.size.width;
-        
-        double randomX;
-        double randomY;
-        
-        int num=20;
-        for(int j=0; j<num/2;j++){
-            
-            if(j%4==0){
-                randomX = 0;
-                randomY = j*1.0/num;
-            }else if(j%4==1){
-                randomX = j*1.0/num;
-                randomY = 0;
-            }else if(j%4==2){
-                randomX = 1 - width;
-                randomY = j*1.0/num;
-            }else{
-                randomX = j*1.0/num;
-                randomY = 1-height;
-            }
-            
-            ConvolutionPoint *negativeExample = [[ConvolutionPoint alloc] initWithRect:CGRectMake(randomX, randomY, width, height) label:-1 imageIndex:groundTruth.imageIndex];
-            
-            if([negativeExample fractionOfAreaOverlappingWith:groundTruth]<0.1)
-                [self.boundingBoxes addObject:negativeExample];
-        }
-        
-        
-        self.numberOfTrainingExamples = self.boundingBoxes.count;
-    }
-}
-
-
-
-- (void) generateFeaturesForBoundingBoxesWithNumSV:(int)numSV
-{
-    // transform each bounding box into hog feature space
-    int i;
-    CGSize currentTemplateSize = self.templateSize;
-    
-    for(i=0; i<self.boundingBoxes.count; i++)
-    {
-        @autoreleasepool
-        {
-            ConvolutionPoint *boundingBox = [self.boundingBoxes objectAtIndex:i];
-            if(i%1000 == 0) NSLog(@"evolution %.1f",i*100.0/self.boundingBoxes.count);
-            //get the image contained in the bounding box and resized it with the template size
-            //TODO: From cut -> HOG to HOG -> cut
-            UIImage *wholeImage = [self.images objectAtIndex:boundingBox.imageIndex];
-            UIImage *resizedImage = [[wholeImage croppedImage:[boundingBox rectangleForImage:wholeImage]] resizedImage:currentTemplateSize interpolationQuality:kCGInterpolationDefault];
-            
-            //calculate the hogfeatures of the image
-            HogFeature *hogFeature = [resizedImage obtainHogFeatures];
-            
-            //check if it has enough space to allocate it
-            if((i+1+numSV)*hogFeature.totalNumberOfFeatures > MAX_NUMBER_EXAMPLES*MAX_NUMBER_FEATURES*sizeof(float))
-            {
-                NSLog(@"BUFFER FULL!!");
-                break;
-            }
-            
-            //add the label
-            self.labels[numSV + i] = (float) boundingBox.label;
-            
-            //add the hog features
-            for(int j=0; j<hogFeature.totalNumberOfFeatures; j++)
-                self.imageFeatures[(numSV + i)*hogFeature.totalNumberOfFeatures + j] = (float) hogFeature.features[j];
-        }
-
-    }
-    self.numberOfTrainingExamples = numSV + i;
-}
-
-@end
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark Classifier
-////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 @interface Classifier ()
@@ -191,12 +34,11 @@ using namespace cv;
 @end
 
 
-
 @implementation Classifier
 
 
-@synthesize svmWeights = _svmWeights;
-@synthesize weightsDimensions = _weightsDimensions;
+@synthesize weightsP = _weightsP;
+@synthesize sizesP = _sizesP;
 
 @synthesize weights = _weights;
 @synthesize sizes = _sizes;
@@ -216,15 +58,15 @@ using namespace cv;
         
     if(self = [super init])
     {
-        self.weightsDimensions = (int *) malloc(3*sizeof(int));
-        self.weightsDimensions[0] = (int) templateWeights[0];
-        self.weightsDimensions[1] = (int) templateWeights[1];
-        self.weightsDimensions[2] = (int) templateWeights[2];
+        self.sizesP = (int *) malloc(3*sizeof(int));
+        self.sizesP[0] = (int) templateWeights[0];
+        self.sizesP[1] = (int) templateWeights[1];
+        self.sizesP[2] = (int) templateWeights[2];
         
-        int numberOfSvmWeights = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2] + 1; //+1 for the bias 
-        self.svmWeights = (double *) malloc(numberOfSvmWeights*sizeof(double));
+        int numberOfSvmWeights = self.sizesP[0]*self.sizesP[1]*self.sizesP[2] + 1; //+1 for the bias
+        self.weightsP = (double *) malloc(numberOfSvmWeights*sizeof(double));
         for(int i=0; i<numberOfSvmWeights; i++) 
-            self.svmWeights[i] = templateWeights[3 + i];
+            self.weightsP[i] = templateWeights[3 + i];
     }
     
     return self;
@@ -233,13 +75,13 @@ using namespace cv;
 - (id) init
 {
     if (self = [super init]) {
-        self.weightsDimensions = (int *) malloc(3*sizeof(int));
-        self.weightsDimensions[0] = 1;
-        self.weightsDimensions[1] = 1;
-        self.weightsDimensions[2] = 1;
+        self.sizesP = (int *) malloc(3*sizeof(int));
+        self.sizesP[0] = 1;
+        self.sizesP[1] = 1;
+        self.sizesP[2] = 1;
         
-        self.svmWeights = (double *) malloc(sizeof(double));
-        self.svmWeights[0] = 0;
+        self.weightsP = (double *) malloc(sizeof(double));
+        self.weightsP[0] = 0;
     }
     
     return self;
@@ -249,8 +91,8 @@ using namespace cv;
 - (void) printListHogFeatures:(float *) listOfHogFeaturesFloat
 {
     //Print unoriented hog features for debugging purposes
-    for(int y=0; y<self.weightsDimensions[0]; y++){
-        for(int x=0; x<self.weightsDimensions[1]; x++){
+    for(int y=0; y<self.sizesP[0]; y++){
+        for(int x=0; x<self.sizesP[1]; x++){
             for(int f = 18; f<27; f++){
                 printf("%f ", listOfHogFeaturesFloat[y + x*7 + f*7*5]);
 //                if(f==17 || f==26) printf("  |  ");
@@ -264,10 +106,10 @@ using namespace cv;
 - (void) showOrientationHistogram
 {
     double *histogram = (double *) calloc(18,sizeof(double));
-    for(int x = 0; x<self.weightsDimensions[1]; x++)
-        for(int y=0; y<self.weightsDimensions[0]; y++)
+    for(int x = 0; x<self.sizesP[1]; x++)
+        for(int y=0; y<self.sizesP[0]; y++)
             for(int f=18; f<27; f++)
-                histogram[f-18] += self.svmWeights[y + x*self.weightsDimensions[0] + f*self.weightsDimensions[0]*self.weightsDimensions[1]];
+                histogram[f-18] += self.weightsP[y + x*self.sizesP[0] + f*self.sizesP[0]*self.sizesP[1]];
     
     printf("Orientation Histogram\n");
     for(int i=0; i<9; i++)
@@ -280,18 +122,18 @@ using namespace cv;
 - (void) train:(TrainingSet *) trainingSet;
 {
     //free previous weights
-    free(self.svmWeights);
-    free(self.weightsDimensions);
+    free(self.weightsP);
+    free(self.sizesP);
     
     // Get the template size and get hog feautures dimension
-    self.weightsDimensions = [[[trainingSet.images objectAtIndex:0] resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault] obtainDimensionsOfHogFeatures];
-    int numOfFeatures = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2];
+    self.sizesP = [[[trainingSet.images objectAtIndex:0] resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault] obtainDimensionsOfHogFeatures];
+    int numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];
     
     if(debugging){
         //NSLog(@"template size: %f, %f", trainingSet.templateSize.height, trainingSet.templateSize.width);
-        //NSLog(@"dimensions of hog features: %d %d %d", self.weightsDimensions[0],self.weightsDimensions[1],self.weightsDimensions[2]);
+        //NSLog(@"dimensions of hog features: %d %d %d", self.sizesP[0],self.sizesP[1],self.sizesP[2]);
         [self.delegate sendMessage:[NSString stringWithFormat:@"template size: %f, %f", trainingSet.templateSize.height, trainingSet.templateSize.width]];
-        [self.delegate sendMessage:[NSString stringWithFormat:@"dimensions of hog features: %d %d %d", self.weightsDimensions[0],self.weightsDimensions[1],self.weightsDimensions[2]]];
+        [self.delegate sendMessage:[NSString stringWithFormat:@"dimensions of hog features: %d %d %d", self.sizesP[0],self.sizesP[1],self.sizesP[2]]];
     }
     
 
@@ -333,7 +175,7 @@ using namespace cv;
         //update weights and store the support vectors
         int numSupportVectors = SVM.get_support_vector_count();
         const CvSVMDecisionFunc *dec = SVM.decision_func;
-        self.svmWeights = (double *) calloc((numOfFeatures+1),sizeof(double)); //TODO: not to be allocated in every iteration
+        self.weightsP = (double *) calloc((numOfFeatures+1),sizeof(double)); //TODO: not to be allocated in every iteration
         printf("Num of support vectors: %d\n", numSupportVectors);
         
         for (int i = 0; i<numSupportVectors; ++i){
@@ -350,17 +192,17 @@ using namespace cv;
             
             for(int j=0;j<numOfFeatures;j++){
                 // add to get the svm weights
-                self.svmWeights[j] -= (double) alpha * supportVector[j];
+                self.weightsP[j] -= (double) alpha * supportVector[j];
                 
                 //store the support vector as the first features
                 trainingSet.imageFeatures[i*numOfFeatures + j] = supportVector[j];
             }
         }
-        self.svmWeights[numOfFeatures] = - (double) dec[0].rho; // The sign of the bias and rho have opposed signs.
+        self.weightsP[numOfFeatures] = - (double) dec[0].rho; // The sign of the bias and rho have opposed signs.
         
         if(debugging){
-            //NSLog(@"bias: %f", self.svmWeights[numOfFeatures]);
-            [self.delegate sendMessage:[NSString stringWithFormat:@"bias: %f", self.svmWeights[numOfFeatures]]];
+            //NSLog(@"bias: %f", self.weightsP[numOfFeatures]);
+            [self.delegate sendMessage:[NSString stringWithFormat:@"bias: %f", self.weightsP[numOfFeatures]]];
         }
         
         
@@ -435,9 +277,8 @@ using namespace cv;
     NSMutableArray *candidateBoundingBoxes = [[NSMutableArray alloc] init];
     
     //rotate image depending on the orientation
-    if(UIDeviceOrientationIsLandscape(orientation)){
+    if(UIDeviceOrientationIsLandscape(orientation))
         image = [UIImage imageWithCGImage:image.CGImage scale:1.0 orientation: UIImageOrientationUp];
-    }
 
     double initialScale = MAX_IMAGE_SIZE/image.size.height;
     double scale = pow(3, 1.0/numberPyramids);
@@ -445,7 +286,7 @@ using namespace cv;
     //Pyramid calculation
     for (int i = 0; i<numberPyramids; i++){
         UIImage *im = [image scaleImageTo:initialScale/pow(scale, i)];
-        NSArray *result = [ConvolutionHelper convolve: im
+        NSArray *result = [ConvolutionHelper convolve:im
                                        withClassifier:self];
 //        NSLog(@"image size: h:%f, w:%f", im.size.height, im.size.width);
         [candidateBoundingBoxes addObjectsFromArray:result];
@@ -516,16 +357,16 @@ using namespace cv;
         self.numberOfPositives = [aDecoder decodeObjectForKey:@"numberOfPositives"];
         self.precisionRecall = [aDecoder decodeObjectForKey:@"precisionRecall"];
         
-        self.weightsDimensions = (int *) malloc(3*sizeof(int));
-        self.weightsDimensions[0] = [(NSNumber *) [self.sizes objectAtIndex:0] intValue];
-        self.weightsDimensions[1] = [(NSNumber *) [self.sizes objectAtIndex:1] intValue];
-        self.weightsDimensions[2] = [(NSNumber *) [self.sizes objectAtIndex:2] intValue];
+        self.sizesP = (int *) malloc(3*sizeof(int));
+        self.sizesP[0] = [(NSNumber *) [self.sizes objectAtIndex:0] intValue];
+        self.sizesP[1] = [(NSNumber *) [self.sizes objectAtIndex:1] intValue];
+        self.sizesP[2] = [(NSNumber *) [self.sizes objectAtIndex:2] intValue];
         
-        int numberOfSvmWeights = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2] + 1; //+1 for the bias
+        int numberOfSvmWeights = self.sizesP[0]*self.sizesP[1]*self.sizesP[2] + 1; //+1 for the bias
         
-        self.svmWeights = (double *) malloc(numberOfSvmWeights*sizeof(double));
+        self.weightsP = (double *) malloc(numberOfSvmWeights*sizeof(double));
         for(int i=0; i<numberOfSvmWeights; i++)
-            self.svmWeights[i] = [(NSNumber *) [self.weights objectAtIndex:i] doubleValue];
+            self.weightsP[i] = [(NSNumber *) [self.weights objectAtIndex:i] doubleValue];
         
     }
     return self;
@@ -534,15 +375,15 @@ using namespace cv;
 - (void) encodeWithCoder:(NSCoder *)aCoder
 {
     self.sizes = [[NSArray alloc] initWithObjects:
-                    [NSNumber numberWithInt:self.weightsDimensions[0]],
-                    [NSNumber numberWithInt:self.weightsDimensions[1]],
-                    [NSNumber numberWithInt:self.weightsDimensions[2]], nil];
+                    [NSNumber numberWithInt:self.sizesP[0]],
+                    [NSNumber numberWithInt:self.sizesP[1]],
+                    [NSNumber numberWithInt:self.sizesP[2]], nil];
     
-    int numberOfSvmWeights = self.weightsDimensions[0]*self.weightsDimensions[1]*self.weightsDimensions[2] + 1; //+1 for the bias
+    int numberOfSvmWeights = self.sizesP[0]*self.sizesP[1]*self.sizesP[2] + 1; //+1 for the bias
     
     self.weights = [[NSMutableArray alloc] initWithCapacity:numberOfSvmWeights];
     for(int i=0; i<numberOfSvmWeights; i++)
-        [self.weights addObject:[NSNumber numberWithDouble:self.svmWeights[i]]];
+        [self.weights addObject:[NSNumber numberWithDouble:self.weightsP[i]]];
     
     
     [aCoder encodeObject:self.weights forKey:@"weights"];

@@ -94,6 +94,8 @@
     sendingView.label.text = @"Signing in...";
     
     [self.view addSubview:sendingView];
+    
+
 }
 
 -(void)viewWillAppear:(BOOL)animated

@@ -133,7 +133,7 @@
         
     }else{
         NSLog(@"Loading classifier");
-        self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
+        self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
         self.saveButton.enabled = NO;
         self.saveButton.alpha = 0.6f;
         [self.trainButton setTitle:@"Retrain" forState:UIControlStateNormal];
@@ -374,7 +374,7 @@
     [self.sendingView showMessage:@"Finished training"];
     
     //update view of the detector
-    //self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
+    //self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
     self.executeButton.enabled = YES;
     self.executeButton.alpha = 1.0f;
     self.saveButton.enabled = YES;

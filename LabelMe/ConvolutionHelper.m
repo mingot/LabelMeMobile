@@ -138,9 +138,10 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     HogFeature *hogFeature = [image obtainHogFeatures];
     int blocks[2] = {hogFeature.numBlocksY, hogFeature.numBlocksX};
     
+    
     int convolutionSize[2];
-    convolutionSize[0] = blocks[0] - svmClassifier.weightsDimensions[0] + 1; //convolution size
-    convolutionSize[1] = blocks[1] - svmClassifier.weightsDimensions[1] + 1;
+    convolutionSize[0] = blocks[0] - svmClassifier.sizesP[0] + 1; //convolution size
+    convolutionSize[1] = blocks[1] - svmClassifier.sizesP[1] + 1;
     if ((convolutionSize[0]<=0) || (convolutionSize[1]<=0))
         return NULL;
     
@@ -149,20 +150,20 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     
     
     // Make the convolution for each feature.
-    for (int f = 0; f < svmClassifier.weightsDimensions[2]; f++)
+    for (int f = 0; f < svmClassifier.sizesP[2]; f++)
     {
         double *dst = c;
         double *A_src = hogFeature.features + f*blocks[0]*blocks[1]; //Select the block of features to do the convolution with
-        double *B_src = svmClassifier.svmWeights + f*svmClassifier.weightsDimensions[0]*svmClassifier.weightsDimensions[1];
+        double *B_src = svmClassifier.weightsP + f*svmClassifier.sizesP[0]*svmClassifier.sizesP[1];
         
         // convolute and add the results to dst
-        [ConvolutionHelper convolution:dst matrixA:A_src :blocks matrixB:B_src :svmClassifier.weightsDimensions];
+        [ConvolutionHelper convolution:dst matrixA:A_src :blocks matrixB:B_src :svmClassifier.sizesP];
         //[ConvolutionHelper convolutionWithVDSP:dst matrixA:A_src :blocks matrixB:B_src :templateSize];
         
     }
     
     //Once done the convolution, detect if something is the object!
-    double bias = svmClassifier.svmWeights[svmClassifier.weightsDimensions[0]*svmClassifier.weightsDimensions[1]*svmClassifier.weightsDimensions[2]];
+    double bias = svmClassifier.weightsP[svmClassifier.sizesP[0]*svmClassifier.sizesP[1]*svmClassifier.sizesP[2]];
     for (int x = 0; x < convolutionSize[1]; x++) {
         for (int y = 0; y < convolutionSize[0]; y++) {
             
@@ -171,10 +172,19 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
             if( p.score > -1 )
             {
                 p.xmin = (double)(x + 1)/((double)blocks[1] + 2);
-                p.xmax = (double)(x + 1)/((double)blocks[1] + 2) + ((double)svmClassifier.weightsDimensions[1]/((double)blocks[1] + 2));
+                p.xmax = (double)(x + 1)/((double)blocks[1] + 2) + ((double)svmClassifier.sizesP[1]/((double)blocks[1] + 2));
                 p.ymin = (double)(y + 1)/((double)blocks[0] + 2);
-                p.ymax = (double)(y + 1)/((double)blocks[0] + 2) + ((double)svmClassifier.weightsDimensions[0]/((double)blocks[0] + 2));
+                p.ymax = (double)(y + 1)/((double)blocks[0] + 2) + ((double)svmClassifier.sizesP[0]/((double)blocks[0] + 2));
                 
+//                //it interest you for each of the 31 hog features:
+//                double *window = (double *) malloc(svmClassifier.weightsDimensions[0]*svmClassifier.weightsDimensions[1]*sizeof(double));
+//                for(int f = 0; f<svmClassifier.weightsDimensions[2];f++)
+//                    for(int i=0;i<svmClassifier.weightsDimensions[1];i++)
+//                        for(int j=0;j<svmClassifier.weightsDimensions[0];j++)
+//                            window[j + i*svmClassifier.weightsDimensions[0] + f*svmClassifier.weightsDimensions[0]*svmClassifier.weightsDimensions[1]] = hogFeature.features[0];
+//                        
+                
+                        
                 [result addObject:p];
             }
         }

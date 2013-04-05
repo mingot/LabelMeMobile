@@ -178,6 +178,7 @@
 		FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC610AF3170A36D800851AC2 /* CoreImage.framework */; };
 		FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */; };
 		FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */; };
+		FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */; };
 		FCED895D17034CAF0027CBE1 /* DetectView.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED895C17034CAF0027CBE1 /* DetectView.m */; };
 		FCED896017034CCA0027CBE1 /* Classifier.mm in Sources */ = {isa = PBXBuildFile; fileRef = FCED895F17034CCA0027CBE1 /* Classifier.mm */; };
 		FCED896317034CD70027CBE1 /* ConvolutionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED896217034CD70027CBE1 /* ConvolutionHelper.m */; };
@@ -403,6 +404,8 @@
 		FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalTVC.h; sourceTree = "<group>"; };
 		FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalTVC.m; sourceTree = "<group>"; };
 		FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ModalTVC.xib; sourceTree = "<group>"; };
+		FCC9FAFA170F6CF4009B7FC6 /* TrainingSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrainingSet.h; sourceTree = "<group>"; };
+		FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrainingSet.m; sourceTree = "<group>"; };
 		FCED895B17034CAF0027CBE1 /* DetectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectView.h; sourceTree = "<group>"; };
 		FCED895C17034CAF0027CBE1 /* DetectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectView.m; sourceTree = "<group>"; };
 		FCED895E17034CCA0027CBE1 /* Classifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Classifier.h; sourceTree = "<group>"; };
@@ -733,6 +736,8 @@
 				FCED896217034CD70027CBE1 /* ConvolutionHelper.m */,
 				FCED895E17034CCA0027CBE1 /* Classifier.h */,
 				FCED895F17034CCA0027CBE1 /* Classifier.mm */,
+				FCC9FAFA170F6CF4009B7FC6 /* TrainingSet.h */,
+				FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */,
 			);
 			name = Detector;
 			sourceTree = "<group>";
@@ -1009,6 +1014,7 @@
 				FCED897E170375050027CBE1 /* ShowTrainingSetViewController.m in Sources */,
 				FCED898317037A5F0027CBE1 /* ShowImageViewController.m in Sources */,
 				FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */,
+				FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

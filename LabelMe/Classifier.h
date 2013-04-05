@@ -7,40 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TrainingSet.h"
 
 
-//////////////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark TrainingSet
-//////////////////////////////////////////////////////////////////////////
-
-
-@interface TrainingSet : NSObject
-
-@property (strong, nonatomic) NSMutableArray *images; //UIImage
-@property (strong, nonatomic) NSMutableArray *groundTruthBoundingBoxes; //ConvolutionPoint
-@property (strong, nonatomic) NSMutableArray *boundingBoxes; //ConvolutionPoints
-@property CGSize templateSize;
-
-@property float *imageFeatures; //the features for the wole trainingset
-@property float *labels; //the corresponding labels
-@property int numberOfTrainingExamples; // bounding boxes + support vectors added
-
-
-//Given a training set of images and ground truth bounding boxes it generates a set of positive and negative bounding boxes for training
-- (void) initialFill;
-
-//Generates the hog features given the bounding boxes begining after numSV positions, corresponding to the sv
-- (void) generateFeaturesForBoundingBoxesWithNumSV:(int)numSV;
-
-@end
-
-
-
-//////////////////////////////////////////////////////////////////////////
-#pragma mark -
-#pragma mark Classifier
-//////////////////////////////////////////////////////////////////////////
 
 @protocol ClassifierDelegate <NSObject>
 
@@ -52,8 +21,8 @@
 
 @interface Classifier : NSObject <NSCoding>
 
-@property double *svmWeights;
-@property int *weightsDimensions;
+@property double *weightsP;
+@property int *sizesP;
 @property (strong, nonatomic) id<ClassifierDelegate> delegate;
 
 //Encoding properties
