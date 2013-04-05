@@ -491,8 +491,6 @@
 #pragma mark UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-    
-    
     UIImage *image = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
     
     //select the xib file to present in function of the device
@@ -500,10 +498,8 @@
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if ([UIScreen mainScreen].bounds.size.height == 568)
             tagviewController = [[TagViewController alloc] initWithNibName:@"TagViewController_iPhone5" bundle:nil];
-            
         else if ([UIScreen mainScreen].bounds.size.height == 480)
             tagviewController = [[TagViewController alloc] initWithNibName:@"TagViewController_iPhone" bundle:nil];
-
     } else tagviewController = [[TagViewController alloc] initWithNibName:@"TagViewController_iPad" bundle:nil];
     
     tagviewController.username = self.usernameField.text;
@@ -518,7 +514,6 @@
         [self.popover dismissPopoverAnimated:NO];
         [tagviewController setHidesBottomBarWhenPushed:YES];
         [self.galleryViewController.navigationController pushViewController:tagviewController animated:YES];
-        
     }else [picker pushViewController:tagviewController animated:YES];
     
     //create a new thread to store image and location information

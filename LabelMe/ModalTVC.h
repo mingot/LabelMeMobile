@@ -11,7 +11,7 @@
 @protocol ModalTVCDelegate <NSObject>
 
 //set the items the user selected
-- (void) userSlection:(NSArray *)selectedItems;
+- (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
 
 @end
 
@@ -22,10 +22,13 @@
 //model
 @property (strong, nonatomic) NSArray *data;
 
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
 @property (strong, nonatomic) NSMutableArray *selectedItems;
 @property (strong, nonatomic) id<ModalTVCDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+//unique name to identify the modal
+@property (strong, nonatomic) NSString *modalTitle;
 @property BOOL multipleChoice;
 
 

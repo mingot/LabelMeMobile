@@ -28,6 +28,7 @@
 @synthesize tableView = _tableView;
 @synthesize delegate = _delegate;
 @synthesize multipleChoice = _multipleChoice;
+@synthesize modalTitle = _modalTitle;
 
 - (void)viewDidLoad
 {
@@ -52,6 +53,11 @@
 
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return  self.modalTitle;
+}
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
 {
@@ -159,13 +165,9 @@
 #pragma mark - IBActions
 
 - (IBAction)doneAction:(id)sender
-{
-    NSLog(@"Done, selected items:");
-    for(NSNumber *num in self.selectedItems)
-        NSLog(@"%@", num);
-    
+{    
     //send index of selected rows
-    [self.delegate userSlection:[[NSArray alloc] initWithArray:self.selectedItems]];
+    [self.delegate userSlection:[[NSArray alloc] initWithArray:self.selectedItems] for:self.modalTitle];
     [self dismissModalViewControllerAnimated:YES];
 }
 
@@ -177,12 +179,10 @@
     button.selected = button.selected ? NO:YES;
     
     [self toggleDoneButton];
-    
-    NSLog(@"selected: %@", self.selectedItems);
 }
 
 #pragma mark
-#pragma mark - Other
+#pragma mark - Private methods
 
 - (UIImage *) addBorderTo:(UIImage *)image
 {

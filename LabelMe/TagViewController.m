@@ -604,12 +604,10 @@
 
         [self createFilename];
         [self createPlistEntry:self.filename];
-
-        NSFileManager * filemng = [NSFileManager defaultManager];
         
-        [filemng createFileAtPath:[[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
+        [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
     
-        [filemng createFileAtPath:[[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
+        [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
 
         [self saveDictionary];
     }
@@ -620,6 +618,7 @@
 {
     NSString *path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename ];
     
+    NSLog(@"self.filename: %@", self.filename);
     if([NSKeyedArchiver archiveRootObject:self.annotationView.objects toFile:path]) return YES;
     else return NO;
 }

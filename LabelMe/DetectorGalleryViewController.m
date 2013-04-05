@@ -10,7 +10,6 @@
 
 
 
-
 #pragma mark
 #pragma mark -  Initialization and lifecycle
 
@@ -90,16 +89,14 @@
 
 - (IBAction) Edit:(id)sender
 {
-    if(self.editing)
-    {
+    if(self.editing){
         [super setEditing:NO animated:NO];
         [self.tableView setEditing:NO animated:NO];
         [self.tableView reloadData];
         [self.navigationItem.leftBarButtonItem setTitle:@"Edit"];
         [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStylePlain];
-    }
-    else
-    {
+        
+    }else{
         [super setEditing:YES animated:YES];
         [self.tableView setEditing:YES animated:YES];
         [self.tableView reloadData];
@@ -111,12 +108,12 @@
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView  editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.editing == NO || !indexPath) return   UITableViewCellEditingStyleNone;
-    if (self.editing && indexPath.row == ([self.detectors count])) {
+    if (self.editing == NO || !indexPath) return UITableViewCellEditingStyleNone;
+    
+    if (self.editing && indexPath.row == ([self.detectors count]))
         return UITableViewCellEditingStyleInsert;
-    } else {
-        return UITableViewCellEditingStyleDelete;
-    }
+    else return UITableViewCellEditingStyleDelete;
+    
     return UITableViewCellEditingStyleNone;
 }
 
@@ -127,10 +124,10 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [self.detectors removeObjectAtIndex:indexPath.row];
         [self.tableView reloadData];
-        if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"]]){
+        if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"]])
             NSLog(@"Unable to save the classifiers");
-        }
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
+        
+    }else if (editingStyle == UITableViewCellEditingStyleInsert) {
         Classifier *newDetector = [[Classifier alloc] init];
         newDetector.name = @"New Detector";
         newDetector.targetClass = @"Not Set";

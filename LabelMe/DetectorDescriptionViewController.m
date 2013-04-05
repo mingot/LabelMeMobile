@@ -20,7 +20,19 @@
 #define MAX_IMAGE_SIZE 300
 #define IMAGE_SCALE_FACTOR 0.6
 
+@interface DetectorDescriptionViewController()
+
+-(void) train;
+
+@end
+
+
+
+
 @implementation DetectorDescriptionViewController
+
+
+@synthesize delegate = _delegate;
 
 @synthesize executeController = _executeController;
 @synthesize trainingSetController = _trainingSetController;
@@ -29,37 +41,59 @@
 @synthesize svmClassifier = _svmClassifier;
 @synthesize executeButton = _executeButton;
 @synthesize userPath = _userPath;
-@synthesize delegate = _delegate;
-@synthesize averageImage = _averageImage;
+
 @synthesize availableObjectClasses = _availableObjectClasses;
+@synthesize availablePositiveImagesNames = _availablePositiveImagesNames;
+@synthesize selectedPositiveImageIndexes = _selectedPositiveImageIndexes;
+@synthesize selectedPostiveImageNames = _selectedPostiveImageNames;
 
 
 
 
-- (NSArray *) availableObjectClasses
+
+-(NSArray *) availablePositiveImagesNames
 {
-    if(!_availableObjectClasses){
-        
+    if(!_availablePositiveImagesNames){
         NSMutableArray *list = [[NSMutableArray alloc] init];
         
-        NSArray *resourcesPaths = [NSArray arrayWithObjects:[self.userPath stringByAppendingPathComponent:@"images"],[self.userPath stringByAppendingPathComponent:@"thumbnail"],[self.userPath stringByAppendingPathComponent:@"annotations"],self.userPath, nil];
-        NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[resourcesPaths objectAtIndex:THUMB]] error:NULL];
+        NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.resourcesPaths objectAtIndex:THUMB]] error:NULL];
         
-        for(int i=0; i<imagesList.count; i++){
-            
-            NSString *path = [[resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[imagesList objectAtIndex:i]];
+        for(NSString *imageName in imagesList){
+            NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
+            NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
+            for(Box *box in objects)
+                if([box.label isEqualToString:self.svmClassifier.targetClass])
+                    [list addObject:imageName];
+        }
+        
+        _availablePositiveImagesNames = [NSArray arrayWithArray:list];
+    }
+    
+    return _availablePositiveImagesNames;
+}
+    
+
+-(NSArray *) availableObjectClasses
+{
+    if(!_availableObjectClasses){
+        NSMutableArray *list = [[NSMutableArray alloc] init];
+
+        NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.resourcesPaths objectAtIndex:THUMB]] error:NULL];
+        
+        for(NSString *imageName in imagesList){
+            NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
             NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
             for(Box *box in objects)
                 if([list indexOfObject:box.label] == NSNotFound)
                     [list addObject:box.label];
-
         }
         
-        _availableObjectClasses = [[NSArray alloc] initWithArray:list];
+        _availableObjectClasses = [NSArray arrayWithArray:list];
     }
     
     return _availableObjectClasses;
 }
+
 
 
 
@@ -72,13 +106,11 @@
     [super viewDidLoad];
     
     self.svmClassifier.delegate = self;
+    self.resourcesPaths = [NSArray arrayWithObjects:[self.userPath stringByAppendingPathComponent:@"images"],[self.userPath stringByAppendingPathComponent:@"thumbnail"],[self.userPath stringByAppendingPathComponent:@"annotations"],self.userPath, nil];
     
     //load views
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
-    
-    self.modalTVC = [[ModalTVC alloc] init];
-    self.modalTVC.delegate = self;
     
     //set labels
     self.targeClassLabel.text = self.svmClassifier.targetClass;
@@ -86,18 +118,25 @@
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
     
     //Check if the classifier exists.
-    if([self.svmClassifier.targetClass isEqualToString:@"Not Set"]){
+    if(self.svmClassifier.weights == nil){
         NSLog(@"No classifier");
         self.executeButton.enabled = NO;
         self.executeButton.alpha = 0.6f;
-        [self showClass:nil];
         
+        //show modal to select the target class
+        self.modalTVC = [[ModalTVC alloc] init];
+        self.modalTVC.delegate = self;
+        self.modalTVC.modalTitle = @"Select Class";
+        self.modalTVC.multipleChoice = NO;
+        self.modalTVC.data = self.availableObjectClasses;
+        [self presentModalViewController:self.modalTVC animated:YES];
         
     }else{
         NSLog(@"Loading classifier");
         self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
         self.saveButton.enabled = NO;
         self.saveButton.alpha = 0.6f;
+        [self.trainButton setTitle:@"Retrain" forState:UIControlStateNormal];
     }
     
     //set buttons
@@ -115,7 +154,6 @@
     self.sendingView.label.frame = CGRectMake(20,20,300,400);
     self.sendingView.label.font = [UIFont fontWithName:@"AmericanTypewriter" size:10];
     [self.view addSubview:self.sendingView];
-    
 }
 
 
@@ -129,6 +167,7 @@
     [self setNameTextField:nil];
     [self setSendingView:nil];
     [self setTargeClassLabel:nil];
+    [self setTrainButton:nil];
     [super viewDidUnload];
 }
 
@@ -142,108 +181,23 @@
     [self.navigationController pushViewController:self.executeController animated:YES];
 }
 
-
--(void) train
-{
-    //retrive all images containing classToLearn
-    NSString *selectedClass = self.svmClassifier.targetClass;
-    
-    TrainingSet *trainingSet = [[TrainingSet alloc] init];
-    
-    //get the path
-    NSArray *resourcesPaths = [NSArray arrayWithObjects:[self.userPath stringByAppendingPathComponent:@"images"],[self.userPath stringByAppendingPathComponent:@"thumbnail"],[self.userPath stringByAppendingPathComponent:@"annotations"],self.userPath, nil];
-    
-    //get items
-    NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[resourcesPaths objectAtIndex:THUMB]] error:NULL];
-    
-    for(int i=0; i<imagesList.count; i++){
-
-        [self.sendingView showMessage:[NSString stringWithFormat:@"IMAGE %d",i]];
-    
-        NSString *path = [[resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[imagesList objectAtIndex:i]];
-        
-        //image
-        UIImage *img = [[UIImage alloc]initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[resourcesPaths objectAtIndex:IMAGES],[imagesList objectAtIndex:i]]];
-        
-        //dictionaries
-        BOOL containClass = NO;
-        NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
-        for(Box *box in objects){
-            if([box.label isEqualToString:selectedClass]){
-                containClass = YES;
-                ConvolutionPoint *cp = [[ConvolutionPoint alloc] init];
-                cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
-                cp.ymin = box.upperLeft.y/box->LOWERBOUND;
-                cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
-                cp.ymax = box.lowerRight.y/box->LOWERBOUND;
-                cp.imageIndex = trainingSet.images.count;
-                cp.label = 1;
-                [trainingSet.groundTruthBoundingBoxes addObject:cp];
-            }
-        }
-        if(containClass) [trainingSet.images addObject:[img scaleImageTo:IMAGE_SCALE_FACTOR]];
-        
-    }
-    
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of boxes: %d", trainingSet.groundTruthBoundingBoxes.count]];
-    
-    
-    [trainingSet initialFill];
-    
-    NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
-    
-    for(int i=0; i<trainingSet.boundingBoxes.count; i++){
-        ConvolutionPoint *cp = [trainingSet.boundingBoxes objectAtIndex:i];
-        UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
-        UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
-        [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
-    }
-    
-    
-    //Image averaging
-    CIFilter *filter = [CIFilter filterWithName:@"CIOverlayBlendMode"];
-    CIImage *result = [[CIImage alloc] initWithImage:[listOfImages objectAtIndex:0]];
-    for(int i=1;i<trainingSet.groundTruthBoundingBoxes.count;i++){
-        CIImage *image = [[CIImage alloc] initWithImage:[listOfImages objectAtIndex:i]];
-        [filter setValue:image forKey:@"inputImage"];
-        [filter setValue:result forKey:@"inputBackgroundImage"];
-        result = [filter valueForKey:kCIOutputImageKey];
-    }
-    self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
-    self.detectorView.image = [UIImage imageWithCIImage:result];
-    
-    //output the initial training images
-    //self.trainingSetController.listOfImages = listOfImages;
-    //self.trainingSetController.listOfImages = trainingSet.images;
-    //[self.navigationController pushViewController:self.trainingSetController animated:YES];
-    
-    //learn
-    [self.sendingView showMessage:@"Training begins!"];
-    [self.svmClassifier train:trainingSet];
-    [self.sendingView showMessage:@"Finished training"];
-
-    //update view of the detector
-    //self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
-    self.executeButton.enabled = YES;
-    self.executeButton.alpha = 1.0f;
-    self.saveButton.enabled = YES;
-    self.saveButton.alpha = 1.0f;    
-    self.sendingView.hidden = YES;
-    [self.sendingView.activityIndicator stopAnimating];
-
-}
-
-
 - (IBAction)trainAction:(id)sender
 {
-    self.sendingView.hidden = NO;
-    [self.sendingView.activityIndicator startAnimating];
-    self.sendingView.cancelButton.hidden = YES;
-    dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
-    dispatch_async(myQueue, ^{
-        [self train];
-    });
+    //show modal to select training positives for the selected class
+    self.modalTVC = [[ModalTVC alloc] init];
+    self.modalTVC.delegate = self;
+    self.modalTVC.modalTitle = @"Training Images";
+    self.modalTVC.multipleChoice = NO;
+    NSMutableArray *imagesList = [[NSMutableArray alloc] init];
+    for(NSString *imageName in self.availablePositiveImagesNames)
+        [imagesList addObject:[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.resourcesPaths objectAtIndex:THUMB],imageName]]];
+    self.modalTVC.data = imagesList;
+    [self.modalTVC.view setNeedsDisplay];
+    [self presentModalViewController:self.modalTVC animated:YES];
+    
+    [self.trainButton setTitle:@"Retrain" forState:UIControlStateNormal];
+    
+    //let's wait for the modalTVCDelegate answer to begin the training
 }
 
 
@@ -266,22 +220,6 @@
     [self.sendingView showMessage:@"**** Results on the training set ****"];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Precision:%@",[self.svmClassifier.precisionRecall objectAtIndex:0]]];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Recall:%@", [self.svmClassifier.precisionRecall objectAtIndex:1]]];
-}
-
-- (IBAction)showClass:(id)sender
-{
-    self.modalTVC.multipleChoice = NO;
-    self.modalTVC.data = self.availableObjectClasses;
-    
-    NSMutableArray *images = [[NSMutableArray alloc] init];
-    NSString *path = [self.userPath stringByAppendingPathComponent:@"thumbnail"];
-    NSArray *directoryContent = [NSBundle pathsForResourcesOfType:@".jpg" inDirectory:path];
-    for(NSString *imagePath in directoryContent){
-        NSLog(@"%@", imagePath);
-        [images addObject:[UIImage imageWithContentsOfFile:imagePath]];
-    }
-    self.modalTVC.data = [[NSArray alloc] initWithArray:images];
-    [self presentModalViewController:self.modalTVC animated:YES];
 }
 
 
@@ -328,12 +266,123 @@
 #pragma mark
 #pragma mark - ModalTVCDelegate
 
-- (void) userSlection:(NSArray *)selectedItems;
+- (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
 {
-    NSNumber *sel = [selectedItems objectAtIndex:0];
-    self.svmClassifier.targetClass = [self.availableObjectClasses objectAtIndex:sel.intValue];
-    NSLog(@"selected class:%@", self.svmClassifier.targetClass);
-    self.targeClassLabel.text = self.svmClassifier.targetClass;
+    if([identifier isEqualToString:@"Select Class"]){
+        NSNumber *sel = [selectedItems objectAtIndex:0];
+        self.svmClassifier.targetClass = [self.availableObjectClasses objectAtIndex:sel.intValue];
+        self.targeClassLabel.text = self.svmClassifier.targetClass;
+        
+        NSLog(@"selected class:%@", self.svmClassifier.targetClass);
+        
+    }else if([identifier isEqualToString:@"Training Images"]){
+        
+        NSLog(@"selected images index: %@", selectedItems);
+        
+        NSMutableArray *traingImagesNames = [[NSMutableArray alloc] init];
+        for(NSNumber *imageIndex in selectedItems)
+            [traingImagesNames addObject:[self.availablePositiveImagesNames objectAtIndex:imageIndex.intValue]];
+        
+        //show debug indicator on screen
+        self.sendingView.hidden = NO;
+        [self.sendingView.activityIndicator startAnimating];
+        self.sendingView.cancelButton.hidden = YES;
+
+        //train in a different thread
+        dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
+        dispatch_async(myQueue, ^{
+            [self trainForImagesNames:traingImagesNames];
+        });
+    }
 }
+
+
+
+#pragma mark
+#pragma mark - Private methods
+
+
+-(void) trainForImagesNames:(NSArray *)imagesNames
+{
+    //training set construction
+    NSString *selectedClass = self.svmClassifier.targetClass;
+    TrainingSet *trainingSet = [[TrainingSet alloc] init];
+    for(NSString *imageName in imagesNames){
+        
+        //dictionaries
+        BOOL containedClass = NO;
+        NSString *objectsPath = [(NSString *)[self.resourcesPaths objectAtIndex:OBJECTS]  stringByAppendingPathComponent:imageName];
+        NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:objectsPath]];
+        for(Box *box in objects){
+            if([box.label isEqualToString:selectedClass]){
+                //add bounding box
+                containedClass = YES;
+                ConvolutionPoint *cp = [[ConvolutionPoint alloc] init];
+                cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
+                cp.ymin = box.upperLeft.y/box->LOWERBOUND;
+                cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
+                cp.ymax = box.lowerRight.y/box->LOWERBOUND;
+                cp.imageIndex = trainingSet.images.count;
+                cp.label = 1;
+                [trainingSet.groundTruthBoundingBoxes addObject:cp];
+            }
+        }
+        
+        if(containedClass){
+            //add Image
+            NSString *imagePath = [(NSString *)[self.resourcesPaths objectAtIndex:IMAGES]  stringByAppendingPathComponent:imageName];
+            UIImage *image = [[UIImage alloc]initWithContentsOfFile:imagePath];
+            [trainingSet.images addObject:[image scaleImageTo:IMAGE_SCALE_FACTOR]];
+        }
+    }
+    
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of boxes: %d", trainingSet.groundTruthBoundingBoxes.count]];
+    
+    
+    [trainingSet initialFill];
+    
+    //constructing intial set of cropped images for visualization and image averaging
+    NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
+    for(int i=0; i<trainingSet.boundingBoxes.count; i++){
+        ConvolutionPoint *cp = [trainingSet.boundingBoxes objectAtIndex:i];
+        UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
+        UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
+        [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
+    }
+    
+    //Image averaging
+    CIFilter *filter = [CIFilter filterWithName:@"CIOverlayBlendMode"];
+    CIImage *result = [[CIImage alloc] initWithImage:[listOfImages objectAtIndex:0]];
+    for(int i=1;i<trainingSet.groundTruthBoundingBoxes.count;i++){
+        CIImage *image = [[CIImage alloc] initWithImage:[listOfImages objectAtIndex:i]];
+        [filter setValue:image forKey:@"inputImage"];
+        [filter setValue:result forKey:@"inputBackgroundImage"];
+        result = [filter valueForKey:kCIOutputImageKey];
+    }
+    self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
+    self.detectorView.image = [UIImage imageWithCIImage:result];
+    
+    //output the initial training images
+    //self.trainingSetController.listOfImages = listOfImages;
+    //self.trainingSetController.listOfImages = trainingSet.images;
+    //[self.navigationController pushViewController:self.trainingSetController animated:YES];
+    
+    //learn
+    [self.sendingView showMessage:@"Training begins!"];
+    [self.svmClassifier train:trainingSet];
+    [self.sendingView showMessage:@"Finished training"];
+    
+    //update view of the detector
+    //self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.svmWeights withSize:self.svmClassifier.weightsDimensions];
+    self.executeButton.enabled = YES;
+    self.executeButton.alpha = 1.0f;
+    self.saveButton.enabled = YES;
+    self.saveButton.alpha = 1.0f;
+    self.sendingView.hidden = YES;
+    [self.sendingView.activityIndicator stopAnimating];
+}
+
+
 
 @end

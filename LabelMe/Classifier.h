@@ -57,10 +57,10 @@
 @property (strong, nonatomic) id<ClassifierDelegate> delegate;
 
 //Encoding properties
-@property (strong, nonatomic) NSMutableArray *weights;
-@property (strong, nonatomic) NSArray *sizes;
 @property (strong, nonatomic) NSString *name;
 @property (strong, nonatomic) NSString *targetClass;
+@property (strong, nonatomic) NSMutableArray *weights;
+@property (strong, nonatomic) NSArray *sizes;
 @property (strong, nonatomic) NSNumber *numberSV;
 @property (strong, nonatomic) NSNumber *numberOfPositives;
 @property (strong, nonatomic) NSArray *precisionRecall;
