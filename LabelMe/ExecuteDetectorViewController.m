@@ -107,9 +107,9 @@
     [self.captureSession startRunning];
 }
 
-- (ConvolutionPoint *) convertConvolutionPointForDetectView:(ConvolutionPoint *) cp
+- (BoundingBox *) convertBoundingBoxesForDetectView:(BoundingBox *) cp
 {
-    ConvolutionPoint *newCP = [[ConvolutionPoint alloc] init];
+    BoundingBox *newCP = [[BoundingBox alloc] init];
     double xmin = cp.ymin;
     double ymin = 1 - cp.xmin;
     double xmax = cp.ymax;
@@ -174,7 +174,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         // Update the navigation controller title with some information about the detection
         if (nmsArray.count > 0)
         {
-            ConvolutionPoint *score = [nmsArray objectAtIndex:0];
+            BoundingBox *score = [nmsArray objectAtIndex:0];
             [self performSelectorOnMainThread:@selector(setTitle:) withObject:[NSString stringWithFormat:@"%3f",score.score] waitUntilDone:YES];
             if(score.score > self.maxDetectionScore) self.maxDetectionScore = score.score;
             

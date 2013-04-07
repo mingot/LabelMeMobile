@@ -12,7 +12,8 @@
 
 
 
-@interface ConvolutionPoint : NSObject
+@interface BoundingBox : NSObject
+
 
 @property double score;
 @property double xmin;
@@ -24,9 +25,11 @@
 @property int imageIndex;
 @property CGRect rectangle;
 
+@property CGPoint locationOnImageHog;
+
 -(id) initWithRect:(CGRect)initialRect label:(int)label imageIndex:(int)imageIndex;
 - (CGRect) rectangleForImage:(UIImage *)image;
-- (double) fractionOfAreaOverlappingWith:(ConvolutionPoint *) cp;
+- (double) fractionOfAreaOverlappingWith:(BoundingBox *) cp;
 
 @end
 
@@ -35,14 +38,9 @@
 
 @interface ConvolutionHelper : NSObject
 
-
-//Return the points with a score greater than -1
-+ (NSArray *) convolve:(UIImage *)image
-        withClassifier:(Classifier *)svmClassifier;
-
 + (void) convolution:(double *)result matrixA:(double *)matrixA :(int *)sizeA matrixB:(double *)matrixB :(int *)sizeB;
 
-+ (NSArray *)nms:(NSArray *)convolutionPointsCandidates maxOverlapArea:(double)overlap minScoreThreshold:(double)scoreThreshold;
++ (NSArray *)nms:(NSArray *)boundingBoxesCandidates maxOverlapArea:(double)overlap minScoreThreshold:(double)scoreThreshold;
 
 @end
 

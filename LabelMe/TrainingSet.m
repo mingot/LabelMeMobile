@@ -11,7 +11,7 @@
 #import "UIImage+Resize.h"
 #import "ConvolutionHelper.h"
 
-#define TEMPLATE_SCALE_FACTOR 0.1 //resize template to obtain a reasonable number of blocks for the hog features
+#define TEMPLATE_SCALE_FACTOR 0.2 //resize template to obtain a reasonable number of blocks for the hog features
 
 #define MAX_NUMBER_EXAMPLES 20000
 #define MAX_NUMBER_FEATURES 2000
@@ -40,7 +40,7 @@
         averageSize.height = 0;
         averageSize.width = 0;
         
-        for(ConvolutionPoint* groundTruthBB in self.groundTruthBoundingBoxes){
+        for(BoundingBox* groundTruthBB in self.groundTruthBoundingBoxes){
             averageSize.height += groundTruthBB.ymax - groundTruthBB.ymin;
             averageSize.width += groundTruthBB.xmax - groundTruthBB.xmin;
         }
@@ -74,14 +74,11 @@
 
 - (void) initialFill
 {
-    // Create a initial set of positive and negative bounding boxes from ground truth labeled images
     self.boundingBoxes = [[NSMutableArray alloc] initWithArray:self.groundTruthBoundingBoxes];
     
-    for(int i=0; i<self.groundTruthBoundingBoxes.count; i++){
+    for(BoundingBox *groundTruth in self.groundTruthBoundingBoxes){
         
-        //Ground truth for the image
-        //TODO: suposing one ground truth per image
-        ConvolutionPoint *groundTruth = [self.groundTruthBoundingBoxes objectAtIndex:i];
+        //TODO: suposing just one ground truth per image
         UIImage *image = [self.images objectAtIndex:groundTruth.imageIndex];
         
         //the new box will have the size of the template size (not necessary though)
@@ -108,7 +105,7 @@
                 randomY = 1-height;
             }
             
-            ConvolutionPoint *negativeExample = [[ConvolutionPoint alloc] initWithRect:CGRectMake(randomX, randomY, width, height) label:-1 imageIndex:groundTruth.imageIndex];
+            BoundingBox *negativeExample = [[BoundingBox alloc] initWithRect:CGRectMake(randomX, randomY, width, height) label:-1 imageIndex:groundTruth.imageIndex];
             
             if([negativeExample fractionOfAreaOverlappingWith:groundTruth]<0.1)
                 [self.boundingBoxes addObject:negativeExample];
@@ -131,10 +128,9 @@
     {
         @autoreleasepool
         {
-            ConvolutionPoint *boundingBox = [self.boundingBoxes objectAtIndex:i];
+            BoundingBox *boundingBox = [self.boundingBoxes objectAtIndex:i];
             if(i%1000 == 0) NSLog(@"evolution %.1f",i*100.0/self.boundingBoxes.count);
             //get the image contained in the bounding box and resized it with the template size
-            //TODO: From cut -> HOG to HOG -> cut
             UIImage *wholeImage = [self.images objectAtIndex:boundingBox.imageIndex];
             UIImage *resizedImage = [[wholeImage croppedImage:[boundingBox rectangleForImage:wholeImage]] resizedImage:currentTemplateSize interpolationQuality:kCGInterpolationDefault];
             

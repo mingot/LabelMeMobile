@@ -21,9 +21,12 @@
 
 @interface Classifier : NSObject <NSCoding>
 
+
+//pointer version of size and weights
 @property double *weightsP;
 @property int *sizesP;
 @property (strong, nonatomic) id<ClassifierDelegate> delegate;
+@property BOOL isLearning;
 
 //Encoding properties
 @property (strong, nonatomic) NSString *name;

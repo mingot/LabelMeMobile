@@ -31,6 +31,9 @@ using namespace cv;
 //Show just the histogram features for debugging purposes
 - (void) showOrientationHistogram;
 
+//make the convolution of the classifier with the image and return de detected bounding boxes
+- (NSArray *) getBoundingBoxesIn:(UIImage *)image;
+
 @end
 
 
@@ -39,6 +42,8 @@ using namespace cv;
 
 @synthesize weightsP = _weightsP;
 @synthesize sizesP = _sizesP;
+@synthesize delegate = _delegate;
+@synthesize isLearning = _isLearning;
 
 @synthesize weights = _weights;
 @synthesize sizes = _sizes;
@@ -103,27 +108,13 @@ using namespace cv;
     }
 }
 
-- (void) showOrientationHistogram
-{
-    double *histogram = (double *) calloc(18,sizeof(double));
-    for(int x = 0; x<self.sizesP[1]; x++)
-        for(int y=0; y<self.sizesP[0]; y++)
-            for(int f=18; f<27; f++)
-                histogram[f-18] += self.weightsP[y + x*self.sizesP[0] + f*self.sizesP[0]*self.sizesP[1]];
-    
-    printf("Orientation Histogram\n");
-    for(int i=0; i<9; i++)
-        printf("%f ", histogram[i]);
-    printf("\n");
-    
-    free(histogram);
-}
-
 - (void) train:(TrainingSet *) trainingSet;
 {
     //free previous weights
     free(self.weightsP);
     free(self.sizesP);
+    
+    self.isLearning = YES;
     
     // Get the template size and get hog feautures dimension
     self.sizesP = [[[trainingSet.images objectAtIndex:0] resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault] obtainDimensionsOfHogFeatures];
@@ -149,7 +140,7 @@ using namespace cv;
     params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6);
     
     //convergence loop
-    int numIterations = 2;
+    int numIterations = 4;
     for (int iter=0; iter<numIterations; iter++){
         // Set up training data
         if(debugging){
@@ -188,6 +179,7 @@ using namespace cv;
             // Get the current label of the supportvector
             Mat supportVectorMat(numOfFeatures,1,CV_32FC1, sv_aux);
             trainingSet.labels[i] = SVM.predict(supportVectorMat);
+            free(sv_aux);
             printf("label: %f   alpha: %f \n", trainingSet.labels[i], alpha);
             
             for(int j=0;j<numOfFeatures;j++){
@@ -212,48 +204,47 @@ using namespace cv;
         
         //remove all current bounding boxes
         [trainingSet.boundingBoxes removeAllObjects];
-        int positives = 0;
+        trainingSet.numberOfTrainingExamples = numSupportVectors;
+        int positives = 0, index = numSupportVectors;
         
-        for(ConvolutionPoint *groundTruthBoundingBox in trainingSet.groundTruthBoundingBoxes){
+        for(BoundingBox *groundTruthBoundingBox in trainingSet.groundTruthBoundingBoxes){
         
             // Get new bounding boxes by running the detector
-            NSArray *newBoundingBoxes = [self detect:[trainingSet.images objectAtIndex:groundTruthBoundingBox.imageIndex] minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp];
-            if(debugging){
-                NSLog(@"Number of new bb obtained for image %d: %d", groundTruthBoundingBox.imageIndex, newBoundingBoxes.count);
-            }
-                
+            UIImage *image = [trainingSet.images objectAtIndex:groundTruthBoundingBox.imageIndex];
+            HogFeature *imageHog = [image obtainHogFeatures];
+            NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp];
+            
+            NSLog(@"Number of new bb obtained for image %d: %d", groundTruthBoundingBox.imageIndex, newBoundingBoxes.count);
             //the rest that are less than an overlap threshold are considered negatives
-            for(int j=0; j<[newBoundingBoxes count]; j++){
-                ConvolutionPoint *boundingBox = [newBoundingBoxes objectAtIndex:j];
-                boundingBox.imageIndex = groundTruthBoundingBox.imageIndex;
+            for(BoundingBox *boundingBox in newBoundingBoxes){
                 double overlapArea = [boundingBox fractionOfAreaOverlappingWith:groundTruthBoundingBox];
-                
+                BOOL addBB = NO;
                 if (overlapArea < 0.25){
                     boundingBox.label = -1;
-                    [trainingSet.boundingBoxes addObject:boundingBox];
-                    
+                    addBB = YES;
                 }else if (overlapArea > 0.8 && overlapArea<1){
                     boundingBox.label = 1;
+                    addBB = YES;
                     positives ++;
-                    [trainingSet.boundingBoxes addObject:boundingBox];
                 }
                 
+                // add the convolution point to the training buffer
+                if (addBB) {
+                    [self addExample:boundingBox to:trainingSet startingAt:index for:imageHog];
+                    index++;
+                    trainingSet.numberOfTrainingExamples++;
+                }
             }
         }
         if(debugging){
-            //NSLog(@"added:%d positives", positives);
-            //NSLog(@"total of new bounding boxes: %d",trainingSet.boundingBoxes.count);
             [self.delegate sendMessage:[NSString stringWithFormat:@"added:%d positives", positives]];
-            [self.delegate sendMessage:[NSString stringWithFormat:@"total of new bounding boxes: %d",trainingSet.boundingBoxes.count]];
             [self.delegate sendMessage:@"Computing HOG features for the Bounding boxes..."];
         }
         
         
         //generate the hog features for the new bounding boxes
+//        [trainingSet generateFeaturesForBoundingBoxesWithNumSV:numSupportVectors];
         
-        [trainingSet generateFeaturesForBoundingBoxesWithNumSV:numSupportVectors];
-        
-        //[self showOrientationHistogram];
         
         //update information about the classifier
         self.numberOfPositives = [NSNumber numberWithInt:positives];
@@ -262,6 +253,7 @@ using namespace cv;
     
     //See the results on training set
     [self testOnSet:trainingSet atThresHold:0];
+    self.isLearning = NO;
 }
 
 
@@ -286,8 +278,8 @@ using namespace cv;
     //Pyramid calculation
     for (int i = 0; i<numberPyramids; i++){
         UIImage *im = [image scaleImageTo:initialScale/pow(scale, i)];
-        NSArray *result = [ConvolutionHelper convolve:im
-                                       withClassifier:self];
+        NSArray *result = [self getBoundingBoxesIn:im];
+        
 //        NSLog(@"image size: h:%f, w:%f", im.size.height, im.size.width);
         [candidateBoundingBoxes addObjectsFromArray:result];
     }
@@ -298,14 +290,14 @@ using namespace cv;
     // Change the resulting orientation of the bounding boxes if the phone orientation requires it
     if(UIInterfaceOrientationIsLandscape(orientation)){
         for(int i=0; i<nmsArray.count; i++){
-            ConvolutionPoint *boundingBox = [nmsArray objectAtIndex:i];
+            BoundingBox *boundingBox = [nmsArray objectAtIndex:i];
             double auxXmin, auxXmax;
             auxXmin = boundingBox.xmin;
             auxXmax = boundingBox.xmax;
-            boundingBox.xmin = (1 - boundingBox.ymin);//*320.0/504;
-            boundingBox.xmax = (1 - boundingBox.ymax);//*320.0/504;
-            boundingBox.ymin = auxXmin;//*504.0/320;
-            boundingBox.ymax = auxXmax;//*504.0/320;
+            boundingBox.xmin = (1 - boundingBox.ymin);
+            boundingBox.xmax = (1 - boundingBox.ymax);
+            boundingBox.ymin = auxXmin;
+            boundingBox.ymax = auxXmax;
         }
     }
     
@@ -318,12 +310,12 @@ using namespace cv;
     
     NSLog(@"Detection threshold: %f", detectionThreshold);
     int tp=0, fp=0, fn=0;// tn=0;
-    for(ConvolutionPoint *groundTruthBoundingBox in set.groundTruthBoundingBoxes){
+    for(BoundingBox *groundTruthBoundingBox in set.groundTruthBoundingBoxes){
         bool found = NO;
         UIImage *selectedImage = [set.images objectAtIndex:groundTruthBoundingBox.imageIndex];
         NSArray *detectedBoundingBoxes = [self detect:selectedImage minimumThreshold:detectionThreshold pyramids:10 usingNms:YES deviceOrientation:UIImageOrientationUp];
         NSLog(@"For image %d generated %d detecting boxes", groundTruthBoundingBox.imageIndex, detectedBoundingBoxes.count);
-        for(ConvolutionPoint *detectedBoundingBox in detectedBoundingBoxes)
+        for(BoundingBox *detectedBoundingBox in detectedBoundingBoxes)
             if ([detectedBoundingBox fractionOfAreaOverlappingWith:groundTruthBoundingBox]>0.5){
                 tp++;
                 found = YES;
@@ -395,6 +387,93 @@ using namespace cv;
     [aCoder encodeObject:self.precisionRecall forKey:@"precisionRecall"];
 }
 
+
+#pragma mark
+#pragma mark - Private methods
+
+- (void) showOrientationHistogram
+{
+    double *histogram = (double *) calloc(18,sizeof(double));
+    for(int x = 0; x<self.sizesP[1]; x++)
+        for(int y=0; y<self.sizesP[0]; y++)
+            for(int f=18; f<27; f++)
+                histogram[f-18] += self.weightsP[y + x*self.sizesP[0] + f*self.sizesP[0]*self.sizesP[1]];
+    
+    printf("Orientation Histogram\n");
+    for(int i=0; i<9; i++)
+        printf("%f ", histogram[i]);
+    printf("\n");
+    
+    free(histogram);
+}
+
+
+- (NSArray *) getBoundingBoxesIn:(UIImage *)image
+{
+    HogFeature *imageHog = [image obtainHogFeatures];
+    int blocks[2] = {imageHog.numBlocksY, imageHog.numBlocksX};
+    
+    int convolutionSize[2];
+    convolutionSize[0] = blocks[0] - self.sizesP[0] + 1; //convolution size
+    convolutionSize[1] = blocks[1] - self.sizesP[1] + 1;
+    if ((convolutionSize[0]<=0) || (convolutionSize[1]<=0))
+        return NULL;
+    
+    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:convolutionSize[0]*convolutionSize[1]];
+    double *c = (double *) calloc(convolutionSize[0]*convolutionSize[1],sizeof(double)); //initialize the convolution result
+    
+    
+    // Make the convolution for each feature.
+    for (int f = 0; f < self.sizesP[2]; f++){
+        
+        double *dst = c;
+        double *A_src = imageHog.features + f*blocks[0]*blocks[1]; //Select the block of features to do the convolution with
+        double *B_src = self.weightsP + f*self.sizesP[0]*self.sizesP[1];
+        
+        // convolute and add the results to dst
+        [ConvolutionHelper convolution:dst matrixA:A_src :blocks matrixB:B_src :self.sizesP];
+        //[ConvolutionHelper convolutionWithVDSP:dst matrixA:A_src :blocks matrixB:B_src :templateSize];
+        
+    }
+    
+    //Once done the convolution, detect if something is the object!
+    double bias = self.weightsP[self.sizesP[0]*self.sizesP[1]*self.sizesP[2]];
+    for (int x = 0; x < convolutionSize[1]; x++) {
+        for (int y = 0; y < convolutionSize[0]; y++) {
+            
+            BoundingBox *p = [[BoundingBox alloc] init];
+            p.score = (*(c + x*convolutionSize[0] + y) - bias);
+            if( p.score > -1 ){
+                p.xmin = (double)(x + 1)/((double)blocks[1] + 2);
+                p.xmax = (double)(x + 1)/((double)blocks[1] + 2) + ((double)self.sizesP[1]/((double)blocks[1] + 2));
+                p.ymin = (double)(y + 1)/((double)blocks[0] + 2);
+                p.ymax = (double)(y + 1)/((double)blocks[0] + 2) + ((double)self.sizesP[0]/((double)blocks[0] + 2));
+                p.locationOnImageHog = CGPointMake(x, y);
+                
+                [result addObject:p];
+            }
+        }
+    }
+    
+    free(c);
+    return result;
+}
+
+-(void) addExample:(BoundingBox *)p to:(TrainingSet *)trainingSet startingAt:(int)index for:(HogFeature *)imageHog
+{
+    //label
+    trainingSet.labels[index] = p.label;
+    
+    //features
+    int boundingBoxPosition = p.locationOnImageHog.y + p.locationOnImageHog.x*self.sizesP[0];
+    int numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];
+    for(int f=0; f<self.sizesP[2];f++)
+        for(int i=0;i<self.sizesP[1];i++)
+            for(int j=0;j<self.sizesP[0];j++){
+                int sweeping = j + i*self.sizesP[0] + f*self.sizesP[0]*self.sizesP[1];
+                trainingSet.imageFeatures[index*numOfFeatures + sweeping] = (float) imageHog.features[boundingBoxPosition + sweeping];
+            }
+}
 
 
 @end

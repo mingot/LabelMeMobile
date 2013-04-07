@@ -25,13 +25,13 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
 
     if (self.corners.count!=0){
         CGContextRef context = UIGraphicsGetCurrentContext();
-        ConvolutionPoint *p;
+        BoundingBox *p;
         CGFloat x,y,w,h;
         
         for (int i=0; i<self.corners.count; i++){
         
             //convert the point from the device system of reference to the prevLayer system of reference
-            p = [self convertConvolutionPointForDetectView:[self.corners objectAtIndex:i]];
+            p = [self convertBoundingBoxForDetectView:[self.corners objectAtIndex:i]];
             
             //set the rectangle within the current boundaries 
             x = max(0,p.xmin);
@@ -56,9 +56,9 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
 }
 
 
-- (ConvolutionPoint *) convertConvolutionPointForDetectView:(ConvolutionPoint *) cp
+- (BoundingBox *) convertBoundingBoxForDetectView:(BoundingBox *) cp
 {
-    ConvolutionPoint *newCP = [[ConvolutionPoint alloc] init];
+    BoundingBox *newCP = [[BoundingBox alloc] init];
     
     CGPoint upperLeft = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(cp.ymin, 1 - cp.xmin)];
     CGPoint lowerRight = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(cp.ymax, 1 - cp.xmax)];

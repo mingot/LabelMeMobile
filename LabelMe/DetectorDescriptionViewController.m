@@ -317,7 +317,7 @@
             if([box.label isEqualToString:selectedClass]){
                 //add bounding box
                 containedClass = YES;
-                ConvolutionPoint *cp = [[ConvolutionPoint alloc] init];
+                BoundingBox *cp = [[BoundingBox alloc] init];
                 cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
                 cp.ymin = box.upperLeft.y/box->LOWERBOUND;
                 cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
@@ -345,7 +345,7 @@
     //constructing intial set of cropped images for visualization and image averaging
     NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
     for(int i=0; i<trainingSet.boundingBoxes.count; i++){
-        ConvolutionPoint *cp = [trainingSet.boundingBoxes objectAtIndex:i];
+        BoundingBox *cp = [trainingSet.boundingBoxes objectAtIndex:i];
         UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
         UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
         [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
@@ -365,7 +365,6 @@
     
     //output the initial training images
     //self.trainingSetController.listOfImages = listOfImages;
-    //self.trainingSetController.listOfImages = trainingSet.images;
     //[self.navigationController pushViewController:self.trainingSetController animated:YES];
     
     //learn

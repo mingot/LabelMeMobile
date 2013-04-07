@@ -100,7 +100,7 @@
     self.prevLayer.frame = self.detectView.frame;
     
     //Insert the detect Frame in the view
-    ConvolutionPoint *detectFrame = [[ConvolutionPoint alloc] initWithRect:CGRectMake(3.0/8, 3.0/8, 1.0/4, 1.0/4) label:0 imageIndex:0];
+    BoundingBox *detectFrame = [[BoundingBox alloc] initWithRect:CGRectMake(3.0/8, 3.0/8, 1.0/4, 1.0/4) label:0 imageIndex:0];
     [self.detectView setCorners:[[NSArray alloc] initWithObjects:detectFrame, nil]];
     [self.detectView setNeedsDisplay];
     
@@ -162,7 +162,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             [self.trainingSet.images addObject:image];
             
             // add ground truth bounding box
-            ConvolutionPoint *boundingBox = [[ConvolutionPoint alloc] initWithRect:CGRectMake(3.0/8, 3.0/8, 1.0/4, 1.0/4) label:1 imageIndex:[self.trainingSet.images count]-1];
+            BoundingBox *boundingBox = [[BoundingBox alloc] initWithRect:CGRectMake(3.0/8, 3.0/8, 1.0/4, 1.0/4) label:1 imageIndex:[self.trainingSet.images count]-1];
             [self.trainingSet.groundTruthBoundingBoxes addObject:boundingBox];
             
             // update the number of training images on the button title
@@ -209,7 +209,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     for(int i=0; i< self.trainingSet.boundingBoxes.count; i++)
     {
-        ConvolutionPoint *cp = [self.trainingSet.boundingBoxes objectAtIndex:i];
+        BoundingBox *cp = [self.trainingSet.boundingBoxes objectAtIndex:i];
         UIImage *wholeImage = [self.trainingSet.images objectAtIndex:cp.imageIndex];
         CGSize templateSize;
         templateSize.height = 72;

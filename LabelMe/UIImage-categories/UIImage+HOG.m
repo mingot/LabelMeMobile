@@ -271,7 +271,7 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
             src = hist + (x+1)*blocks[0] + (y+1);
             for (int o = 0; o < 18; o++) //looping over the different channels of
             {
-                double h1 = min(*src * n1, 0.2); //?? why impose a max of 0.2
+                double h1 = min(*src * n1, 0.2); 
                 double h2 = min(*src * n2, 0.2);
                 double h3 = min(*src * n3, 0.2);
                 double h4 = min(*src * n4, 0.2);
