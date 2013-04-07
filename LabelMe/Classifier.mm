@@ -20,6 +20,7 @@ using namespace cv;
 #define debugging YES
 #define MAX_NUMBER_EXAMPLES 20000
 #define MAX_NUMBER_FEATURES 2000
+#define STOP_CRITERIA 0.1
 
 
 #define MAX_IMAGE_SIZE 300.0
@@ -28,11 +29,20 @@ using namespace cv;
 
 @interface Classifier ()
 
+//store the weights of the last iteration for convergence
+@property double *weightsPLast;
+
 //Show just the histogram features for debugging purposes
 - (void) showOrientationHistogram;
 
 //make the convolution of the classifier with the image and return de detected bounding boxes
 - (NSArray *) getBoundingBoxesIn:(UIImage *)image;
+
+//add a selected bounding box to the training buffer
+-(void) addExample:(BoundingBox *)p to:(TrainingSet *)trainingSet startingAt:(int)index for:(HogFeature *)imageHog;
+
+
+-(double) computeDifferenceOfWeights;
 
 @end
 
@@ -42,6 +52,7 @@ using namespace cv;
 
 @synthesize weightsP = _weightsP;
 @synthesize sizesP = _sizesP;
+@synthesize imagesHogPyramid = _imagesHogPyramid;
 @synthesize delegate = _delegate;
 @synthesize isLearning = _isLearning;
 
@@ -113,21 +124,19 @@ using namespace cv;
     //free previous weights
     free(self.weightsP);
     free(self.sizesP);
-    
+    self.imagesHogPyramid = [[NSMutableArray alloc] init];
     self.isLearning = YES;
     
     // Get the template size and get hog feautures dimension
     self.sizesP = [[[trainingSet.images objectAtIndex:0] resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault] obtainDimensionsOfHogFeatures];
+
+
     int numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];
     
-    if(debugging){
-        //NSLog(@"template size: %f, %f", trainingSet.templateSize.height, trainingSet.templateSize.width);
-        //NSLog(@"dimensions of hog features: %d %d %d", self.sizesP[0],self.sizesP[1],self.sizesP[2]);
-        [self.delegate sendMessage:[NSString stringWithFormat:@"template size: %f, %f", trainingSet.templateSize.height, trainingSet.templateSize.width]];
-        [self.delegate sendMessage:[NSString stringWithFormat:@"dimensions of hog features: %d %d %d", self.sizesP[0],self.sizesP[1],self.sizesP[2]]];
-    }
-    
+    [self.delegate sendMessage:[NSString stringWithFormat:@"template size: %f, %f", trainingSet.templateSize.height, trainingSet.templateSize.width]];
+    [self.delegate sendMessage:[NSString stringWithFormat:@"dimensions of hog features: %d %d %d", self.sizesP[0],self.sizesP[1],self.sizesP[2]]];
 
+    
     //TODO: max size for the buffers
     trainingSet.imageFeatures = (float *) malloc(MAX_NUMBER_EXAMPLES*MAX_NUMBER_FEATURES*sizeof(float));
     trainingSet.labels = (float *) malloc(MAX_NUMBER_EXAMPLES*sizeof(float));
@@ -140,16 +149,17 @@ using namespace cv;
     params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6);
     
     //convergence loop
-    int numIterations = 4;
-    for (int iter=0; iter<numIterations; iter++){
+    self.weightsP = (double *) calloc((numOfFeatures+1),sizeof(double));
+    self.weightsPLast = (double *) calloc((numOfFeatures+1),sizeof(double));
+    float diff = 1;
+    int iter = 0;
+    while(diff > STOP_CRITERIA){
         // Set up training data
-        if(debugging){
-            //NSLog(@"\n\n ************************ Iteration %d ********************************", iter);
-            //NSLog(@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples);
 
-            [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter]];
-            [self.delegate sendMessage:[NSString stringWithFormat:@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples]];
-        }
+        [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter++]];
+        [self.delegate sendMessage:[NSString stringWithFormat:@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples]];
+        [self.delegate sendMessage:[NSString stringWithFormat:@"Difference:%f", diff]];
+
         
         Mat labelsMat(trainingSet.numberOfTrainingExamples,1,CV_32FC1, trainingSet.labels);
         Mat trainingDataMat(trainingSet.numberOfTrainingExamples, numOfFeatures, CV_32FC1, trainingSet.imageFeatures);
@@ -166,10 +176,10 @@ using namespace cv;
         //update weights and store the support vectors
         int numSupportVectors = SVM.get_support_vector_count();
         const CvSVMDecisionFunc *dec = SVM.decision_func;
-        self.weightsP = (double *) calloc((numOfFeatures+1),sizeof(double)); //TODO: not to be allocated in every iteration
+        
         printf("Num of support vectors: %d\n", numSupportVectors);
         
-        for (int i = 0; i<numSupportVectors; ++i){
+        for (int i=0; i<numSupportVectors; i++){
             float alpha = dec[0].alpha[i];
             const float *supportVector = SVM.get_support_vector(i);
             float *sv_aux = (float *) malloc(numOfFeatures*sizeof(float));
@@ -192,10 +202,10 @@ using namespace cv;
         }
         self.weightsP[numOfFeatures] = - (double) dec[0].rho; // The sign of the bias and rho have opposed signs.
         
-        if(debugging){
-            //NSLog(@"bias: %f", self.weightsP[numOfFeatures]);
-            [self.delegate sendMessage:[NSString stringWithFormat:@"bias: %f", self.weightsP[numOfFeatures]]];
-        }
+        diff = [self computeDifferenceOfWeights];
+
+        [self.delegate sendMessage:[NSString stringWithFormat:@"bias: %f", self.weightsP[numOfFeatures]]];
+        
         
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,7 +221,6 @@ using namespace cv;
         
             // Get new bounding boxes by running the detector
             UIImage *image = [trainingSet.images objectAtIndex:groundTruthBoundingBox.imageIndex];
-            HogFeature *imageHog = [image obtainHogFeatures];
             NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp];
             
             NSLog(@"Number of new bb obtained for image %d: %d", groundTruthBoundingBox.imageIndex, newBoundingBoxes.count);
@@ -230,21 +239,15 @@ using namespace cv;
                 
                 // add the convolution point to the training buffer
                 if (addBB) {
-                    [self addExample:boundingBox to:trainingSet startingAt:index for:imageHog];
+                    [self addExample:boundingBox to:trainingSet startingAt:index for:[self.imagesHogPyramid objectAtIndex:boundingBox.imageHogIndex]];
                     index++;
                     trainingSet.numberOfTrainingExamples++;
                 }
             }
         }
-        if(debugging){
-            [self.delegate sendMessage:[NSString stringWithFormat:@"added:%d positives", positives]];
-            [self.delegate sendMessage:@"Computing HOG features for the Bounding boxes..."];
-        }
-        
-        
-        //generate the hog features for the new bounding boxes
-//        [trainingSet generateFeaturesForBoundingBoxesWithNumSV:numSupportVectors];
-        
+
+        [self.delegate sendMessage:[NSString stringWithFormat:@"added:%d positives", positives]];
+
         
         //update information about the classifier
         self.numberOfPositives = [NSNumber numberWithInt:positives];
@@ -255,8 +258,6 @@ using namespace cv;
     [self testOnSet:trainingSet atThresHold:0];
     self.isLearning = NO;
 }
-
-
 
 
 - (NSArray *) detect:(UIImage *)image
@@ -422,7 +423,6 @@ using namespace cv;
     NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:convolutionSize[0]*convolutionSize[1]];
     double *c = (double *) calloc(convolutionSize[0]*convolutionSize[1],sizeof(double)); //initialize the convolution result
     
-    
     // Make the convolution for each feature.
     for (int f = 0; f < self.sizesP[2]; f++){
         
@@ -448,8 +448,16 @@ using namespace cv;
                 p.xmax = (double)(x + 1)/((double)blocks[1] + 2) + ((double)self.sizesP[1]/((double)blocks[1] + 2));
                 p.ymin = (double)(y + 1)/((double)blocks[0] + 2);
                 p.ymax = (double)(y + 1)/((double)blocks[0] + 2) + ((double)self.sizesP[0]/((double)blocks[0] + 2));
-                p.locationOnImageHog = CGPointMake(x, y);
                 
+                //save the location and image hog for the later feature extraction during the learning
+                if(self.isLearning){
+                    p.locationOnImageHog = CGPointMake(x, y);
+                    NSUInteger index = [self.imagesHogPyramid indexOfObject:imageHog];
+                    if( index == NSNotFound){
+                        [self.imagesHogPyramid addObject:imageHog];
+                        p.imageHogIndex = self.imagesHogPyramid.count - 1;
+                    }else p.imageHogIndex = index;
+                }
                 [result addObject:p];
             }
         }
@@ -475,5 +483,23 @@ using namespace cv;
             }
 }
 
+
+-(double) computeDifferenceOfWeights
+{
+    double diff=0.0;
+    
+    double norm=0, normLast=0;
+    for(int i=0; i<self.sizesP[0]*self.sizesP[1]*self.sizesP[2]; i++){
+        norm += self.weightsP[i]*self.weightsP[i];
+        normLast += self.weightsPLast[i]*self.weightsPLast[i];
+    }
+    norm = sqrt(norm);
+    normLast = sqrt(normLast);
+    
+    for(int i=0; i<self.sizesP[0]*self.sizesP[1]*self.sizesP[2]; i++)
+        diff += (self.weightsP[i]/norm - self.weightsPLast[i]/normLast)*(self.weightsP[i]/norm - self.weightsPLast[i]/normLast);
+    
+    return sqrt(diff);
+}
 
 @end

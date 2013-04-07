@@ -30,22 +30,34 @@
 @synthesize multipleChoice = _multipleChoice;
 @synthesize modalTitle = _modalTitle;
 
+-(NSMutableArray *) selectedItems
+{
+    if(!_selectedItems){
+        _selectedItems = [[NSMutableArray alloc] init];
+    }
+    return _selectedItems;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.selectedItems = [[NSMutableArray alloc] init];
     
-    self.doneButton.enabled = NO;
-    self.doneButton.alpha = 0.6f;
+    
+    if(self.selectedItems.count == 0){
+        self.doneButton.enabled = NO;
+        self.doneButton.alpha = 0.6f;
+    }
     
     //select grid (for images) or list (for text) as table view type depending on the data
     self.isGrid = NO;
     if([[self.data objectAtIndex:0] isKindOfClass:[UIImage class]])
         self.isGrid = YES;
     
-    if(self.isGrid)
+    if(self.isGrid){
         self.tableView.rowHeight = (0.225*self.view.frame.size.width*ceil((float)self.data.count/4) + 0.0375*self.view.frame.size.width);
-
+        
+    }
+    
     //TODO: in grid mode, no distinction between multiplechoice.
 }
 
@@ -114,6 +126,10 @@
                  forControlEvents:UIControlEventTouchUpInside];
                 [button setImage:image forState:UIControlStateNormal];
                 [button setImage:[self addBorderTo:imageSelected] forState:UIControlStateSelected];
+                
+                //if the cell is a selected item
+                if ([self.selectedItems indexOfObject:[NSNumber numberWithInt:indexPath.row]] != NSNotFound)
+                    button.selected = YES;
 
                 [cell addSubview:button];
             }

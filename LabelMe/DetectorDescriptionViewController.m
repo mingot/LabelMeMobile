@@ -65,7 +65,6 @@
                 if([box.label isEqualToString:self.svmClassifier.targetClass])
                     [list addObject:imageName];
         }
-        
         _availablePositiveImagesNames = [NSArray arrayWithArray:list];
     }
     
@@ -176,7 +175,6 @@
 
 - (IBAction)executeAction:(id)sender
 {
-    NSLog(@"Execute detector");
     self.executeController.svmClassifier = self.svmClassifier;
     [self.navigationController pushViewController:self.executeController animated:YES];
 }
@@ -189,8 +187,10 @@
     self.modalTVC.modalTitle = @"Training Images";
     self.modalTVC.multipleChoice = NO;
     NSMutableArray *imagesList = [[NSMutableArray alloc] init];
-    for(NSString *imageName in self.availablePositiveImagesNames)
+    for(NSString *imageName in self.availablePositiveImagesNames){
         [imagesList addObject:[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.resourcesPaths objectAtIndex:THUMB],imageName]]];
+        [self.modalTVC.selectedItems addObject:[NSNumber numberWithInt:(imagesList.count-1)]];
+    }
     self.modalTVC.data = imagesList;
     [self.modalTVC.view setNeedsDisplay];
     [self presentModalViewController:self.modalTVC animated:YES];
@@ -296,6 +296,14 @@
     }
 }
 
+#pragma mark
+#pragma mark - Memory Management
+
+-(void) didReceiveMemoryWarning
+{
+    NSLog(@"Memory warning received!!!");
+    [super didReceiveMemoryWarning];
+}
 
 
 #pragma mark
@@ -305,8 +313,8 @@
 -(void) trainForImagesNames:(NSArray *)imagesNames
 {
     //training set construction
-    NSString *selectedClass = self.svmClassifier.targetClass;
     TrainingSet *trainingSet = [[TrainingSet alloc] init];
+    
     for(NSString *imageName in imagesNames){
         
         //dictionaries
@@ -314,7 +322,7 @@
         NSString *objectsPath = [(NSString *)[self.resourcesPaths objectAtIndex:OBJECTS]  stringByAppendingPathComponent:imageName];
         NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:objectsPath]];
         for(Box *box in objects){
-            if([box.label isEqualToString:selectedClass]){
+            if([box.label isEqualToString:self.svmClassifier.targetClass]){
                 //add bounding box
                 containedClass = YES;
                 BoundingBox *cp = [[BoundingBox alloc] init];

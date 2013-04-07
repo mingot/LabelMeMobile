@@ -28,6 +28,7 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
 @synthesize imageIndex = _imageIndex;
 @synthesize rectangle = _rectangle;
 @synthesize locationOnImageHog = _locationOnImageHog;
+@synthesize imageHogIndex = _imageHogIndex;
 
 -(id) initWithRect:(CGRect)initialRect label:(int)label imageIndex:(int)imageIndex;
 {

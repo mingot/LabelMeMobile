@@ -26,6 +26,8 @@
 @property CGRect rectangle;
 
 @property CGPoint locationOnImageHog;
+//index in for the classifier array of hog features of the pyramids
+@property int imageHogIndex;
 
 -(id) initWithRect:(CGRect)initialRect label:(int)label imageIndex:(int)imageIndex;
 - (CGRect) rectangleForImage:(UIImage *)image;

@@ -13,6 +13,7 @@
 @property (strong, nonatomic) NSMutableArray *images; //UIImage
 @property (strong, nonatomic) NSMutableArray *groundTruthBoundingBoxes; //BoundingBox
 @property (strong, nonatomic) NSMutableArray *boundingBoxes; //BoundingBox
+
 @property CGSize templateSize;
 
 @property float *imageFeatures; //the features for the wole trainingset
