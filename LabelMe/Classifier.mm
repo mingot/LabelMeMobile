@@ -20,7 +20,7 @@ using namespace cv;
 #define debugging YES
 #define MAX_NUMBER_EXAMPLES 20000
 #define MAX_NUMBER_FEATURES 2000
-#define STOP_CRITERIA 0.1
+#define STOP_CRITERIA 0.8
 
 
 #define MAX_IMAGE_SIZE 300.0
@@ -158,7 +158,6 @@ using namespace cv;
 
         [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter++]];
         [self.delegate sendMessage:[NSString stringWithFormat:@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples]];
-        [self.delegate sendMessage:[NSString stringWithFormat:@"Difference:%f", diff]];
 
         
         Mat labelsMat(trainingSet.numberOfTrainingExamples,1,CV_32FC1, trainingSet.labels);
@@ -494,10 +493,17 @@ using namespace cv;
         normLast += self.weightsPLast[i]*self.weightsPLast[i];
     }
     norm = sqrt(norm);
-    normLast = sqrt(normLast);
+    normLast = normLast!=0 ? sqrt(normLast):1;
     
-    for(int i=0; i<self.sizesP[0]*self.sizesP[1]*self.sizesP[2]; i++)
+
+    
+    for(int i=0; i<self.sizesP[0]*self.sizesP[1]*self.sizesP[2]; i++){
         diff += (self.weightsP[i]/norm - self.weightsPLast[i]/normLast)*(self.weightsP[i]/norm - self.weightsPLast[i]/normLast);
+        self.weightsPLast[i] = self.weightsP[i];
+    }
+    
+    [self.delegate sendMessage:[NSString stringWithFormat:@"norms: %f, %f", norm, normLast]];
+    [self.delegate sendMessage:[NSString stringWithFormat:@"difference: %f", sqrt(diff)]];
     
     return sqrt(diff);
 }
