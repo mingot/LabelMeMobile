@@ -28,6 +28,9 @@
 @property (strong, nonatomic) NSMutableArray *imagesHogPyramid;
 @property (strong, nonatomic) id<ClassifierDelegate> delegate;
 @property BOOL isLearning;
+@property NSMutableArray *imageListAux;
+
+
 
 
 //Encoding properties

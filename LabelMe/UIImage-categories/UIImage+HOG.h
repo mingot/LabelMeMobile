@@ -30,6 +30,6 @@
 - (UIImage *) convertToHogImage;
 
 + (UIImage *) hogImageFromFeatures:(double *)hogFeatures withSize:(int *)blocks;
-
++ (UIImage *) hogImageFromFeature:(HogFeature *)hogFeature;
 
 @end

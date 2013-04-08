@@ -11,7 +11,7 @@
 #import "UIImage+Resize.h"
 #import "ConvolutionHelper.h"
 
-#define TEMPLATE_SCALE_FACTOR 0.2 //resize template to obtain a reasonable number of blocks for the hog features
+#define TEMPLATE_SCALE_FACTOR 0.1 //resize template to obtain a reasonable number of blocks for the hog features
 
 #define MAX_NUMBER_EXAMPLES 20000
 #define MAX_NUMBER_FEATURES 2000

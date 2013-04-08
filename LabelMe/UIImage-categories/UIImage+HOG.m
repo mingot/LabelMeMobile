@@ -248,8 +248,8 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     
     // Normalization of each block of cells
     for (int x = 0; x < hog.numBlocksX; x++) {
-        for (int y = 0; y < hog.numBlocksY; y++)
-        {
+        for (int y = 0; y < hog.numBlocksY; y++){
+            
             double *dst = feat + x*hog.numBlocksY + y;
             double *src, *p, n1, n2, n3, n4;
             
@@ -386,6 +386,37 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     UIImage *image = [UIImage imageWithCGImage:ima scale:1.0 orientation:UIImageOrientationUp];
     return(image);
 }
+
++ (UIImage *) hogImageFromFeature:(HogFeature *)hogFeature
+{
+    int pix = 12;
+    int blocks[3] = {hogFeature.numBlocksY, hogFeature.numBlocksX, hogFeature.numFeaturesPerBlock};
+    UInt8 *imageBuffer = calloc(pix*pix*blocks[1]*blocks[0]*4,sizeof(UInt8)); //4 referring to the number of channels present in a RGB image
+    double *f = malloc(9*sizeof(double));
+    
+    for (int x=0; x<blocks[1]; x++){
+        for (int y=0; y<blocks[0]; y++){
+            for (int i=0; i<9; i++){  //Just plot of the unoriented features
+                f[i] = hogFeature.features[y + x*blocks[0] + blocks[1]*blocks[0]*(i+18)]; // for each block, we store in *f the features sequentially
+            }
+            [UIImage blockPicture:f :imageBuffer :pix :x :y :blocks[1] :blocks[0]];
+        }
+    }
+    
+    CGContextRef context = CGBitmapContextCreate(imageBuffer, //data
+                                                 blocks[1]*pix, //width
+                                                 blocks[0]*pix, //height
+                                                 8, //bits per component
+                                                 blocks[1]*pix*4, //bytes per row
+                                                 CGColorSpaceCreateDeviceRGB(),
+                                                 kCGImageAlphaPremultipliedLast ); //bitmap info
+    
+    CGImageRef ima = CGBitmapContextCreateImage(context);
+    CGContextRelease(context);
+    UIImage *image = [UIImage imageWithCGImage:ima scale:1.0 orientation:UIImageOrientationUp];
+    return(image);
+}
+
 
 + (void)blockPicture:(double *)features // compute the block picture for a block of HOG
                     :(UInt8 *)im //Image where to store the results

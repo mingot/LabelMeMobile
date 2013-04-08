@@ -371,6 +371,7 @@
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
     self.detectorView.image = [UIImage imageWithCIImage:result];
     
+    
     //output the initial training images
     //self.trainingSetController.listOfImages = listOfImages;
     //[self.navigationController pushViewController:self.trainingSetController animated:YES];
@@ -379,6 +380,9 @@
     [self.sendingView showMessage:@"Training begins!"];
     [self.svmClassifier train:trainingSet];
     [self.sendingView showMessage:@"Finished training"];
+
+    self.trainingSetController.listOfImages = self.svmClassifier.imageListAux;
+    [self.navigationController pushViewController:self.trainingSetController animated:YES];
     
     //update view of the detector
     //self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];

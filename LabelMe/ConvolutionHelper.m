@@ -62,12 +62,14 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
 
 - (double) fractionOfAreaOverlappingWith:(BoundingBox *) cp
 {
-    double area1, area2, unionArea, intersectionArea;
+    double area1, area2, unionArea, intersectionArea, a, b;
     
     area1 = (self.xmax - self.xmin)*(self.ymax - self.ymin);
     area2 = (cp.xmax - cp.xmin)*(cp.ymax - cp.ymin);
     
-    intersectionArea = (min(self.xmax, cp.xmax) - max(self.xmin, cp.xmin))*(min(self.ymax, cp.ymax) - max(self.ymin, cp.ymin));
+    a = (min(self.xmax, cp.xmax) - max(self.xmin, cp.xmin));
+    b = (min(self.ymax, cp.ymax) - max(self.ymin, cp.ymin));
+    intersectionArea = (a>0 && b>0) ? a*b : 0;
     unionArea = area1 + area2 - intersectionArea;
     if (intersectionArea == area1 || intersectionArea == area2) //one bb contain the other
         intersectionArea = unionArea;
