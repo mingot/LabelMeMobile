@@ -23,6 +23,7 @@
 
 @property int label;
 @property int imageIndex;
+@property int pyramidLevel;
 @property CGRect rectangle;
 
 @property CGPoint locationOnImageHog;

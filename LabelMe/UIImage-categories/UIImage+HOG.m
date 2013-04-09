@@ -384,6 +384,8 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     CGImageRef ima = CGBitmapContextCreateImage(context);
     CGContextRelease(context);
     UIImage *image = [UIImage imageWithCGImage:ima scale:1.0 orientation:UIImageOrientationUp];
+    free(imageBuffer);
+    free(f);
     return(image);
 }
 
@@ -414,6 +416,9 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     CGImageRef ima = CGBitmapContextCreateImage(context);
     CGContextRelease(context);
     UIImage *image = [UIImage imageWithCGImage:ima scale:1.0 orientation:UIImageOrientationUp];
+    free(imageBuffer);
+    free(f);
+    free(blocks);
     return(image);
 }
 

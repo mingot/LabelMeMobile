@@ -22,7 +22,10 @@
 
 @interface DetectorDescriptionViewController()
 
--(void) train;
+-(void) trainForImagesNames:(NSArray *)imagesNames;
+
+//generate a unique id
+- (NSString *)uuid;
 
 @end
 
@@ -112,7 +115,7 @@
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
     
     //set labels
-    self.targeClassLabel.text = self.svmClassifier.targetClass;
+    self.targetClassLabel.text = self.svmClassifier.targetClass;
     self.nameTextField.text = self.svmClassifier.name;
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
     
@@ -165,7 +168,7 @@
     [self setSaveButton:nil];
     [self setNameTextField:nil];
     [self setSendingView:nil];
-    [self setTargeClassLabel:nil];
+    [self setTargetClassLabel:nil];
     [self setTrainButton:nil];
     [super viewDidUnload];
 }
@@ -186,6 +189,7 @@
     self.modalTVC.delegate = self;
     self.modalTVC.modalTitle = @"Training Images";
     self.modalTVC.multipleChoice = NO;
+    self.availablePositiveImagesNames = nil; //to reset
     NSMutableArray *imagesList = [[NSMutableArray alloc] init];
     for(NSString *imageName in self.availablePositiveImagesNames){
         [imagesList addObject:[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.resourcesPaths objectAtIndex:THUMB],imageName]]];
@@ -271,7 +275,9 @@
     if([identifier isEqualToString:@"Select Class"]){
         NSNumber *sel = [selectedItems objectAtIndex:0];
         self.svmClassifier.targetClass = [self.availableObjectClasses objectAtIndex:sel.intValue];
-        self.targeClassLabel.text = self.svmClassifier.targetClass;
+        self.targetClassLabel.text = self.svmClassifier.targetClass;
+        self.svmClassifier.name = [NSString stringWithFormat:@"%@%@",self.svmClassifier.targetClass, [self uuid]];
+        self.nameTextField.text = self.svmClassifier.name;
         
         NSLog(@"selected class:%@", self.svmClassifier.targetClass);
         
@@ -291,6 +297,8 @@
         //train in a different thread
         dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
         dispatch_async(myQueue, ^{
+            free(self.svmClassifier.weightsP);
+            free(self.svmClassifier.sizesP);
             [self trainForImagesNames:traingImagesNames];
         });
     }
@@ -345,15 +353,13 @@
     }
     
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of boxes: %d", trainingSet.groundTruthBoundingBoxes.count]];
     
     
     [trainingSet initialFill];
     
     //constructing intial set of cropped images for visualization and image averaging
     NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
-    for(int i=0; i<trainingSet.boundingBoxes.count; i++){
-        BoundingBox *cp = [trainingSet.boundingBoxes objectAtIndex:i];
+    for(BoundingBox *cp in trainingSet.boundingBoxes){
         UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
         UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
         [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
@@ -395,5 +401,13 @@
 }
 
 
+- (NSString *)uuid
+{
+    CFUUIDRef uuidRef = CFUUIDCreate(NULL);
+    CFStringRef uuidStringRef = CFUUIDCreateString(NULL, uuidRef);
+    CFRelease(uuidRef);
+    NSString *result = (__bridge NSString *) uuidStringRef;
+    return [result substringToIndex:8];
+}
 
 @end

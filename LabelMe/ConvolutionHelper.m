@@ -26,6 +26,7 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
 @synthesize xmax = _xmax;
 @synthesize label = _label;
 @synthesize imageIndex = _imageIndex;
+@synthesize pyramidLevel = _pyramidLevel;
 @synthesize rectangle = _rectangle;
 @synthesize locationOnImageHog = _locationOnImageHog;
 @synthesize imageHogIndex = _imageHogIndex;
@@ -137,20 +138,13 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
    maxOverlapArea:(double)overlap
 minScoreThreshold:(double)scoreThreshold
 {
-    
-    // Sort the convolution points by its score descending
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"score" ascending:NO];
-    NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
-    NSArray *sortedArray = [boundingBoxesCandidates sortedArrayUsingDescriptors:sortDescriptors];
-    if (sortedArray.count <= 0)
-        return nil;
 
     NSMutableArray *result = [[NSMutableArray alloc] init];
     
     // select only those bounding boxes with score above the threshold and non overlapping areas
-    for (int i = 0; i<sortedArray.count; i++){
+    for (int i = 0; i<boundingBoxesCandidates.count; i++){
         BOOL selected = YES;
-        BoundingBox *point = [sortedArray objectAtIndex:i];
+        BoundingBox *point = [boundingBoxesCandidates objectAtIndex:i];
     
         if (point.score < scoreThreshold)
             break;

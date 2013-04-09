@@ -36,7 +36,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *saveButton;
 @property (weak, nonatomic) IBOutlet UIImageView *detectorView;
 @property (weak, nonatomic) IBOutlet UITextField *nameTextField;
-@property (weak, nonatomic) IBOutlet UILabel *targeClassLabel;
+@property (weak, nonatomic) IBOutlet UILabel *targetClassLabel;
 
 @property (strong, nonatomic) Classifier *svmClassifier;
 @property (strong, nonatomic) NSString *userPath;

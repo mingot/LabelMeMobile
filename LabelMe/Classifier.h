@@ -21,7 +21,6 @@
 
 @interface Classifier : NSObject <NSCoding>
 
-
 //pointer version of size and weights
 @property double *weightsP;
 @property int *sizesP;
@@ -30,7 +29,9 @@
 @property BOOL isLearning;
 @property NSMutableArray *imageListAux;
 
-
+//for pyramid limits
+@property int ini;
+@property int fin;
 
 
 //Encoding properties
@@ -41,6 +42,7 @@
 @property (strong, nonatomic) NSNumber *numberSV;
 @property (strong, nonatomic) NSNumber *numberOfPositives;
 @property (strong, nonatomic) NSArray *precisionRecall;
+
 
 
 

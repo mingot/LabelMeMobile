@@ -15,6 +15,8 @@
 @property (strong, nonatomic) NSMutableArray *boundingBoxes; //BoundingBox
 
 @property CGSize templateSize;
+//ratio between the average area of the bounding boxes inside the images
+@property float areaRatio;
 
 @property float *imageFeatures; //the features for the wole trainingset
 @property float *labels; //the corresponding labels
@@ -24,7 +26,5 @@
 //Given a training set of images and ground truth bounding boxes it generates a set of positive and negative bounding boxes for training
 - (void) initialFill;
 
-//Generates the hog features given the bounding boxes begining after numSV positions, corresponding to the sv
-- (void) generateFeaturesForBoundingBoxesWithNumSV:(int)numSV;
 
 @end
