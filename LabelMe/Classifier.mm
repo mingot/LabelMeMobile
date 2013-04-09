@@ -64,8 +64,8 @@ using namespace cv;
 @synthesize numberOfPositives = _numberOfPositives;
 @synthesize precisionRecall = _precisionRecall;
 
-@synthesize ini = _ini;
-@synthesize fin = _fin;
+@synthesize iniPyramid = _iniPyramid;
+@synthesize finPyramid = _finPyramid;
 
 
 #pragma mark
@@ -272,8 +272,8 @@ using namespace cv;
     double scale = pow(2, 1.0/numberPyramids);
 
     //Pyramid calculation
-    if(self.fin == 0) self.fin = numberPyramids;
-    for (int i=self.ini; i<self.fin; i++){
+    if(self.finPyramid == 0) self.finPyramid = numberPyramids;
+    for (int i=self.iniPyramid; i<self.finPyramid; i++){
         UIImage *im = [image scaleImageTo:initialScale/pow(scale, i)];
         [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:im for:i]];
     }
@@ -288,11 +288,11 @@ using namespace cv;
     
     if(!self.isLearning && nmsArray.count > 0){
         int level = [(BoundingBox*)[nmsArray objectAtIndex:0] pyramidLevel];
-        self.ini = level>1 ? level - 1 : 0;
-        self.fin = level<numberPyramids ? level + 1 :numberPyramids;
+        self.iniPyramid = level>1 ? level - 1 : 0;
+        self.finPyramid = level<numberPyramids ? level + 1 :numberPyramids;
     }else{
-        self.ini = 0;
-        self.fin = numberPyramids;
+        self.iniPyramid = 0;
+        self.finPyramid = numberPyramids;
     }
     
     

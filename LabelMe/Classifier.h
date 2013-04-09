@@ -29,10 +29,9 @@
 @property BOOL isLearning;
 @property NSMutableArray *imageListAux;
 
-//for pyramid limits
-@property int ini;
-@property int fin;
-
+//pyramid limits for detection in execution
+@property int iniPyramid;
+@property int finPyramid;
 
 //Encoding properties
 @property (strong, nonatomic) NSString *name;
@@ -42,7 +41,6 @@
 @property (strong, nonatomic) NSNumber *numberSV;
 @property (strong, nonatomic) NSNumber *numberOfPositives;
 @property (strong, nonatomic) NSArray *precisionRecall;
-
 
 
 
