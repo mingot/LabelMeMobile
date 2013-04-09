@@ -42,7 +42,6 @@
 {
     [super viewDidLoad];
     
-    
     if(self.selectedItems.count == 0){
         self.doneButton.enabled = NO;
         self.doneButton.alpha = 0.6f;
@@ -53,9 +52,10 @@
     if([[self.data objectAtIndex:0] isKindOfClass:[UIImage class]])
         self.isGrid = YES;
     
+    self.cancelButton.hidden = YES;
     if(self.isGrid){
         self.tableView.rowHeight = (0.225*self.view.frame.size.width*ceil((float)self.data.count/4) + 0.0375*self.view.frame.size.width);
-        
+        self.cancelButton.hidden = NO;
     }
     
     //TODO: in grid mode, no distinction between multiplechoice.
@@ -197,6 +197,10 @@
     [self toggleDoneButton];
 }
 
+- (IBAction)cancelAction:(id)sender {
+    [self dismissModalViewControllerAnimated:YES];
+}
+
 #pragma mark
 #pragma mark - Private methods
 
@@ -257,4 +261,8 @@
 }
 
 
+- (void)viewDidUnload {
+    [self setCancelButton:nil];
+    [super viewDidUnload];
+}
 @end

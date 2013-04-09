@@ -26,6 +26,7 @@
 @property (strong, nonatomic) NSMutableArray *selectedItems;
 @property (strong, nonatomic) id<ModalTVCDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
+@property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 //unique name to identify the modal
 @property (strong, nonatomic) NSString *modalTitle;
@@ -33,6 +34,8 @@
 
 
 - (IBAction)doneAction:(id)sender;
+- (IBAction)cancelAction:(id)sender;
 - (IBAction)imageSelectedAction:(UIButton *)button;
+
 
 @end
