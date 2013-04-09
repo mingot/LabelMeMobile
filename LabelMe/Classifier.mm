@@ -36,7 +36,7 @@ using namespace cv;
 - (void) showOrientationHistogram;
 
 //make the convolution of the classifier with the image and return de detected bounding boxes
-- (NSArray *) getBoundingBoxesIn:(UIImage *)image for:(int) pyramidLevel;
+- (NSArray *) getBoundingBoxesIn:(HogFeature *)imageHog forPyramid:(int)pyramidLevel forIndex:(int)imageHogIndex;
 
 //add a selected bounding box to the training buffer
 -(void) addExample:(BoundingBox *)p to:(TrainingSet *)trainingSet;
@@ -52,9 +52,11 @@ using namespace cv;
 
 @synthesize weightsP = _weightsP;
 @synthesize sizesP = _sizesP;
-@synthesize imagesHogPyramid = _imagesHogPyramid;
 @synthesize delegate = _delegate;
 @synthesize isLearning = _isLearning;
+
+@synthesize iniPyramid = _iniPyramid;
+@synthesize finPyramid = _finPyramid;
 
 @synthesize weights = _weights;
 @synthesize sizes = _sizes;
@@ -64,8 +66,11 @@ using namespace cv;
 @synthesize numberOfPositives = _numberOfPositives;
 @synthesize precisionRecall = _precisionRecall;
 
-@synthesize iniPyramid = _iniPyramid;
-@synthesize finPyramid = _finPyramid;
+@synthesize receivedImages = _receivedImages;
+@synthesize imagesHogPyramid = _imagesHogPyramid;
+
+
+
 
 
 #pragma mark
@@ -126,11 +131,14 @@ using namespace cv;
 {
     self.isLearning = YES;
     self.imageListAux = [[NSMutableArray alloc] init];
+    self.imagesHogPyramid = [[NSMutableArray alloc] init];
+    self.receivedImages = [[NSMutableArray alloc] init];
+    
     
     // Get the template size and get hog feautures dimension
     float ratio = trainingSet.templateSize.width/trainingSet.templateSize.height;
     self.sizesP = (int *) malloc(3*sizeof(int));
-    self.sizesP[0] = 40*trainingSet.areaRatio + 3; //Determined empirically to ajust the size of the template according to the size in the training set
+    self.sizesP[0] = round(40*trainingSet.areaRatio + 4); //Determined empirically to ajust the size of the template according to the size in the training set
     self.sizesP[1] = round(self.sizesP[0]*ratio);
     self.sizesP[2] = 31;
     int numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];
@@ -169,7 +177,6 @@ using namespace cv;
         for(BoundingBox *groundTruthBoundingBox in trainingSet.groundTruthBoundingBoxes){
             
             // Get new bounding boxes by running the detector
-            self.imagesHogPyramid = [[NSMutableArray alloc] init];
             UIImage *image = [trainingSet.images objectAtIndex:groundTruthBoundingBox.imageIndex];
             NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp];
             
@@ -191,7 +198,6 @@ using namespace cv;
 
         }
         [self.delegate sendMessage:[NSString stringWithFormat:@"added:%d positives", positives]];
-        self.imagesHogPyramid = nil;
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //Train the SVM, update weights and store support vectors and labels
@@ -271,11 +277,43 @@ using namespace cv;
     double initialScale = MAX_IMAGE_SIZE/image.size.height;
     double scale = pow(2, 1.0/numberPyramids);
 
-    //Pyramid calculation
+    //Pyramid limits
     if(self.finPyramid == 0) self.finPyramid = numberPyramids;
+    
+    //locate pyramids already calculated in the buffer
+    BOOL found;
+    NSUInteger index;
+    if(self.isLearning){
+        found = YES;
+        index = [self.receivedImages indexOfObject:image];
+        if(index == NSNotFound or self.receivedImages.count == 0){
+            [self.receivedImages addObject:image];
+            found = NO;
+        }
+    }
+    
+    //pyramid
     for (int i=self.iniPyramid; i<self.finPyramid; i++){
-        UIImage *im = [image scaleImageTo:initialScale/pow(scale, i)];
-        [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:im for:i]];
+        HogFeature *imageHog;
+        if(!self.isLearning){
+            UIImage *im = [image scaleImageTo:initialScale/pow(scale, i)];
+            imageHog = [im obtainHogFeatures];
+            [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:0]];
+        }else{
+            if (!found) {
+                UIImage *im = [image scaleImageTo:initialScale/pow(scale, i)];
+                imageHog = [im obtainHogFeatures];
+                int indexRR = 0;
+                [self.imagesHogPyramid addObject:imageHog];
+                indexRR = self.imagesHogPyramid.count - 1;
+                NSLog(@"Not found, so storing at index: %d", indexRR);
+                [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:indexRR]];
+            }else{
+                NSLog(@"Found at index: %d for level:%d", index, i);
+                imageHog = (HogFeature *)[self.imagesHogPyramid objectAtIndex:(index*numberPyramids + i)];
+                [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:(index*numberPyramids + i)]];
+            }
+        }
     }
     
     //sort array of bounding boxes by score
@@ -416,9 +454,8 @@ using namespace cv;
 }
 
 
-- (NSArray *) getBoundingBoxesIn:(UIImage *)image for:(int)pyramidLevel
+- (NSArray *) getBoundingBoxesIn:(HogFeature *)imageHog forPyramid:(int)pyramidLevel forIndex:(int)imageHogIndex
 {
-    HogFeature *imageHog = [image obtainHogFeatures];
     int blocks[2] = {imageHog.numBlocksY, imageHog.numBlocksX};
     
     int convolutionSize[2];
@@ -430,7 +467,7 @@ using namespace cv;
     NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:convolutionSize[0]*convolutionSize[1]];
     double *c = (double *) calloc(convolutionSize[0]*convolutionSize[1],sizeof(double)); //initialize the convolution result
     
-    // Make the convolution for each feature and add them to the result.
+    // convolve and add the result
     for (int f = 0; f < self.sizesP[2]; f++){
         
         double *dst = c;
@@ -443,7 +480,7 @@ using namespace cv;
         
     }
     
-    //detect the object
+    //detect max in the convolution
     double bias = self.weightsP[self.sizesP[0]*self.sizesP[1]*self.sizesP[2]];
     for (int x = 0; x < convolutionSize[1]; x++) {
         for (int y = 0; y < convolutionSize[0]; y++) {
@@ -460,11 +497,7 @@ using namespace cv;
                 //save the location and image hog for the later feature extraction during the learning
                 if(self.isLearning){
                     p.locationOnImageHog = CGPointMake(x, y);
-                    NSUInteger index = [self.imagesHogPyramid indexOfObject:imageHog];
-                    if( index == NSNotFound){
-                        [self.imagesHogPyramid addObject:imageHog];
-                        p.imageHogIndex = self.imagesHogPyramid.count - 1;
-                    }else p.imageHogIndex = index;
+                    p.imageHogIndex = imageHogIndex;
                 }
                 [result addObject:p];
             }

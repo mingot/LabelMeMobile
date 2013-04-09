@@ -24,7 +24,6 @@
 //pointer version of size and weights
 @property double *weightsP;
 @property int *sizesP;
-@property (strong, nonatomic) NSMutableArray *imagesHogPyramid;
 @property (strong, nonatomic) id<ClassifierDelegate> delegate;
 @property BOOL isLearning;
 @property NSMutableArray *imageListAux;
@@ -42,6 +41,9 @@
 @property (strong, nonatomic) NSNumber *numberOfPositives;
 @property (strong, nonatomic) NSArray *precisionRecall;
 
+//detector buffer (when training)
+@property (strong, nonatomic) NSMutableArray *receivedImages;
+@property (strong, nonatomic) NSMutableArray *imagesHogPyramid;
 
 
 //Initialization of the classifier given the weight vectors of it
