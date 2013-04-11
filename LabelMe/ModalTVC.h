@@ -16,7 +16,6 @@
 @end
 
 
-
 @interface ModalTVC : UIViewController <UITableViewDelegate,UITableViewDataSource>
 
 //model

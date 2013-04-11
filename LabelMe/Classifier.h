@@ -15,6 +15,7 @@
 
 //Send a message to the delegate (to output as a debug during the traingnin)
 - (void) sendMessage:(NSString *) message;
+- (void) updateProgress:(float) prog;
 
 @end
 

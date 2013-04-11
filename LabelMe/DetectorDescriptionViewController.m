@@ -52,7 +52,8 @@
 
 
 
-
+#pragma mark
+#pragma mark - Setters and Getters
 
 -(NSArray *) availablePositiveImagesNames
 {
@@ -65,8 +66,8 @@
             NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
             NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
             for(Box *box in objects)
-                if([box.label isEqualToString:self.svmClassifier.targetClass])
-                    [list addObject:imageName];
+                if([box.label isEqualToString:self.svmClassifier.targetClass] && [list indexOfObject:imageName]==NSNotFound)
+                        [list addObject:imageName];
         }
         _availablePositiveImagesNames = [NSArray arrayWithArray:list];
     }
@@ -151,7 +152,7 @@
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     self.sendingView.delegate = self;
     self.sendingView.hidden = YES;
-    self.sendingView.progressView.hidden = YES;
+    self.sendingView.progressView.hidden = NO;
     self.sendingView.label.numberOfLines = 0;
     self.sendingView.label.frame = CGRectMake(20,20,300,400);
     self.sendingView.label.font = [UIFont fontWithName:@"AmericanTypewriter" size:10];
@@ -184,6 +185,8 @@
 
 - (IBAction)trainAction:(id)sender
 {
+    
+    [self.sendingView.progressView setProgress:0 animated:YES];
     //show modal to select training positives for the selected class
     self.modalTVC = [[ModalTVC alloc] init];
     self.modalTVC.delegate = self;
@@ -263,7 +266,15 @@
 
 -(void) sendMessage:(NSString *)message
 {
+
     [self.sendingView showMessage:message];
+}
+
+-(void) updateProgress:(float)prog
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.sendingView.progressView setProgress:prog animated:YES];
+    });
 }
 
 
@@ -383,6 +394,7 @@
     //[self.navigationController pushViewController:self.trainingSetController animated:YES];
     
     //learn
+    [self updateProgress:0.05];
     [self.sendingView showMessage:@"Training begins!"];
     [self.svmClassifier train:trainingSet];
     [self.sendingView showMessage:@"Finished training"];

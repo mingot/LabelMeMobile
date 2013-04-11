@@ -162,6 +162,9 @@
 		A5FAF9FE1642D830002B56B4 /* navbarBg.png in Resources */ = {isa = PBXBuildFile; fileRef = A5FAF9FC1642D830002B56B4 /* navbarBg.png */; };
 		A5FAF9FF1642D830002B56B4 /* navbarBg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A5FAF9FD1642D830002B56B4 /* navbarBg@2x.png */; };
 		A5FAFA0916430D37002B56B4 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5FAFA0816430D37002B56B4 /* AssetsLibrary.framework */; };
+		FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC4D68801716164E002A73AD /* CoreMotion.framework */; };
+		FC4D688A17167036002A73AD /* ThreeDimVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4D688817167036002A73AD /* ThreeDimVC.m */; };
+		FC4D688B17167036002A73AD /* ThreeDimVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC4D688917167036002A73AD /* ThreeDimVC.xib */; };
 		FC5C939A16FCB89900637B69 /* app login-11.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C939916FCB89900637B69 /* app login-11.png */; };
 		FC5C939C16FCB8A600637B69 /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C939B16FCB8A600637B69 /* tick.png */; };
 		FC5C939E16FCB8AE00637B69 /* cruz.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C939D16FCB8AE00637B69 /* cruz.png */; };
@@ -383,6 +386,10 @@
 		A5FAF9FC1642D830002B56B4 /* navbarBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navbarBg.png; sourceTree = "<group>"; };
 		A5FAF9FD1642D830002B56B4 /* navbarBg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navbarBg@2x.png"; sourceTree = "<group>"; };
 		A5FAFA0816430D37002B56B4 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		FC4D68801716164E002A73AD /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		FC4D688717167036002A73AD /* ThreeDimVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThreeDimVC.h; path = ../ThreeDimVC.h; sourceTree = "<group>"; };
+		FC4D688817167036002A73AD /* ThreeDimVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ThreeDimVC.m; path = ../ThreeDimVC.m; sourceTree = "<group>"; };
+		FC4D688917167036002A73AD /* ThreeDimVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ThreeDimVC.xib; path = ../ThreeDimVC.xib; sourceTree = "<group>"; };
 		FC5C939916FCB89900637B69 /* app login-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "app login-11.png"; path = "../archivos/app login-11.png"; sourceTree = "<group>"; };
 		FC5C939B16FCB8A600637B69 /* tick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tick.png; path = ../archivos/tick.png; sourceTree = "<group>"; };
 		FC5C939D16FCB8AE00637B69 /* cruz.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cruz.png; path = ../archivos/cruz.png; sourceTree = "<group>"; };
@@ -431,6 +438,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */,
 				FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */,
 				FCED8976170354010027CBE1 /* CoreVideo.framework in Frameworks */,
 				FCED8974170353FB0027CBE1 /* CoreMedia.framework in Frameworks */,
@@ -502,6 +510,7 @@
 		A558D60A16134E0B001DED8C = {
 			isa = PBXGroup;
 			children = (
+				FC4D68801716164E002A73AD /* CoreMotion.framework */,
 				FC610AF3170A36D800851AC2 /* CoreImage.framework */,
 				A558D61F16134E0C001DED8C /* LabelMe */,
 				A558D61816134E0C001DED8C /* Frameworks */,
@@ -722,6 +731,8 @@
 				FC5C93A916FCFA9000637B69 /* DetectorDescriptionViewController.m */,
 				FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */,
 				FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */,
+				FC4D688717167036002A73AD /* ThreeDimVC.h */,
+				FC4D688817167036002A73AD /* ThreeDimVC.m */,
 				FC5C93AD16FCFE8C00637B69 /* TrainDetectorViewController.h */,
 				FC5C93AE16FCFE8D00637B69 /* TrainDetectorViewController.m */,
 				FCED897B170375050027CBE1 /* ShowTrainingSetViewController.h */,
@@ -775,6 +786,7 @@
 				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
 				FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */,
 				FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */,
+				FC4D688917167036002A73AD /* ThreeDimVC.xib */,
 				FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */,
 				FCED897D170375050027CBE1 /* ShowTrainingSetViewController.xib */,
 				FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */,
@@ -969,6 +981,7 @@
 				FCED897F170375050027CBE1 /* ShowTrainingSetViewController.xib in Resources */,
 				FCED898417037A5F0027CBE1 /* ShowImageViewController.xib in Resources */,
 				FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */,
+				FC4D688B17167036002A73AD /* ThreeDimVC.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1015,6 +1028,7 @@
 				FCED898317037A5F0027CBE1 /* ShowImageViewController.m in Sources */,
 				FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */,
 				FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */,
+				FC4D688A17167036002A73AD /* ThreeDimVC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

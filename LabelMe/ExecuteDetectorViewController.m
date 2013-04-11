@@ -26,6 +26,10 @@
 @synthesize detectionThresholdSliderButton = _detectionThresholdSliderButton;
 @synthesize  fpsLabel = _fpsLabel;
 
+//detection
+@synthesize trainingSetController = _trainingSetController;
+@synthesize imagesList = _imagesList;
+
 
 
 - (BOOL) shouldAutorotate
@@ -39,6 +43,15 @@
 {
     // Initialitzation after the view load and all the outlets are hooked
     [super viewDidLoad];
+    
+    //image poistion detection
+    self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
+    self.threeDimVC = [[ThreeDimVC alloc] initWithNibName:@"ThreeDimVC" bundle:nil];
+    self.imagesList = [[NSMutableArray alloc] init];
+    self.rollList = [[NSMutableArray alloc] init];
+    self.positionsDic = [[NSMutableDictionary alloc] init];
+    self.motionManager = [[CMMotionManager alloc] init];
+    [self.motionManager startDeviceMotionUpdates];
     
     self.prevLayer = nil;
     
@@ -158,6 +171,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         CGColorSpaceRelease(colorSpace);
         
         
+        
         double detectionThreshold = -1 + (self.maxDetectionScore + 1)*self.detectionThresholdSliderButton.value;
         NSArray *nmsArray = [self.svmClassifier detect:
                              [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight]
@@ -172,19 +186,18 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         [self.detectView performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
         
         // Update the navigation controller title with some information about the detection
-        if (nmsArray.count > 0)
-        {
+        if (nmsArray.count > 0){
             BoundingBox *score = [nmsArray objectAtIndex:0];
             [self performSelectorOnMainThread:@selector(setTitle:) withObject:[NSString stringWithFormat:@"%3f",score.score] waitUntilDone:YES];
             if(score.score > self.maxDetectionScore) self.maxDetectionScore = score.score;
+            //[self takePicture:nmsArray for:[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight]];
             
-        } else{
-            [self performSelectorOnMainThread:@selector(setTitle:) withObject:@"No detection." waitUntilDone:YES];
-        }
+        } else [self performSelectorOnMainThread:@selector(setTitle:) withObject:@"No detection." waitUntilDone:YES];
+        
+        
         
         //Put the HOG picture on screen
-        if (hogOnScreen)
-        {
+        if (hogOnScreen){
             UIImage *image = [ [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight] scaleImageTo:230/480.0] convertToHogImage];
             [self.HOGimageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:YES];
         }
@@ -203,12 +216,14 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #pragma mark -
 #pragma mark Settings delegate
 
--(void) setHOGValue:(BOOL) value{
+-(void) setHOGValue:(BOOL) value
+{
     hogOnScreen = value;
     if(!value) [self.HOGimageView performSelectorOnMainThread:@selector(setImage:) withObject:nil waitUntilDone:YES];
 }
 
--(void) setNumMaximums:(BOOL) value{
+-(void) setNumMaximums:(BOOL) value
+{
     numMax = value ? 10 : 1;
 }
 
@@ -231,6 +246,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #pragma mark Memory management
 
 - (void)viewDidUnload {
+    [self setShowImagesButton:nil];
     [self setFpsLabel:nil];
     [self setDetectionThresholdSliderButton:nil];
     NSLog(@"viewdidunload");
@@ -242,6 +258,54 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.captureSession stopRunning];
     [self.detectView reset];
 }
+
+
+
+#pragma mark
+#pragma mark - Position images
+
+- (IBAction)showImagesAction:(id)sender
+{
+    self.trainingSetController.listOfImages = self.imagesList;
+    [self.navigationController pushViewController:self.trainingSetController animated:YES];
+}
+
+- (IBAction)showModelAction:(id)sender
+{
+    //sort images
+    //load images in the model
+//    self.threeDimVC.imageList = self.imagesList;
+    self.threeDimVC.positionsDic = self.positionsDic;
+    [self.navigationController pushViewController:self.threeDimVC animated:YES];
+    
+}
+
+- (void) takePicture:(NSArray *)nmsArray for:(UIImage *)image
+{
+    BoundingBox *bb = [nmsArray objectAtIndex:0];
+    CMAttitude *attitude = self.motionManager.deviceMotion.attitude;
+//    NSLog(@"pitch: %f, yaw:%f, roll:%f", attitude.pitch, attitude.yaw, attitude.roll);
+    
+
+
+    NSString *key = [NSString stringWithFormat:@"%d_%d",20 + (int)round(attitude.pitch*10),20 + (int)round(attitude.roll*10)];
+    if(self.positionsDic.count == 0 || [self.positionsDic objectForKey:key]==nil){
+        [self.positionsDic setObject:[image croppedImage:[bb rectangleForImage:image]] forKey:key];
+        NSLog(@"Added key %@ and total: %d", key, self.positionsDic.count);
+    }
+//    int normalizedRoll = round(attitude.pitch*10);
+//    if(self.rollList.count == 0){
+//        [self.rollList addObject:[NSNumber numberWithInt:normalizedRoll]];
+//        
+//    }else if([self.rollList indexOfObject:[NSNumber numberWithInt:normalizedRoll]]==NSNotFound){
+//        [self.rollList addObject:[NSNumber numberWithInt:normalizedRoll]];
+//        [self.imagesList addObject:[image croppedImage:[bb rectangleForImage:image]]];
+//        NSLog(@"%@",self.rollList);
+//    }
+    
+    
+}
+
 
 
 @end

@@ -55,6 +55,7 @@
     self.cancelButton.hidden = YES;
     if(self.isGrid){
         self.tableView.rowHeight = (0.225*self.view.frame.size.width*ceil((float)self.data.count/4) + 0.0375*self.view.frame.size.width);
+        //TODO: hidden button made from the caller, more genearl approach
         self.cancelButton.hidden = NO;
     }
     

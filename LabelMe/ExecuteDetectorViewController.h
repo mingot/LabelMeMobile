@@ -12,11 +12,14 @@
 #import <CoreVideo/CoreVideo.h>
 #import <CoreMedia/CoreMedia.h>
 #import <CoreLocation/CoreLocation.h>
+#import <CoreMotion/CoreMotion.h>
 
 
 #import "DetectView.h"
 #import "SettingsViewController.h"
 #import "Classifier.h"
+#import "ShowTrainingSetViewController.h"
+#import "ThreeDimVC.h"
 
 
 @interface ExecuteDetectorViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate>
@@ -25,6 +28,18 @@
     BOOL hogOnScreen;
     int numMax;
 }
+
+
+//position detection
+@property (nonatomic, strong) ShowTrainingSetViewController *trainingSetController;
+@property (nonatomic, strong) ThreeDimVC *threeDimVC;
+@property (nonatomic, strong) NSMutableArray *imagesList;
+@property (nonatomic, strong) NSMutableArray *rollList;
+@property (nonatomic, strong) NSMutableDictionary *positionsDic;
+@property (weak, nonatomic) IBOutlet UIButton *showImagesButton;
+@property (nonatomic, strong) CMMotionManager *motionManager;
+- (IBAction)showImagesAction:(id)sender;
+- (IBAction)showModelAction:(id)sender;
 
 
 //model properties

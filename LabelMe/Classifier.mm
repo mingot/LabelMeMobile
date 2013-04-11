@@ -174,29 +174,32 @@ using namespace cv;
         positives = 0;
         trainingSet.numberOfTrainingExamples = numSupportVectors;
         
-        for(BoundingBox *groundTruthBoundingBox in trainingSet.groundTruthBoundingBoxes){
-            
-            // Get new bounding boxes by running the detector
-            UIImage *image = [trainingSet.images objectAtIndex:groundTruthBoundingBox.imageIndex];
+        for(int i=0; i<trainingSet.images.count; i++){
+            UIImage *image = [trainingSet.images objectAtIndex:i];
             NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp];
-            
-            NSLog(@"Number of new bb obtained for image %d: %d", groundTruthBoundingBox.imageIndex, newBoundingBoxes.count);
-            //the rest that are less than an overlap threshold are considered negatives
-            int quota = 100;
-            for(BoundingBox *boundingBox in newBoundingBoxes){
-                double overlapArea = [boundingBox fractionOfAreaOverlappingWith:groundTruthBoundingBox];
-                if (overlapArea < 0.25 && quota>0){
-                    boundingBox.label = -1;
+            [self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %d: %d", i, newBoundingBoxes.count]];
+            int quota =100;
+            for(BoundingBox *newBB in newBoundingBoxes){
+                BOOL isNegative = NO;
+                for(BoundingBox *groundTruthBB in trainingSet.groundTruthBoundingBoxes){
+                    if(groundTruthBB.imageIndex == i){
+                        double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];
+                        if (overlapArea > 0.8 && overlapArea<1){
+                            newBB.label = 1;
+                            isNegative = NO;
+                            [self addExample:newBB to:trainingSet];
+                            positives ++;
+                        }else if(overlapArea < 0.25 && quota>0) isNegative = YES;
+                    }
+                }
+                if(isNegative){
+                    newBB.label = -1;
                     quota--;
-                    [self addExample:boundingBox to:trainingSet];
-                }else if (overlapArea > 0.8 && overlapArea<1){
-                    boundingBox.label = 1;
-                    [self addExample:boundingBox to:trainingSet];
-                    positives ++;
+                    [self addExample:newBB to:trainingSet];
                 }
             }
-
         }
+
         [self.delegate sendMessage:[NSString stringWithFormat:@"added:%d positives", positives]];
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -245,6 +248,7 @@ using namespace cv;
         [self.delegate sendMessage:[NSString stringWithFormat:@"bias: %f", self.weightsP[numOfFeatures]]];
         
         diff = [self computeDifferenceOfWeights];
+        if(iter!=1) [self.delegate updateProgress:STOP_CRITERIA/diff];
         
         //update information about the classifier
         self.numberOfPositives = [NSNumber numberWithInt:positives];
@@ -252,6 +256,7 @@ using namespace cv;
     }
     
     //See the results on training set
+    [self.delegate updateProgress:1];
     [self testOnSet:trainingSet atThresHold:0];
     self.isLearning = NO;
     self.imagesHogPyramid = nil;
@@ -306,10 +311,8 @@ using namespace cv;
                 int indexRR = 0;
                 [self.imagesHogPyramid addObject:imageHog];
                 indexRR = self.imagesHogPyramid.count - 1;
-                NSLog(@"Not found, so storing at index: %d", indexRR);
                 [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:indexRR]];
             }else{
-                NSLog(@"Found at index: %d for level:%d", index, i);
                 imageHog = (HogFeature *)[self.imagesHogPyramid objectAtIndex:(index*numberPyramids + i)];
                 [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:(index*numberPyramids + i)]];
             }
@@ -529,8 +532,8 @@ using namespace cv;
                 ramonet[sweeping1] = imageHog.features[boundingBoxPosition + sweeping2];
             }
     if(p.label == 1){
-        [self.imageListAux addObject:[UIImage hogImageFromFeature:imageHog]];
-        [self.imageListAux addObject:[UIImage hogImageFromFeatures:ramonet withSize:self.sizesP]];
+//        [self.imageListAux addObject:[UIImage hogImageFromFeature:imageHog]];
+//        [self.imageListAux addObject:[UIImage hogImageFromFeatures:ramonet withSize:self.sizesP]];
 //        NSLog(@"********ADDED IMAGE**********");
 //        NSLog(@"on image: %d, %d with template size: %d, %d", imageHog.numBlocksX, imageHog.numBlocksY, self.sizesP[0], self.sizesP[1]);
 //        NSLog(@"(x,y): (%f,%f)", p.locationOnImageHog.x, p.locationOnImageHog.y);
