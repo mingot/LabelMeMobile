@@ -48,7 +48,7 @@
     CMAttitude *attitude = self.motionManager.deviceMotion.attitude;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *key = [NSString stringWithFormat:@"%d_%d",20 + (int)round(attitude.pitch*10),20 + (int)round(attitude.roll*10)];
+        NSString *key = [NSString stringWithFormat:@"%d/%d",(int)round(attitude.pitch*10), (int)round(attitude.roll*10)];
         UIImage *image = [self.positionsDic objectForKey:key];
         if(image){
             self.imageView.image = image;

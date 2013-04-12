@@ -17,17 +17,31 @@
 
 using namespace cv;
 
-#define debugging YES
-#define MAX_NUMBER_EXAMPLES 20000
-#define MAX_NUMBER_FEATURES 2000
-#define STOP_CRITERIA 0.05
-
-
+#define MAX_NUMBER_EXAMPLES (500+200)*20 //max number of examples in buffer, (500neg + 200pos)*20images
+#define MAX_QUOTA 500 //max negative examples (bb) per iteration
+#define STOP_CRITERIA 0.05 
 #define MAX_IMAGE_SIZE 300.0
 
 
 
 @interface Classifier ()
+{
+    int numOfFeatures;
+    int numSupportVectors;
+    float diff;
+}
+
+
+@property BOOL isLearning;
+
+
+//pyramid limits for detection in execution
+@property int iniPyramid;
+@property int finPyramid;
+
+//detector buffer (when training)
+@property (strong, nonatomic) NSMutableArray *receivedImages;
+@property (strong, nonatomic) NSMutableArray *imagesHogPyramid;
 
 //store the weights of the last iteration for convergence
 @property double *weightsPLast;
@@ -54,9 +68,10 @@ using namespace cv;
 @synthesize sizesP = _sizesP;
 @synthesize delegate = _delegate;
 @synthesize isLearning = _isLearning;
-
 @synthesize iniPyramid = _iniPyramid;
 @synthesize finPyramid = _finPyramid;
+@synthesize receivedImages = _receivedImages;
+@synthesize imagesHogPyramid = _imagesHogPyramid;
 
 @synthesize weights = _weights;
 @synthesize sizes = _sizes;
@@ -65,10 +80,6 @@ using namespace cv;
 @synthesize numberSV = _numberSV;
 @synthesize numberOfPositives = _numberOfPositives;
 @synthesize precisionRecall = _precisionRecall;
-
-@synthesize receivedImages = _receivedImages;
-@synthesize imagesHogPyramid = _imagesHogPyramid;
-
 
 
 
@@ -79,7 +90,6 @@ using namespace cv;
 
 - (id) initWithTemplateWeights:(double *)templateWeights
 {
-        
     if(self = [super init])
     {
         self.sizesP = (int *) malloc(3*sizeof(int));
@@ -104,6 +114,7 @@ using namespace cv;
         self.sizesP[1] = 1;
         self.sizesP[2] = 1;
         
+        //dummy initialization to be replaced during the training
         self.weightsP = (double *) malloc(sizeof(double));
         self.weightsP[0] = 0;
     }
@@ -129,6 +140,8 @@ using namespace cv;
 
 - (void) train:(TrainingSet *) trainingSet;
 {
+    
+    free(self.weightsP);
     self.isLearning = YES;
     self.imageListAux = [[NSMutableArray alloc] init];
     self.imagesHogPyramid = [[NSMutableArray alloc] init];
@@ -137,121 +150,39 @@ using namespace cv;
     
     // Get the template size and get hog feautures dimension
     float ratio = trainingSet.templateSize.width/trainingSet.templateSize.height;
-    self.sizesP = (int *) malloc(3*sizeof(int));
     self.sizesP[0] = round(40*trainingSet.areaRatio + 4); //Determined empirically to ajust the size of the template according to the size in the training set
     self.sizesP[1] = round(self.sizesP[0]*ratio);
     self.sizesP[2] = 31;
-    int numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];
+    numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];
     [self.delegate sendMessage:[NSString stringWithFormat:@"Hog features: %d %d %d for ratio:%f", self.sizesP[0],self.sizesP[1],self.sizesP[2], ratio]];
     [self.delegate sendMessage:[NSString stringWithFormat:@"area ratio: %f", trainingSet.areaRatio]];
     
     //TODO: max size for the buffers
-    trainingSet.imageFeatures = (float *) malloc(MAX_NUMBER_EXAMPLES*MAX_NUMBER_FEATURES*sizeof(float));
+    trainingSet.imageFeatures = (float *) malloc(MAX_NUMBER_EXAMPLES*numOfFeatures*sizeof(float));
     trainingSet.labels = (float *) malloc(MAX_NUMBER_EXAMPLES*sizeof(float));
-
-    // Set up SVM's parameters
-    CvSVMParams params;
-    params.svm_type    = CvSVM::C_SVC;
-    params.kernel_type = CvSVM::LINEAR;
-    params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6);
     
     //convergence loop
     self.weightsP = (double *) calloc((numOfFeatures+1),sizeof(double));
     for(int i=0; i<numOfFeatures+1;i++) self.weightsP[i]=1;
     self.weightsPLast = (double *) calloc((numOfFeatures+1),sizeof(double));
-    float diff = 1;
-    int iter = 0, numSupportVectors=0, positives;
+    diff = 1;
+    int iter = 0;
+    numSupportVectors=0;
     
     while(diff > STOP_CRITERIA && iter<10){
 
         [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter++]];
         
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //Get Bounding Boxes from detection
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        [self getBoundingBoxesForTrainingWith:trainingSet];
         
-        positives = 0;
-        trainingSet.numberOfTrainingExamples = numSupportVectors;
-        
-        for(int i=0; i<trainingSet.images.count; i++){
-            UIImage *image = [trainingSet.images objectAtIndex:i];
-            NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp];
-            [self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %d: %d", i, newBoundingBoxes.count]];
-            int quota =100;
-            for(BoundingBox *newBB in newBoundingBoxes){
-                BOOL isNegative = NO;
-                for(BoundingBox *groundTruthBB in trainingSet.groundTruthBoundingBoxes){
-                    if(groundTruthBB.imageIndex == i){
-                        double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];
-                        if (overlapArea > 0.8 && overlapArea<1){
-                            newBB.label = 1;
-                            isNegative = NO;
-                            [self addExample:newBB to:trainingSet];
-                            positives ++;
-                        }else if(overlapArea < 0.25 && quota>0) isNegative = YES;
-                    }
-                }
-                if(isNegative){
-                    newBB.label = -1;
-                    quota--;
-                    [self addExample:newBB to:trainingSet];
-                }
-            }
-        }
-
-        [self.delegate sendMessage:[NSString stringWithFormat:@"added:%d positives", positives]];
-        
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////
         //Train the SVM, update weights and store support vectors and labels
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        [self.delegate sendMessage:[NSString stringWithFormat:@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples]];
-        
-        Mat labelsMat(trainingSet.numberOfTrainingExamples,1,CV_32FC1, trainingSet.labels);
-        Mat trainingDataMat(trainingSet.numberOfTrainingExamples, numOfFeatures, CV_32FC1, trainingSet.imageFeatures);
-        //std::cout << trainingDataMat << std::endl; //output learning matrix
-    
-        CvSVM SVM;
-        SVM.train(trainingDataMat, labelsMat, Mat(), Mat(), params);
-        
-        //update weights and store the support vectors
-        numSupportVectors = SVM.get_support_vector_count();
-        trainingSet.numberOfTrainingExamples = numSupportVectors;
-        const CvSVMDecisionFunc *dec = SVM.decision_func;
-        for(int i=0; i<numOfFeatures+1;i++) self.weightsP[i] = 0.0;
-        
-        NSLog(@"Num of support vectors: %d\n", numSupportVectors);
-        
-        for (int i=0; i<numSupportVectors; i++){
-            float alpha = dec[0].alpha[i];
-            const float *supportVector = SVM.get_support_vector(i);
-            float *sv_aux = (float *) malloc(numOfFeatures*sizeof(float));
-            for(int j=0;j<numOfFeatures;j++) //const float* to float*
-                sv_aux[j] = supportVector[j];
-            
-            // Get the current label of the supportvector
-            Mat supportVectorMat(numOfFeatures,1,CV_32FC1, sv_aux);
-            trainingSet.labels[i] = SVM.predict(supportVectorMat);
-            free(sv_aux);
-            NSLog(@"label: %f   alpha: %f \n", trainingSet.labels[i], alpha);
-            
-            for(int j=0;j<numOfFeatures;j++){
-                // add to get the svm weights
-                self.weightsP[j] -= (double) alpha * supportVector[j];
-                
-                //store the support vector as the first features
-                trainingSet.imageFeatures[i*numOfFeatures + j] = supportVector[j];
-            }
-        }
-        self.weightsP[numOfFeatures] = - (double) dec[0].rho; // The sign of the bias and rho have opposed signs.
-        [self.delegate sendMessage:[NSString stringWithFormat:@"bias: %f", self.weightsP[numOfFeatures]]];
+        [self trainSVMAndGetWeights:trainingSet];
         
         diff = [self computeDifferenceOfWeights];
         if(iter!=1) [self.delegate updateProgress:STOP_CRITERIA/diff];
         
         //update information about the classifier
-        self.numberOfPositives = [NSNumber numberWithInt:positives];
         self.numberSV = [NSNumber numberWithInt:numSupportVectors];
     }
     
@@ -312,12 +243,14 @@ using namespace cv;
                 [self.imagesHogPyramid addObject:imageHog];
                 indexRR = self.imagesHogPyramid.count - 1;
                 [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:indexRR]];
+                NSLog(@"Added image for level %d at index %d", i, indexRR);
             }else{
                 imageHog = (HogFeature *)[self.imagesHogPyramid objectAtIndex:(index*numberPyramids + i)];
                 [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:(index*numberPyramids + i)]];
             }
         }
     }
+    
     
     //sort array of bounding boxes by score
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"score" ascending:NO];
@@ -338,7 +271,7 @@ using namespace cv;
     
     
     // Change the resulting orientation of the bounding boxes if the phone orientation requires it
-    if(UIInterfaceOrientationIsLandscape(orientation)){
+    if(!self.isLearning && UIInterfaceOrientationIsLandscape(orientation)){
         for(int i=0; i<nmsArray.count; i++){
             BoundingBox *boundingBox = [nmsArray objectAtIndex:i];
             double auxXmin, auxXmax;
@@ -359,6 +292,7 @@ using namespace cv;
 - (void) testOnSet:(TrainingSet *)set atThresHold:(float)detectionThreshold
 {
     
+    //TODO: not multiimage
     NSLog(@"Detection threshold: %f", detectionThreshold);
     int tp=0, fp=0, fn=0;// tn=0;
     for(BoundingBox *groundTruthBoundingBox in set.groundTruthBoundingBoxes){
@@ -522,7 +456,6 @@ using namespace cv;
     //features
     double *ramonet = (double *) malloc(self.sizesP[0]*self.sizesP[1]*self.sizesP[2]*sizeof(double));
     int boundingBoxPosition = p.locationOnImageHog.y + p.locationOnImageHog.x*imageHog.numBlocksY;
-    int numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];
     for(int f=0; f<self.sizesP[2]; f++)
         for(int i=0; i<self.sizesP[1]; i++)
             for(int j=0; j<self.sizesP[0]; j++){
@@ -545,9 +478,101 @@ using namespace cv;
 }
 
 
+
+- (void) getBoundingBoxesForTrainingWith:(TrainingSet *) trainingSet
+{
+    int positives = 0;
+    trainingSet.numberOfTrainingExamples = numSupportVectors;
+    for(int i=0; i<trainingSet.images.count; i++){
+        UIImage *image = [trainingSet.images objectAtIndex:i];
+        NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp];
+        [self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %d: %d", i, newBoundingBoxes.count]];
+        int quota = MAX_QUOTA;
+        NSArray *selectedGT = trainingSet.groundTruthBoundingBoxes;
+        NSMutableArray *aux = [selectedGT mutableCopy];
+        
+        for(BoundingBox *newBB in newBoundingBoxes){
+            BOOL isNegative = NO;
+            for(BoundingBox *groundTruthBB in selectedGT){
+                if(groundTruthBB.imageIndex == i){
+                    double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];
+                    if (overlapArea > 0.8 && overlapArea<1){
+                        newBB.label = 1;
+                        isNegative = NO;
+                        if(trainingSet.numberOfTrainingExamples+1 < MAX_NUMBER_EXAMPLES){
+                            [self addExample:newBB to:trainingSet];
+                            positives ++;
+                        }else NSLog(@"Training Buffer FUL!!");
+                    }else if(overlapArea < 0.25 && quota>0) isNegative = YES;
+                }else [aux removeObject:groundTruthBB];
+                
+            }
+            selectedGT = aux;
+            if(isNegative){
+                newBB.label = -1;
+                quota--;
+                [self addExample:newBB to:trainingSet];
+            }
+        }
+    }
+    
+    [self.delegate sendMessage:[NSString stringWithFormat:@"added:%d positives", positives]];
+    self.numberOfPositives = [NSNumber numberWithInt:positives];
+}
+
+-(void) trainSVMAndGetWeights:(TrainingSet *)trainingSet
+{
+    [self.delegate sendMessage:[NSString stringWithFormat:@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples]];
+    
+    Mat labelsMat(trainingSet.numberOfTrainingExamples,1,CV_32FC1, trainingSet.labels);
+    Mat trainingDataMat(trainingSet.numberOfTrainingExamples, numOfFeatures, CV_32FC1, trainingSet.imageFeatures);
+    //std::cout << trainingDataMat << std::endl; //output learning matrix
+    
+    // Set up SVM's parameters
+    CvSVMParams params;
+    params.svm_type    = CvSVM::C_SVC;
+    params.kernel_type = CvSVM::LINEAR;
+    params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6);
+    
+    CvSVM SVM;
+    SVM.train(trainingDataMat, labelsMat, Mat(), Mat(), params);
+    
+    //update weights and store the support vectors
+    numSupportVectors = SVM.get_support_vector_count();
+    trainingSet.numberOfTrainingExamples = numSupportVectors;
+    const CvSVMDecisionFunc *dec = SVM.decision_func;
+    for(int i=0; i<numOfFeatures+1;i++) self.weightsP[i] = 0.0;
+    
+    NSLog(@"Num of support vectors: %d\n", numSupportVectors);
+    
+    for (int i=0; i<numSupportVectors; i++){
+        float alpha = dec[0].alpha[i];
+        const float *supportVector = SVM.get_support_vector(i);
+        float *sv_aux = (float *) malloc(numOfFeatures*sizeof(float));
+        for(int j=0;j<numOfFeatures;j++) //const float* to float*
+            sv_aux[j] = supportVector[j];
+        
+        // Get the current label of the supportvector
+        Mat supportVectorMat(numOfFeatures,1,CV_32FC1, sv_aux);
+        trainingSet.labels[i] = SVM.predict(supportVectorMat);
+        free(sv_aux);
+        NSLog(@"label: %f   alpha: %f \n", trainingSet.labels[i], alpha);
+        
+        for(int j=0;j<numOfFeatures;j++){
+            // add to get the svm weights
+            self.weightsP[j] -= (double) alpha * supportVector[j];
+            
+            //store the support vector as the first features
+            trainingSet.imageFeatures[i*numOfFeatures + j] = supportVector[j];
+        }
+    }
+    self.weightsP[numOfFeatures] = - (double) dec[0].rho; // The sign of the bias and rho have opposed signs.
+    [self.delegate sendMessage:[NSString stringWithFormat:@"bias: %f", self.weightsP[numOfFeatures]]];
+}
+
 -(double) computeDifferenceOfWeights
 {
-    double diff=0.0;
+    diff=0.0;
     
     double norm=0, normLast=0;
     for(int i=0; i<self.sizesP[0]*self.sizesP[1]*self.sizesP[2] + 1; i++){

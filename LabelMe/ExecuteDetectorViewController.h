@@ -38,8 +38,11 @@
 @property (nonatomic, strong) NSMutableDictionary *positionsDic;
 @property (weak, nonatomic) IBOutlet UIButton *showImagesButton;
 @property (nonatomic, strong) CMMotionManager *motionManager;
+@property BOOL isRecording;
 - (IBAction)showImagesAction:(id)sender;
 - (IBAction)showModelAction:(id)sender;
+- (IBAction)startRecordingAction:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *startRecordingButton;
 
 
 //model properties

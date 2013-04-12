@@ -27,6 +27,9 @@
 //generate a unique id
 - (NSString *)uuid;
 
+// average per pixel image
+-(UIImage *) imageAveraging:(NSArray *) images;
+
 @end
 
 
@@ -308,8 +311,6 @@
         //train in a different thread
         dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
         dispatch_async(myQueue, ^{
-            free(self.svmClassifier.weightsP);
-            free(self.svmClassifier.sizesP);
             [self trainForImagesNames:traingImagesNames];
         });
     }
@@ -370,7 +371,7 @@
     
     //constructing intial set of cropped images for visualization and image averaging
     NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
-    for(BoundingBox *cp in trainingSet.boundingBoxes){
+    for(BoundingBox *cp in trainingSet.groundTruthBoundingBoxes){
         UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
         UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
         [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
@@ -386,7 +387,8 @@
         result = [filter valueForKey:kCIOutputImageKey];
     }
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
-    self.detectorView.image = [UIImage imageWithCIImage:result];
+//    self.detectorView.image = [UIImage imageWithCIImage:result];
+    self.detectorView.image = [self imageAveraging:listOfImages];
     
     
     //output the initial training images
@@ -421,5 +423,46 @@
     NSString *result = (__bridge NSString *) uuidStringRef;
     return [result substringToIndex:8];
 }
+
+-(UIImage *) imageAveraging:(NSArray *) images
+{
+    //buffer for the result
+    
+    CGImageRef imageRef = [(UIImage *)[images objectAtIndex:0] CGImage];
+    NSUInteger width = CGImageGetWidth(imageRef); //#pixels width
+    NSUInteger height = CGImageGetHeight(imageRef); //#pixels height
+    UInt8 *imageResult = (UInt8 *) calloc(height*width*4,sizeof(UInt8));
+
+    
+    for(UIImage *image in images){
+        
+        //obtain pixels per image
+        CGImageRef imageRef = image.CGImage;
+        NSLog(@"height: %zd, width:%zd", CGImageGetHeight(imageRef), CGImageGetWidth(imageRef)); //in case distinct
+        int bytesPerPixel = 4;
+        int bytesPerRow = bytesPerPixel * width;
+        int bitsPerComponent = 8;
+        UInt8 *imagePointer = (UInt8 *) calloc(height * width * 4, sizeof(UInt8)); //4 channels
+        CGContextRef contextImage = CGBitmapContextCreate(imagePointer, width, height, bitsPerComponent, bytesPerRow, CGColorSpaceCreateDeviceRGB(),kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+        CGContextDrawImage(contextImage, CGRectMake(0, 0, width, height), imageRef);
+        CGContextRelease(contextImage);
+        
+        
+        for(int i=0; i<height*width*4; i++)
+            imageResult[i] += imagePointer[i]*1.0/images.count;
+            
+    }
+    
+    //construct final image
+    CGContextRef contextResult = CGBitmapContextCreate(imageResult, width, height, 8, 4*width,
+                                                 CGColorSpaceCreateDeviceRGB(),kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big); 
+    
+    CGImageRef imageResultRef = CGBitmapContextCreateImage(contextResult);
+    CGContextRelease(contextResult);
+    UIImage *image = [UIImage imageWithCGImage:imageResultRef scale:1.0 orientation:UIImageOrientationUp];
+    return image;
+
+}
+
 
 @end

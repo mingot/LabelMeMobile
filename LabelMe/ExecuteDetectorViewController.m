@@ -52,6 +52,7 @@
     self.positionsDic = [[NSMutableDictionary alloc] init];
     self.motionManager = [[CMMotionManager alloc] init];
     [self.motionManager startDeviceMotionUpdates];
+    self.isRecording = NO;
     
     self.prevLayer = nil;
     
@@ -190,7 +191,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             BoundingBox *score = [nmsArray objectAtIndex:0];
             [self performSelectorOnMainThread:@selector(setTitle:) withObject:[NSString stringWithFormat:@"%3f",score.score] waitUntilDone:YES];
             if(score.score > self.maxDetectionScore) self.maxDetectionScore = score.score;
-            //[self takePicture:nmsArray for:[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight]];
+            if(self.isRecording) [self takePicture:nmsArray for:[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight]];
             
         } else [self performSelectorOnMainThread:@selector(setTitle:) withObject:@"No detection." waitUntilDone:YES];
         
@@ -246,6 +247,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #pragma mark Memory management
 
 - (void)viewDidUnload {
+    [self setStartRecordingButton:nil];
     [self setShowImagesButton:nil];
     [self setFpsLabel:nil];
     [self setDetectionThresholdSliderButton:nil];
@@ -280,30 +282,28 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
 }
 
+- (IBAction)startRecordingAction:(id)sender
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.isRecording = self.isRecording ? NO:YES;
+        self.startRecordingButton.titleLabel.text = self.isRecording ? @"start" : @"stop";
+        NSLog(self.isRecording ? @"Yes" : @"No");
+    });
+
+}
+
 - (void) takePicture:(NSArray *)nmsArray for:(UIImage *)image
 {
     BoundingBox *bb = [nmsArray objectAtIndex:0];
     CMAttitude *attitude = self.motionManager.deviceMotion.attitude;
-//    NSLog(@"pitch: %f, yaw:%f, roll:%f", attitude.pitch, attitude.yaw, attitude.roll);
+    NSLog(@"pitch: %f, yaw:%f, roll:%f", attitude.pitch, attitude.yaw, attitude.roll);
     
 
-
-    NSString *key = [NSString stringWithFormat:@"%d_%d",20 + (int)round(attitude.pitch*10),20 + (int)round(attitude.roll*10)];
+    NSString *key = [NSString stringWithFormat:@"%d/%d",(int)round(attitude.pitch*10), (int)round(attitude.roll*10)];
     if(self.positionsDic.count == 0 || [self.positionsDic objectForKey:key]==nil){
         [self.positionsDic setObject:[image croppedImage:[bb rectangleForImage:image]] forKey:key];
         NSLog(@"Added key %@ and total: %d", key, self.positionsDic.count);
     }
-//    int normalizedRoll = round(attitude.pitch*10);
-//    if(self.rollList.count == 0){
-//        [self.rollList addObject:[NSNumber numberWithInt:normalizedRoll]];
-//        
-//    }else if([self.rollList indexOfObject:[NSNumber numberWithInt:normalizedRoll]]==NSNotFound){
-//        [self.rollList addObject:[NSNumber numberWithInt:normalizedRoll]];
-//        [self.imagesList addObject:[image croppedImage:[bb rectangleForImage:image]]];
-//        NSLog(@"%@",self.rollList);
-//    }
-    
-    
 }
 
 
