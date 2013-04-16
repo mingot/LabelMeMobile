@@ -32,4 +32,7 @@
 + (UIImage *) hogImageFromFeatures:(double *)hogFeatures withSize:(int *)blocks;
 + (UIImage *) hogImageFromFeature:(HogFeature *)hogFeature;
 
+//FDOW implementation for hog scaling
++ (HogFeature *) scaleHog:(HogFeature *)originalHog to:(int) scale for:(int)numScalesPerOctave;
+
 @end

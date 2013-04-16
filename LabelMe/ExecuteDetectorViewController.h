@@ -27,6 +27,7 @@
     //settings
     BOOL hogOnScreen;
     int numMax;
+    BOOL isUsingFrontFacingCamera;
 }
 
 
@@ -64,6 +65,6 @@
 @property (weak, nonatomic) IBOutlet UISlider *detectionThresholdSliderButton;
 @property (weak, nonatomic) IBOutlet UILabel *fpsLabel;
 
-
+- (IBAction)switchCameras:(id)sender;
 
 @end

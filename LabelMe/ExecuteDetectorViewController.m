@@ -12,6 +12,16 @@
 #import "UIImage+Resize.h"
 
 
+
+@interface ExecuteDetectorViewController()
+{
+    float fps;
+    int num;
+}
+@end
+
+
+
 @implementation ExecuteDetectorViewController
 
 
@@ -43,6 +53,10 @@
 {
     // Initialitzation after the view load and all the outlets are hooked
     [super viewDidLoad];
+    
+    isUsingFrontFacingCamera = NO;
+    fps = 0.0;
+    num = 0;
     
     //image poistion detection
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
@@ -171,8 +185,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         CGContextRelease(newContext);
         CGColorSpaceRelease(colorSpace);
         
-        
-        
         double detectionThreshold = -1 + (self.maxDetectionScore + 1)*self.detectionThresholdSliderButton.value;
         NSArray *nmsArray = [self.svmClassifier detect:
                              [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight]
@@ -208,9 +220,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         CGImageRelease(imageRef);
         
         //update label with the current FPS
+        fps = (fps*num + -1.0/[start timeIntervalSinceNow])/(num+1);
+        num++;
         [self.fpsLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%.1f FPS",-1.0/[start timeIntervalSinceNow]] waitUntilDone:YES];
-        
-        
     }
 }
 
@@ -307,6 +319,26 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 }
 
 
+- (IBAction)switchCameras:(id)sender
+
+{
+    AVCaptureDevicePosition desiredPosition = isUsingFrontFacingCamera ? AVCaptureDevicePositionBack : AVCaptureDevicePositionFront;
+
+    
+    for (AVCaptureDevice *d in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
+        if ([d position] == desiredPosition) {
+            [[self.prevLayer session] beginConfiguration];
+            AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:d error:nil];
+            for (AVCaptureInput *oldInput in [[self.prevLayer session] inputs])
+                [[self.prevLayer session] removeInput:oldInput];
+            
+            [[self.prevLayer session] addInput:input];
+            [[self.prevLayer session] commitConfiguration];
+            break;
+        }
+    }
+    isUsingFrontFacingCamera = !isUsingFrontFacingCamera;
+}
 
 @end
 

@@ -35,4 +35,14 @@
 
 - (UIImage *)scaleImageTo:(double) scale;
 
+
+
+//Image bitmap manipulation
+- (unsigned char *) convertUIImageToBitmapRGBA8;
+
+- (UIImage *) convertBitmapRGBA8ToUIImage:(unsigned char *) buffer
+                                withWidth:(int) width
+                               withHeight:(int) height;
+
+
 @end

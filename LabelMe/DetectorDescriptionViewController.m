@@ -18,7 +18,7 @@
 #define THUMB 1
 #define OBJECTS 2
 #define MAX_IMAGE_SIZE 300
-#define IMAGE_SCALE_FACTOR 0.6
+//#define IMAGE_SCALE_FACTOR 0.6
 
 @interface DetectorDescriptionViewController()
 
@@ -190,6 +190,7 @@
 {
     
     [self.sendingView.progressView setProgress:0 animated:YES];
+    
     //show modal to select training positives for the selected class
     self.modalTVC = [[ModalTVC alloc] init];
     self.modalTVC.delegate = self;
@@ -199,7 +200,8 @@
     NSMutableArray *imagesList = [[NSMutableArray alloc] init];
     for(NSString *imageName in self.availablePositiveImagesNames){
         [imagesList addObject:[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.resourcesPaths objectAtIndex:THUMB],imageName]]];
-        [self.modalTVC.selectedItems addObject:[NSNumber numberWithInt:(imagesList.count-1)]];
+        if(self.svmClassifier.imagesUsedTraining == nil || [self.svmClassifier.imagesUsedTraining indexOfObject:imageName]!= NSNotFound)
+            [self.modalTVC.selectedItems addObject:[NSNumber numberWithInt:(imagesList.count-1)]];
     }
     self.modalTVC.data = imagesList;
     [self.modalTVC.view setNeedsDisplay];
@@ -224,12 +226,15 @@
     self.sendingView.cancelButton.hidden = NO;
     self.sendingView.cancelButton.titleLabel.text = @"Done";
     [self.sendingView.messagesStack removeAllObjects];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Detector %@ for class %@", self.svmClassifier.name, self.svmClassifier.targetClass]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Detector %@", self.svmClassifier.name]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images:%d", self.svmClassifier.imagesUsedTraining.count]];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of Support Vectors:%@", self.svmClassifier.numberSV]];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of positives %@", self.svmClassifier.numberOfPositives]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"HOG Dimensions:%@ x %@",[self.svmClassifier.sizes objectAtIndex:0],[self.svmClassifier.sizes objectAtIndex:1] ]];
     [self.sendingView showMessage:@"**** Results on the training set ****"];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Precision:%@",[self.svmClassifier.precisionRecall objectAtIndex:0]]];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Recall:%@", [self.svmClassifier.precisionRecall objectAtIndex:1]]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Precision:%.1f",[(NSNumber *)[self.svmClassifier.precisionRecall objectAtIndex:0] floatValue]]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Recall:%.1f", [(NSNumber *)[self.svmClassifier.precisionRecall objectAtIndex:1] floatValue]]];
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Time learning:%.1f", self.svmClassifier.timeLearning.floatValue]];
 }
 
 
@@ -297,8 +302,6 @@
         
     }else if([identifier isEqualToString:@"Training Images"]){
         
-        NSLog(@"selected images index: %@", selectedItems);
-        
         NSMutableArray *traingImagesNames = [[NSMutableArray alloc] init];
         for(NSNumber *imageIndex in selectedItems)
             [traingImagesNames addObject:[self.availablePositiveImagesNames objectAtIndex:imageIndex.intValue]];
@@ -332,18 +335,17 @@
 
 -(void) trainForImagesNames:(NSArray *)imagesNames
 {
-    //training set construction
+    //initialization
     TrainingSet *trainingSet = [[TrainingSet alloc] init];
+    self.svmClassifier.imagesUsedTraining = [[NSMutableArray alloc] init];
     
+    //training set construction
     for(NSString *imageName in imagesNames){
-        
-        //dictionaries
         BOOL containedClass = NO;
         NSString *objectsPath = [(NSString *)[self.resourcesPaths objectAtIndex:OBJECTS]  stringByAppendingPathComponent:imageName];
         NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:objectsPath]];
         for(Box *box in objects){
-            if([box.label isEqualToString:self.svmClassifier.targetClass]){
-                //add bounding box
+            if([box.label isEqualToString:self.svmClassifier.targetClass]){ //add bounding box
                 containedClass = YES;
                 BoundingBox *cp = [[BoundingBox alloc] init];
                 cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
@@ -355,54 +357,39 @@
                 [trainingSet.groundTruthBoundingBoxes addObject:cp];
             }
         }
-        
-        if(containedClass){
-            //add Image
+        if(containedClass){ //add image
             NSString *imagePath = [(NSString *)[self.resourcesPaths objectAtIndex:IMAGES]  stringByAppendingPathComponent:imageName];
             UIImage *image = [[UIImage alloc]initWithContentsOfFile:imagePath];
-            [trainingSet.images addObject:[image scaleImageTo:IMAGE_SCALE_FACTOR]];
+            [trainingSet.images addObject:image];
+            [self.svmClassifier.imagesUsedTraining addObject:imageName];
         }
     }
     
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
     
     
-    [trainingSet initialFill];
-    
-    //constructing intial set of cropped images for visualization and image averaging
+    //obtain the image average of the groundtruth images
     NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
     for(BoundingBox *cp in trainingSet.groundTruthBoundingBoxes){
         UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
         UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
-        [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationDefault]];
-    }
-    
-    //Image averaging
-    CIFilter *filter = [CIFilter filterWithName:@"CIOverlayBlendMode"];
-    CIImage *result = [[CIImage alloc] initWithImage:[listOfImages objectAtIndex:0]];
-    for(int i=1;i<trainingSet.groundTruthBoundingBoxes.count;i++){
-        CIImage *image = [[CIImage alloc] initWithImage:[listOfImages objectAtIndex:i]];
-        [filter setValue:image forKey:@"inputImage"];
-        [filter setValue:result forKey:@"inputBackgroundImage"];
-        result = [filter valueForKey:kCIOutputImageKey];
+        [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationLow]];
     }
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
-//    self.detectorView.image = [UIImage imageWithCIImage:result];
     self.detectorView.image = [self imageAveraging:listOfImages];
-    
-    
-    //output the initial training images
-    //self.trainingSetController.listOfImages = listOfImages;
-    //[self.navigationController pushViewController:self.trainingSetController animated:YES];
     
     //learn
     [self updateProgress:0.05];
     [self.sendingView showMessage:@"Training begins!"];
     [self.svmClassifier train:trainingSet];
     [self.sendingView showMessage:@"Finished training"];
+    [self updateProgress:1];
 
-    self.trainingSetController.listOfImages = self.svmClassifier.imageListAux;
-    [self.navigationController pushViewController:self.trainingSetController animated:YES];
+    //Show hog images of positive instances (if any)
+    if(self.svmClassifier.imageListAux.count!=0){
+        self.trainingSetController.listOfImages = self.svmClassifier.imageListAux;
+        [self.navigationController pushViewController:self.trainingSetController animated:YES];
+    }
     
     //update view of the detector
     //self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
@@ -425,29 +412,26 @@
 }
 
 -(UIImage *) imageAveraging:(NSArray *) images
-{
-    //buffer for the result
-    
+{    
     CGImageRef imageRef = [(UIImage *)[images objectAtIndex:0] CGImage];
     NSUInteger width = CGImageGetWidth(imageRef); //#pixels width
     NSUInteger height = CGImageGetHeight(imageRef); //#pixels height
     UInt8 *imageResult = (UInt8 *) calloc(height*width*4,sizeof(UInt8));
-
+    int bytesPerPixel = 4;
+    int bytesPerRow = bytesPerPixel * width;
+    int bitsPerComponent = 8;
+    
     
     for(UIImage *image in images){
         
         //obtain pixels per image
         CGImageRef imageRef = image.CGImage;
-        NSLog(@"height: %zd, width:%zd", CGImageGetHeight(imageRef), CGImageGetWidth(imageRef)); //in case distinct
-        int bytesPerPixel = 4;
-        int bytesPerRow = bytesPerPixel * width;
-        int bitsPerComponent = 8;
         UInt8 *imagePointer = (UInt8 *) calloc(height * width * 4, sizeof(UInt8)); //4 channels
         CGContextRef contextImage = CGBitmapContextCreate(imagePointer, width, height, bitsPerComponent, bytesPerRow, CGColorSpaceCreateDeviceRGB(),kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
         CGContextDrawImage(contextImage, CGRectMake(0, 0, width, height), imageRef);
         CGContextRelease(contextImage);
         
-        
+        //average
         for(int i=0; i<height*width*4; i++)
             imageResult[i] += imagePointer[i]*1.0/images.count;
             

@@ -17,6 +17,7 @@
 
 
 
+
 @implementation SignInViewController
 
 @synthesize scrollView = _scrollView;
@@ -33,6 +34,8 @@
 @synthesize detectorGalleryController = _detectorGalleryController;
 @synthesize userDictionary = _userDictionary;
 @synthesize userPaths = _userPaths;
+
+
 
 
 #pragma mark 
@@ -95,6 +98,7 @@
     
     [self.view addSubview:sendingView];
     
+
 
 }
 

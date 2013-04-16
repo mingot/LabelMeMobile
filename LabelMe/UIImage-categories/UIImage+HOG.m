@@ -113,7 +113,7 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     int bytesPerRow = bytesPerPixel * width;
     int bitsPerComponent = 8;
     UInt8 *im = (UInt8 *)malloc(height * width * 4);
-    
+        
     CGContextRef contextImage = CGBitmapContextCreate(im, width, height,
                                                       bitsPerComponent, bytesPerRow, colorSpace,
                                                       kCGImageAlphaPremultipliedLast| kCGBitmapByteOrder32Big );
@@ -459,6 +459,77 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
             im[x*bs*4 + y*blockw*bs*bs*4 + i*4 + j*4*bs*blockw + 3] = 255;
         }
     }
+}
+
+
++ (HogFeature *) scaleHog:(HogFeature *)originalHog to:(int)scale for:(int)numScalesPerOctave;
+{
+    
+//    if(scale == 0) return originalHog;
+//    http://stackoverflow.com/questions/9570895/image-downscaling-algorithm
+    
+    int heights[10] = {48,45,42,39,36,34,31,29,27,25};
+    int widths[10] = {36,33,31,29,27,25,23,21,20,18};
+
+    int newHeight = heights[scale];
+    int newWidth = widths[scale];
+
+    int height = originalHog.numBlocksY;
+    int width = originalHog.numBlocksX;
+    
+    
+    
+    //new hog
+    HogFeature *scaledHog = [[HogFeature alloc] init];
+    scaledHog.numBlocksX = newWidth;
+    scaledHog.numBlocksY = newHeight;
+    scaledHog.numFeaturesPerBlock = 31;
+    scaledHog.features = (double *) malloc(newWidth*newHeight*31*sizeof(double));
+    scaledHog.totalNumberOfFeatures = newWidth*newHeight*31;
+    scaledHog.dimensionOfHogFeatures = (int *)malloc(3*sizeof(int));
+    scaledHog.dimensionOfHogFeatures[0] = newHeight;
+    scaledHog.dimensionOfHogFeatures[1] = newWidth;
+    scaledHog.dimensionOfHogFeatures[2] = 31;
+
+    double xscale = newWidth*1.0/width;
+    double yscale = newHeight*1.0/height;
+    double yend = 0.0;
+    
+    for(int feat = 0; feat<31;feat++)
+        for (int f = 0; f < newHeight; f++) // y on output
+        {
+            double ystart = yend;
+            yend = (f + 1) / yscale;
+            if (yend >= height) yend = height - 0.000001;
+            double xend = 0.0;
+            for (int g = 0; g < newWidth; g++) // x on output
+            {
+                double xstart = xend;
+                xend = (g + 1) / xscale;
+                if (xend >= width) xend = width - 0.000001;
+                double sum = 0.0;
+                int num = 0;
+                for (int y = (int)ystart; y <= (int)yend; ++y)
+                {
+                    double yportion = 1.0;
+                    if (y == (int)ystart) yportion -= ystart - y;
+                    if (y == (int)yend) yportion -= y+1 - yend;
+                    for (int x = (int)xstart; x <= (int)xend; ++x)
+                    {
+                        double xportion = 1.0;
+                        if (x == (int)xstart) xportion -= xstart - x;
+                        if (x == (int)xend) xportion -= x+1 - xend;
+                        sum += originalHog.features[y + x*height + feat*width*height] * yportion * xportion;
+                        num++;
+                    }
+                }
+                scaledHog.features[f + g*newHeight + feat*newHeight*newWidth] = sum*1.0*exp(-1.294*scale/numScalesPerOctave)/num;
+            }
+        }
+    
+    
+    return scaledHog;
+    
 }
 
 

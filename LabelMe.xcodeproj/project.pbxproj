@@ -390,6 +390,7 @@
 		FC4D688717167036002A73AD /* ThreeDimVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThreeDimVC.h; path = ../ThreeDimVC.h; sourceTree = "<group>"; };
 		FC4D688817167036002A73AD /* ThreeDimVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ThreeDimVC.m; path = ../ThreeDimVC.m; sourceTree = "<group>"; };
 		FC4D688917167036002A73AD /* ThreeDimVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ThreeDimVC.xib; path = ../ThreeDimVC.xib; sourceTree = "<group>"; };
+		FC4D6890171A37E4002A73AD /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		FC5C939916FCB89900637B69 /* app login-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "app login-11.png"; path = "../archivos/app login-11.png"; sourceTree = "<group>"; };
 		FC5C939B16FCB8A600637B69 /* tick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tick.png; path = ../archivos/tick.png; sourceTree = "<group>"; };
 		FC5C939D16FCB8AE00637B69 /* cruz.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cruz.png; path = ../archivos/cruz.png; sourceTree = "<group>"; };
@@ -510,8 +511,6 @@
 		A558D60A16134E0B001DED8C = {
 			isa = PBXGroup;
 			children = (
-				FC4D68801716164E002A73AD /* CoreMotion.framework */,
-				FC610AF3170A36D800851AC2 /* CoreImage.framework */,
 				A558D61F16134E0C001DED8C /* LabelMe */,
 				A558D61816134E0C001DED8C /* Frameworks */,
 				A558D61616134E0C001DED8C /* Products */,
@@ -530,6 +529,9 @@
 		A558D61816134E0C001DED8C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FC4D6890171A37E4002A73AD /* MediaPlayer.framework */,
+				FC4D68801716164E002A73AD /* CoreMotion.framework */,
+				FC610AF3170A36D800851AC2 /* CoreImage.framework */,
 				FCED8975170354010027CBE1 /* CoreVideo.framework */,
 				FCED8973170353FB0027CBE1 /* CoreMedia.framework */,
 				FCED896F17034F980027CBE1 /* opencv2.framework */,
@@ -1135,6 +1137,10 @@
 				GCC_PREFIX_HEADER = "LabelMe/LabelMe-Prefix.pch";
 				INFOPLIST_FILE = "LabelMe/LabelMe-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Downloads/DFVideoOut\"",
+				);
 				PRODUCT_NAME = LabelMe;
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1157,6 +1163,10 @@
 				GCC_PREFIX_HEADER = "LabelMe/LabelMe-Prefix.pch";
 				INFOPLIST_FILE = "LabelMe/LabelMe-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Downloads/DFVideoOut\"",
+				);
 				PRODUCT_NAME = LabelMe;
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1179,6 +1189,10 @@
 				GCC_PREFIX_HEADER = "LabelMe/LabelMe-Prefix.pch";
 				INFOPLIST_FILE = "LabelMe/LabelMe-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Downloads/DFVideoOut\"",
+				);
 				PRODUCT_NAME = LabelMe;
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -38,6 +38,9 @@
 @property (strong, nonatomic) NSNumber *numberSV;
 @property (strong, nonatomic) NSNumber *numberOfPositives;
 @property (strong, nonatomic) NSArray *precisionRecall;
+@property (strong, nonatomic) NSNumber *timeLearning;
+@property (strong, nonatomic) NSMutableArray *imagesUsedTraining;
+
 
 
 //Initialization of the classifier given the weight vectors of it

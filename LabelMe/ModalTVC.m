@@ -59,6 +59,7 @@
         self.cancelButton.hidden = NO;
     }
     
+    
     //TODO: in grid mode, no distinction between multiplechoice.
 }
 
@@ -122,16 +123,17 @@
                 
                 else button.frame = CGRectMake(0.07*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.2*self.view.frame.size.width, 0.2*self.view.frame.size.width);
                 
+                //if the cell is a selected item
+                if ([self.selectedItems indexOfObject:[NSNumber numberWithInt:i]] == NSNotFound)
+                    button.selected = NO;
+                else button.selected = YES;
+                
                 [button addTarget:self
                            action:@selector(imageSelectedAction:)
                  forControlEvents:UIControlEventTouchUpInside];
                 [button setImage:image forState:UIControlStateNormal];
                 [button setImage:[self addBorderTo:imageSelected] forState:UIControlStateSelected];
                 
-                //if the cell is a selected item
-                if ([self.selectedItems indexOfObject:[NSNumber numberWithInt:indexPath.row]] != NSNotFound)
-                    button.selected = YES;
-
                 [cell addSubview:button];
             }
         }
