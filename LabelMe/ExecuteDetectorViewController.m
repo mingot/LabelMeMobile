@@ -191,7 +191,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                                       minimumThreshold:detectionThreshold
                                               pyramids:self.numPyramids
                                               usingNms:YES
-                                     deviceOrientation:[[UIDevice currentDevice] orientation]];
+                                     deviceOrientation:[[UIDevice currentDevice] orientation]
+                                    learningImageIndex:0];
         
         
         // set boundaries of the detection and redraw
@@ -199,11 +200,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         [self.detectView performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
         
         // Update the navigation controller title with some information about the detection
+        int level;
         if (nmsArray.count > 0){
-            BoundingBox *score = [nmsArray objectAtIndex:0];
+            BoundingBox *score = (BoundingBox *)[nmsArray objectAtIndex:0];
             [self performSelectorOnMainThread:@selector(setTitle:) withObject:[NSString stringWithFormat:@"%3f",score.score] waitUntilDone:YES];
             if(score.score > self.maxDetectionScore) self.maxDetectionScore = score.score;
             if(self.isRecording) [self takePicture:nmsArray for:[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight]];
+            level = score.pyramidLevel;
             
         } else [self performSelectorOnMainThread:@selector(setTitle:) withObject:@"No detection." waitUntilDone:YES];
         
@@ -223,6 +226,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         fps = (fps*num + -1.0/[start timeIntervalSinceNow])/(num+1);
         num++;
         [self.fpsLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%.1f FPS",-1.0/[start timeIntervalSinceNow]] waitUntilDone:YES];
+        
+        [self.scaleLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%d",level] waitUntilDone:YES];
     }
 }
 
@@ -259,6 +264,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #pragma mark Memory management
 
 - (void)viewDidUnload {
+    [self setScaleLabel:nil];
     [self setStartRecordingButton:nil];
     [self setShowImagesButton:nil];
     [self setFpsLabel:nil];

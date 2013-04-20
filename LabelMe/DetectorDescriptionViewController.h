@@ -42,7 +42,7 @@
 @property (strong, nonatomic) NSString *userPath;
 @property (strong, nonatomic) NSArray *resourcesPaths;
 
-//usefu information
+//usefull information
 @property (strong, nonatomic) NSArray *availableObjectClasses;
 @property (strong, nonatomic) NSArray *availablePositiveImagesNames;
 @property (strong, nonatomic) NSMutableArray *selectedPositiveImageIndexes;

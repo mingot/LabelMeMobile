@@ -56,7 +56,8 @@
     minimumThreshold:(double) detectionThreshold
             pyramids:(int) numberPyramids
             usingNms:(BOOL)useNms
-   deviceOrientation:(int) orientation;
+   deviceOrientation:(int) orientation
+  learningImageIndex:(int) imageIndex;
 
 //Given a set with ground truth bounding boxes, returns the metric spesified.
 - (void) testOnSet:(TrainingSet *)set atThresHold:(float)detectionThreshold;

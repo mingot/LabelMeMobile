@@ -22,7 +22,9 @@
 
 @interface DetectorDescriptionViewController()
 
+// wrapper to call the detector for training and testing
 -(void) trainForImagesNames:(NSArray *)imagesNames;
+-(void) testForImagesNames: (NSArray *) imagesNames;
 
 //generate a unique id
 - (NSString *)uuid;
@@ -274,7 +276,6 @@
 
 -(void) sendMessage:(NSString *)message
 {
-
     [self.sendingView showMessage:message];
 }
 
@@ -303,8 +304,16 @@
     }else if([identifier isEqualToString:@"Training Images"]){
         
         NSMutableArray *traingImagesNames = [[NSMutableArray alloc] init];
-        for(NSNumber *imageIndex in selectedItems)
-            [traingImagesNames addObject:[self.availablePositiveImagesNames objectAtIndex:imageIndex.intValue]];
+        NSMutableArray *testImagesNames = [[NSMutableArray alloc]init];
+        
+        for(int i=0;i<self.availablePositiveImagesNames.count;i++){
+            NSUInteger index = [selectedItems indexOfObject:[NSNumber numberWithInt:i]];
+            if(index != NSNotFound) [traingImagesNames addObject:[self.availablePositiveImagesNames objectAtIndex:i]];
+            else [testImagesNames addObject:[self.availablePositiveImagesNames objectAtIndex:i]];
+        }
+    
+        if(testImagesNames.count == 0) testImagesNames = traingImagesNames;
+        
         
         //show debug indicator on screen
         self.sendingView.hidden = NO;
@@ -315,6 +324,10 @@
         dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
         dispatch_async(myQueue, ^{
             [self trainForImagesNames:traingImagesNames];
+            [self testForImagesNames:testImagesNames];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.sendingView setHidden:YES];
+            });
         });
     }
 }
@@ -399,6 +412,42 @@
     self.saveButton.alpha = 1.0f;
     self.sendingView.hidden = YES;
     [self.sendingView.activityIndicator stopAnimating];
+}
+
+
+- (void) testForImagesNames: (NSArray *) imagesNames
+{
+    //initialization
+    TrainingSet *testSet = [[TrainingSet alloc] init];
+    
+    //training set construction
+    for(NSString *imageName in imagesNames){
+        BOOL containedClass = NO;
+        NSString *objectsPath = [(NSString *)[self.resourcesPaths objectAtIndex:OBJECTS]  stringByAppendingPathComponent:imageName];
+        NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:objectsPath]];
+        for(Box *box in objects){
+            if([box.label isEqualToString:self.svmClassifier.targetClass]){ //add bounding box
+                containedClass = YES;
+                BoundingBox *cp = [[BoundingBox alloc] init];
+                cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
+                cp.ymin = box.upperLeft.y/box->LOWERBOUND;
+                cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
+                cp.ymax = box.lowerRight.y/box->LOWERBOUND;
+                cp.imageIndex = testSet.images.count;
+                cp.label = 1;
+                [testSet.groundTruthBoundingBoxes addObject:cp];
+            }
+        }
+        if(containedClass){ //add image
+            NSString *imagePath = [(NSString *)[self.resourcesPaths objectAtIndex:IMAGES]  stringByAppendingPathComponent:imageName];
+            UIImage *image = [[UIImage alloc]initWithContentsOfFile:imagePath];
+            [testSet.images addObject:image];
+        }
+    }
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the test set: %d",testSet.images.count]];
+    [self.sendingView showMessage:@"Testing begins!"];
+    [self.svmClassifier testOnSet:testSet atThresHold:0.0];
+    [self.sendingView showMessage:@"Finished testing"];
 }
 
 

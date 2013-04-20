@@ -64,6 +64,7 @@
 
 @property (weak, nonatomic) IBOutlet UISlider *detectionThresholdSliderButton;
 @property (weak, nonatomic) IBOutlet UILabel *fpsLabel;
+@property (weak, nonatomic) IBOutlet UILabel *scaleLabel;
 
 - (IBAction)switchCameras:(id)sender;
 

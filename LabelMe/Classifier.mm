@@ -30,6 +30,7 @@ using namespace cv;
     int numSupportVectors;
     float diff;
     int levelsPyramid[10]; //how many bb of each level do we obtain
+
 }
 
 
@@ -41,7 +42,7 @@ using namespace cv;
 @property int finPyramid;
 
 //detector buffer (when training)
-@property (strong, nonatomic) NSMutableArray *receivedImages;
+@property (strong, nonatomic) NSMutableArray *receivedImageIndex;
 @property (strong, nonatomic) NSMutableArray *imagesHogPyramid;
 
 //store the weights of the last iteration for convergence
@@ -71,7 +72,7 @@ using namespace cv;
 @synthesize isLearning = _isLearning;
 @synthesize iniPyramid = _iniPyramid;
 @synthesize finPyramid = _finPyramid;
-@synthesize receivedImages = _receivedImages;
+@synthesize receivedImageIndex = _receivedImageIndex;
 @synthesize imagesHogPyramid = _imagesHogPyramid;
 
 @synthesize weights = _weights;
@@ -93,7 +94,8 @@ using namespace cv;
 {
     for(int i=0; i<10;i++)
         levelsPyramid[i] =0;
-        
+    
+
         
     if(self = [super init])
     {
@@ -150,7 +152,11 @@ using namespace cv;
     self.isLearning = YES;
     self.imageListAux = [[NSMutableArray alloc] init];
     self.imagesHogPyramid = [[NSMutableArray alloc] init];
-    self.receivedImages = [[NSMutableArray alloc] init];
+    for (int i = 0; i < trainingSet.images.count*10; ++i)
+        [self.imagesHogPyramid addObject:[NSNull null]];
+    
+    self.receivedImageIndex = [[NSMutableArray alloc] init];
+
     
     
     // Get the template size and get hog feautures dimension
@@ -194,7 +200,6 @@ using namespace cv;
     
     //See the results on training set
     [self.delegate updateProgress:1];
-    [self testOnSet:trainingSet atThresHold:0];
     self.isLearning = NO;
     self.imagesHogPyramid = nil;
     free(self.weightsPLast);
@@ -208,6 +213,8 @@ using namespace cv;
             pyramids:(int)numberPyramids
             usingNms:(BOOL)useNms
    deviceOrientation:(int)orientation
+  learningImageIndex:(int) imageIndex
+
 {
     
     NSMutableArray *candidateBoundingBoxes = [[NSMutableArray alloc] init];
@@ -222,49 +229,68 @@ using namespace cv;
     //Pyramid limits
     if(self.finPyramid == 0) self.finPyramid = numberPyramids;
     
+    
     //locate pyramids already calculated in the buffer
-    BOOL found;
-    NSUInteger index;
+    BOOL found=NO;
     if(self.isLearning){
+        
+        //pyramid limits
+        self.iniPyramid = 0; self.finPyramid = numberPyramids;
+        
+        //Locate pyramids in buffer
         found = YES;
-        index = [self.receivedImages indexOfObject:image];
-        if(index == NSNotFound or self.receivedImages.count == 0){
-            [self.receivedImages addObject:image];
+        if([self.receivedImageIndex indexOfObject:[NSNumber numberWithInt:imageIndex]] == NSNotFound || self.receivedImageIndex.count == 0){
+//            NSLog(@"Adding imageIndex:%d",imageIndex);
+            [self.receivedImageIndex addObject:[NSNumber numberWithInt:imageIndex]];
             found = NO;
         }
+//        else NSLog(@"ImageIndex %d found!", imageIndex);
     }
-//    dispatch_queue_t myQueue = dispatch_queue_create("com.mycompany.myqueue", 0);
-//    dispatch_async(myQueue, ^{
-//        printf("this is a block!\n");
-//    });
     
-    
-//    HogFeature *originalImageHog = [[image scaleImageTo:initialScale] obtainHogFeatures];
-    //pyramid
-    for (int i=self.iniPyramid; i<self.finPyramid; i++){
+    dispatch_queue_t pyramidQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    UIImage *im = [image scaleImageTo:initialScale/pow(scale,self.iniPyramid)];
+    dispatch_apply(self.finPyramid - self.iniPyramid, pyramidQueue, ^(size_t i) {
         HogFeature *imageHog;
-        if(!self.isLearning){
-            UIImage *im = [image scaleImageTo:initialScale/pow(scale, i)];
-//            NSLog(@"image size: %f, %f", im.size.width, im.size.height);
-            imageHog = [im obtainHogFeatures];
-//            imageHog = [UIImage scaleHog:originalImageHog to:i for:numberPyramids];
-//            NSLog(@"original sizes: %d, %d for scale:%d", imageHog.numBlocksY, imageHog.numBlocksX,i);
-//            NSLog(@"levels: ini:%d, fin:%d", self.iniPyramid, self.finPyramid);
-            [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:0]];
-        }else{
-            if (!found) {
-                UIImage *im = [image scaleImageTo:initialScale/pow(scale, i)];
-                imageHog = [im obtainHogFeatures];
-                int indexRR = 0;
-                [self.imagesHogPyramid addObject:imageHog];
-                indexRR = self.imagesHogPyramid.count - 1;
-                [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:indexRR]];
-            }else{
-                imageHog = (HogFeature *)[self.imagesHogPyramid objectAtIndex:(index*numberPyramids + i)];
-                [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:(index*numberPyramids + i)]];
+        int imageHogIndex = 0;
+        float scaleLevel = pow(1.0/scale, i);
+        if(!found){
+            imageHog = [[im scaleImageTo:scaleLevel] obtainHogFeatures];
+            if(self.isLearning){
+//                [self.imagesHogPyramid addObject:imageHog];
+                imageHogIndex = imageIndex*numberPyramids + i + self.iniPyramid;
+                [self.imagesHogPyramid replaceObjectAtIndex:imageHogIndex withObject:imageHog];
+//                NSLog(@"Not found, saving scale: %zd at index: %d",i,imageHogIndex );
             }
+        }else{
+            imageHogIndex = (imageIndex*numberPyramids + i + self.iniPyramid);
+            imageHog = (HogFeature *)[self.imagesHogPyramid objectAtIndex:imageHogIndex];
+//            NSLog(@"Found it scale: %zd at index:%d", i , imageHogIndex);
         }
-    }
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i+self.iniPyramid forIndex:imageHogIndex]];
+        });
+    });
+    dispatch_release(pyramidQueue);
+
+    
+//    //pyramid
+//    UIImage *im = [image scaleImageTo:initialScale/pow(scale,self.iniPyramid)];
+//    for (int i=self.iniPyramid; i<self.finPyramid; i++){
+//        HogFeature *imageHog;
+//        int imageHogIndex = 0;
+//        if(!found){
+//            im = [im scaleImageTo:1/scale];
+//            imageHog = [im obtainHogFeatures];
+//            if(self.isLearning){
+//                imageHogIndex = imageIndex*numberPyramids + i;
+//                [self.imagesHogPyramid replaceObjectAtIndex:imageHogIndex withObject:imageHog];
+//            }
+//        }else{
+//            imageHogIndex = (imageIndex*numberPyramids + i);
+//            imageHog = (HogFeature *)[self.imagesHogPyramid objectAtIndex:imageHogIndex];
+//        }
+//        [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:imageHogIndex]];
+//    }
     
     
     //sort array of bounding boxes by score
@@ -272,9 +298,6 @@ using namespace cv;
     NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
     NSArray *candidateBoundingBoxesSorted = [candidateBoundingBoxes sortedArrayUsingDescriptors:sortDescriptors];
     
-//    for(BoundingBox *bb in candidateBoundingBoxesSorted)
-//        NSLog(@"level: %d, score: %f", bb.pyramidLevel, bb.score);
-//    NSLog(@"\n");
     
     NSArray *nmsArray = candidateBoundingBoxesSorted;
     if(useNms) nmsArray = [ConvolutionHelper nms:candidateBoundingBoxesSorted maxOverlapArea:0.25 minScoreThreshold:detectionThreshold]; 
@@ -282,9 +305,8 @@ using namespace cv;
     if(!self.isLearning && nmsArray.count > 0){
         //get the level of the maximum score bb
         int level = [(BoundingBox*)[nmsArray objectAtIndex:0] pyramidLevel];
-        self.iniPyramid = level>1 ? level - 1 : 0;
-        self.finPyramid = (level<numberPyramids) ? level + 1 :numberPyramids;
-        if(level == 0) self.finPyramid=2; else NSLog(@"found at level:%d !!", level);
+        self.iniPyramid = level-1 > -1 ? level - 1 : 0;
+        self.finPyramid = level+2 < numberPyramids ? level+2 : numberPyramids;
     }else{
         self.iniPyramid = 0;
         self.finPyramid = numberPyramids;
@@ -315,13 +337,14 @@ using namespace cv;
 - (void) testOnSet:(TrainingSet *)set atThresHold:(float)detectionThreshold
 {
     
+    self.isLearning = YES;
     //TODO: not multiimage
     NSLog(@"Detection threshold: %f", detectionThreshold);
     int tp=0, fp=0, fn=0;// tn=0;
     for(BoundingBox *groundTruthBoundingBox in set.groundTruthBoundingBoxes){
         bool found = NO;
         UIImage *selectedImage = [set.images objectAtIndex:groundTruthBoundingBox.imageIndex];
-        NSArray *detectedBoundingBoxes = [self detect:selectedImage minimumThreshold:detectionThreshold pyramids:10 usingNms:YES deviceOrientation:UIImageOrientationUp];
+        NSArray *detectedBoundingBoxes = [self detect:selectedImage minimumThreshold:detectionThreshold pyramids:10 usingNms:YES deviceOrientation:UIImageOrientationUp learningImageIndex:groundTruthBoundingBox.imageIndex];
         NSLog(@"For image %d generated %d detecting boxes", groundTruthBoundingBox.imageIndex, detectedBoundingBoxes.count);
         for(BoundingBox *detectedBoundingBox in detectedBoundingBoxes)
             if ([detectedBoundingBox fractionOfAreaOverlappingWith:groundTruthBoundingBox]>0.5){
@@ -338,6 +361,8 @@ using namespace cv;
     [self.delegate sendMessage:[NSString stringWithFormat:@"PRECISION: %f", tp*1.0/(tp+fp)]];
     [self.delegate sendMessage:[NSString stringWithFormat:@"RECALL: %f", tp*1.0/(tp+fn)]];
     self.precisionRecall = [[NSArray alloc] initWithObjects:[NSNumber numberWithDouble:tp*1.0/(tp+fp)],[NSNumber numberWithDouble:tp*1.0/(tp+fn)] ,nil];
+    
+    self.isLearning = NO;
 }
 
 
@@ -467,10 +492,10 @@ using namespace cv;
             }
         }
     }
-    
     free(c);
     return result;
 }
+
 
 -(void) addExample:(BoundingBox *)p to:(TrainingSet *)trainingSet
 {
@@ -498,7 +523,6 @@ using namespace cv;
 //        NSLog(@"on image: %d, %d with template size: %d, %d", imageHog.numBlocksX, imageHog.numBlocksY, self.sizesP[0], self.sizesP[1]);
 //        NSLog(@"(x,y): (%f,%f)", p.locationOnImageHog.x, p.locationOnImageHog.y);
 //    }
-
     
     trainingSet.numberOfTrainingExamples++;
 //    free(ramonet);
@@ -508,12 +532,15 @@ using namespace cv;
 
 - (void) getBoundingBoxesForTrainingWith:(TrainingSet *) trainingSet
 {
-    int positives = 0;
+    __block int positives = 0;
     trainingSet.numberOfTrainingExamples = numSupportVectors;
-    for(int i=0; i<trainingSet.images.count; i++){
+    
+    //concurrent adding examples for the different images
+    dispatch_queue_t trainingQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_apply(trainingSet.images.count, trainingQueue, ^(size_t i) {
         UIImage *image = [trainingSet.images objectAtIndex:i];
-        NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp];
-        [self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %d: %d", i, newBoundingBoxes.count]];
+        NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp learningImageIndex:i];
+        dispatch_sync(dispatch_get_main_queue(),^{[self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %zd: %d", i, newBoundingBoxes.count]];});
         int quota = MAX_QUOTA;
         NSArray *selectedGT = trainingSet.groundTruthBoundingBoxes;
         NSMutableArray *aux = [selectedGT mutableCopy];
@@ -527,8 +554,10 @@ using namespace cv;
                         newBB.label = 1;
                         isNegative = NO;
                         if(trainingSet.numberOfTrainingExamples+1 < MAX_NUMBER_EXAMPLES){
-                            [self addExample:newBB to:trainingSet];
-                            positives ++;
+                            dispatch_sync(dispatch_get_main_queue(), ^{
+                                [self addExample:newBB to:trainingSet];
+                                positives++;
+                            });
                         }else NSLog(@"Training Buffer FULL!!");
                     }else if(overlapArea < 0.25 && quota>0) isNegative = YES;
                 }else [aux removeObject:groundTruthBB];
@@ -536,12 +565,46 @@ using namespace cv;
             }
             selectedGT = aux;
             if(isNegative){
-                newBB.label = -1;
                 quota--;
-                [self addExample:newBB to:trainingSet];
+                newBB.label = -1;
+                dispatch_sync(dispatch_get_main_queue(), ^{[self addExample:newBB to:trainingSet];});
             }
         }
-    }
+    });
+    dispatch_release(trainingQueue);
+    
+//    for(int i=0; i<trainingSet.images.count; i++){
+//        UIImage *image = [trainingSet.images objectAtIndex:i];
+//        NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp learningImageIndex:i];
+//        [self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %d: %d", i, newBoundingBoxes.count]];
+//        int quota = MAX_QUOTA;
+//        NSArray *selectedGT = trainingSet.groundTruthBoundingBoxes;
+//        NSMutableArray *aux = [selectedGT mutableCopy];
+//        
+//        for(BoundingBox *newBB in newBoundingBoxes){
+//            BOOL isNegative = NO;
+//            for(BoundingBox *groundTruthBB in selectedGT){
+//                if(groundTruthBB.imageIndex == i){
+//                    double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];
+//                    if (overlapArea > 0.8 && overlapArea<1){
+//                        newBB.label = 1;
+//                        isNegative = NO;
+//                        if(trainingSet.numberOfTrainingExamples+1 < MAX_NUMBER_EXAMPLES){
+//                            [self addExample:newBB to:trainingSet];
+//                            positives ++;
+//                        }else NSLog(@"Training Buffer FULL!!");
+//                    }else if(overlapArea < 0.25 && quota>0) isNegative = YES;
+//                }else [aux removeObject:groundTruthBB];
+//                
+//            }
+//            selectedGT = aux;
+//            if(isNegative){
+//                newBB.label = -1;
+//                quota--;
+//                [self addExample:newBB to:trainingSet];
+//            }
+//        }
+//    }
     
     [self.delegate sendMessage:[NSString stringWithFormat:@"added:%d positives", positives]];
     self.numberOfPositives = [NSNumber numberWithInt:positives];
