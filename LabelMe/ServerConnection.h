@@ -47,9 +47,7 @@
 @property (nonatomic, strong) NSString *downloadProfilePictureURL;
 @property (nonatomic, strong) NSString *uploadProfilePictureURL;
 @property (nonatomic, strong) NSString *forgotPasswordURL;
-
-
-@property (nonatomic, strong) NSString          *filenamePending;
+@property (nonatomic, strong) NSString *filenamePending;
 
 -(void)setURLs;
 -(void)checkLoginForUsername:(NSString *)username andPassword:(NSString *)password;

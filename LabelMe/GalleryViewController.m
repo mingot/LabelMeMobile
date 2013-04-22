@@ -205,7 +205,8 @@
 
 -(void) reloadGallery
 {
-    [self setItems:[[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.paths objectAtIndex:THUMB]] error:NULL]];
+    self.items = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.paths objectAtIndex:THUMB]] error:NULL];
+    NSLog(@"Gallery is being looked at %@", [NSString stringWithFormat:@"%@",[self.paths objectAtIndex:THUMB]]);
     
     [self.tableViewGrid setRowHeight:(0.225*self.view.frame.size.width*ceil((float)self.items.count/4) + 0.0375*self.view.frame.size.width)];
     [self.tableView reloadData];

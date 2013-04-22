@@ -13,9 +13,10 @@
 #import "DetectorGalleryViewController.h"
 #import "CreateAccountViewController.h"
 #import "CameraOverlayViewController.h"
+#import "CameraViewController.h"
 #import "SendingView.h"
 
-@interface SignInViewController : UIViewController <UITextFieldDelegate,ServerConnectionDelegate,UITabBarControllerDelegate,CreateAccountDelegate, UINavigationControllerDelegate,UIImagePickerControllerDelegate, UIAlertViewDelegate, SendingViewDelegate>
+@interface SignInViewController : UIViewController <UITextFieldDelegate,ServerConnectionDelegate,UITabBarControllerDelegate,CreateAccountDelegate, UINavigationControllerDelegate,UIImagePickerControllerDelegate, UIAlertViewDelegate, SendingViewDelegate, CameraViewControllerDeledate>
 
 {
     
@@ -39,6 +40,7 @@
 @property (strong,nonatomic) GalleryViewController *galleryViewController;
 @property (strong,nonatomic) SettingsViewController *settingsViewController;
 @property (strong,nonatomic) DetectorGalleryViewController *detectorGalleryController;
+@property (strong,nonatomic) CameraViewController *cameraVC;
 @property (strong,nonatomic) NSDictionary *userDictionary;
 @property (strong,nonatomic) NSArray *userPaths;
 

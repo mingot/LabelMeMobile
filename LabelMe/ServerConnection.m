@@ -50,6 +50,7 @@ static BOOL didSignIn = NO;
 
 #pragma mark -
 #pragma mark Initialization Methods
+
 -(id)init{
     self = [super init];
     if (self) {
@@ -77,7 +78,8 @@ static BOOL didSignIn = NO;
 #pragma mark -
 #pragma mark Request Methods
 
--(void)checkLoginForUsername:(NSString *)username andPassword:(NSString *)password{
+-(void)checkLoginForUsername:(NSString *)username andPassword:(NSString *)password
+{
     didSignIn = NO;
     
     NSString *boundary = @"AaB03x";
@@ -86,7 +88,8 @@ static BOOL didSignIn = NO;
     [theRequest setHTTPMethod:@"POST"];
     NSString *contentType = [[NSString alloc] initWithFormat:@"multipart/form-data, boundary=%@", boundary ];
     [theRequest setValue:contentType forHTTPHeaderField:@"Content-type"];
-    NSMutableData *postBody = [[NSMutableData alloc]init];
+    
+    NSMutableData *postBody = [[NSMutableData alloc] init];
     [postBody appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[@"Content-Disposition: form-data; name=\"username\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[username dataUsingEncoding:NSUTF8StringEncoding]];
@@ -94,18 +97,18 @@ static BOOL didSignIn = NO;
     [postBody appendData:[@"Content-Disposition: form-data; name=\"password\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[password dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r \n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    
     [theRequest setHTTPBody:postBody];
-    NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:theRequest delegate:self];
-    if (connection == nil) {
-        [self errorWithTitle:@"Unknown error" andDescription:@""];
-    }
-    else{
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    
+    //connection
+    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
+    if (connection == nil) [self errorWithTitle:@"Unknown error" andDescription:@""];
+    else [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
-    }
 }
--(void) createAccountWithFields:(NSArray *)fields{
+
+
+-(void) createAccountWithFields:(NSArray *)fields
+{
     NSString *name = [fields objectAtIndex:0];
     NSString *institution = [fields objectAtIndex:1];
     NSString *username = [fields objectAtIndex:2];
@@ -134,45 +137,43 @@ static BOOL didSignIn = NO;
     [postBody appendData:[@"Content-Disposition: form-data; name=\"email\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[email dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r \n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    
     [theRequest setHTTPBody:postBody];
+    
+    
     NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:theRequest delegate:self];
-    if (connection == nil) {
-        [self errorWithTitle:@"Unknown error" andDescription:@""];
-    }
-    else{
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-
-    }
+    if (connection == nil) [self errorWithTitle:@"Unknown error" andDescription:@""];
+    else [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
 }
--(void)forgotPassword:(NSString *)email{
+
+
+-(void)forgotPassword:(NSString *)email
+{
     NSString *boundary = @"AaB03x";
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.forgotPasswordURL]];
     
     [theRequest setHTTPMethod:@"POST"];
-    NSString *contentType = [[NSString alloc] initWithFormat:@"multipart/form-data, boundary=%@", boundary ];
+    NSString *contentType = [[NSString alloc] initWithFormat:@"multipart/form-data, boundary=%@", boundary];
     [theRequest setValue:contentType forHTTPHeaderField:@"Content-type"];
     NSMutableData *postBody = [[NSMutableData alloc]init];
     [postBody appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[@"Content-Disposition: form-data; name=\"email\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[email dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r \n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    
     [theRequest setHTTPBody:postBody];
+    
     NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:theRequest delegate:self];
-    if (connection == nil) {
-        [self errorWithTitle:@"Unknown error" andDescription:@""];
-    }
-    else{
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-        
-    }
+    if (connection == nil) [self errorWithTitle:@"Unknown error" andDescription:@""];
+    else [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
 }
--(void)sendPhoto:(UIImage *) photo filename: (NSString *)filename path:(NSString *)objectpath withSize:(CGPoint)size andAnnotation:(NSMutableArray *) annotation{
+
+
+-(void)sendPhoto:(UIImage *) photo filename:(NSString *)filename path:(NSString *)objectpath withSize:(CGPoint)size andAnnotation:(NSMutableArray *) annotation
+{
     cancel = NO;
 
+    //check settings for wifi only.
     NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[objectpath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"settings.plist"]];
     NSNumber *dictnum = [dict objectForKey:@"wifi"];
     Reachability *networkReachability = [Reachability reachabilityForInternetConnection];
@@ -223,9 +224,11 @@ static BOOL didSignIn = NO;
 
     }
     self.filenamePending = @"";
-    
 }
--(void)sendPhotoWithFilename:(NSString *)filename{
+
+
+-(void)sendPhotoWithFilename:(NSString *)filename
+{
     cancel = NO;
 
     NSString *boundary = @"AaB03x";
@@ -250,14 +253,13 @@ static BOOL didSignIn = NO;
 
     }
     self.filenamePending = @"";
-
 }
+
 
 -(void)updateAnnotationFrom: (NSString *)filename withSize:(CGPoint)size :(NSMutableArray *)annotation
 {
     cancel = NO;
 
-    
     NSString *boundary = @"AaB03x";
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.updateAnnotationURL]];
     NSData *annotationData = [[NSData alloc]initWithData:[self createXMLFromAnnotation:annotation andImageSize:size]];
@@ -295,7 +297,10 @@ static BOOL didSignIn = NO;
 
     }self.filenamePending = @"";
 }
--(BOOL)createHTTPBodyWithImage: (UIImage *)image size:(CGPoint)point filename:(NSString *)filename  path:(NSString *)objectpath andAnnotation:(NSMutableArray *)annotation{
+
+
+-(BOOL)createHTTPBodyWithImage: (UIImage *)image size:(CGPoint)point filename:(NSString *)filename  path:(NSString *)objectpath andAnnotation:(NSMutableArray *)annotation
+{
     BOOL ret= NO;
     NSFileManager * filemng = [NSFileManager defaultManager];
    // NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
@@ -328,9 +333,10 @@ static BOOL didSignIn = NO;
         
     }
     return ret;
-    
 }
--(void)updateAnnotationWithFilename:(NSString *)filename{
+
+-(void)updateAnnotationWithFilename:(NSString *)filename
+{
     cancel = NO;
 
     NSString *boundary = @"AaB03x";
@@ -356,61 +362,26 @@ static BOOL didSignIn = NO;
 
     }
     self.filenamePending = @"";
-
 }
--(NSString *)generateDateString{
+
+
+-(NSString *)generateDateString
+{
     NSString *originalDate = [[[NSDate date] description] substringToIndex:19];
     NSString *time = [originalDate substringFromIndex:11];
     NSString *day = [originalDate substringWithRange:NSMakeRange(8, 2)];
     NSString *year = [originalDate substringWithRange:NSMakeRange(0, 4)];
     NSString *month = [originalDate substringWithRange:NSMakeRange(5, 2)];
     int m = [month intValue];
-    switch (m) {
-        case 1:
-            month = @"Jan";
-            break;
-        case 2:
-            month = @"Feb";
-            break;
-        case 3:
-            month = @"Mar";
-            break;
-        case 4:
-            month = @"Apr";
-            break;
-        case 5:
-            month = @"May";
-            break;
-        case 6:
-            month = @"Jun";
-            break;
-        case 7:
-            month = @"Jul";
-            break;
-        case 8:
-            month = @"Aug";
-            break;
-        case 9:
-            month = @"Sep";
-            break;
-        case 10:
-            month = @"Oct";
-            break;
-        case 11:
-            month = @"Nov";
-            break;
-        case 12:
-            month = @"Dec";
-            break;
-        default:
-            break;
-    }
+    NSArray *months = [[NSArray alloc] initWithObjects:@"Jan",@"Feb",@"Mar",@"Apr",@"May",@"Jun",@"Jul",@"Aug",@"Sep",@"Oct",@"Nov",@"Dec", nil];
+    month = [months objectAtIndex:m-1];
     NSString *ret = [NSString stringWithFormat:@"%@-%@-%@ -%@",day,month,year,time];
     return ret;
     
 }
 
--(NSData *)createXMLFromAnnotation:(NSMutableArray *) annotation andImageSize:(CGPoint) point{
+-(NSData *)createXMLFromAnnotation:(NSMutableArray *) annotation andImageSize:(CGPoint) point
+{
     NSMutableData *XMLString = [[NSMutableData alloc] init];
     NSString *boundary = @"--022289--";
         for (int i=0; i<annotation.count; i++) {
@@ -440,7 +411,8 @@ static BOOL didSignIn = NO;
 }
 
 
--(void)downloadProfilePictureToUsername:(NSString *) username{
+-(void)downloadProfilePictureToUsername:(NSString *) username
+{
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[documentsDirectory stringByAppendingPathComponent:username] stringByAppendingPathComponent:@"settings.plist"]];
     NSNumber *dictnum = [dict objectForKey:@"wifi"];
@@ -455,21 +427,18 @@ static BOOL didSignIn = NO;
     }
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.downloadProfilePictureURL]];
     [theRequest setHTTPMethod:@"POST"];
+    
     NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:theRequest delegate:self];
-    if (connection == nil) {
-        [self errorWithTitle:@"Unknown error" andDescription:@""];
-    }
-    else{
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    if (connection == nil) [self errorWithTitle:@"Unknown error" andDescription:@""];
+    else [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
-    }
 }
 
 
--(void)uploadProfilePicture:(UIImage *)ppicture{
+-(void)uploadProfilePicture:(UIImage *)ppicture
+{
     NSArray *fields = [[NSArray alloc] initWithArray:[self signInAgain]];
-    
-    
+        
     NSString *boundary = @"AaB03x";
     UIImage *imageToSend = rotate(ppicture, ppicture.imageOrientation);
     NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(imageToSend, 1.0)];
@@ -492,17 +461,12 @@ static BOOL didSignIn = NO;
     
     [theRequest setHTTPBody:postBody];
     NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:theRequest delegate:self];
-    if (connection == nil) {
-        [self errorWithTitle:@"Unknown error" andDescription:@""];
-    }
-    else{
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-
-    }
-
+    if (connection == nil) [self errorWithTitle:@"Unknown error" andDescription:@""];
+    else [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 }
--(NSArray *) signInAgain{
-    
+
+-(NSArray *) signInAgain
+{
     NSFileManager * filemng = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSError *error;

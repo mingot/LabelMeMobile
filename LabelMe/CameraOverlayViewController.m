@@ -135,7 +135,8 @@
 
    	// Do any additional setup after loading the view.
 }
--(void) lastPhoto{
+-(void) lastPhoto
+{
     ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
     [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
                                  usingBlock:^(ALAssetsGroup *group, BOOL *stop) {

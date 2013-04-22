@@ -32,6 +32,7 @@
 @synthesize galleryViewController = _galleryViewController;
 @synthesize settingsViewController = _settingsViewController;
 @synthesize detectorGalleryController = _detectorGalleryController;
+@synthesize cameraVC = _cameraVC;
 @synthesize userDictionary = _userDictionary;
 @synthesize userPaths = _userPaths;
 
@@ -377,40 +378,43 @@
             self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone5" bundle:nil];
             self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone5" bundle:nil];
             self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
+            self.cameraVC = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
             
         }else if ([UIScreen mainScreen].bounds.size.height == 480){
             self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone" bundle:nil];
             self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone" bundle:nil];
             self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
+            self.cameraVC = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
         }
         
     }else{
         self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPad" bundle:nil];
         self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPad" bundle:nil];
         self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
+        self.cameraVC = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
     }
    
     //set username
     self.galleryViewController.username = self.usernameField.text;
     self.settingsViewController.username = self.usernameField.text;
     self.detectorGalleryController.username = self.usernameField.text;
+    self.cameraVC.delegate = self;
     
     //set the tabBar
     self.tabBarController =[[UITabBarController alloc] init];
     self.tabBarController.delegate = self;
     UIViewController *cameraVC = [[UIViewController alloc] init];
-    cameraVC.tabBarItem =[[UITabBarItem alloc]initWithTitle:@"Camera" image:nil tag:1];
-    [cameraVC.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"camera.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"cameraActive.png"]];
+    self.cameraVC.tabBarItem =[[UITabBarItem alloc]initWithTitle:@"Camera" image:nil tag:1];
+    [self.cameraVC.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"camera.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"cameraActive.png"]];
     self.tabBarController.viewControllers = @[[[UINavigationController alloc] initWithRootViewController:self.galleryViewController],
-                                              cameraVC,
+                                              self.cameraVC,
                                               [[UINavigationController alloc] initWithRootViewController:self.detectorGalleryController],
                                               [[UINavigationController alloc] initWithRootViewController:self.settingsViewController]];
     
     
-    NSFileManager * filemng = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSString *path = [[NSString alloc] initWithString:[[documentsDirectory stringByAppendingPathComponent:self.usernameField.text] stringByAppendingPathComponent:@"profilepicture.jpg" ]];
-    if (![filemng fileExistsAtPath:path]) {
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         [sConnection downloadProfilePictureToUsername:self.usernameField.text];
     }
     
@@ -436,10 +440,8 @@
 
 -(void)signInWithoutConnection
 {
-    if (previousSession) {
-        [self signInComplete];
-        
-    }else{
+    if (previousSession) [self signInComplete];
+    else{
         [self errorWithTitle:@"No internet connection" andDescription:@"The app could not connect."];
         [sendingView setHidden:YES];
         [sendingView.activityIndicator stopAnimating];
@@ -458,43 +460,45 @@
 #pragma mark TabBarController Delegate
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
-{    
-    if (tabBarController.selectedIndex == 1) {
-        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
-        imagePicker.delegate = self;
-        
-        //detect if camera is available
-        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
-            [imagePicker setSourceType:UIImagePickerControllerSourceTypeCamera];
-        else [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
-    
-        //decide how to present the camera depending if it is iphone or ipad
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-          [tabBarController.selectedViewController presentViewController:imagePicker animated:NO completion:NULL];
-
-        }else{
-            if ([imagePicker sourceType] == UIImagePickerControllerSourceTypePhotoLibrary ) {
-                if ([self.popover isPopoverVisible]) {
-                    [self.popover dismissPopoverAnimated:YES];
-                    
-                }else{
-                    UIPopoverController *popover = [[UIPopoverController alloc] initWithContentViewController:imagePicker];
-                    [popover presentPopoverFromBarButtonItem:[tabBarController.tabBar.items objectAtIndex:1] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES ];
-                    
-                    self.popover = popover;
-                }
-
-            }
-            else [tabBarController.selectedViewController presentViewController:imagePicker animated:NO completion:NULL];
-
-        }
-    }
+{
+//    //camera selected
+//    if (tabBarController.selectedIndex == 1) {
+//        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+//        imagePicker.delegate = self;
+//        
+//        //detect if camera is available
+//        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
+//            [imagePicker setSourceType:UIImagePickerControllerSourceTypeCamera];
+//        else [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+//    
+//        //decide how to present the camera depending if it is iphone or ipad
+//        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+//          [tabBarController.selectedViewController presentViewController:imagePicker animated:NO completion:NULL];
+//
+//        }else{
+//            if ([imagePicker sourceType] == UIImagePickerControllerSourceTypePhotoLibrary ) {
+//                if ([self.popover isPopoverVisible]) {
+//                    [self.popover dismissPopoverAnimated:YES];
+//                    
+//                }else{
+//                    UIPopoverController *popover = [[UIPopoverController alloc] initWithContentViewController:imagePicker];
+//                    [popover presentPopoverFromBarButtonItem:[tabBarController.tabBar.items objectAtIndex:1] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES ];
+//                    
+//                    self.popover = popover;
+//                }
+//
+//            }
+//            else [tabBarController.selectedViewController presentViewController:imagePicker animated:NO completion:NULL];
+//
+//        }
+//    }
 
 }
 
 
 #pragma mark -
 #pragma mark UIImagePickerControllerDelegate
+
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     UIImage *image = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
@@ -547,11 +551,11 @@
         
         [locationMng stopUpdatingLocation];
     });
-        
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
+    NSLog(@"Cancel");
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque];
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
     
@@ -560,6 +564,42 @@
         
     else [picker dismissViewControllerAnimated:YES completion:NULL];
 
+}
+
+#pragma mark
+#pragma mark - CameraVC Delegate
+
+-(void) cancelPhotoCapture
+{
+    NSLog(@"cancel");
+}
+
+-(void) addImage:(UIImage *)image
+{
+    
+    NSLog(@"adding image to gallery");
+    [locationMng startUpdatingLocation];
+    TagViewController *tagViewController = [[TagViewController alloc] init];
+    tagViewController.username = self.usernameField.text;
+    
+    //get the new size of the image according to the defined resolution and save image
+    CGSize newSize = image.size;
+    float resolution = [[self.userDictionary objectForKey:@"resolution"] floatValue];
+    float max = newSize.width > newSize.height ? newSize.width : newSize.height;
+    if ((resolution != 0.0) && (resolution < max))
+        newSize = image.size.height > image.size.width ? CGSizeMake(resolution*0.75, resolution) : CGSizeMake(resolution, resolution*0.75);
+    NSLog(@"New size for the image %f %f", newSize.height, newSize.width);
+    
+    
+    //save location information
+    NSString *location = @"";
+    location = [[locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
+    [location writeToFile:[[self.userPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[tagViewController.filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+    
+    [locationMng stopUpdatingLocation];
+
+    
+    [tagViewController saveImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
 }
 
 

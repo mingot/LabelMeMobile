@@ -302,9 +302,8 @@
 {
     [self.sendButton setTitle:@"Send"];
     NSString *plistPath = [[NSString alloc] initWithFormat:@"%@/%@.plist",[self.paths objectAtIndex:USER],self.username];
-      NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:plistPath];
-    NSNumber *num = [[NSNumber alloc] initWithInt:-1];
-    [dict setObject:num forKey:filename];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:plistPath];
+    [dict setObject:[[NSNumber alloc] initWithInt:-1] forKey:filename];
     [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
 }
 
@@ -565,33 +564,32 @@
 #pragma mark Save State
 -(BOOL)saveThumbnail
 {
-    NSFileManager * filemng = [NSFileManager defaultManager];
     [self.annotationView setSelectedBox:-1];
     [self.annotationView setNeedsDisplay];
-    //NSData *image = UIImageJPEGRepresentation(self.imageView.image, 0.75);
     UIGraphicsBeginImageContext(self.scrollView.frame.size);
     [self.scrollView.layer renderInContext:UIGraphicsGetCurrentContext()];
     UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    CGImageRef image = CGImageCreateWithImageInRect(viewImage.CGImage, self.imageView.frame);
+    CGImageRef imageRef = CGImageCreateWithImageInRect(viewImage.CGImage, self.imageView.frame);
     UIImage *thumbnailImage = nil;
-    NSLog(@"imagesize: %zux%zu",CGImageGetWidth(image),CGImageGetHeight(image));
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-       thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
-
-    }
-    else{
-        thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
-
-    }
+    NSLog(@"[THUMBNAIL] imagesize: %zux%zu",CGImageGetWidth(imageRef),CGImageGetHeight(imageRef));
     
-    CGImageRelease(image);
+    int thumbnailSize = 300;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
+    thumbnailImage  = [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
+    
+//    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+//       thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
+//
+//    else thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
+
+    
+    CGImageRelease(imageRef);
 
     NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
-    if([filemng createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil])
+    if([[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil])
         return YES;
-    else
-        return NO;
+    else return NO;
 }
 
 
@@ -602,13 +600,18 @@
         if (self.paths == nil)
             self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
 
+        //set self.filename
         [self createFilename];
         [self createPlistEntry:self.filename];
         
-        [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
-    
-        [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:self.filename] contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
-
+        NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:self.filename];
+        [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
+        NSLog(@"[IMAGE] Saved at path %@", pathImages);
+        
+        NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:self.filename];
+        [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
+        NSLog(@"[THUMB] Saved at path %@", pathThumb);
+        
         [self saveDictionary];
     }
 }
@@ -616,10 +619,8 @@
 
 -(BOOL)saveDictionary
 {
-    NSString *path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename ];
-    
-    NSLog(@"self.filename: %@", self.filename);
-    if([NSKeyedArchiver archiveRootObject:self.annotationView.objects toFile:path]) return YES;
+    NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename ];
+    if([NSKeyedArchiver archiveRootObject:self.annotationView.objects toFile:pathObject]) return YES;
     else return NO;
 }
 

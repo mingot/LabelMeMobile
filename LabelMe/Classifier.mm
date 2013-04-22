@@ -202,6 +202,7 @@ using namespace cv;
     [self.delegate updateProgress:1];
     self.isLearning = NO;
     self.imagesHogPyramid = nil;
+    self.receivedImageIndex = nil;
     free(self.weightsPLast);
     free(trainingSet.imageFeatures);
     free(trainingSet.labels);
@@ -240,11 +241,11 @@ using namespace cv;
         //Locate pyramids in buffer
         found = YES;
         if([self.receivedImageIndex indexOfObject:[NSNumber numberWithInt:imageIndex]] == NSNotFound || self.receivedImageIndex.count == 0){
-//            NSLog(@"Adding imageIndex:%d",imageIndex);
+            NSLog(@"Adding imageIndex:%d",imageIndex);
             [self.receivedImageIndex addObject:[NSNumber numberWithInt:imageIndex]];
             found = NO;
         }
-//        else NSLog(@"ImageIndex %d found!", imageIndex);
+        else NSLog(@"ImageIndex %d found!", imageIndex);
     }
     
     dispatch_queue_t pyramidQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);

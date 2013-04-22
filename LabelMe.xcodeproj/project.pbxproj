@@ -165,6 +165,8 @@
 		FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC4D68801716164E002A73AD /* CoreMotion.framework */; };
 		FC4D688A17167036002A73AD /* ThreeDimVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4D688817167036002A73AD /* ThreeDimVC.m */; };
 		FC4D688B17167036002A73AD /* ThreeDimVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC4D688917167036002A73AD /* ThreeDimVC.xib */; };
+		FC4EE0F617231A1700536B4A /* CameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4EE0F417231A1700536B4A /* CameraViewController.m */; };
+		FC4EE0F717231A1700536B4A /* CameraViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC4EE0F517231A1700536B4A /* CameraViewController.xib */; };
 		FC5C939A16FCB89900637B69 /* app login-11.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C939916FCB89900637B69 /* app login-11.png */; };
 		FC5C939C16FCB8A600637B69 /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C939B16FCB8A600637B69 /* tick.png */; };
 		FC5C939E16FCB8AE00637B69 /* cruz.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C939D16FCB8AE00637B69 /* cruz.png */; };
@@ -391,6 +393,9 @@
 		FC4D688817167036002A73AD /* ThreeDimVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ThreeDimVC.m; path = ../ThreeDimVC.m; sourceTree = "<group>"; };
 		FC4D688917167036002A73AD /* ThreeDimVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ThreeDimVC.xib; path = ../ThreeDimVC.xib; sourceTree = "<group>"; };
 		FC4D6890171A37E4002A73AD /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		FC4EE0F317231A1700536B4A /* CameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraViewController.h; sourceTree = "<group>"; };
+		FC4EE0F417231A1700536B4A /* CameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraViewController.m; sourceTree = "<group>"; };
+		FC4EE0F517231A1700536B4A /* CameraViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CameraViewController.xib; sourceTree = "<group>"; };
 		FC5C939916FCB89900637B69 /* app login-11.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "app login-11.png"; path = "../archivos/app login-11.png"; sourceTree = "<group>"; };
 		FC5C939B16FCB8A600637B69 /* tick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tick.png; path = ../archivos/tick.png; sourceTree = "<group>"; };
 		FC5C939D16FCB8AE00637B69 /* cruz.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cruz.png; path = ../archivos/cruz.png; sourceTree = "<group>"; };
@@ -764,6 +769,8 @@
 				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
 				A5480D6716176CEB009F630D /* CameraOverlayViewController.h */,
 				A5480D6816176CEB009F630D /* CameraOverlayViewController.m */,
+				FC4EE0F317231A1700536B4A /* CameraViewController.h */,
+				FC4EE0F417231A1700536B4A /* CameraViewController.m */,
 				A5A567721617D756008AFE2E /* SettingsViewController.h */,
 				A5A567731617D756008AFE2E /* SettingsViewController.m */,
 				A5C8BFCC162F4EC4009A39E0 /* ResolutionViewController.h */,
@@ -793,6 +800,7 @@
 				FCED897D170375050027CBE1 /* ShowTrainingSetViewController.xib */,
 				FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */,
 				FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */,
+				FC4EE0F517231A1700536B4A /* CameraViewController.xib */,
 			);
 			name = Detector;
 			sourceTree = "<group>";
@@ -984,6 +992,7 @@
 				FCED898417037A5F0027CBE1 /* ShowImageViewController.xib in Resources */,
 				FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */,
 				FC4D688B17167036002A73AD /* ThreeDimVC.xib in Resources */,
+				FC4EE0F717231A1700536B4A /* CameraViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1031,6 +1040,7 @@
 				FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */,
 				FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */,
 				FC4D688A17167036002A73AD /* ThreeDimVC.m in Sources */,
+				FC4EE0F617231A1700536B4A /* CameraViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

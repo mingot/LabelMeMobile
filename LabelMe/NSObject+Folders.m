@@ -81,7 +81,8 @@
     
     return YES;
 }
--(NSArray *) newArrayWithFolders: (NSString *)username{
+-(NSArray *) newArrayWithFolders: (NSString *)username
+{
     
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     NSString *path = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,username ];
