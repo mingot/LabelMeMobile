@@ -113,14 +113,12 @@
 
 -(void) drawBox:(CGContextRef )context :(Box *)box1 :(CGFloat) alpha
 {
-    
     const CGFloat *components = CGColorGetComponents(box1.color.CGColor);
     CGContextBeginPath(context);
     CGContextSetRGBStrokeColor(context, components[0] ,components[1],components[2], alpha);
     CGContextAddRect(context, CGRectMake([box1 upperLeft].x, [box1 upperLeft].y, [box1 lowerRight].x-[box1 upperLeft].x, [box1 lowerRight].y-[box1 upperLeft].y) );
     CGContextClosePath(context);
     CGContextStrokePath(context);
-    
 }
 
 

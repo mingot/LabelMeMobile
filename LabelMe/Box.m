@@ -14,6 +14,7 @@
 @synthesize label = _label;
 @synthesize color = _color;
 @synthesize date = _date;
+@synthesize downloadDate = _downloadDate;
 
 static float LINEWIDTH = 6;
 

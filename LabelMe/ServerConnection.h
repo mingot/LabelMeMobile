@@ -28,7 +28,7 @@
 
 
 
-@interface ServerConnection : NSObject <NSURLConnectionDataDelegate, NSURLConnectionDelegate>
+@interface ServerConnection : NSObject <NSURLConnectionDataDelegate>
 {
     
     NSMutableData *receivedData;
@@ -45,6 +45,7 @@
 @property (nonatomic, strong) NSString *sendPhotoURL;
 @property (nonatomic, strong) NSString *updateAnnotationURL;
 @property (nonatomic, strong) NSString *downloadProfilePictureURL;
+@property (nonatomic, strong) NSString *downloadNamesURL;
 @property (nonatomic, strong) NSString *uploadProfilePictureURL;
 @property (nonatomic, strong) NSString *forgotPasswordURL;
 @property (nonatomic, strong) NSString *filenamePending;
@@ -56,6 +57,7 @@
 -(void)sendPhoto:(UIImage *) photo filename: (NSString *)filename path:(NSString *)objectpath withSize:(CGPoint)size andAnnotation:(NSMutableArray *) annotation;
 -(void)updateAnnotationFrom:(NSString *)filename withSize:(CGPoint)size : (NSMutableArray *) annotation;
 -(void)downloadProfilePictureToUsername:(NSString *) username;
+-(void)downloadNamesForUsername:(NSString *)username;
 -(void)uploadProfilePicture:(UIImage *)ppicture;
 -(void)cancelRequestFor:(int)req;
 @end

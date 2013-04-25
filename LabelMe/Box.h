@@ -14,16 +14,17 @@
 {
     CGPoint upperLeft;
     CGPoint lowerRigth;
-    @public float   UPPERBOUND;
-    @public float   LOWERBOUND;
-    @public float   LEFTBOUND;
-    @public float   RIGHTBOUND;
+    @public float UPPERBOUND;
+    @public float LOWERBOUND;
+    @public float LEFTBOUND;
+    @public float RIGHTBOUND;
     BOOL    sent;
 }
 
 @property (strong, nonatomic) NSString *label;
 @property (strong, nonatomic) NSString *date;
 @property (strong, nonatomic) UIColor *color;
+@property (strong, nonatomic) NSDate *downloadDate;
 
 
 - (id) initWithPoints:(CGPoint)upper :(CGPoint)lower;

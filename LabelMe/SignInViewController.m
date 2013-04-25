@@ -403,7 +403,7 @@
     //set the tabBar
     self.tabBarController =[[UITabBarController alloc] init];
     self.tabBarController.delegate = self;
-    UIViewController *cameraVC = [[UIViewController alloc] init];
+//    UIViewController *cameraVC = [[UIViewController alloc] init];
     self.cameraVC.tabBarItem =[[UITabBarItem alloc]initWithTitle:@"Camera" image:nil tag:1];
     [self.cameraVC.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"camera.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"cameraActive.png"]];
     self.tabBarController.viewControllers = @[[[UINavigationController alloc] initWithRootViewController:self.galleryViewController],
@@ -417,6 +417,9 @@
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         [sConnection downloadProfilePictureToUsername:self.usernameField.text];
     }
+    
+//    //print names of all images in iphone collection
+//    [sConnection downloadNamesForUsername:self.usernameField.text];
     
     sendingView.hidden = YES;
     [sendingView.activityIndicator stopAnimating];
@@ -492,6 +495,7 @@
 //
 //        }
 //    }
+    
 
 }
 
@@ -576,30 +580,35 @@
 
 -(void) addImage:(UIImage *)image
 {
+    dispatch_queue_t savingQueue = dispatch_queue_create("saving_image", 0);
+    dispatch_async(savingQueue, ^{
+        NSLog(@"adding image to gallery");
+        [locationMng startUpdatingLocation];
+        TagViewController *tagViewController = [[TagViewController alloc] init];
+        tagViewController.username = self.usernameField.text;
+        
+        //get the new size of the image according to the defined resolution and save image
+        CGSize newSize = image.size;
+        float resolution = [[self.userDictionary objectForKey:@"resolution"] floatValue];
+        float max = newSize.width > newSize.height ? newSize.width : newSize.height;
+        if ((resolution != 0.0) && (resolution < max))
+            newSize = image.size.height > image.size.width ? CGSizeMake(resolution*0.75, resolution) : CGSizeMake(resolution, resolution*0.75);
+        NSLog(@"New size for the image %f %f", newSize.height, newSize.width);
+        
+        //save image into library if option enabled in settings
+        if ([[self.userDictionary objectForKey:@"cameraroll"] boolValue]) UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
+        
+        //save location information
+        NSString *location = @"";
+        location = [[locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
+        [location writeToFile:[[self.userPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[tagViewController.filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+        
+        [locationMng stopUpdatingLocation];
+        
+        [tagViewController saveImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
+    });
+    dispatch_release(savingQueue);
     
-    NSLog(@"adding image to gallery");
-    [locationMng startUpdatingLocation];
-    TagViewController *tagViewController = [[TagViewController alloc] init];
-    tagViewController.username = self.usernameField.text;
-    
-    //get the new size of the image according to the defined resolution and save image
-    CGSize newSize = image.size;
-    float resolution = [[self.userDictionary objectForKey:@"resolution"] floatValue];
-    float max = newSize.width > newSize.height ? newSize.width : newSize.height;
-    if ((resolution != 0.0) && (resolution < max))
-        newSize = image.size.height > image.size.width ? CGSizeMake(resolution*0.75, resolution) : CGSizeMake(resolution, resolution*0.75);
-    NSLog(@"New size for the image %f %f", newSize.height, newSize.width);
-    
-    
-    //save location information
-    NSString *location = @"";
-    location = [[locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
-    [location writeToFile:[[self.userPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[tagViewController.filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
-    
-    [locationMng stopUpdatingLocation];
-
-    
-    [tagViewController saveImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
 }
 
 

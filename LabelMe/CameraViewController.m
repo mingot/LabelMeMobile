@@ -17,8 +17,6 @@
 @end
 
 
-
-
 @implementation CameraViewController
 
 @synthesize delegate = _delegate;
@@ -28,6 +26,7 @@
 
 //private
 @synthesize isUsingFrontFacingCamera = _isUsingFrontFacingCamera;
+@synthesize numberImages = _numberImages;
 
 
 
@@ -73,14 +72,12 @@
     NSDictionary *outputSettings = [[NSDictionary alloc] initWithObjectsAndKeys: AVVideoCodecJPEG, AVVideoCodecKey, nil];
     [self.stillImageOutput setOutputSettings:outputSettings];
     
-    
     //Capture session definition
     self.captureSession = [[AVCaptureSession alloc] init];
     [self.captureSession addInput:captureInput];
     [self.captureSession addOutput:captureOutput]; //video output
     [self.captureSession addOutput:self.stillImageOutput]; //still image output
     [self.captureSession setSessionPreset:AVCaptureSessionPresetPhoto];
-    
     
     // Previous layer to show the video image
     self.prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
@@ -93,7 +90,6 @@
 	[[self view] addSubview:CameraView];
 	[self.view sendSubviewToBack:CameraView];
 	[[CameraView layer] addSublayer:self.prevLayer];
-
 }
 
 
@@ -134,7 +130,7 @@
          UIImage *image = [[UIImage alloc] initWithData:imageData];
         
         self.numberImages++;
-        [self.numberImagesLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%d",self.numberImages] waitUntilDone:YES];
+        self.numberImagesLabel.text = [NSString stringWithFormat:@"%d",self.numberImages];
         [self.delegate addImage:image];
 	 }];
 }

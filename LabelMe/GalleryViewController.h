@@ -27,11 +27,11 @@
 @property (nonatomic,strong) IBOutlet UIToolbar *bottomToolbar;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *deleteButton;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *sendButton;
-
 @property (nonatomic,strong) IBOutlet UILabel *usernameLabel;
-@property (nonatomic, strong) IBOutlet UIImageView *profilePicture;
-
+@property (nonatomic,strong) IBOutlet UIImageView *profilePicture;
 @property (nonatomic,strong) IBOutlet UIButton *listButton;
+@property (nonatomic,strong) IBOutlet UITableView *tableView;
+@property (nonatomic,strong) IBOutlet UITableView *tableViewGrid;
 
 @property (nonatomic,strong) NSArray *paths;
 @property (nonatomic,strong) NSArray *items;
@@ -40,12 +40,7 @@
 @property (nonatomic,strong) NSMutableArray *selectedItemsSend;
 @property (nonatomic,strong) NSMutableArray *selectedItemsDelete;
 
-@property (nonatomic,strong) IBOutlet UITableView *tableView;
-@property (nonatomic,strong) IBOutlet UITableView *tableViewGrid;
-
 @property (nonatomic,strong) TagViewController *tagViewController;
-
-
 @property (nonatomic,strong) NSString *username;
 
 
@@ -56,5 +51,7 @@
 -(IBAction)listAction:(id)sender;
 -(IBAction)cancelAction:(id)sender;
 -(IBAction)editAction:(id)sender;
+-(void)moreImagesAction;
+
 
 @end

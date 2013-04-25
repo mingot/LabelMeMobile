@@ -167,6 +167,7 @@
         tip.hidden = YES;
 
     [self.labelsView setBackgroundView:backgroundView];
+    
 }
 
 
@@ -187,7 +188,24 @@
     
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
-
+    
+    //check for all the boxes have the correct size (correction for the downloaded boxes)
+    for(Box* box in self.annotationView.objects){
+        CGFloat frameWidth = self.annotationView.frame.size.width;
+        CGFloat frameHeight = self.annotationView.frame.size.height;
+        
+        box.upperLeft = CGPointMake(box.upperLeft.x*frameWidth/box->RIGHTBOUND, box.upperLeft.y*frameHeight/box->LOWERBOUND);
+        box.lowerRight = CGPointMake(box.lowerRight.x*frameWidth/box->RIGHTBOUND, box.lowerRight.y*frameHeight/box->LOWERBOUND);
+        box->RIGHTBOUND = frameWidth;
+        box->LOWERBOUND = frameHeight;
+        
+        
+        //        NSLog(@"BOXES LOADING");
+        //        NSLog(@"POINTS: (%f,%f), (%f,%f)", box.upperLeft.x,box.upperLeft.y, box.lowerRight.x, box.lowerRight.y);
+        //        NSLog(@"BOUNDS: %f, %f",box->LOWERBOUND, box->RIGHTBOUND);
+    }
+    
+    
     [self.annotationView setNeedsDisplay];
 	keyboardVisible = NO;
 }
@@ -280,8 +298,7 @@
 
 -(void)setImage:(UIImage *)image
 {
-    NSLog(@"setting the image!");
-    
+
    double f = image.size.height/image.size.width;
    double f2 = self.scrollView.frame.size.height / self.scrollView.frame.size.width;
    if (f>f2) {
@@ -331,6 +348,7 @@
     Box *box = [[Box alloc]initWithPoints:CGPointMake(self.annotationView.visibleFrame.origin.x+(self.annotationView.frame.size.width  - 100)/(2*self.scrollView.zoomScale), self.annotationView.visibleFrame.origin.y+(self.annotationView.frame.size.height  - 100)/(2*self.scrollView.zoomScale)) :CGPointMake(self.annotationView.visibleFrame.origin.x+(self.annotationView.frame.size.width  + 100)/(2*self.scrollView.zoomScale),self.annotationView.visibleFrame.origin.y+(self.annotationView.frame.size.height  + 100)/(2*self.scrollView.zoomScale))];
     [box setBounds:self.annotationView.frame];
     [box generateDateString];
+    box.downloadDate = [NSDate date];
     box.color=[[self.annotationView colorArray] objectAtIndex:(num%8)];
     [[self.annotationView objects] addObject:box];
     [self.annotationView setSelectedBox:num];

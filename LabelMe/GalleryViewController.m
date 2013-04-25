@@ -8,6 +8,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import <QuartzCore/CALayer.h>
+#include <stdlib.h>
 
 #import "GalleryViewController.h"
 #import "Constants.h"
@@ -17,6 +18,17 @@
 #import "UIImage+Resize.h"
 #import "NSObject+ShowAlert.h"
 #import "NSObject+Folders.h"
+#import "Box.h"
+
+
+
+@interface GalleryViewController()
+
+//Return the list of files of path ordered by modification date
+- (NSArray *) getOrderedListOfFilesForPath:(NSString *)path;
+
+@end
+
 
 
 
@@ -110,22 +122,31 @@
     [self.listButton setImage:[UIImage imageNamed:@"listC.png"] forState:UIControlStateNormal];
     [self.listButton setImage:[UIImage imageNamed:@"gridC.png"] forState:UIControlStateSelected];
     
-    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.frame.size.height+2, self.view.frame.size.width, self.view.frame.size.height-self.navigationController.navigationBar.frame.size.height-2) style:UITableViewStyleGrouped];
+    //table views
     self.tableView.backgroundColor = [UIColor clearColor];
     [self.tableView setBackgroundView:nil];
     self.tableView.hidden = YES;
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
     self.tableView.rowHeight = self.view.frame.size.width/4;
     self.tableView.tag = 1;
     
-    self.tableViewGrid = [[UITableView alloc] initWithFrame:CGRectMake(0, self.navigationController.navigationBar.frame.size.height+2, self.view.frame.size.width, self.view.frame.size.height-self.navigationController.navigationBar.frame.size.height-2) style:UITableViewStyleGrouped];
     self.tableViewGrid.backgroundColor = [UIColor clearColor];
     [self.tableViewGrid setBackgroundView:nil];
-    self.tableViewGrid.delegate = self;
-    self.tableViewGrid.dataSource = self;
     self.tableViewGrid.tag = 0;
+
+    // create a UIButton at table footer (More images)
+    UIButton *btnDeco = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    btnDeco.frame = CGRectMake(0, 0, 280, 40);
+    [btnDeco setTitle:@"More Images" forState:UIControlStateNormal];
+    btnDeco.backgroundColor = [UIColor clearColor];
+    [btnDeco setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+    [btnDeco addTarget:self action:@selector(moreImagesAction) forControlEvents:UIControlEventTouchUpInside];
     
+    //create a footer view on the bottom of the tabeview
+    UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
+    [footerView addSubview:btnDeco];
+    self.tableView.tableFooterView = footerView;
+    self.tableViewGrid.tableFooterView = footerView;
+
     noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
     [noImages setBackgroundColor:[UIColor whiteColor]];
     noImages.layer.masksToBounds = YES;
@@ -205,8 +226,9 @@
 
 -(void) reloadGallery
 {
-    self.items = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.paths objectAtIndex:THUMB]] error:NULL];
-    NSLog(@"Gallery is being looked at %@", [NSString stringWithFormat:@"%@",[self.paths objectAtIndex:THUMB]]);
+    
+    //get sorted files by date of modification of the image
+    self.items = [self getOrderedListOfFilesForPath:[self.paths objectAtIndex:IMAGES]];
     
     [self.tableViewGrid setRowHeight:(0.225*self.view.frame.size.width*ceil((float)self.items.count/4) + 0.0375*self.view.frame.size.width)];
     [self.tableView reloadData];
@@ -216,6 +238,7 @@
     else [noImages setHidden:YES];
     
 }
+
 
 
 -(UIView *)correctAccessoryAtIndex:(int)i withNum:(NSNumber *)num withSize:(CGSize)size
@@ -378,9 +401,8 @@
 -(void)imageDidSelectedWithIndex:(int)selectedImage
 {
     NSString *path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.items objectAtIndex:selectedImage]   ];
+    NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];    
     
-
-    NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
     NSLog(@"image: %@",[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:IMAGES],[self.items objectAtIndex:selectedImage]]);
     UIImage *img = [[UIImage alloc]initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:IMAGES],[self.items objectAtIndex:selectedImage]]];
     NSLog(@"size: %f x %f",img.size.width,img.size.height);
@@ -468,6 +490,102 @@
 
     [self.selectedItemsSend removeAllObjects];
     [self.usernameLabel setHidden:NO];
+}
+
+
+-(void) moreImagesAction
+{
+    NSLog(@"More images");
+    
+    NSString *query = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=mingot";
+    NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error = nil;
+    NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
+    if (error) NSLog(@"[%@ %@] JSON error: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), error.localizedDescription);
+
+    
+    int count = 2;
+    NSArray *colors = [[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
+    
+    
+    //select NUM images not currently present in iphone
+    for (NSDictionary *element in results) {
+        
+        //get the name of the image
+        NSString *imageName = [element objectForKey:@"name"];
+        if([self.items indexOfObject:imageName] == NSNotFound && count>0){
+            //get and save thumb
+            NSString *thumbUrl = [element objectForKey:@"thumb"];
+            UIImage *thumbImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:thumbUrl]]];
+            
+            NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:imageName];
+            [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation(thumbImage, 1.0) attributes:nil];
+            
+            //get and save images (new thread)
+            NSString *imageUrl = [element objectForKey:@"image"];
+            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]]];
+            
+            NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
+            [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
+            
+            //get and save annotations
+            NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
+            
+            NSDictionary *annotation = (NSDictionary *) [element objectForKey:@"annotation"];
+            NSDictionary *imageSize = (NSDictionary *) [annotation objectForKey:@"imagesize"];
+            
+            
+            id objects = [annotation objectForKey:@"object"];
+            NSArray *boxes;
+            if([objects isKindOfClass:[NSArray class]]) boxes = (NSArray *) objects;
+            else boxes = [[NSArray alloc] initWithObjects:(NSDictionary *)objects, nil];
+            
+            for(NSDictionary *box in boxes){
+                
+                //label
+                NSString *label = [(NSString *) [box objectForKey:@"name"] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                
+                NSDictionary *polygon = (NSDictionary *)[box objectForKey:@"polygon"];
+                NSArray *points = (NSArray *)[polygon objectForKey:@"pt"];
+                
+                CGFloat xmin=100000, xmax=0, ymin=100000, ymax=0;
+                for(NSDictionary *point in points){
+                    int x = [[(NSString *)[point objectForKey:@"x"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] floatValue];
+                    int y = [[(NSString *)[point objectForKey:@"y"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] floatValue];
+                    xmin = x<xmin ? x:xmin;
+                    xmax = x>xmax ? x:xmax;
+                    ymin = y<ymin ? y:ymin;
+                    ymax = y>ymax ? y:ymax;
+                }
+                
+                //box construction
+                Box *box = [[Box alloc] initWithPoints:CGPointMake(xmin*1.0, ymin*1.0) :CGPointMake(xmax*1.0, ymax*1.0)];
+                box.label = label;
+                box.sent = YES;
+                box.color = [colors objectAtIndex:arc4random() % colors.count];  //choose random color
+                box->UPPERBOUND = 0;
+                box->LOWERBOUND = [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
+                box->LEFTBOUND = 0;
+                box->RIGHTBOUND = [[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
+                box.downloadDate = [NSDate date];
+                
+                [boundingBoxes addObject:box];
+                
+                //NSLog(@"POINTS: (%f,%f), (%f,%f)", box.upperLeft.x,box.upperLeft.y, box.lowerRight.x, box.lowerRight.y);
+                //NSLog(@"BOUNDS: %f, %f",box->LOWERBOUND, box->RIGHTBOUND);
+                
+            }
+            
+            //save the dictionary
+            NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
+            [NSKeyedArchiver archiveRootObject:boundingBoxes toFile:pathObject];
+
+            count --;
+        }
+        
+    }
+    
+    [self reloadGallery];
 }
 
 
@@ -574,12 +692,12 @@
     [self.selectedItemsSend removeObject:filename];
     NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
     if (objects != nil) {
-        for (int i=0; i<objects.count; i++) {
+        for (int i=0; i<objects.count; i++) 
             [[objects objectAtIndex:i] setSent:YES];
-        }
+        
         [NSKeyedArchiver archiveRootObject:objects toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
-
     }
+    
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     NSNumber *newdictnum = [[NSNumber alloc]initWithInt:0];
     [dict removeObjectForKey:filename];
@@ -735,7 +853,7 @@
     //grid
     if (tableView.tag == 0) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-        [self setItems:[[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.paths objectAtIndex:THUMB]] error:NULL]];
+//        self.items = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.paths objectAtIndex:THUMB]] error:NULL];
         
         for(int i = 0; i < self.items.count; i++) {
             @autoreleasepool {
@@ -809,7 +927,7 @@
         if ([self.editButton.title isEqual: @"Done"]) [button setHidden:YES];
         
         
-        NSMutableArray *annotation = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.items objectAtIndex:indexPath.row] ] ];
+        NSMutableArray *annotation = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.items objectAtIndex:indexPath.row]]];
         UIImage *newimage = [[UIImage alloc]initWithContentsOfFile:[[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:[self.items objectAtIndex:indexPath.row]] ];
         cell.detailTextLabel.numberOfLines = 2;
         NSString *detailText = [[NSString alloc]initWithFormat:@"%d objects\n%d x %d",annotation.count,(int)newimage.size.width,(int)newimage.size.height];
@@ -877,6 +995,44 @@
     
 }
 
+
+#pragma mark
+#pragma mark -  Private Methods
+
+
+- (NSArray *) getOrderedListOfFilesForPath:(NSString *)path
+{
+    
+    NSMutableArray *files = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL] mutableCopy];
+    NSMutableArray *filesAndProperties = [NSMutableArray arrayWithCapacity:[files count]];
+    
+    for(NSString *file in files) {
+        NSString *filePath = [path stringByAppendingPathComponent:file];
+        NSDictionary *properties = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil];
+        NSDate *modDate = (NSDate *)[properties objectForKey:NSFileModificationDate];
+        [filesAndProperties addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                                       file, @"path",
+                                       modDate, @"lastModDate",nil]];
+        
+    }
+    
+    // sort using a block
+    // order inverted as we want latest date first
+    NSArray *sortedFiles = [filesAndProperties sortedArrayUsingComparator:^(id path1, id path2){
+        
+                                // compare
+                                NSComparisonResult comp = [[path1 objectForKey:@"lastModDate"] compare:
+                                                           [path2 objectForKey:@"lastModDate"]];
+                                // invert ordering
+                                return comp == NSOrderedAscending ? NSOrderedDescending : NSOrderedAscending;
+                            }];
+    
+    [files removeAllObjects];
+    for(NSDictionary *sortFile in sortedFiles)
+        [files addObject:(NSString *)[sortFile objectForKey:@"path"]];
+    
+    return [NSArray arrayWithArray:files];
+}
 
 
 @end

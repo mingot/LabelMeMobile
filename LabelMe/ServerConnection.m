@@ -65,13 +65,23 @@ static BOOL didSignIn = NO;
 
 -(void)setURLs
 {
-    self.checkLoginURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/checkLoginFromiPhone.php";
-    self.createAccountURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/addUserFromiPhone2.php";
-    self.sendPhotoURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/sendPhotoFromiPhone.php";
-    self.updateAnnotationURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/updateAnnotation.php";
-    self.downloadProfilePictureURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/downloadProfilePicture.php";
-    self.uploadProfilePictureURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/uploadProfilePicture.php";
-    self.forgotPasswordURL = @"http://labelme.csail.mit.edu/Release3.0/browserTools/php/forgot_password.php";
+//    self.checkLoginURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/checkLoginFromiPhone.php";
+//    self.createAccountURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/addUserFromiPhone2.php";
+//    self.sendPhotoURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/sendPhotoFromiPhone.php";
+//    self.updateAnnotationURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/updateAnnotation.php";
+//    self.downloadProfilePictureURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/downloadProfilePicture.php";
+//    self.downloadNamesURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/download.php";
+//    self.uploadProfilePictureURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/uploadProfilePicture.php";
+//    self.forgotPasswordURL = @"http://labelme.csail.mit.edu/Release3.0/browserTools/php/forgot_password.php";
+    
+    self.checkLoginURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/checkLoginFromiPhone.php";
+    self.createAccountURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/addUserFromiPhone2.php";
+    self.sendPhotoURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/sendPhotoFromiPhone.php";
+    self.updateAnnotationURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/updateAnnotation.php";
+    self.downloadProfilePictureURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/downloadProfilePicture.php";
+    self.downloadNamesURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php";
+    self.uploadProfilePictureURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/uploadProfilePicture.php";
+    self.forgotPasswordURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/browserTools/php/forgot_password.php";
 }
 
 
@@ -103,7 +113,6 @@ static BOOL didSignIn = NO;
     NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
     if (connection == nil) [self errorWithTitle:@"Unknown error" andDescription:@""];
     else [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-
 }
 
 
@@ -169,60 +178,57 @@ static BOOL didSignIn = NO;
 }
 
 
--(void)sendPhoto:(UIImage *) photo filename:(NSString *)filename path:(NSString *)objectpath withSize:(CGPoint)size andAnnotation:(NSMutableArray *) annotation
+-(void)sendPhoto:(UIImage *) photo filename:(NSString *)filename path:(NSString *)objectpath withSize:(CGPoint)size andAnnotation:(NSMutableArray *)annotation
 {
     cancel = NO;
 
     //check settings for wifi only.
     NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[objectpath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"settings.plist"]];
-    NSNumber *dictnum = [dict objectForKey:@"wifi"];
+    NSNumber *wifiOnly = [dict objectForKey:@"wifi"];
     Reachability *networkReachability = [Reachability reachabilityForInternetConnection];
     NetworkStatus networkStatus = [networkReachability currentReachabilityStatus];
-    
-    if (dictnum.boolValue) {
-        
+    if (wifiOnly.boolValue) {
         if ((networkStatus != ReachableViaWiFi) && (networkStatus !=NotReachable)) {
             [self errorWithTitle:@"Check your connection" andDescription:@"Sorry, wifi connection is required."];
             [self.delegate sendPhotoError];
             return;
         }
     }
+    
+    //check for user signed in
     if (!didSignIn) {
         NSArray *fields = [[NSArray alloc] initWithArray:[self signInAgain]];
         [self createHTTPBodyWithImage:photo size:size filename:filename path:objectpath andAnnotation:annotation];
         self.filenamePending = filename;
         NSString *user = [[NSString alloc] initWithData:[fields objectAtIndex:0] encoding:NSUTF8StringEncoding];
         NSString *pass = [[NSString alloc] initWithData:[fields objectAtIndex:1] encoding:NSUTF8StringEncoding];
-
         [self checkLoginForUsername:user andPassword:pass];
         return;
     }
+    
+    
     NSString *boundary = @"AaB03x";
     
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.sendPhotoURL]];
     [theRequest setHTTPMethod:@"POST"];
     NSString *contentType = [NSString stringWithFormat:@"multipart/form-data, boundary=%@", boundary];
-    
     [theRequest setValue:contentType forHTTPHeaderField:@"Content-type"];
+    
+    //store the post request in a temporary file
     [self createHTTPBodyWithImage:photo size:size filename:filename path:objectpath andAnnotation:annotation];
     
-    NSFileManager * filemng = [NSFileManager defaultManager];
-    
-
+    //read the temporay file with the request
     NSString *tmpPath = NSTemporaryDirectory();
     NSInputStream *bodyStream = [[NSInputStream alloc] initWithFileAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]]];
     [theRequest setHTTPBodyStream:bodyStream];
-    NSNumber *filesize = [[filemng attributesOfItemAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] error:nil] objectForKey:NSFileSize];
-    bytestowrite = [filesize doubleValue];
+    NSNumber *filesize = [[[NSFileManager defaultManager] attributesOfItemAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] error:nil] objectForKey:NSFileSize];
+    bytestowrite = filesize.doubleValue;
 
     NSURLConnection *connection = [[NSURLConnection alloc]initWithRequest:theRequest delegate:self];
-    if (connection == nil) {
-        [self errorWithTitle:@"Unknown error" andDescription:@""];
-    }
-    else{
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    if (connection == nil) [self errorWithTitle:@"Unknown error" andDescription:@""];
+    else [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
-    }
+
     self.filenamePending = @"";
 }
 
@@ -299,21 +305,19 @@ static BOOL didSignIn = NO;
 }
 
 
--(BOOL)createHTTPBodyWithImage: (UIImage *)image size:(CGPoint)point filename:(NSString *)filename  path:(NSString *)objectpath andAnnotation:(NSMutableArray *)annotation
+-(BOOL)createHTTPBodyWithImage:(UIImage *)image size:(CGPoint)point filename:(NSString *)filename  path:(NSString *)objectpath andAnnotation:(NSMutableArray *)annotation
 {
-    BOOL ret= NO;
-    NSFileManager * filemng = [NSFileManager defaultManager];
-   // NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     BOOL isDir = YES;
-    //NSString *tmpPath = [documentsDirectory stringByAppendingPathComponent:@"tmpRequest"];
     NSString *tmpPath = NSTemporaryDirectory();
 
-    if (![filemng fileExistsAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] isDirectory:&isDir]) {
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] isDirectory:&isDir]) {
         NSString *boundary = @"AaB03x";
         UIImage *imageToSend = rotate(image, image.imageOrientation);
         NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(imageToSend, 1.0)];
         NSData *annotationData = [[NSData alloc] initWithData:[self createXMLFromAnnotation:annotation andImageSize:point]];
         NSString *location = [[NSString alloc] initWithContentsOfFile:[objectpath stringByAppendingPathComponent:[[filename stringByDeletingPathExtension] stringByAppendingString:@".txt"] ] encoding:NSUTF8StringEncoding error:NULL];
+        
+        //post body construction
         NSMutableData *postBody = [[NSMutableData alloc] init];
         [postBody appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
         [postBody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"image_file\"; filename=\"%@\"\r\n", filename] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -324,15 +328,12 @@ static BOOL didSignIn = NO;
         [postBody appendData:annotationData];
         [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
         [postBody appendData:[@"Content-Disposition: form-data; name=\"location\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-        
         [postBody appendData:[location dataUsingEncoding:NSUTF8StringEncoding]];
         [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r \n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-        if([postBody writeToFile:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] atomically:NO]){
-            ret = YES;
-        }
-        
+        if([postBody writeToFile:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] atomically:NO])
+            return YES;
     }
-    return ret;
+    return NO;
 }
 
 -(void)updateAnnotationWithFilename:(NSString *)filename
@@ -380,21 +381,23 @@ static BOOL didSignIn = NO;
     
 }
 
--(NSData *)createXMLFromAnnotation:(NSMutableArray *) annotation andImageSize:(CGPoint) point
+-(NSData *)createXMLFromAnnotation:(NSMutableArray *)annotation andImageSize:(CGPoint)point
 {
     NSMutableData *XMLString = [[NSMutableData alloc] init];
     NSString *boundary = @"--022289--";
         for (int i=0; i<annotation.count; i++) {
 
             Box *b = [annotation objectAtIndex:i];
-            int x1 = (int) (b.upperLeft.x*point.x);
-            int x2 = (int) (b.lowerRight.x*point.x);
-            int x3 = (int) (b.lowerRight.x*point.x);
-            int x4 = (int) (b.upperLeft.x*point.x);
-            int y1 = (int) (b.upperLeft.y*point.y);
-            int y2 = (int) (b.upperLeft.y*point.y);
-            int y3 = (int) (b.lowerRight.y*point.y);
-            int y4 = (int) (b.lowerRight.y*point.y);
+            int x1 = (int) (b.upperLeft.x   *point.x);
+            int x2 = (int) (b.lowerRight.x  *point.x);
+            int x3 = (int) (b.lowerRight.x  *point.x);
+            int x4 = (int) (b.upperLeft.x   *point.x);
+            int y1 = (int) (b.upperLeft.y   *point.y);
+            int y2 = (int) (b.upperLeft.y   *point.y);
+            int y3 = (int) (b.lowerRight.y  *point.y);
+            int y4 = (int) (b.lowerRight.y  *point.y);
+            
+            //last anotation
             if (i == annotation.count-1) {
 
                 NSString *object = [NSString stringWithFormat:@"%@%@%@%@%d%@%d%@%d%@%d%@%d%@%d%@%d%@%d%@%d%@%d%@%d",b.label,boundary,b.date,boundary,i,boundary,x1,boundary,y1,boundary,x2,boundary,y2,boundary,x3,boundary,y3,boundary,x4,boundary,y4,boundary,x1,boundary,y1];
@@ -411,20 +414,19 @@ static BOOL didSignIn = NO;
 }
 
 
--(void)downloadProfilePictureToUsername:(NSString *) username
+-(void)downloadProfilePictureToUsername:(NSString *)username
 {
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[documentsDirectory stringByAppendingPathComponent:username] stringByAppendingPathComponent:@"settings.plist"]];
-    NSNumber *dictnum = [dict objectForKey:@"wifi"];
+    NSNumber *wifiOnly = [dict objectForKey:@"wifi"];
     Reachability *networkReachability = [Reachability reachabilityForInternetConnection];
     NetworkStatus networkStatus = [networkReachability currentReachabilityStatus];
     
-    if (dictnum.boolValue) {
-        
-        if ((networkStatus != ReachableViaWiFi) && (networkStatus !=NotReachable)) {
+    if (wifiOnly.boolValue)
+        if ((networkStatus != ReachableViaWiFi) && (networkStatus != NotReachable))
             return;
-        }
-    }
+        
+
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.downloadProfilePictureURL]];
     [theRequest setHTTPMethod:@"POST"];
     
@@ -432,6 +434,32 @@ static BOOL didSignIn = NO;
     if (connection == nil) [self errorWithTitle:@"Unknown error" andDescription:@""];
     else [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 
+}
+
+-(void)downloadNamesForUsername:(NSString *)username //neeed the current images loaded in the server
+{
+
+    NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:self.downloadNamesURL] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error = nil;
+    NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
+    if (error) NSLog(@"[%@ %@] JSON error: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), error.localizedDescription);
+    NSLog(@"received %@",  results);
+    
+    
+    NSArray *currentImages = [[NSArray alloc] initWithObjects:@"caca.jpg","unaltracaca.jpg", nil];
+    int count = 10;
+    
+    //select NUM images not currently present in iphone
+    for (NSString* key in results) {
+        NSDictionary *value = (NSDictionary *)[results objectForKey:key];
+        //get the name of the image
+        NSString *imageName = [value objectForKey:@"name"];
+        if([currentImages indexOfObject:imageName] != NSNotFound){
+            
+            count --;
+        }
+        
+    }
 }
 
 
@@ -494,6 +522,7 @@ static BOOL didSignIn = NO;
         [connection cancel];
         cancel = NO;
     }
+    NSLog(@"recieving!!");
     [receivedData appendData:data];
 
 }
@@ -507,61 +536,60 @@ static BOOL didSignIn = NO;
     }
     if ([connection.currentRequest.URL.absoluteString isEqualToString:self.sendPhotoURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.updateAnnotationURL]) {
         float p = (float) totalBytesWritten / (float) bytestowrite ;
-        if ([self.delegate respondsToSelector:@selector(sendingProgress:)]) {
+        if ([self.delegate respondsToSelector:@selector(sendingProgress:)])
             [self.delegate sendingProgress:p];
-        }
 
     }
 
 }
--(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error{
+
+-(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+{
     if([connection.currentRequest.URL.absoluteString isEqualToString:self.checkLoginURL]){
-        if ([self.delegate respondsToSelector:@selector(signInWithoutConnection)]) {
+        if ([self.delegate respondsToSelector:@selector(signInWithoutConnection)])
             [self.delegate signInWithoutConnection];
-        }
-        else if ([self.delegate respondsToSelector:@selector(sendPhotoError)]) {
+        else if ([self.delegate respondsToSelector:@selector(sendPhotoError)])
             [self.delegate sendPhotoError];
-        }
-    }
-    else if([connection.currentRequest.URL.absoluteString isEqualToString:self.createAccountURL]){
+        
+    }else if([connection.currentRequest.URL.absoluteString isEqualToString:self.createAccountURL]){
         [self errorWithTitle:error.localizedDescription andDescription:error.localizedRecoverySuggestion];
         [self.delegate createAccountError];
 
-    }
-    else if([connection.currentRequest.URL.absoluteString isEqualToString:self.sendPhotoURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.updateAnnotationURL]){
-       // [self.delegate createAccountError];
-        if ([self.delegate respondsToSelector:@selector(sendPhotoError)]) {
+    }else if([connection.currentRequest.URL.absoluteString isEqualToString:self.sendPhotoURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.updateAnnotationURL]){
+        NSLog(@"ERROR: %@", error);
+        if ([self.delegate respondsToSelector:@selector(sendPhotoError)])
             [self.delegate sendPhotoError];
-        }
-        else{
-            [self errorWithTitle:error.localizedDescription andDescription:error.localizedRecoverySuggestion];
+        
+        else [self errorWithTitle:error.localizedDescription andDescription:error.localizedRecoverySuggestion];
 
-        }
     }
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 
      // no se si deberia ir aqui
 }
--(void)connectionDidFinishLoading:(NSURLConnection *)connection{
+
+
+-(void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+    //finish checking login URL
     if ([connection.currentRequest.URL.absoluteString isEqualToString:self.checkLoginURL]) {
         NSString *response = [[NSString alloc]initWithData:receivedData encoding:NSUTF8StringEncoding];
         NSArray *divided = [[NSArray alloc] initWithArray:[response componentsSeparatedByString:@"\n"]];
-        int result = [[divided objectAtIndex:divided.count -2] integerValue];
+        int result = [[divided objectAtIndex:divided.count-2] integerValue];
         switch (result) {
                 
             case 0:
                 didSignIn = YES;
                 if (self.filenamePending.length > 0) {
-                    if ([[self.filenamePending substringFromIndex:self.filenamePending.length - 14] isEqualToString:@"_update2278965"]) {
+                    if ([[self.filenamePending substringFromIndex:self.filenamePending.length - 14] isEqualToString:@"_update2278965"])
                         [self updateAnnotationWithFilename:self.filenamePending];
-                    }
-                    else{
-                        [self sendPhotoWithFilename:self.filenamePending];
-                    }
+                    
+                    else [self sendPhotoWithFilename:self.filenamePending];
+                    
                 }
-                if ([self.delegate respondsToSelector:@selector(signInComplete)]) {
+                
+                if ([self.delegate respondsToSelector:@selector(signInComplete)])
                     [self.delegate signInComplete];
-                }
 
                 break;
                 
@@ -571,8 +599,9 @@ static BOOL didSignIn = NO;
                 break;
                 
         }
-    }
-    else if ([connection.currentRequest.URL.absoluteString isEqualToString:self.createAccountURL]) {
+     
+    //finish creating account
+    }else if ([connection.currentRequest.URL.absoluteString isEqualToString:self.createAccountURL]) {
         NSString *response = [[NSString alloc]initWithData:receivedData encoding:NSUTF8StringEncoding];
 
         NSArray *divided = [[NSArray alloc] initWithArray:[response componentsSeparatedByString:@"\n"]];
@@ -588,9 +617,9 @@ static BOOL didSignIn = NO;
                 break;
                 
         }
-        
-    }
-    else if ([connection.currentRequest.URL.absoluteString isEqualToString:self.sendPhotoURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.updateAnnotationURL]){
+     
+    //finish sending photo or update annotation
+    }else if ([connection.currentRequest.URL.absoluteString isEqualToString:self.sendPhotoURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.updateAnnotationURL]){
         
         NSString *result = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
         NSArray *divided = [[NSArray alloc] initWithArray:[result componentsSeparatedByString:@"\n"]];
@@ -603,48 +632,50 @@ static BOOL didSignIn = NO;
 
         switch (resultCode) {
             case 0:
+                NSLog(@"correct");
                 [filemng removeItemAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] error:NULL];
                 [self.delegate photoSentCorrectly:filename];
                 break;
             case 2:
+                NSLog(@"not correct1");
                 //[self errorWithTitle:@"ERROR" andDescription:[divided objectAtIndex:divided.count-1]];
                 [self.delegate photoNotOnServer:[divided objectAtIndex:divided.count-3]];
                 break;
             default:
+                NSLog(@"default");
                 [self errorWithTitle:[divided objectAtIndex:divided.count-1] andDescription:@"Please, try again."];
                 [self.delegate sendPhotoError];
                 break;
         }
 
        // [self.delegate photoSentCorrectly:filename];
+     
+    //finish downloading profile picture or upload profile picture
+    }else if ([connection.currentRequest.URL.absoluteString isEqualToString:self.downloadProfilePictureURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.uploadProfilePictureURL]){
         
-    }
-    else if ([connection.currentRequest.URL.absoluteString isEqualToString:self.downloadProfilePictureURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.uploadProfilePictureURL]){
-        //NSString *response = [[NSString alloc]initWithData:receivedData encoding:NSUTF8StringEncoding];
         if (receivedData.length > 8) {
-            if ([self.delegate respondsToSelector:@selector(profilePictureReceived:)]) {
+            if ([self.delegate respondsToSelector:@selector(profilePictureReceived:)]) 
                 [self.delegate profilePictureReceived:[UIImage imageWithData:receivedData]];
 
-            }
-            else{
-                if ([self.delegate respondsToSelector:@selector(profilePictureReceived:)]) {
+            else if ([self.delegate respondsToSelector:@selector(profilePictureReceived:)]) 
                     [self.delegate profilePictureReceived:nil];
-
-                }
-            }
-
         }
+        
+    //Download images
+    }else if ([connection.currentRequest.URL.absoluteString isEqualToString:self.downloadNamesURL]){
+        NSLog(@"Received data from directories");
+        NSLog(@"NSSTRING1: %@", [NSString stringWithUTF8String:receivedData.bytes]);
     }
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 
     [receivedData setLength:0];
 
 }
--(void)cancelRequestFor:(int)req{
+
+-(void)cancelRequestFor:(int)req
+{
     cancel = YES;
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-
-    
 }
 
 
