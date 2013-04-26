@@ -33,6 +33,7 @@
 @property (nonatomic, strong) NSMutableArray *downloadedAnnotations;
 @property (nonatomic, strong) NSMutableArray *downloadedImageUrls;
 @property (nonatomic, strong) NSMutableArray *downloadedImageNames;
+@property (nonatomic, strong) NSMutableDictionary *downloadedLabelsMap; //label -> array with indexes 
 
 @end
 
@@ -148,19 +149,27 @@
     [btnDeco setTitle:@"More Images" forState:UIControlStateNormal];
     btnDeco.backgroundColor = [UIColor clearColor];
     [btnDeco setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    [btnDeco addTarget:self action:@selector(moreImagesAction) forControlEvents:UIControlEventTouchUpInside];
+    [btnDeco addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
     
     UIButton *btnDeco2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     btnDeco2.frame = CGRectMake(0, 0, 280, 40);
     [btnDeco2 setTitle:@"More Images" forState:UIControlStateNormal];
     btnDeco2.backgroundColor = [UIColor clearColor];
     [btnDeco2 setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    [btnDeco2 addTarget:self action:@selector(moreImagesAction) forControlEvents:UIControlEventTouchUpInside];
+    [btnDeco2 addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIButton *btnDeco3 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    btnDeco3.frame = CGRectMake(0, 50, 280, 40);
+    [btnDeco3 setTitle:@"More Labels" forState:UIControlStateNormal];
+    btnDeco3.backgroundColor = [UIColor clearColor];
+    [btnDeco3 setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+    [btnDeco3 addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
     
     //create a footer view on the bottom of the tableview
     UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
     UIView *footerView2 = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
     [footerView addSubview:btnDeco];
+    [footerView addSubview:btnDeco3];
     [footerView2 addSubview:btnDeco2];
     self.tableView.tableFooterView = footerView2;
     self.tableViewGrid.tableFooterView = footerView;
@@ -511,9 +520,9 @@
 }
 
 
--(void) moreImagesAction
+-(IBAction) moreImagesAction:(id)sender
 {
-    NSLog(@"More images");
+    NSString *buttonTitle = [(UIButton *)sender titleLabel].text;
     
     NSString *query = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=mingot";
     NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
@@ -525,7 +534,7 @@
     self.downloadedAnnotations = [[NSMutableArray alloc] init];
     self.downloadedImageUrls = [[NSMutableArray alloc] init];
     self.downloadedImageNames = [[NSMutableArray alloc] init];
-    
+    self.downloadedLabelsMap = [[NSMutableDictionary alloc] init];
 
     NSArray *colors = [[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
 
@@ -571,8 +580,15 @@
             
             for(NSDictionary *box in boxes){
                 
-                //label
+                //label: insert into the map to download specific images for a given label
                 NSString *label = [(NSString *) [box objectForKey:@"name"] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                NSMutableArray *imageIndexes = [self.downloadedLabelsMap objectForKey:label];
+                if(imageIndexes==nil){
+                    imageIndexes = [[NSMutableArray alloc] initWithObjects:[NSNumber numberWithInt:self.downloadedImageNames.count-1], nil];
+                    [self.downloadedLabelsMap setObject:imageIndexes forKey:label];
+                
+                }else [imageIndexes addObject:[NSNumber numberWithInt:self.downloadedImageNames.count-1]];
+                
                 
                 NSDictionary *polygon = (NSDictionary *)[box objectForKey:@"polygon"];
                 NSArray *points = (NSArray *)[polygon objectForKey:@"pt"];
@@ -611,14 +627,29 @@
         
     }
     
+    //present the modal depending on the sender button: show images or labels
     if(self.downloadedThumbnails.count>0){
-        self.modalTVC = [[ModalTVC alloc] init];
-        self.modalTVC.delegate = self;
-        self.modalTVC.modalTitle = @"Training Images";
-        self.modalTVC.multipleChoice = NO;
-        self.modalTVC.data = self.downloadedThumbnails;
-        [self.modalTVC.view setNeedsDisplay];
-        [self presentModalViewController:self.modalTVC animated:YES];
+        if([buttonTitle isEqualToString:@"More Images"]){
+            self.modalTVC = [[ModalTVC alloc] init];
+            self.modalTVC.delegate = self;
+            self.modalTVC.modalTitle = @"Choose Images";
+            self.modalTVC.multipleChoice = NO;
+            self.modalTVC.data = self.downloadedThumbnails;
+            [self.modalTVC.view setNeedsDisplay];
+            [self presentModalViewController:self.modalTVC animated:YES];
+        }else if([buttonTitle isEqualToString:@"More Labels"]){
+            
+            //get the labels
+            NSArray *labels = [self.downloadedLabelsMap allKeys];
+            
+            self.modalTVC = [[ModalTVC alloc] init];
+            self.modalTVC.delegate = self;
+            self.modalTVC.modalTitle = @"Choose Labels";
+            self.modalTVC.multipleChoice = NO;
+            self.modalTVC.data = labels;
+            [self.modalTVC.view setNeedsDisplay];
+            [self presentModalViewController:self.modalTVC animated:YES];
+        }
     }else{
         UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
                                                              message:@"You have all the images"
@@ -895,7 +926,6 @@
     //grid
     if (tableView.tag == 0) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-//        self.items = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.paths objectAtIndex:THUMB]] error:NULL];
         
         for(int i = 0; i < self.items.count; i++) {
             @autoreleasepool {
@@ -1043,28 +1073,72 @@
 
 - (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier
 {
-    NSLog(@"selected: %@", selectedItems);
-    for(NSNumber *selectedIndex in selectedItems){
-        
-        NSString *imageName = [self.downloadedImageNames objectAtIndex:selectedIndex.intValue];
-        
-        //Save thumbnail
-        NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:imageName];
-        [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation([self.downloadedThumbnails objectAtIndex:selectedIndex.intValue], 1.0) attributes:nil];
-        
-        //Save annotation
-        NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
-        [NSKeyedArchiver archiveRootObject:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue] toFile:pathObject];
+    dispatch_queue_t queue = dispatch_queue_create("DownloadQueue", NULL);
 
+    //sending view preparation
+    sendingView.total = selectedItems.count;
+    [sendingView setHidden:NO];
+    [sendingView.activityIndicator startAnimating];
+    [sendingView.progressView setProgress:0];
+    
+    
+    NSMutableArray *newIndexes = [[NSMutableArray alloc] init];
+    if([identifier isEqualToString:@"Choose Labels"]){
+        NSArray *labels = [self.downloadedLabelsMap allKeys];
+        for(NSNumber *select in selectedItems){
+            NSString *label = [labels objectAtIndex:select.intValue];
+            NSArray *indexes = [self.downloadedLabelsMap objectForKey:label];
+            [newIndexes addObjectsFromArray:indexes];
+        }
+        newIndexes = [[[NSSet setWithArray:newIndexes] allObjects] mutableCopy];
         
-        //download and save images in a new thread
-        UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[self.downloadedImageUrls objectAtIndex:selectedIndex.intValue]]]];
-
-        NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
-        [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
+        selectedItems = newIndexes;
     }
     
-    [self reloadGallery];
+    
+    
+    dispatch_async(queue, ^(void){
+        __block int i=0;
+        for(NSNumber *selectedIndex in selectedItems){
+            
+
+            NSString *imageName = [self.downloadedImageNames objectAtIndex:selectedIndex.intValue];
+            
+            //Save thumbnail
+            NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:imageName];
+            [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation([self.downloadedThumbnails objectAtIndex:selectedIndex.intValue], 1.0) attributes:nil];
+            
+            //Save annotation
+            NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
+            [NSKeyedArchiver archiveRootObject:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue] toFile:pathObject];
+
+            
+            //download and save images in a new thread
+            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[self.downloadedImageUrls objectAtIndex:selectedIndex.intValue]]]];
+
+            NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
+            [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
+            
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [sendingView incrementNum];
+                [sendingView.progressView setProgress:i/selectedItems.count];
+                i++;
+            });
+            
+        }
+        
+        
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self reloadGallery];
+            sendingView.hidden = YES;
+            [sendingView.activityIndicator stopAnimating];
+            [sendingView reset];
+        });
+        
+    });
+    
+    dispatch_release(queue);
+
 }
 
 

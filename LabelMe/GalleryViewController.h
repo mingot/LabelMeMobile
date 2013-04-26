@@ -54,7 +54,7 @@
 -(IBAction)listAction:(id)sender;
 -(IBAction)cancelAction:(id)sender;
 -(IBAction)editAction:(id)sender;
--(void)moreImagesAction;
+-(IBAction)moreImagesAction:(id)sender;
 
 
 @end
