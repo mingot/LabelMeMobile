@@ -10,8 +10,9 @@
 #import "TagViewController.h"
 #import "ServerConnection.h"
 #import "SendingView.h"
+#import "ModalTVC.h"
 
-@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate>
+@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalTVCDelegate>
 {    
     ServerConnection *serverConnection;
     SendingView *sendingView;
@@ -33,6 +34,7 @@
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
 @property (nonatomic,strong) IBOutlet UITableView *tableViewGrid;
 
+
 @property (nonatomic,strong) NSArray *paths;
 @property (nonatomic,strong) NSArray *items;
 
@@ -41,6 +43,7 @@
 @property (nonatomic,strong) NSMutableArray *selectedItemsDelete;
 
 @property (nonatomic,strong) TagViewController *tagViewController;
+@property (nonatomic,strong) ModalTVC *modalTVC;
 @property (nonatomic,strong) NSString *username;
 
 

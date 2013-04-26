@@ -27,6 +27,13 @@
 //Return the list of files of path ordered by modification date
 - (NSArray *) getOrderedListOfFilesForPath:(NSString *)path;
 
+
+//arrays to store information about downloaded images from server
+@property (nonatomic, strong) NSMutableArray *downloadedThumbnails;
+@property (nonatomic, strong) NSMutableArray *downloadedAnnotations;
+@property (nonatomic, strong) NSMutableArray *downloadedImageUrls;
+@property (nonatomic, strong) NSMutableArray *downloadedImageNames;
+
 @end
 
 
@@ -74,6 +81,7 @@
         self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStyleBordered target:self action:@selector(deleteAction:)];
         self.editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(editAction:)];
         serverConnection.delegate = self;
+        self.modalTVC = [[ModalTVC alloc] initWithNibName:@"ModalTVC" bundle:nil];
 
     }
     return self;
@@ -133,7 +141,8 @@
     [self.tableViewGrid setBackgroundView:nil];
     self.tableViewGrid.tag = 0;
 
-    // create a UIButton at table footer (More images)
+    //TODO: do not duplicate the button
+    //create a UIButton at table footer (More images)
     UIButton *btnDeco = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     btnDeco.frame = CGRectMake(0, 0, 280, 40);
     [btnDeco setTitle:@"More Images" forState:UIControlStateNormal];
@@ -141,10 +150,19 @@
     [btnDeco setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
     [btnDeco addTarget:self action:@selector(moreImagesAction) forControlEvents:UIControlEventTouchUpInside];
     
-    //create a footer view on the bottom of the tabeview
+    UIButton *btnDeco2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    btnDeco2.frame = CGRectMake(0, 0, 280, 40);
+    [btnDeco2 setTitle:@"More Images" forState:UIControlStateNormal];
+    btnDeco2.backgroundColor = [UIColor clearColor];
+    [btnDeco2 setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+    [btnDeco2 addTarget:self action:@selector(moreImagesAction) forControlEvents:UIControlEventTouchUpInside];
+    
+    //create a footer view on the bottom of the tableview
     UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
+    UIView *footerView2 = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
     [footerView addSubview:btnDeco];
-    self.tableView.tableFooterView = footerView;
+    [footerView2 addSubview:btnDeco2];
+    self.tableView.tableFooterView = footerView2;
     self.tableViewGrid.tableFooterView = footerView;
 
     noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
@@ -503,9 +521,14 @@
     NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
     if (error) NSLog(@"[%@ %@] JSON error: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), error.localizedDescription);
 
+    self.downloadedThumbnails = [[NSMutableArray alloc] init];
+    self.downloadedAnnotations = [[NSMutableArray alloc] init];
+    self.downloadedImageUrls = [[NSMutableArray alloc] init];
+    self.downloadedImageNames = [[NSMutableArray alloc] init];
     
-    int count = 2;
+
     NSArray *colors = [[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
+
     
     
     //select NUM images not currently present in iphone
@@ -513,24 +536,30 @@
         
         //get the name of the image
         NSString *imageName = [element objectForKey:@"name"];
-        if([self.items indexOfObject:imageName] == NSNotFound && count>0){
+
+        
+        if([self.items indexOfObject:imageName] == NSNotFound){
+            
+            //save the name of the image
+            [self.downloadedImageNames addObject:imageName];
+            NSLog(@"found image %@ and inserting", imageName);
+           
             //get and save thumb
             NSString *thumbUrl = [element objectForKey:@"thumb"];
             UIImage *thumbImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:thumbUrl]]];
+            NSLog(@"thumb %@", thumbImage);
+            if(thumbImage!=nil) [self.downloadedThumbnails addObject:thumbImage];
+            else [self.downloadedThumbnails addObject:[UIImage imageNamed:@"image_not_found.png"]];
             
-            NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:imageName];
-            [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation(thumbImage, 1.0) attributes:nil];
             
-            //get and save images (new thread)
+            //get and save images urls
             NSString *imageUrl = [element objectForKey:@"image"];
-            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]]];
-            
-            NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
-            [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
+            NSLog(@"image url %@", imageUrl);
+            [self.downloadedImageUrls addObject:imageUrl];
+
             
             //get and save annotations
             NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
-            
             NSDictionary *annotation = (NSDictionary *) [element objectForKey:@"annotation"];
             NSDictionary *imageSize = (NSDictionary *) [annotation objectForKey:@"imagesize"];
             
@@ -577,15 +606,28 @@
             }
             
             //save the dictionary
-            NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
-            [NSKeyedArchiver archiveRootObject:boundingBoxes toFile:pathObject];
-
-            count --;
+            [self.downloadedAnnotations addObject:boundingBoxes];
         }
         
     }
     
-    [self reloadGallery];
+    if(self.downloadedThumbnails.count>0){
+        self.modalTVC = [[ModalTVC alloc] init];
+        self.modalTVC.delegate = self;
+        self.modalTVC.modalTitle = @"Training Images";
+        self.modalTVC.multipleChoice = NO;
+        self.modalTVC.data = self.downloadedThumbnails;
+        [self.modalTVC.view setNeedsDisplay];
+        [self presentModalViewController:self.modalTVC animated:YES];
+    }else{
+        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
+                                                             message:@"You have all the images"
+                                                            delegate:nil
+                                                   cancelButtonTitle:@"OK"
+                                                   otherButtonTitles:nil];
+        [errorAlert show];
+    }
+
 }
 
 
@@ -993,6 +1035,36 @@
     [sendingView.activityIndicator stopAnimating];
 
     
+}
+
+#pragma mark    
+#pragma mark - ModalTVC Delegate
+
+
+- (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier
+{
+    NSLog(@"selected: %@", selectedItems);
+    for(NSNumber *selectedIndex in selectedItems){
+        
+        NSString *imageName = [self.downloadedImageNames objectAtIndex:selectedIndex.intValue];
+        
+        //Save thumbnail
+        NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:imageName];
+        [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation([self.downloadedThumbnails objectAtIndex:selectedIndex.intValue], 1.0) attributes:nil];
+        
+        //Save annotation
+        NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
+        [NSKeyedArchiver archiveRootObject:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue] toFile:pathObject];
+
+        
+        //download and save images in a new thread
+        UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[self.downloadedImageUrls objectAtIndex:selectedIndex.intValue]]]];
+
+        NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
+        [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
+    }
+    
+    [self reloadGallery];
 }
 
 
