@@ -42,8 +42,7 @@
                 self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPhone5" bundle:nil];
             else if ([UIScreen mainScreen].bounds.size.height == 480)
                 self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPhone" bundle:nil];
-        }else
-            self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPad" bundle:nil];
+        }else self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPad" bundle:nil];
     }
     
     return self;
@@ -409,6 +408,8 @@
         NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
         UIStepper *stepper = [[UIStepper alloc] initWithFrame:CGRectZero];
         stepper.value = [(NSNumber *)[dict objectForKey:@"hogdimension"] doubleValue];
+        stepper.maximumValue = 12;
+        stepper.minimumValue = 4;
         
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         cell.textLabel.text = [NSString stringWithFormat: @"Max HOG: %d", (int) stepper.value];

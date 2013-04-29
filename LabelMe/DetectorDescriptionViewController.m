@@ -17,6 +17,7 @@
 #define IMAGES 0
 #define THUMB 1
 #define OBJECTS 2
+#define USER 3
 #define MAX_IMAGE_SIZE 300
 //#define IMAGE_SCALE_FACTOR 0.6
 
@@ -133,6 +134,7 @@
         
         //show modal to select the target class
         self.modalTVC = [[ModalTVC alloc] init];
+        self.modalTVC.showCancelButton = NO;
         self.modalTVC.delegate = self;
         self.modalTVC.modalTitle = @"Select Class";
         self.modalTVC.multipleChoice = NO;
@@ -185,6 +187,7 @@
 - (IBAction)executeAction:(id)sender
 {
     self.executeController.svmClassifier = self.svmClassifier;
+    self.executeController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.executeController animated:YES];
 }
 
@@ -320,6 +323,13 @@
         [self.sendingView.activityIndicator startAnimating];
         self.sendingView.cancelButton.hidden = YES;
 
+        //set hog dimension based on user preferences
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[self.resourcesPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
+        int hog = [(NSNumber *)[dict objectForKey:@"hogdimension"] intValue];
+        if(hog==0) hog = 4; //minimum hog
+        self.svmClassifier.maxHog = hog;
+
+        
         //train in a different thread
         dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
         dispatch_async(myQueue, ^{

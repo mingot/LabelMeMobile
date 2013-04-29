@@ -371,7 +371,6 @@
     [self createUserFolders:self.usernameField.text];
     
     //select correct layout
-    //TODO: add .xibs for iphone 4 and iPAD
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         
         if ([UIScreen mainScreen].bounds.size.height == 568) {

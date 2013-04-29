@@ -51,6 +51,10 @@
     [self.navigationItem setLeftBarButtonItem:addButton];
     self.detectorController = [[DetectorDescriptionViewController alloc]initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
     
+    //navigation controller
+    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
+    [self.navigationController.navigationBar setTintColor:[UIColor colorWithRed:150/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
+    
     [super viewDidLoad];
 }
 

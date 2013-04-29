@@ -95,7 +95,6 @@
     
     self.usernameLabel.text = self.username;
     [self.usernameLabel setTextColor:[UIColor colorWithRed:51/255.0f green:51/255.0f blue:51/255.0f alpha:1.0]];
-    //[self.usernameLabel setTextColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
     // TitleView: LabelMe Logo
     UIImage *titleImage = [UIImage imageNamed:@"logo-title.png"];
     UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
@@ -645,6 +644,7 @@
     //present the modal depending on the sender button: show images or labels
     if(self.downloadedThumbnails.count>0){
         if([buttonTitle isEqualToString:@"More Images"]){
+            self.modalTVC.showCancelButton = YES;
             self.modalTVC = [[ModalTVC alloc] init];
             self.modalTVC.delegate = self;
             self.modalTVC.modalTitle = @"Choose Images";
@@ -660,7 +660,7 @@
                 NSArray *indexes = [self.downloadedLabelsMap objectForKey:key];
                 [labels addObject:[NSString stringWithFormat:@"%@ (%d)",key,indexes.count]];
             }
-            
+            self.modalTVC.showCancelButton = YES;
             self.modalTVC = [[ModalTVC alloc] init];
             self.modalTVC.delegate = self;
             self.modalTVC.modalTitle = @"Choose Labels";

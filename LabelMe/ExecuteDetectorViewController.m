@@ -58,6 +58,8 @@
     fps = 0.0;
     num = 0;
     
+
+    
     //image poistion detection
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
     self.threeDimVC = [[ThreeDimVC alloc] initWithNibName:@"ThreeDimVC" bundle:nil];
@@ -123,6 +125,14 @@
     [self.view addSubview:self.HOGimageView];
     [self.view addSubview:self.detectView];
     
+    
+    //Navigation controller
+//    UIBarButtonItem *switchCamerasButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageWithContentsOfFile:@"switch_camera.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(switchCameras:)];
+    UIBarButtonItem *switchCamerasButton = [[UIBarButtonItem alloc] initWithTitle:@"switch" style:UIBarButtonItemStyleBordered target:self action:@selector(switchCameras:)];
+    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbarBg"]resizableImageWithCapInsets:UIEdgeInsetsZero ] forBarMetrics:UIBarMetricsDefault];
+    
+    [switchCamerasButton setStyle:UIBarButtonItemStyleBordered];
+    [self.navigationItem setRightBarButtonItem:switchCamerasButton];
 }
 
 

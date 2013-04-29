@@ -162,6 +162,7 @@
 		A5FAF9FE1642D830002B56B4 /* navbarBg.png in Resources */ = {isa = PBXBuildFile; fileRef = A5FAF9FC1642D830002B56B4 /* navbarBg.png */; };
 		A5FAF9FF1642D830002B56B4 /* navbarBg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A5FAF9FD1642D830002B56B4 /* navbarBg@2x.png */; };
 		A5FAFA0916430D37002B56B4 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5FAFA0816430D37002B56B4 /* AssetsLibrary.framework */; };
+		FC4B0A2C172EC0C200A099A0 /* switch_camera.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2B172EC0C200A099A0 /* switch_camera.png */; };
 		FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC4D68801716164E002A73AD /* CoreMotion.framework */; };
 		FC4D688A17167036002A73AD /* ThreeDimVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4D688817167036002A73AD /* ThreeDimVC.m */; };
 		FC4D688B17167036002A73AD /* ThreeDimVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC4D688917167036002A73AD /* ThreeDimVC.xib */; };
@@ -389,6 +390,7 @@
 		A5FAF9FC1642D830002B56B4 /* navbarBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navbarBg.png; sourceTree = "<group>"; };
 		A5FAF9FD1642D830002B56B4 /* navbarBg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navbarBg@2x.png"; sourceTree = "<group>"; };
 		A5FAFA0816430D37002B56B4 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		FC4B0A2B172EC0C200A099A0 /* switch_camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switch_camera.png; sourceTree = "<group>"; };
 		FC4D68801716164E002A73AD /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		FC4D688717167036002A73AD /* ThreeDimVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThreeDimVC.h; path = ../ThreeDimVC.h; sourceTree = "<group>"; };
 		FC4D688817167036002A73AD /* ThreeDimVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ThreeDimVC.m; path = ../ThreeDimVC.m; sourceTree = "<group>"; };
@@ -624,6 +626,7 @@
 		A558D64116138D37001DED8C /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				FC4B0A2B172EC0C200A099A0 /* switch_camera.png */,
 				FCE35A02172AD5AC00FFE98B /* image_not_found.png */,
 				A5B8F9ED166568E000D8F73A /* silueta.png */,
 				A5B8F9EE166568E100D8F73A /* silueta@2x.png */,
@@ -997,6 +1000,7 @@
 				FC4D688B17167036002A73AD /* ThreeDimVC.xib in Resources */,
 				FC4EE0F717231A1700536B4A /* CameraViewController.xib in Resources */,
 				FCE35A03172AD5AC00FFE98B /* image_not_found.png in Resources */,
+				FC4B0A2C172EC0C200A099A0 /* switch_camera.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

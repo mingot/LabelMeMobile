@@ -30,6 +30,7 @@
 //unique name to identify the modal
 @property (strong, nonatomic) NSString *modalTitle;
 @property BOOL multipleChoice;
+@property BOOL showCancelButton;
 
 
 - (IBAction)doneAction:(id)sender;

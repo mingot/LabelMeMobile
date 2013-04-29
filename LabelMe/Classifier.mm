@@ -68,6 +68,7 @@ using namespace cv;
 
 @synthesize weightsP = _weightsP;
 @synthesize sizesP = _sizesP;
+@synthesize maxHog = _maxHog;
 @synthesize delegate = _delegate;
 @synthesize isLearning = _isLearning;
 @synthesize iniPyramid = _iniPyramid;
@@ -157,11 +158,13 @@ using namespace cv;
     
     self.receivedImageIndex = [[NSMutableArray alloc] init];
 
-    
+
     
     // Get the template size and get hog feautures dimension
     float ratio = trainingSet.templateSize.width/trainingSet.templateSize.height;
     self.sizesP[0] = round(40*trainingSet.areaRatio + 4); //Determined empirically to ajust the size of the template according to the size in the training set
+//    self.sizesP[0] = self.maxHog; //set in user preferences
+    NSLog(@"MAX HOG:%d", self.maxHog);
     self.sizesP[1] = round(self.sizesP[0]*ratio);
     self.sizesP[2] = 31;
     numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];

@@ -29,6 +29,7 @@
 @property int *sizesP;
 @property double *weightsP;
 @property NSMutableArray *imageListAux;
+@property int maxHog; //hog readed from user preferences;
 
 //Encoding properties
 @property (strong, nonatomic) NSString *name;

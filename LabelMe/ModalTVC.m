@@ -29,6 +29,7 @@
 @synthesize delegate = _delegate;
 @synthesize multipleChoice = _multipleChoice;
 @synthesize modalTitle = _modalTitle;
+@synthesize cancelButton = _cancelButton;
 
 -(NSMutableArray *) selectedItems
 {
@@ -52,12 +53,9 @@
     if([[self.data objectAtIndex:0] isKindOfClass:[UIImage class]])
         self.isGrid = YES;
     
-    self.cancelButton.hidden = YES;
-    if(self.isGrid){
+    self.cancelButton.hidden = !self.cancelButton;
+    if(self.isGrid)
         self.tableView.rowHeight = (0.225*self.view.frame.size.width*ceil((float)self.data.count/4) + 0.0375*self.view.frame.size.width);
-        //TODO: hidden button made from the caller, more genearl approach
-        self.cancelButton.hidden = NO;
-    }
     
     
     //TODO: in grid mode, no distinction between multiplechoice.

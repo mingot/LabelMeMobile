@@ -113,6 +113,7 @@ static BOOL didSignIn = NO;
     NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
     if (connection == nil) [self errorWithTitle:@"Unknown error" andDescription:@""];
     else [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+
 }
 
 
@@ -522,7 +523,6 @@ static BOOL didSignIn = NO;
         [connection cancel];
         cancel = NO;
     }
-    NSLog(@"recieving!!");
     [receivedData appendData:data];
 
 }
