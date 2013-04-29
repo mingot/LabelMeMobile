@@ -18,5 +18,8 @@
 
 
 -(IBAction)logOutAction:(id)sender;
+-(IBAction)profilePictureAction:(id)sender;
+-(IBAction)valueDidChange:(id)sender;
+-(IBAction)stepperDidChange:(id)sender;
 
 @end

@@ -141,18 +141,33 @@
                 break;
         }
     }
-    else{
-        UISlider *slider = (UISlider *)sender;
-        dictnum = [NSNumber numberWithFloat:[slider value]];
-        [dict removeObjectForKey:@"resolution"];
-        [dict setObject:dictnum forKey:@"resolution"];
-    }
+
+//    }else{
+//        UISlider *slider = (UISlider *)sender;
+//        dictnum = [NSNumber numberWithFloat:[slider value]];
+//        [dict removeObjectForKey:@"resolution"];
+//        [dict setObject:dictnum forKey:@"resolution"];
+//    }
     
     [dict writeToFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"] atomically:NO];
 
 }
 
+-(IBAction)stepperDidChange:(id)sender
+{
+    NSArray *paths = [self newArrayWithFolders:self.username];
+    UIStepper *stepper = (UIStepper *) sender;
+    
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
+    
+    [dict removeObjectForKey:@"hogdimension"];
+    [dict setObject:[NSNumber numberWithDouble:stepper.value] forKey:@"hogdimension"];
 
+    NSLog(@"%f", stepper.value);
+    [self.tableView reloadData];
+    
+    [dict writeToFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"] atomically:NO];
+}
 
 #pragma mark - UIActionSheetDelegate methods
 
@@ -239,7 +254,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 5;
+    return 6;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -262,6 +277,8 @@
     NSString * ret = [[NSString alloc] init];
     if (section == 3)
         ret = @"Advanced settings";
+    if(section == 4)
+        ret = @"Detector settings";
     
     return  ret;
 }
@@ -269,9 +286,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section == 0)
-         return  self.view.frame.size.width/2;
-    
+    if (indexPath.section == 0) return  self.view.frame.size.width/2;
     else return tableView.rowHeight;
 }
 
@@ -281,20 +296,17 @@
     if (sectionTitle == nil)
         return nil;
     
-    
     // Create label with section title
     UILabel *label = [[UILabel alloc] init];
     label.frame = CGRectMake(20, 6, 300, 30);
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
-    //label.textColor = [UIColor whiteColor];
     label.shadowColor = [UIColor grayColor];
     label.shadowOffset = CGSizeMake(0.0, 1.0);
     label.text = sectionTitle;
     
     // Create header view and add label as a subview
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 40)];
-//    [view autorelease];
     [view addSubview:label];
     
     return view;
@@ -306,28 +318,26 @@
     NSArray *paths = [self newArrayWithFolders:self.username];
     UITableViewCell *cell = nil;
 
+    //Profile picture
     if (indexPath.section == 0) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
         UIButton *profilePictureButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [cell.imageView setBackgroundColor:[UIColor clearColor]];
         cell.imageView.layer.masksToBounds = YES;
         cell.imageView.layer.cornerRadius = 10.0;
-        if (![filemng fileExistsAtPath:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]]) {
-            
+        if (![filemng fileExistsAtPath:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]])
             [cell.imageView setImage:[UIImage imageNamed:@"silueta.png"]];
-        }
-        else{
-            [cell.imageView  setImage:[UIImage imageWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]] ];
-
             
-        }
+        else [cell.imageView  setImage:[UIImage imageWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]] ];
+
+        
         [profilePictureButton setFrame:CGRectMake(0.0625*self.view.frame.size.width, 0.03125*self.view.frame.size.width, self.view.frame.size.width/2,  self.view.frame.size.width/2)];
         [profilePictureButton addTarget:self action:@selector(profilePictureAction:) forControlEvents:UIControlEventTouchUpInside];
         [cell addSubview:profilePictureButton];
         [cell.textLabel setText:self.username];
 
-    }
-    else if (indexPath.section == 1){
+    //number of images
+    }else if (indexPath.section == 1){
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         NSNumber *numberfiles =[NSNumber numberWithInteger: [[filemng contentsOfDirectoryAtPath:[paths objectAtIndex:THUMB] error:NULL] count]];
         
@@ -335,16 +345,18 @@
         [cell.detailTextLabel setText:numberfiles.stringValue];
         [cell.detailTextLabel setTextColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
         [cell.textLabel setTextAlignment:NSTextAlignmentCenter];
-    }
-    else if (indexPath.section == 2){
+    
+    //go to labelme website
+    }else if (indexPath.section == 2){
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         
         [cell.textLabel setText:@"Go to LabelMe Website"];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
 
         [cell.textLabel setTextAlignment:NSTextAlignmentCenter];
-    }
-    else if (indexPath.section == 3){
+    
+    //advanced settings
+    }else if (indexPath.section == 3){
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectZero];
         [sw setOnTintColor:[UIColor colorWithRed:(180.0/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0]];
@@ -390,8 +402,21 @@
             default:
                 break;
         }
-    }
-    else if (indexPath.section == 4){
+    
+    //detector settings
+    }else if(indexPath.section == 4){
+        
+        NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
+        UIStepper *stepper = [[UIStepper alloc] initWithFrame:CGRectZero];
+        stepper.value = [(NSNumber *)[dict objectForKey:@"hogdimension"] doubleValue];
+        
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        cell.textLabel.text = [NSString stringWithFormat: @"Max HOG: %d", (int) stepper.value];
+        cell.accessoryView = stepper;
+        [stepper addTarget:self action:@selector(stepperDidChange:) forControlEvents:UIControlEventValueChanged];
+        
+    //about
+    }else if (indexPath.section == 5){
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         
         [cell.textLabel setText:@"About LabelMe"];
@@ -414,38 +439,36 @@
     if (indexPath.section == 2) {
         [self.website setHidesBottomBarWhenPushed:YES];
         [self.navigationController pushViewController:self.website animated:YES];
-        
+    
+    //image resolution choos
     }else if ((indexPath.section == 3) && (indexPath.row == 1)) {
-        ResolutionViewController *resolution = nil;
         
-        //choose controller
+        ResolutionViewController *resolutionVC = nil;
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
             if ([UIScreen mainScreen].bounds.size.height == 568) 
-                resolution = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPhone5" bundle:nil];
+                resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPhone5" bundle:nil];
             else if ([UIScreen mainScreen].bounds.size.height == 480)
-                resolution = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPhone" bundle:nil];
-        }else
-            resolution = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPad" bundle:nil];
+                resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPhone" bundle:nil];
+        }else resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPad" bundle:nil];
 
 
-        [resolution setUsername:self.username];
-        [self.navigationController pushViewController:resolution animated:YES];
+        resolutionVC.username = self.username;
+        [self.navigationController pushViewController:resolutionVC animated:YES];
         
-    }else if ((indexPath.section == 4) ) {
-        CreditsViewController *credits = nil;
+    }else if ((indexPath.section == 5) ) {
+        CreditsViewController *creditsVC = nil;
         
         //choose controller
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
             if ([UIScreen mainScreen].bounds.size.height == 568)
-                credits = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPhone5" bundle:nil];
+                creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPhone5" bundle:nil];
             else if ([UIScreen mainScreen].bounds.size.height == 480)
-                credits = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPhone" bundle:nil];
-        }else
-            credits = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPad" bundle:nil];
+                creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPhone" bundle:nil];
+        }else creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPad" bundle:nil];
             
         
-        [credits setHidesBottomBarWhenPushed:YES];
-        [self.navigationController pushViewController:credits animated:YES];
+        [creditsVC setHidesBottomBarWhenPushed:YES];
+        [self.navigationController pushViewController:creditsVC animated:YES];
     }
 
 }

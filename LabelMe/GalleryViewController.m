@@ -174,6 +174,14 @@
     self.tableView.tableFooterView = footerView2;
     self.tableViewGrid.tableFooterView = footerView;
 
+    UIButton *btnDeco4 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    btnDeco4.frame = CGRectMake(10, 200, 280, 40);
+    [btnDeco4 setTitle:@"More Labels" forState:UIControlStateNormal];
+    btnDeco4.backgroundColor = [UIColor clearColor];
+    [btnDeco4 setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+    [btnDeco4 addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchDown];//UIControlEventTouchUpInside];
+    
+    
     noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
     [noImages setBackgroundColor:[UIColor whiteColor]];
     noImages.layer.masksToBounds = YES;
@@ -183,8 +191,10 @@
     noImages.shadowColor = [UIColor grayColor];
     [noImages setNumberOfLines:2];
     noImages.shadowOffset = CGSizeMake(0.0, 1.0);
-    noImages.text = @"You do not have images, \nstart taking pics and labeling!";
+    noImages.text = @"You do not have images, \nstart taking pics and labeling or download from web!";
     [noImages setTextAlignment:NSTextAlignmentCenter];
+    [noImages addSubview:btnDeco4];
+    [noImages setUserInteractionEnabled:YES];
     
     sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     [sendingView setHidden:YES];
@@ -261,8 +271,13 @@
     [self.tableView reloadData];
     [self.tableViewGrid reloadData];
     
-    if (self.items.count == 0) [noImages setHidden:NO];
-    else [noImages setHidden:YES];
+    if(self.items.count == 0) {
+        noImages.hidden = NO;
+        self.tableView.hidden = YES;
+        self.tableView.hidden = NO;
+    }
+    else noImages.hidden = YES;
+
     
 }
 
@@ -640,13 +655,17 @@
         }else if([buttonTitle isEqualToString:@"More Labels"]){
             
             //get the labels
-            NSArray *labels = [self.downloadedLabelsMap allKeys];
+            NSMutableArray *labels = [[NSMutableArray alloc] init];
+            for(NSString *key in self.downloadedLabelsMap){
+                NSArray *indexes = [self.downloadedLabelsMap objectForKey:key];
+                [labels addObject:[NSString stringWithFormat:@"%@ (%d)",key,indexes.count]];
+            }
             
             self.modalTVC = [[ModalTVC alloc] init];
             self.modalTVC.delegate = self;
             self.modalTVC.modalTitle = @"Choose Labels";
             self.modalTVC.multipleChoice = NO;
-            self.modalTVC.data = labels;
+            self.modalTVC.data = [NSArray arrayWithArray:labels];
             [self.modalTVC.view setNeedsDisplay];
             [self presentModalViewController:self.modalTVC animated:YES];
         }

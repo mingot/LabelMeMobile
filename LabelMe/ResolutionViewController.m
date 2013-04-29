@@ -125,7 +125,7 @@
 {
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     
-    // change to accomodate user
+    // change resolution preferences
     NSString *path = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,self.username ];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[path stringByAppendingPathComponent:@"settings.plist"]];
     NSNumber *dictnum = [NSNumber numberWithInteger:[tableView cellForRowAtIndexPath:indexPath].tag];
