@@ -567,19 +567,15 @@
     NSNumber *num = [dict objectForKey:self.filename];
     
     CGPoint point = CGPointMake(self.imageView.image.size.width/self.annotationView.frame.size.width, self.imageView.image.size.height/self.annotationView.frame.size.height);
-    if (num.intValue<0) {
-        [sConnection sendPhoto:self.imageView.image filename:self.filename path:[self.paths objectAtIndex:OBJECTS] withSize:point andAnnotation:self.annotationView.objects];
-    }
-    else{
-        [sConnection updateAnnotationFrom:self.filename withSize:point :self.annotationView.objects];
-    }
     
-    
+    if (num.intValue<0) [sConnection sendPhoto:self.imageView.image filename:self.filename path:[self.paths objectAtIndex:OBJECTS] withSize:point andAnnotation:self.annotationView.objects];
+    else [sConnection updateAnnotationFrom:self.filename withSize:point :self.annotationView.objects];
 }
 
 
 #pragma mark -
 #pragma mark Save State
+
 -(BOOL)saveThumbnail
 {
     [self.annotationView setSelectedBox:-1];

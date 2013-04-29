@@ -385,6 +385,8 @@ using namespace cv;
         self.precisionRecall = [aDecoder decodeObjectForKey:@"precisionRecall"];
         self.timeLearning = [aDecoder decodeObjectForKey:@"timeLearning"];
         self.imagesUsedTraining = [aDecoder decodeObjectForKey:@"imagesUsedTraining"];
+        self.averageImagePath = [aDecoder decodeObjectForKey:@"averageImagePath"];
+        self.averageImageThumbPath = [aDecoder decodeObjectForKey:@"averageImageThumbPath"];
         
         self.sizesP = (int *) malloc(3*sizeof(int));
         self.sizesP[0] = [(NSNumber *) [self.sizes objectAtIndex:0] intValue];
@@ -424,6 +426,8 @@ using namespace cv;
     [aCoder encodeObject:self.precisionRecall forKey:@"precisionRecall"];
     [aCoder encodeObject:self.timeLearning forKey:@"timeLearning"];
     [aCoder encodeObject:self.imagesUsedTraining forKey:@"imagesUsedTraining"];
+    [aCoder encodeObject:self.averageImagePath forKey:@"averageImagePath"];
+    [aCoder encodeObject:self.averageImageThumbPath forKey:@"averageImageThumbPath"];
 }
 
 

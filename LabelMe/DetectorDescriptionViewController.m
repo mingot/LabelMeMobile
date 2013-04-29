@@ -17,11 +17,14 @@
 #define IMAGES 0
 #define THUMB 1
 #define OBJECTS 2
-#define USER 3
+#define DETECTORS 3
+#define USER 4
 #define MAX_IMAGE_SIZE 300
-//#define IMAGE_SCALE_FACTOR 0.6
+
 
 @interface DetectorDescriptionViewController()
+
+@property (strong, nonatomic) UIImage *averageImage;
 
 // wrapper to call the detector for training and testing
 -(void) trainForImagesNames:(NSArray *)imagesNames;
@@ -32,6 +35,7 @@
 
 // average per pixel image
 -(UIImage *) imageAveraging:(NSArray *) images;
+
 
 @end
 
@@ -56,6 +60,7 @@
 @synthesize selectedPositiveImageIndexes = _selectedPositiveImageIndexes;
 @synthesize selectedPostiveImageNames = _selectedPostiveImageNames;
 
+@synthesize averageImage = _averageImage;
 
 
 #pragma mark
@@ -115,7 +120,12 @@
     [super viewDidLoad];
     
     self.svmClassifier.delegate = self;
-    self.resourcesPaths = [NSArray arrayWithObjects:[self.userPath stringByAppendingPathComponent:@"images"],[self.userPath stringByAppendingPathComponent:@"thumbnail"],[self.userPath stringByAppendingPathComponent:@"annotations"],self.userPath, nil];
+    self.resourcesPaths = [NSArray arrayWithObjects:
+                           [self.userPath stringByAppendingPathComponent:@"images"],
+                           [self.userPath stringByAppendingPathComponent:@"thumbnail"],
+                           [self.userPath stringByAppendingPathComponent:@"annotations"],
+                           [self.userPath stringByAppendingPathComponent:@"Detectors"],
+                           self.userPath, nil];
     
     //load views
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
@@ -143,7 +153,8 @@
         
     }else{
         NSLog(@"Loading classifier");
-        self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
+//        self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
+        self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];
         self.saveButton.enabled = NO;
         self.saveButton.alpha = 0.6f;
         [self.trainButton setTitle:@"Retrain" forState:UIControlStateNormal];
@@ -220,6 +231,18 @@
 
 - (IBAction)saveAction:(id)sender
 {
+    //save average image
+    NSString *pathDetectorsBig = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
+                                  [NSString stringWithFormat:@"%@_big.jpg",self.svmClassifier.name]];
+    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsBig contents:UIImageJPEGRepresentation(self.averageImage, 1.0) attributes:nil];
+    self.svmClassifier.averageImagePath = pathDetectorsBig;
+    
+    //save average image thumbnail
+    NSString *pathDetectorsThumb = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
+                                    [NSString stringWithFormat:@"%@_thumb.jpg",self.svmClassifier.name]];
+    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsThumb contents:UIImageJPEGRepresentation([self.averageImage thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
+    self.svmClassifier.averageImageThumbPath = pathDetectorsThumb;
+    
     [self.delegate updateDetector:self.svmClassifier];
     self.saveButton.enabled = NO;
     self.saveButton.alpha = 0.6f;
@@ -389,9 +412,8 @@
     }
     
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
-    
-    
-    //obtain the image average of the groundtruth images
+        
+    //obtain the image average of the groundtruth images and save them
     NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
     for(BoundingBox *cp in trainingSet.groundTruthBoundingBoxes){
         UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
@@ -399,8 +421,10 @@
         [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationLow]];
     }
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
-    self.detectorView.image = [self imageAveraging:listOfImages];
+    self.averageImage = [self imageAveraging:listOfImages];
+    self.detectorView.image = self.averageImage;
     
+
     //learn
     [self updateProgress:0.05];
     [self.sendingView showMessage:@"Training begins!"];
@@ -506,6 +530,7 @@
     return image;
 
 }
+
 
 
 @end

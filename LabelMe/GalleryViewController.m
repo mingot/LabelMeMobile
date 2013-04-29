@@ -48,6 +48,7 @@
 @synthesize deleteButton = _deleteButton;
 @synthesize sendButton = _sendButton;
 @synthesize usernameLabel = _usernameLabel;
+@synthesize profilePicture = _profilePicture;
 
 @synthesize listButton = _listButton;
 @synthesize paths = _paths;
@@ -61,6 +62,12 @@
 @synthesize username = _username;
 
 
+
+#pragma mark
+#pragma mark - setters and getters
+
+
+
 #pragma mark -
 #pragma mark lifecycle
 
@@ -68,19 +75,24 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
+        
+        //objects initialization
         self.items = [[NSArray alloc] init];
-        self.tabBarItem= [[UITabBarItem alloc]initWithTitle:@"Home" image:nil tag:0];
-        [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"home.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"homeActive.png"]];
         self.selectedItems = [[NSMutableArray alloc]init];
         self.selectedItemsSend = [[NSMutableArray alloc]init];
         self.selectedItemsDelete = [[NSMutableArray alloc]init];
         self.username = [[NSString alloc] init];
         serverConnection = [[ServerConnection alloc] init];
-
+        
+        //tab bar
+        self.tabBarItem= [[UITabBarItem alloc]initWithTitle:@"Home" image:nil tag:0];
+        [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"home.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"homeActive.png"]];
+        
+        //buttons
         self.sendButton = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleBordered target:self action:@selector(sendAction:)];
         self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStyleBordered target:self action:@selector(deleteAction:)];
         self.editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(editAction:)];
+        
         serverConnection.delegate = self;
         self.modalTVC = [[ModalTVC alloc] initWithNibName:@"ModalTVC" bundle:nil];
 
@@ -95,31 +107,42 @@
     
     self.usernameLabel.text = self.username;
     [self.usernameLabel setTextColor:[UIColor colorWithRed:51/255.0f green:51/255.0f blue:51/255.0f alpha:1.0]];
-    // TitleView: LabelMe Logo
+    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
+    photosWithErrors = 0;
+    
+    //titleView: LabelMe Logo and title images
     UIImage *titleImage = [UIImage imageNamed:@"logo-title.png"];
     UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
     [titleView setImage:titleImage];
     [self.navigationItem setTitleView:titleView];
-
-    UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"] ;
+    UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"];
+    
+    //profile picture
+    self.profilePicture = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, view1.frame.size.width, view1.frame.size.height)];
+    self.profilePicture.layer.masksToBounds = YES;
+    self.profilePicture.layer.cornerRadius = 6.0;
+    [self.profilePicture setContentMode:UIViewContentModeScaleAspectFit];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]])
+        [self.profilePicture setImage:[UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]] ];
+    else [self.profilePicture setImage:[UIImage imageNamed:@"silueta.png"]];
+    
+    
+    //buttons
     [self.editButton setStyle:UIBarButtonItemStyleBordered];
     [self.navigationItem setRightBarButtonItem:self.editButton];
-
     [self.deleteButton setTintColor:[UIColor redColor]];
     [self.deleteButton setWidth:self.view.frame.size.width/2 - 11];
     [self.sendButton setWidth:self.view.frame.size.width/2 - 11];
     [self.deleteButton setEnabled:NO];
     [self.sendButton setEnabled:NO];
+    
+    //navigation and tool bar
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
     [self.navigationController.navigationBar setBackgroundImage:barImage forBarMetrics:UIBarMetricsDefault];
-
-
     [self.navigationController.toolbar setBarStyle:UIBarStyleBlackTranslucent];
     [self.navigationController.navigationBar setTintColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
 
-    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
-    
-    //device selection
+    //device selection for tagVC
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if ([UIScreen mainScreen].bounds.size.height == 568)
             self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone5" bundle:nil];
@@ -180,7 +203,7 @@
     [btnDeco4 setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
     [btnDeco4 addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchDown];//UIControlEventTouchUpInside];
     
-    
+    //no images view
     noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
     [noImages setBackgroundColor:[UIColor whiteColor]];
     noImages.layer.masksToBounds = YES;
@@ -195,6 +218,7 @@
     [noImages addSubview:btnDeco4];
     [noImages setUserInteractionEnabled:YES];
     
+    //sending view
     sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     [sendingView setHidden:YES];
     [self.tabBarController.tabBar setUserInteractionEnabled:YES];
@@ -205,11 +229,9 @@
     [self.view addSubview:self.tableViewGrid];
     [self.view addSubview:noImages];
     [self.view addSubview:sendingView];
-    photosWithErrors = 0;
-    self.profilePicture = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, view1.frame.size.width, view1.frame.size.height)];
-    self.profilePicture.layer.masksToBounds = YES;
-    self.profilePicture.layer.cornerRadius = 6.0;
-    [self.profilePicture setContentMode:UIViewContentModeScaleAspectFit];
+    
+    
+
 
     [view1.layer setShadowColor:[UIColor blackColor].CGColor];
     [view1.layer setShadowOffset:CGSizeMake(0, 1)];
@@ -219,19 +241,20 @@
     [view1 addSubview:self.profilePicture];
     [view1 setClipsToBounds:NO];
     
-}
 
+    
+    [self reloadGallery];
+}
 
 - (void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-
+    
+    //upload profile picture
     if ([[NSFileManager defaultManager] fileExistsAtPath:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]])
         [self.profilePicture setImage:[UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]] ];
-    
     else [self.profilePicture setImage:[UIImage imageNamed:@"silueta.png"]];
     
-    [self reloadGallery];
 }
 
 
@@ -276,8 +299,6 @@
         self.tableView.hidden = NO;
     }
     else noImages.hidden = YES;
-
-    
 }
 
 
@@ -290,7 +311,7 @@
         size2 = CGSizeMake(80, 80);
 
     if (num.intValue < 0) {
-        NSString *numBadge= [[NSString alloc] initWithFormat:@"%d",abs(num.intValue+1)];
+        NSString *numBadge = [[NSString alloc] initWithFormat:@"%d",abs(num.intValue+1)];
         CustomBadge *accessory = [CustomBadge customBadgeWithString:numBadge withStringColor:[UIColor whiteColor] withInsetColor:[UIColor redColor] withBadgeFrame:YES withBadgeFrameColor:[UIColor whiteColor] withScale:1.0 withShining:YES];
         [accessory setFrame:CGRectMake(size.width- 0.30*size2.width, 0, 0.30*size2.width, 0.30*size2.width)];
         ret = accessory;
@@ -406,9 +427,7 @@
 
 -(IBAction)buttonClicked:(id)sender
 {
-    
     UIButton *button = (UIButton *)sender;
-    
     
     if ([self.editButton.title isEqual: @"Cancel"]) {
         if ([self.selectedItems containsObject:[self.items objectAtIndex:abs(button.tag)-1]]) {
@@ -552,8 +571,6 @@
 
     NSArray *colors = [[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
 
-    
-    
     //select NUM images not currently present in iphone
     for (NSDictionary *element in results) {
         
@@ -948,8 +965,6 @@
         
         for(int i = 0; i < self.items.count; i++) {
             @autoreleasepool {
-                NSNumber *num = [dict objectForKey:[self.items objectAtIndex:i]];
-                
                 UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0.0375*self.view.frame.size.width,0.4125*self.view.frame.size.width, 0.4125*self.view.frame.size.width)];
                 imageView.image = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:THUMB],[self.items objectAtIndex:i]]];
                 UIView *imview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width)];
@@ -980,7 +995,6 @@
                  forControlEvents:UIControlEventTouchUpInside];
                 [button setImage:image forState:UIControlStateNormal];
                 [button setImage:[self addBorderTo:image2] forState:UIControlStateSelected];
-//                [button addSubview:[self correctAccessoryAtIndex:i withNum:num withSize:button.frame.size]];
                 
                 [cell addSubview:button];
             }
@@ -991,7 +1005,6 @@
     }else if (tableView.tag == 1) {
        
         NSNumber *num = [dict objectForKey:[self.items objectAtIndex:indexPath.row]];
-        
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
         
         //button
@@ -1020,8 +1033,7 @@
         
         NSMutableArray *annotation = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.items objectAtIndex:indexPath.row]]];
         UIImage *newimage = [[UIImage alloc]initWithContentsOfFile:[[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:[self.items objectAtIndex:indexPath.row]] ];
-        cell.detailTextLabel.numberOfLines = 2;
-        NSString *detailText = [[NSString alloc]initWithFormat:@"%d objects\n%d x %d",annotation.count,(int)newimage.size.width,(int)newimage.size.height];
+
 
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0375*self.view.frame.size.width, 0.0375*self.view.frame.size.width, 0.425*self.view.frame.size.width, 0.425*self.view.frame.size.width)];
         imageView.image = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:THUMB],[self.items objectAtIndex:indexPath.row]]];
@@ -1034,7 +1046,8 @@
         UIGraphicsEndImageContext();
         [cell.imageView setImage:image];
         [cell.imageView addSubview:[self correctAccessoryAtIndex:indexPath.row withNum:num withSize:CGSizeMake(tableView.rowHeight, tableView.rowHeight)]];
-        
+        cell.detailTextLabel.numberOfLines = 2;
+        NSString *detailText = [[NSString alloc]initWithFormat:@"%d objects\n%d x %d",annotation.count,(int)newimage.size.width,(int)newimage.size.height];
         cell.detailTextLabel.text = detailText;
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         NSString *date = [[NSString alloc]initWithFormat:@"%@-%@-%@",[[self.items objectAtIndex:indexPath.row] substringWithRange:NSMakeRange(4, 2)],[[self.items objectAtIndex:indexPath.row] substringWithRange:NSMakeRange(6, 2)],[[self.items objectAtIndex:indexPath.row] substringToIndex:4] ];

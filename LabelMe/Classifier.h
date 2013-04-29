@@ -41,6 +41,8 @@
 @property (strong, nonatomic) NSArray *precisionRecall;
 @property (strong, nonatomic) NSNumber *timeLearning;
 @property (strong, nonatomic) NSMutableArray *imagesUsedTraining;
+@property (strong, nonatomic) NSString *averageImagePath;
+@property (strong, nonatomic) NSString *averageImageThumbPath;
 
 
 

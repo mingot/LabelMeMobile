@@ -25,6 +25,8 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        
+        //tab bar
         self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Detector" image:nil tag:2];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"settings.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"settingsActive.png"]];
     }
@@ -48,7 +50,7 @@
     //view controller specifications
     self.title = @"Detectors";
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(Edit:)];
-    [self.navigationItem setLeftBarButtonItem:addButton];
+    [self.navigationItem setRightBarButtonItem:addButton];
     self.detectorController = [[DetectorDescriptionViewController alloc]initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
     
     //navigation controller
@@ -86,8 +88,16 @@
     }
     Classifier *detector = [self.detectors objectAtIndex:indexPath.row];
     cell.textLabel.text = detector.name;
-    cell.detailTextLabel.text = detector.targetClass;
+    cell.detailTextLabel.numberOfLines = 2;
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"Class:%@ \nTraining Images: %d", detector.targetClass, detector.imagesUsedTraining.count];
+    cell.imageView.image = [UIImage imageWithContentsOfFile:detector.averageImageThumbPath];
     return cell;
+}
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 80;
 }
 
 
