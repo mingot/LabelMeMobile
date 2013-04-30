@@ -297,6 +297,7 @@
                                     [NSString stringWithFormat:@"%@_thumb.jpg",self.svmClassifier.name]];
     [[NSFileManager defaultManager] createFileAtPath:pathDetectorsThumb contents:UIImageJPEGRepresentation([self.averageImage thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
     self.svmClassifier.averageImageThumbPath = pathDetectorsThumb;
+    self.svmClassifier.updateDate = [NSDate date];
     
     [self.delegate updateDetector:self.svmClassifier];
     self.saveButton.enabled = NO;
@@ -583,7 +584,6 @@
         //average
         for(int i=0; i<height*width*4; i++)
             imageResult[i] += imagePointer[i]*1.0/images.count;
-            
     }
     
     //construct final image
@@ -603,7 +603,7 @@
     [description appendFormat:@"NAME: %@\n", self.svmClassifier.name];
     [description appendFormat:@"CLASS: %@\n", self.svmClassifier.targetClass];
     [description appendFormat:@"NUMBER IMAGES: %d\n", self.svmClassifier.imagesUsedTraining.count];
-    [description appendFormat:@"LAST TRAINED: 23-04-89"];
+    [description appendFormat:@"LAST TRAINED: %@", self.svmClassifier.updateDate];
     self.descriptionLabel.text = [NSString stringWithString:description];
 }
 

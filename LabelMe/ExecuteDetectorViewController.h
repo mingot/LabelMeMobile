@@ -25,7 +25,6 @@
 @interface ExecuteDetectorViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate>
 {
     //settings
-    BOOL hogOnScreen;
     int numMax;
     BOOL isUsingFrontFacingCamera;
 }
@@ -63,8 +62,16 @@
 @property (nonatomic, weak) IBOutlet DetectView *detectView;
 
 @property (weak, nonatomic) IBOutlet UISlider *detectionThresholdSliderButton;
-@property (weak, nonatomic) IBOutlet UILabel *scaleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *fpsLabel;
+
+//info label
+@property (weak, nonatomic) IBOutlet UIView *infoView;
+@property (weak, nonatomic) IBOutlet UILabel *infoLabel;
+
+//settings view
+@property (weak, nonatomic) IBOutlet UIView *settingsView;
+- (IBAction)showSettingsAction:(id)sender;
+- (IBAction)settingsButtonAction:(id)sender;
+
 
 
 - (IBAction)switchCameras:(id)sender;

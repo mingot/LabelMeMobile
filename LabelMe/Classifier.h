@@ -43,7 +43,7 @@
 @property (strong, nonatomic) NSMutableArray *imagesUsedTraining;
 @property (strong, nonatomic) NSString *averageImagePath;
 @property (strong, nonatomic) NSString *averageImageThumbPath;
-
+@property (strong, nonatomic) NSDate *updateDate;
 
 
 //Initialization of the classifier given the weight vectors of it

@@ -83,7 +83,7 @@
 
 - (IBAction)addDetector:(id)sender
 {
-    NSLog(@"Adding detector!!");
+    _selectedRow = self.detectors;
     
     Classifier *newDetector = [[Classifier alloc] init];
     newDetector.name = @"New Detector";
@@ -203,8 +203,10 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (void) updateDetector:(Classifier *)updatedDetector
 {
-    //update table
-    [self.detectors addObject:updatedDetector];
+    //add or update detector
+    if(_selectedRow < self.detectors.count) [self.detectors replaceObjectAtIndex:_selectedRow withObject:updatedDetector];
+    else [self.detectors addObject:updatedDetector];
+
     NSLog(@"updating detector at position: %d", _selectedRow);
     if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"]]){
         NSLog(@"Unable to save the classifiers");

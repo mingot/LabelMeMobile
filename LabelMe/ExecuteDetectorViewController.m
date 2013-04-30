@@ -18,6 +18,14 @@
     float fps;
     int num;
 }
+
+@property BOOL score;
+@property BOOL fps;
+@property BOOL scale;
+@property BOOL hog;
+
+
+
 @end
 
 
@@ -34,7 +42,6 @@
 @synthesize HOGimageView = _HOGimageView;
 @synthesize detectView = _detectView;
 @synthesize detectionThresholdSliderButton = _detectionThresholdSliderButton;
-@synthesize  fpsLabel = _fpsLabel;
 
 //detection
 @synthesize trainingSetController = _trainingSetController;
@@ -51,14 +58,11 @@
 
 - (void)viewDidLoad
 {
-    // Initialitzation after the view load and all the outlets are hooked
     [super viewDidLoad];
     
     isUsingFrontFacingCamera = NO;
     fps = 0.0;
     num = 0;
-    
-
     
     //image poistion detection
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
@@ -72,10 +76,7 @@
     
     self.prevLayer = nil;
     
-    hogOnScreen = NO;
-    numMax = 1;
-    
-    self.fpsLabel.text = @"0 FPS";
+    numMax = 1;    
     
     //Initialization of model properties
     self.numPyramids = 10;
@@ -125,14 +126,16 @@
     [self.view addSubview:self.HOGimageView];
     [self.view addSubview:self.detectView];
     
-    
-    //Navigation controller
-//    UIBarButtonItem *switchCamerasButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageWithContentsOfFile:@"switch_camera.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(switchCameras:)];
-    UIBarButtonItem *switchCamerasButton = [[UIBarButtonItem alloc] initWithTitle:@"switch" style:UIBarButtonItemStyleBordered target:self action:@selector(switchCameras:)];
+    //Navigation controller navigation bar
+    UIBarButtonItem *settingsButton = [[UIBarButtonItem alloc] initWithTitle:@"settings" style:UIBarButtonItemStyleBordered target:self action:@selector(showSettingsAction:)];
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbarBg"]resizableImageWithCapInsets:UIEdgeInsetsZero ] forBarMetrics:UIBarMetricsDefault];
+    [settingsButton setStyle:UIBarButtonItemStyleBordered];
+    [self.navigationItem setRightBarButtonItem:settingsButton];
     
-    [switchCamerasButton setStyle:UIBarButtonItemStyleBordered];
-    [self.navigationItem setRightBarButtonItem:switchCamerasButton];
+    self.settingsView.hidden = YES;
+    
+    //variable number of lines
+    self.infoLabel.numberOfLines = 0;
 }
 
 
@@ -210,10 +213,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         [self.detectView performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
         
         // Update the navigation controller title with some information about the detection
-        int level;
+        int level=-1;
+        float scoreFloat = -1;
         if (nmsArray.count > 0){
             BoundingBox *score = (BoundingBox *)[nmsArray objectAtIndex:0];
             [self performSelectorOnMainThread:@selector(setTitle:) withObject:[NSString stringWithFormat:@"%3f",score.score] waitUntilDone:YES];
+            scoreFloat = score.score;
             if(score.score > self.maxDetectionScore) self.maxDetectionScore = score.score;
             if(self.isRecording) [self takePicture:nmsArray for:[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight]];
             level = score.pyramidLevel;
@@ -223,7 +228,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         
         //Put the HOG picture on screen
-        if (hogOnScreen){
+        if (self.hog){
             UIImage *image = [ [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight] scaleImageTo:230/480.0] convertToHogImage];
             [self.HOGimageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:YES];
         }
@@ -235,20 +240,19 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         //update label with the current FPS
         fps = (fps*num + -1.0/[start timeIntervalSinceNow])/(num+1);
         num++;
-        [self.fpsLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%.1f FPS",-1.0/[start timeIntervalSinceNow]] waitUntilDone:YES];
+        NSMutableString *screenLabelText = [[NSMutableString alloc] initWithString:@""];
+        if(self.score) [screenLabelText appendString:[NSString stringWithFormat:@"score:%.1f\n", scoreFloat]];
+        if(self.fps) [screenLabelText appendString: [NSString stringWithFormat:@"FPS: %.1f\n",-1.0/[start timeIntervalSinceNow]]];
+        if(self.scale) [screenLabelText appendString: [NSString stringWithFormat:@"scale: %d\n",level]];
+        [self.infoLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithString:screenLabelText] waitUntilDone:YES];
         
-        [self.scaleLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithFormat:@"%d",level] waitUntilDone:YES];
+        
     }
 }
 
 #pragma mark -
 #pragma mark Settings delegate
 
--(void) setHOGValue:(BOOL) value
-{
-    hogOnScreen = value;
-    if(!value) [self.HOGimageView performSelectorOnMainThread:@selector(setImage:) withObject:nil waitUntilDone:YES];
-}
 
 -(void) setNumMaximums:(BOOL) value
 {
@@ -274,10 +278,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #pragma mark Memory management
 
 - (void)viewDidUnload {
-    [self setScaleLabel:nil];
+    [self setSettingsView:nil];
+    [self setInfoView:nil];
     [self setStartRecordingButton:nil];
     [self setShowImagesButton:nil];
-    [self setFpsLabel:nil];
     [self setDetectionThresholdSliderButton:nil];
     NSLog(@"viewdidunload");
     
@@ -334,6 +338,31 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
 }
 
+
+#pragma mark
+#pragma mark - IBActions
+
+-(IBAction)showSettingsAction:(id)sender
+{
+    self.settingsView.hidden = self.settingsView.hidden ? NO:YES;
+}
+
+
+- (IBAction)settingsButtonAction:(id)sender
+{
+    UIButton *button = (UIButton *)sender;
+    
+    if([button.titleLabel.text isEqualToString:@"Score"]) self.score = self.score ? NO:YES;
+    else if([button.titleLabel.text isEqualToString:@"FPS"]) self.fps = self.fps ? NO:YES;
+    else if([button.titleLabel.text isEqualToString:@"Scale"]) self.scale = self.scale ? NO:YES;
+    else if ([button.titleLabel.text isEqualToString:@"Switch"]) [self switchCameras:self];
+    else if([button.titleLabel.text isEqualToString:@"HOG"]){
+        self.hog = self.hog ? NO:YES;
+        if(!self.hog) {self.HOGimageView.image = nil; self.HOGimageView.hidden = YES;}
+        else self.HOGimageView.hidden = NO;
+    }
+
+}
 
 - (IBAction)switchCameras:(id)sender
 

@@ -387,6 +387,7 @@ using namespace cv;
         self.imagesUsedTraining = [aDecoder decodeObjectForKey:@"imagesUsedTraining"];
         self.averageImagePath = [aDecoder decodeObjectForKey:@"averageImagePath"];
         self.averageImageThumbPath = [aDecoder decodeObjectForKey:@"averageImageThumbPath"];
+        self.updateDate = [aDecoder decodeObjectForKey:@"updateDate"];
         
         self.sizesP = (int *) malloc(3*sizeof(int));
         self.sizesP[0] = [(NSNumber *) [self.sizes objectAtIndex:0] intValue];
@@ -428,6 +429,7 @@ using namespace cv;
     [aCoder encodeObject:self.imagesUsedTraining forKey:@"imagesUsedTraining"];
     [aCoder encodeObject:self.averageImagePath forKey:@"averageImagePath"];
     [aCoder encodeObject:self.averageImageThumbPath forKey:@"averageImageThumbPath"];
+    [aCoder encodeObject:self.updateDate forKey:@"updateDate"];
 }
 
 

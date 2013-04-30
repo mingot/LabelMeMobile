@@ -11,6 +11,9 @@
 #import "Classifier.h"
 
 @interface DetectorGalleryViewController : UIViewController <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource,DetectorDescriptionViewControllerDelegate>
+{
+    NSInteger _selectedRow;
+}
 
 @property (nonatomic, strong) NSMutableArray *detectors; //Classifier
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
