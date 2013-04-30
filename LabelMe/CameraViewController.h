@@ -14,7 +14,7 @@
 @protocol CameraViewControllerDeledate <NSObject>
 
 - (void) cancelPhotoCapture;
-- (void) addImage:(UIImage *)image;
+- (void) addImageCaptured:(UIImage *)image;
 
 @end
 

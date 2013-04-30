@@ -16,7 +16,7 @@
 #import "CameraViewController.h"
 #import "SendingView.h"
 
-@interface SignInViewController : UIViewController <UITextFieldDelegate,ServerConnectionDelegate,UITabBarControllerDelegate,CreateAccountDelegate, UINavigationControllerDelegate,UIImagePickerControllerDelegate, UIAlertViewDelegate, SendingViewDelegate, CameraViewControllerDeledate>
+@interface SignInViewController : UIViewController <UITextFieldDelegate,ServerConnectionDelegate,CreateAccountDelegate, UINavigationControllerDelegate, UIAlertViewDelegate, SendingViewDelegate>
 
 {
     
@@ -40,7 +40,6 @@
 @property (strong,nonatomic) GalleryViewController *galleryViewController;
 @property (strong,nonatomic) SettingsViewController *settingsViewController;
 @property (strong,nonatomic) DetectorGalleryViewController *detectorGalleryController;
-@property (strong,nonatomic) CameraViewController *cameraVC;
 @property (strong,nonatomic) NSDictionary *userDictionary;
 @property (strong,nonatomic) NSArray *userPaths;
 

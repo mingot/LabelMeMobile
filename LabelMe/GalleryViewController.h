@@ -7,12 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
 #import "TagViewController.h"
 #import "ServerConnection.h"
 #import "SendingView.h"
 #import "ModalTVC.h"
+#import "CameraViewController.h"
 
-@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalTVCDelegate>
+@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalTVCDelegate, CameraViewControllerDeledate>
 {    
     ServerConnection *serverConnection;
     SendingView *sendingView;
@@ -43,10 +45,13 @@
 @property (nonatomic,strong) NSMutableArray *selectedItemsDelete;
 
 @property (nonatomic,strong) TagViewController *tagViewController;
+@property (nonatomic,strong) CameraViewController *cameraVC;
 @property (nonatomic,strong) ModalTVC *modalTVC;
 @property (nonatomic,strong) NSString *username;
+@property (nonatomic,strong) NSArray *userPaths;
 
 
+@property (nonatomic,strong) CLLocationManager *locationMng;
 
 -(IBAction)buttonClicked:(id)sender;
 -(IBAction)deleteAction:(id)sender;
@@ -55,6 +60,7 @@
 -(IBAction)cancelAction:(id)sender;
 -(IBAction)editAction:(id)sender;
 -(IBAction)moreImagesAction:(id)sender;
+-(IBAction)addImage:(id)sender;
 
 
 @end

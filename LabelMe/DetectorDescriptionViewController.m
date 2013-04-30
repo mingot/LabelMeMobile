@@ -21,10 +21,17 @@
 #define USER 4
 #define MAX_IMAGE_SIZE 300
 
+//self.firstTrainingState
+#define NOT_FIRST 0
+#define INITIATED 1
+#define INTERRUPTED 2
+
 
 @interface DetectorDescriptionViewController()
 
 @property (strong, nonatomic) UIImage *averageImage;
+@property int firstTraingState; //0: not first training, 1: first training initiated, 2: first training interrupted
+
 
 // wrapper to call the detector for training and testing
 -(void) trainForImagesNames:(NSArray *)imagesNames;
@@ -118,6 +125,7 @@
 {
     [super viewDidLoad];
     
+    self.firstTraingState = NOT_FIRST;
     self.title = self.svmClassifier.name;
     
     self.svmClassifier.delegate = self;
@@ -147,21 +155,16 @@
     [trainButtonView setImage:[UIImage imageNamed:@"train.png"] forState:UIControlStateNormal];
     [trainButtonView addTarget:self action:@selector(trainAction:) forControlEvents:UIControlEventTouchUpInside];
     self.trainButtonBar = [[UIBarButtonItem alloc] initWithCustomView:trainButtonView];
-    
     UIButton *saveButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [saveButtonView setImage:[UIImage imageNamed:@"save.png"] forState:UIControlStateNormal];
     [saveButtonView addTarget:self action:@selector(saveAction:) forControlEvents:UIControlEventTouchUpInside];
     self.saveButtonBar = [[UIBarButtonItem alloc] initWithCustomView:saveButtonView];
-    
     UIButton *infoButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [infoButtonView setImage:[UIImage imageNamed:@"labelsList.png"] forState:UIControlStateNormal];
     [infoButtonView setTitle:@"info" forState:UIControlStateNormal];
     [infoButtonView addTarget:self action:@selector(infoAction:) forControlEvents:UIControlEventTouchUpInside];
     self.infoButtonBar = [[UIBarButtonItem alloc] initWithCustomView:infoButtonView];
-    
-    
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    
     [self.bottomToolbar setItems:[NSArray arrayWithObjects:self.executeButtonBar,flexibleSpace,self.trainButtonBar,flexibleSpace, self.saveButtonBar,flexibleSpace, self.infoButtonBar,nil]];
     
 
@@ -174,12 +177,13 @@
         
         //show modal to select the target class
         self.modalTVC = [[ModalTVC alloc] init];
-        self.modalTVC.showCancelButton = NO;
+        self.modalTVC.showCancelButton = YES;
         self.modalTVC.delegate = self;
         self.modalTVC.modalTitle = @"Select Class";
         self.modalTVC.multipleChoice = NO;
         self.modalTVC.data = self.availableObjectClasses;
         [self presentModalViewController:self.modalTVC animated:YES];
+        self.firstTraingState = INITIATED;
         
     }else{
         NSLog(@"Loading classifier");
@@ -215,8 +219,17 @@
 {
     [super viewWillAppear:animated];
     [self getAndSetDescriptionLabel];
+    
 }
 
+- (void) viewDidAppear:(BOOL)animated
+{
+    if(self.firstTraingState == INTERRUPTED) [self.navigationController popViewControllerAnimated:YES];
+    else if(self.firstTraingState == INITIATED){
+        [self trainAction:self];
+    }
+    
+}
 
 - (void)viewDidUnload
 {
@@ -260,6 +273,7 @@
         if(self.svmClassifier.imagesUsedTraining == nil || [self.svmClassifier.imagesUsedTraining indexOfObject:imageName]!= NSNotFound)
             [self.modalTVC.selectedItems addObject:[NSNumber numberWithInt:(imagesList.count-1)]];
     }
+    self.modalTVC.showCancelButton = YES;
     self.modalTVC.data = imagesList;
     [self.modalTVC.view setNeedsDisplay];
     [self presentModalViewController:self.modalTVC animated:YES];
@@ -371,6 +385,9 @@
         
     }else if([identifier isEqualToString:@"Training Images"]){
         
+        //not first training any more
+        self.firstTraingState = NOT_FIRST;
+        
         NSMutableArray *traingImagesNames = [[NSMutableArray alloc] init];
         NSMutableArray *testImagesNames = [[NSMutableArray alloc]init];
         
@@ -405,6 +422,11 @@
             });
         });
     }
+}
+
+- (void) selectionCancelled
+{
+    if(self.firstTraingState != NOT_FIRST) self.firstTraingState = INTERRUPTED;
 }
 
 #pragma mark

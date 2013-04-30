@@ -85,7 +85,7 @@
         serverConnection = [[ServerConnection alloc] init];
         
         //tab bar
-        self.tabBarItem= [[UITabBarItem alloc]initWithTitle:@"Home" image:nil tag:0];
+        self.tabBarItem= [[UITabBarItem alloc]initWithTitle:@"Label" image:nil tag:0];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"home.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"homeActive.png"]];
         
         //buttons
@@ -95,6 +95,12 @@
         
         serverConnection.delegate = self;
         self.modalTVC = [[ModalTVC alloc] initWithNibName:@"ModalTVC" bundle:nil];
+        self.cameraVC = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
+        self.cameraVC.delegate = self;
+        
+        //GPS settings
+        self.locationMng = [[CLLocationManager alloc] init];
+        self.locationMng.desiredAccuracy = kCLLocationAccuracyKilometer;
 
     }
     return self;
@@ -109,6 +115,7 @@
     [self.usernameLabel setTextColor:[UIColor colorWithRed:51/255.0f green:51/255.0f blue:51/255.0f alpha:1.0]];
     self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
     photosWithErrors = 0;
+
     
     //titleView: LabelMe Logo and title images
     UIImage *titleImage = [UIImage imageNamed:@"logo-title.png"];
@@ -129,7 +136,9 @@
     
     //buttons
     [self.editButton setStyle:UIBarButtonItemStyleBordered];
-    [self.navigationItem setRightBarButtonItem:self.editButton];
+    UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addImage:)];
+    self.navigationItem.leftBarButtonItem = plusButton;
+    self.navigationItem.rightBarButtonItem = self.editButton;
     [self.deleteButton setTintColor:[UIColor redColor]];
     [self.deleteButton setWidth:self.view.frame.size.width/2 - 11];
     [self.sendButton setWidth:self.view.frame.size.width/2 - 11];
@@ -423,6 +432,12 @@
         }
     }
     
+}
+
+-(IBAction)addImage:(id)sender
+{
+    [self.navigationController pushViewController:self.cameraVC animated:YES];
+
 }
 
 -(IBAction)buttonClicked:(id)sender
@@ -791,6 +806,58 @@
     else [serverConnection updateAnnotationFrom:[self.selectedItemsSend objectAtIndex:0] withSize:point :annotation];
     
 }
+
+#pragma mark
+#pragma mark - CameraVC Delegate
+
+- (void) cancelPhotoCapture
+{
+    NSLog(@"Cancel Capture");
+}
+
+-(void) addImageCaptured:(UIImage *)image
+{
+    dispatch_queue_t savingQueue = dispatch_queue_create("saving_image", 0);
+    dispatch_async(savingQueue, ^{
+        NSLog(@"adding image to gallery");
+        
+        NSDictionary *userDictionary = [[NSDictionary alloc] initWithContentsOfFile:[[self.userPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
+        
+        [self.locationMng startUpdatingLocation];
+        TagViewController *tagViewController = [[TagViewController alloc] init];
+        tagViewController.username = self.username;
+        
+        //get the new size of the image according to the defined resolution and save image
+        CGSize newSize = image.size;
+        float resolution = [[userDictionary objectForKey:@"resolution"] floatValue];
+        float max = newSize.width > newSize.height ? newSize.width : newSize.height;
+        if ((resolution != 0.0) && (resolution < max))
+            newSize = image.size.height > image.size.width ? CGSizeMake(resolution*0.75, resolution) : CGSizeMake(resolution, resolution*0.75);
+        NSLog(@"New size for the image %f %f", newSize.height, newSize.width);
+        
+        //save image into library if option enabled in settings
+        if ([[userDictionary objectForKey:@"cameraroll"] boolValue]) UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
+        
+        //save location information
+        NSString *location = @"";
+        location = [[self.locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
+        [location writeToFile:[[self.userPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[tagViewController.filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+        
+        [self.locationMng stopUpdatingLocation];
+        
+        [tagViewController saveImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self reloadGallery];
+        });
+    });
+    dispatch_release(savingQueue);
+    
+}
+
+
+
+
+
 
 
 #pragma mark -

@@ -13,6 +13,8 @@
 //set the items the user selected
 - (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
 
+- (void) selectionCancelled;
+
 @end
 
 

@@ -131,7 +131,7 @@
         
         self.numberImages++;
         self.numberImagesLabel.text = [NSString stringWithFormat:@"%d",self.numberImages];
-        [self.delegate addImage:image];
+        [self.delegate addImageCaptured:image];
 	 }];
 }
 

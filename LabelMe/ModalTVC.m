@@ -53,7 +53,8 @@
     if([[self.data objectAtIndex:0] isKindOfClass:[UIImage class]])
         self.isGrid = YES;
     
-    self.cancelButton.hidden = !self.cancelButton;
+    self.cancelButton.hidden = !self.showCancelButton;
+    
     if(self.isGrid)
         self.tableView.rowHeight = (0.225*self.view.frame.size.width*ceil((float)self.data.count/4) + 0.0375*self.view.frame.size.width);
     
@@ -200,6 +201,7 @@
 
 - (IBAction)cancelAction:(id)sender {
     [self dismissModalViewControllerAnimated:YES];
+    [self.delegate selectionCancelled];
 }
 
 #pragma mark
