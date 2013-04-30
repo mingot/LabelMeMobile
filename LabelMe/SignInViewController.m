@@ -32,13 +32,11 @@
 @synthesize galleryViewController = _galleryViewController;
 @synthesize settingsViewController = _settingsViewController;
 @synthesize detectorGalleryController = _detectorGalleryController;
-@synthesize userDictionary = _userDictionary;
-@synthesize userPaths = _userPaths;
 
 
 
 
-#pragma mark 
+#pragma mark
 #pragma mark - lifecycle
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -413,9 +411,8 @@
     [sendingView.activityIndicator stopAnimating];
     [self presentViewController:self.tabBarController animated:YES completion:NULL];
     
-    self.userPaths = [self newArrayWithFolders:self.usernameField.text];
-    self.userDictionary = [[NSDictionary alloc] initWithContentsOfFile:[[self.userPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
-    self.galleryViewController.userPaths = self.userPaths;
+    //transferring paths to galleryVC
+    self.galleryViewController.userPaths = [self newArrayWithFolders:self.usernameField.text];
 
 }
 

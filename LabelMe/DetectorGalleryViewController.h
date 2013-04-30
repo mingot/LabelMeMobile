@@ -11,9 +11,6 @@
 #import "Classifier.h"
 
 @interface DetectorGalleryViewController : UIViewController <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource,DetectorDescriptionViewControllerDelegate>
-{
-    NSInteger _selectedRow;
-}
 
 @property (nonatomic, strong) NSMutableArray *detectors; //Classifier
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -22,8 +19,9 @@
 @property (nonatomic, strong) NSString *username;
 
 
-
-- (IBAction) Edit:(id)sender;
+//top toolbar actions
+- (IBAction) edit:(id)sender;
+- (IBAction) addDetector:(id)sender;
 
 @end
 

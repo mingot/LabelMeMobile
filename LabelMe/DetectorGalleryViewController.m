@@ -25,8 +25,6 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        
-        //tab bar
         self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Detector" image:nil tag:2];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"camera.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"cameraActive.png"]];
     }
@@ -42,16 +40,17 @@
     NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"];
     self.detectors = [NSKeyedUnarchiver unarchiveObjectWithFile:detectorsPath];
     if(!self.detectors) {
-        //create directory
         [[NSFileManager defaultManager] createDirectoryAtPath:[self.userPath stringByAppendingPathComponent:@"Detectors"] withIntermediateDirectories:YES attributes:nil error:nil];
         self.detectors = [[NSMutableArray alloc] init];
     }
     
-    //view controller specifications
+    //view controller specifications and top toolbar setting
     self.title = @"Detectors";
-    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(Edit:)];
-    [self.navigationItem setRightBarButtonItem:addButton];
-    self.detectorController = [[DetectorDescriptionViewController alloc]initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
+    UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(edit:)];
+    [self.navigationItem setRightBarButtonItem:editButton];
+    UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addDetector:)];
+    self.navigationItem.leftBarButtonItem = plusButton;
+    self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
     
     //navigation controller
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
@@ -61,13 +60,50 @@
 }
 
 
+#pragma mark
+#pragma mark - IBActions
+
+- (IBAction) edit:(id)sender
+{
+    if(self.editing){
+        [super setEditing:NO animated:NO];
+        [self.tableView setEditing:NO animated:NO];
+        [self.tableView reloadData];
+        [self.navigationItem.leftBarButtonItem setTitle:@"Edit"];
+        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStylePlain];
+        
+    }else{
+        [super setEditing:YES animated:YES];
+        [self.tableView setEditing:YES animated:YES];
+        [self.tableView reloadData];
+        [self.navigationItem.leftBarButtonItem setTitle:@"Done"];
+        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStyleDone];
+    }
+}
+
+- (IBAction)addDetector:(id)sender
+{
+    NSLog(@"Adding detector!!");
+    
+    Classifier *newDetector = [[Classifier alloc] init];
+    newDetector.name = @"New Detector";
+    newDetector.targetClass = @"Not Set";
+    self.detectorController.hidesBottomBarWhenPushed = YES;
+    self.detectorController.delegate = self;
+    self.detectorController.svmClassifier = newDetector;
+    self.detectorController.view = nil; //to reexecute viewDidLoad
+    self.detectorController.userPath = self.userPath;
+    [self.navigationController pushViewController:self.detectorController animated:YES];
+    
+}
 
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
 {
-    return self.editing ? self.detectors.count + 1 : self.detectors.count;
+//    return self.editing ? self.detectors.count + 1 : self.detectors.count;
+    return self.detectors.count;
 }
 
 
@@ -98,25 +134,6 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return 80;
-}
-
-
-- (IBAction) Edit:(id)sender
-{
-    if(self.editing){
-        [super setEditing:NO animated:NO];
-        [self.tableView setEditing:NO animated:NO];
-        [self.tableView reloadData];
-        [self.navigationItem.leftBarButtonItem setTitle:@"Edit"];
-        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStylePlain];
-        
-    }else{
-        [super setEditing:YES animated:YES];
-        [self.tableView setEditing:YES animated:YES];
-        [self.tableView reloadData];
-        [self.navigationItem.leftBarButtonItem setTitle:@"Done"];
-        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStyleDone];
-    }
 }
 
 
@@ -173,10 +190,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
         self.detectorController.hidesBottomBarWhenPushed = YES;
         self.detectorController.delegate = self;
         self.detectorController.svmClassifier = [self.detectors objectAtIndex:indexPath.row];
-        if([self.detectorController.svmClassifier.targetClass isEqualToString:@"Not Set"])
-        {
-        
-        }
         self.detectorController.view = nil; //to reexecute viewDidLoad
         self.detectorController.userPath = self.userPath;
         [self.navigationController pushViewController:self.detectorController animated:YES];
@@ -191,7 +204,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 - (void) updateDetector:(Classifier *)updatedDetector
 {
     //update table
-    [self.detectors replaceObjectAtIndex:_selectedRow withObject:updatedDetector];
+    [self.detectors addObject:updatedDetector];
     NSLog(@"updating detector at position: %d", _selectedRow);
     if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"]]){
         NSLog(@"Unable to save the classifiers");
