@@ -170,6 +170,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self.editing == NO) {
         _selectedRow = indexPath.row;
+        self.detectorController.hidesBottomBarWhenPushed = YES;
         self.detectorController.delegate = self;
         self.detectorController.svmClassifier = [self.detectors objectAtIndex:indexPath.row];
         if([self.detectorController.svmClassifier.targetClass isEqualToString:@"Not Set"])

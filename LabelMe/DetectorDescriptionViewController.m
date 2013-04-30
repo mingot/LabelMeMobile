@@ -54,6 +54,7 @@
 @synthesize svmClassifier = _svmClassifier;
 @synthesize executeButton = _executeButton;
 @synthesize userPath = _userPath;
+@synthesize bottomToolbar = _bottomToolbar;
 
 @synthesize availableObjectClasses = _availableObjectClasses;
 @synthesize availablePositiveImagesNames = _availablePositiveImagesNames;
@@ -113,11 +114,11 @@
 
 #pragma mark
 #pragma mark - Life cycle
-
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.title = self.svmClassifier.name;
     
     self.svmClassifier.delegate = self;
     self.resourcesPaths = [NSArray arrayWithObjects:
@@ -136,11 +137,40 @@
     self.nameTextField.text = self.svmClassifier.name;
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
     
+    //bottom toolbar
+    [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
+    UIButton *executeButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
+    [executeButtonView setImage:[UIImage imageNamed:@"execute.png"] forState:UIControlStateNormal];
+    [executeButtonView addTarget:self action:@selector(executeAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.executeButtonBar = [[UIBarButtonItem alloc] initWithCustomView:executeButtonView];
+    UIButton *trainButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
+    [trainButtonView setImage:[UIImage imageNamed:@"train.png"] forState:UIControlStateNormal];
+    [trainButtonView addTarget:self action:@selector(trainAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.trainButtonBar = [[UIBarButtonItem alloc] initWithCustomView:trainButtonView];
+    
+    UIButton *saveButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
+    [saveButtonView setImage:[UIImage imageNamed:@"save.png"] forState:UIControlStateNormal];
+    [saveButtonView addTarget:self action:@selector(saveAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.saveButtonBar = [[UIBarButtonItem alloc] initWithCustomView:saveButtonView];
+    
+    UIButton *infoButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
+    [infoButtonView setImage:[UIImage imageNamed:@"labelsList.png"] forState:UIControlStateNormal];
+    [infoButtonView setTitle:@"info" forState:UIControlStateNormal];
+    [infoButtonView addTarget:self action:@selector(infoAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.infoButtonBar = [[UIBarButtonItem alloc] initWithCustomView:infoButtonView];
+    
+    
+    UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    
+    [self.bottomToolbar setItems:[NSArray arrayWithObjects:self.executeButtonBar,flexibleSpace,self.trainButtonBar,flexibleSpace, self.saveButtonBar,flexibleSpace, self.infoButtonBar,nil]];
+    
+
     //Check if the classifier exists.
     if(self.svmClassifier.weights == nil){
         NSLog(@"No classifier");
         self.executeButton.enabled = NO;
         self.executeButton.alpha = 0.6f;
+        self.executeButtonBar.enabled = NO;
         
         //show modal to select the target class
         self.modalTVC = [[ModalTVC alloc] init];
@@ -153,10 +183,11 @@
         
     }else{
         NSLog(@"Loading classifier");
-//        self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
+        self.detectorHogView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
         self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];
         self.saveButton.enabled = NO;
         self.saveButton.alpha = 0.6f;
+        self.saveButtonBar.enabled = NO;
         [self.trainButton setTitle:@"Retrain" forState:UIControlStateNormal];
     }
     
@@ -165,6 +196,8 @@
     self.nameTextField.enabled = NO;
     self.saveButton.enabled = NO;
     self.saveButton.alpha = 0.6f;
+    self.saveButtonBar.enabled = NO;
+
     
     //sending view, responsible for the waiting view
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
@@ -175,8 +208,14 @@
     self.sendingView.label.frame = CGRectMake(20,20,300,400);
     self.sendingView.label.font = [UIFont fontWithName:@"AmericanTypewriter" size:10];
     [self.view addSubview:self.sendingView];
+    
 }
 
+-(void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self getAndSetDescriptionLabel];
+}
 
 
 - (void)viewDidUnload
@@ -189,6 +228,8 @@
     [self setSendingView:nil];
     [self setTargetClassLabel:nil];
     [self setTrainButton:nil];
+    [self setDetectorHogView:nil];
+    [self setDescriptionLabel:nil];
     [super viewDidUnload];
 }
 
@@ -246,6 +287,7 @@
     [self.delegate updateDetector:self.svmClassifier];
     self.saveButton.enabled = NO;
     self.saveButton.alpha = 0.6f;
+    self.saveButtonBar.enabled = NO;
 }
 
 - (IBAction)infoAction:(id)sender
@@ -444,8 +486,10 @@
     self.executeButton.alpha = 1.0f;
     self.saveButton.enabled = YES;
     self.saveButton.alpha = 1.0f;
+    self.saveButtonBar.enabled = YES;
     self.sendingView.hidden = YES;
     [self.sendingView.activityIndicator stopAnimating];
+    [self getAndSetDescriptionLabel];
 }
 
 
@@ -522,7 +566,7 @@
     
     //construct final image
     CGContextRef contextResult = CGBitmapContextCreate(imageResult, width, height, 8, 4*width,
-                                                 CGColorSpaceCreateDeviceRGB(),kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big); 
+                                                 CGColorSpaceCreateDeviceRGB(),kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
     
     CGImageRef imageResultRef = CGBitmapContextCreateImage(contextResult);
     CGContextRelease(contextResult);
@@ -531,6 +575,14 @@
 
 }
 
-
+- (void) getAndSetDescriptionLabel
+{
+    NSMutableString *description = [NSMutableString stringWithFormat:@""];
+    [description appendFormat:@"NAME: %@\n", self.svmClassifier.name];
+    [description appendFormat:@"CLASS: %@\n", self.svmClassifier.targetClass];
+    [description appendFormat:@"NUMBER IMAGES: %d\n", self.svmClassifier.imagesUsedTraining.count];
+    [description appendFormat:@"LAST TRAINED: 23-04-89"];
+    self.descriptionLabel.text = [NSString stringWithString:description];
+}
 
 @end

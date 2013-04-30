@@ -163,6 +163,9 @@
 		A5FAF9FF1642D830002B56B4 /* navbarBg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A5FAF9FD1642D830002B56B4 /* navbarBg@2x.png */; };
 		A5FAFA0916430D37002B56B4 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5FAFA0816430D37002B56B4 /* AssetsLibrary.framework */; };
 		FC4B0A2C172EC0C200A099A0 /* switch_camera.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2B172EC0C200A099A0 /* switch_camera.png */; };
+		FC4B0A31172F358600A099A0 /* train.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2E172F358600A099A0 /* train.png */; };
+		FC4B0A32172F358600A099A0 /* save.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2F172F358600A099A0 /* save.png */; };
+		FC4B0A33172F358600A099A0 /* execute.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A30172F358600A099A0 /* execute.png */; };
 		FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC4D68801716164E002A73AD /* CoreMotion.framework */; };
 		FC4D688A17167036002A73AD /* ThreeDimVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4D688817167036002A73AD /* ThreeDimVC.m */; };
 		FC4D688B17167036002A73AD /* ThreeDimVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC4D688917167036002A73AD /* ThreeDimVC.xib */; };
@@ -391,6 +394,9 @@
 		A5FAF9FD1642D830002B56B4 /* navbarBg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navbarBg@2x.png"; sourceTree = "<group>"; };
 		A5FAFA0816430D37002B56B4 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		FC4B0A2B172EC0C200A099A0 /* switch_camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switch_camera.png; sourceTree = "<group>"; };
+		FC4B0A2E172F358600A099A0 /* train.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = train.png; sourceTree = "<group>"; };
+		FC4B0A2F172F358600A099A0 /* save.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = save.png; sourceTree = "<group>"; };
+		FC4B0A30172F358600A099A0 /* execute.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = execute.png; sourceTree = "<group>"; };
 		FC4D68801716164E002A73AD /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		FC4D688717167036002A73AD /* ThreeDimVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThreeDimVC.h; path = ../ThreeDimVC.h; sourceTree = "<group>"; };
 		FC4D688817167036002A73AD /* ThreeDimVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ThreeDimVC.m; path = ../ThreeDimVC.m; sourceTree = "<group>"; };
@@ -626,8 +632,7 @@
 		A558D64116138D37001DED8C /* Icons */ = {
 			isa = PBXGroup;
 			children = (
-				FC4B0A2B172EC0C200A099A0 /* switch_camera.png */,
-				FCE35A02172AD5AC00FFE98B /* image_not_found.png */,
+				FC4B0A2D172F352D00A099A0 /* news */,
 				A5B8F9ED166568E000D8F73A /* silueta.png */,
 				A5B8F9EE166568E100D8F73A /* silueta@2x.png */,
 				A5B8F9DE16651DB900D8F73A /* back.png */,
@@ -733,6 +738,18 @@
 				A5CAAF42161637D70095D703 /* uitabbar_selection_indicator.png */,
 			);
 			path = iconos_labelmeapp;
+			sourceTree = "<group>";
+		};
+		FC4B0A2D172F352D00A099A0 /* news */ = {
+			isa = PBXGroup;
+			children = (
+				FC4B0A2E172F358600A099A0 /* train.png */,
+				FC4B0A2F172F358600A099A0 /* save.png */,
+				FC4B0A30172F358600A099A0 /* execute.png */,
+				FCE35A02172AD5AC00FFE98B /* image_not_found.png */,
+				FC4B0A2B172EC0C200A099A0 /* switch_camera.png */,
+			);
+			name = news;
 			sourceTree = "<group>";
 		};
 		FC5C93B716FD014200637B69 /* Detector */ = {
@@ -1001,6 +1018,9 @@
 				FC4EE0F717231A1700536B4A /* CameraViewController.xib in Resources */,
 				FCE35A03172AD5AC00FFE98B /* image_not_found.png in Resources */,
 				FC4B0A2C172EC0C200A099A0 /* switch_camera.png in Resources */,
+				FC4B0A31172F358600A099A0 /* train.png in Resources */,
+				FC4B0A32172F358600A099A0 /* save.png in Resources */,
+				FC4B0A33172F358600A099A0 /* execute.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

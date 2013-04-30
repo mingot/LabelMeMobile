@@ -69,10 +69,10 @@
     self.navigationItem.titleView = titleView;
 
     [self.navigationController.navigationBar setTintColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
-    [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
-
     self.title = @"Annotation Tool";
 
+    //bottom toolbar
+    [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
     UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"] ;
     UIButton *addButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [addButtonView setImage:[UIImage imageNamed:@"newLabel.png"] forState:UIControlStateNormal];
@@ -98,6 +98,7 @@
     [self.navigationController.navigationBar setBackgroundImage:barImage forBarMetrics:UIBarMetricsDefault];
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
     _flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    
     [self.bottomToolbar setItems:[NSArray arrayWithObjects:self.addButton,_flexibleSpace,self.deleteButton,_flexibleSpace, self.sendButton,_flexibleSpace,self.labelsButton, nil]];
     
     [self.view setBackgroundColor:[UIColor blackColor]];
@@ -117,8 +118,7 @@
 
     self.annotationView.delegate = self;
     [self.scrollView setContentSize:self.scrollView.frame.size];
-    
-    
+
     labelSize = self.label.frame.size;
 
     [self.composeView addSubview:self.imageView];
@@ -198,11 +198,6 @@
         box.lowerRight = CGPointMake(box.lowerRight.x*frameWidth/box->RIGHTBOUND, box.lowerRight.y*frameHeight/box->LOWERBOUND);
         box->RIGHTBOUND = frameWidth;
         box->LOWERBOUND = frameHeight;
-        
-        
-        //        NSLog(@"BOXES LOADING");
-        //        NSLog(@"POINTS: (%f,%f), (%f,%f)", box.upperLeft.x,box.upperLeft.y, box.lowerRight.x, box.lowerRight.y);
-        //        NSLog(@"BOUNDS: %f, %f",box->LOWERBOUND, box->RIGHTBOUND);
     }
     
     
@@ -549,6 +544,7 @@
         [self selectedAnObject:NO];
     }
 }
+
 #pragma mark -
 #pragma mark Buttons Management
 -(void)barButtonsEnabled:(BOOL)value
@@ -575,7 +571,6 @@
 
 #pragma mark -
 #pragma mark Save State
-
 -(BOOL)saveThumbnail
 {
     [self.annotationView setSelectedBox:-1];
