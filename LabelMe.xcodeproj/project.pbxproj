@@ -185,6 +185,8 @@
 		FC5C93B516FCFEAB00637B69 /* ExecuteDetectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */; };
 		FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */; };
 		FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC610AF3170A36D800851AC2 /* CoreImage.framework */; };
+		FC92DD7F173083BF004F8189 /* CustomBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = FC92DD7E173083BF004F8189 /* CustomBarButtonItem.m */; };
+		FC92DD8117316C2D004F8189 /* undo.png in Resources */ = {isa = PBXBuildFile; fileRef = FC92DD8017316C2D004F8189 /* undo.png */; };
 		FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */; };
 		FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */; };
 		FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */; };
@@ -423,6 +425,9 @@
 		FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExecuteDetectorViewController.m; sourceTree = "<group>"; };
 		FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ExecuteDetectorViewController.xib; sourceTree = "<group>"; };
 		FC610AF3170A36D800851AC2 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
+		FC92DD7D173083BF004F8189 /* CustomBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomBarButtonItem.h; sourceTree = "<group>"; };
+		FC92DD7E173083BF004F8189 /* CustomBarButtonItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomBarButtonItem.m; sourceTree = "<group>"; };
+		FC92DD8017316C2D004F8189 /* undo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = undo.png; sourceTree = "<group>"; };
 		FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalTVC.h; sourceTree = "<group>"; };
 		FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalTVC.m; sourceTree = "<group>"; };
 		FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ModalTVC.xib; sourceTree = "<group>"; };
@@ -526,6 +531,8 @@
 		A558D60A16134E0B001DED8C = {
 			isa = PBXGroup;
 			children = (
+				FC92DD7D173083BF004F8189 /* CustomBarButtonItem.h */,
+				FC92DD7E173083BF004F8189 /* CustomBarButtonItem.m */,
 				A558D61F16134E0C001DED8C /* LabelMe */,
 				A558D61816134E0C001DED8C /* Frameworks */,
 				A558D61616134E0C001DED8C /* Products */,
@@ -743,6 +750,7 @@
 		FC4B0A2D172F352D00A099A0 /* news */ = {
 			isa = PBXGroup;
 			children = (
+				FC92DD8017316C2D004F8189 /* undo.png */,
 				FC4B0A2E172F358600A099A0 /* train.png */,
 				FC4B0A2F172F358600A099A0 /* save.png */,
 				FC4B0A30172F358600A099A0 /* execute.png */,
@@ -1021,6 +1029,7 @@
 				FC4B0A31172F358600A099A0 /* train.png in Resources */,
 				FC4B0A32172F358600A099A0 /* save.png in Resources */,
 				FC4B0A33172F358600A099A0 /* execute.png in Resources */,
+				FC92DD8117316C2D004F8189 /* undo.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1069,6 +1078,7 @@
 				FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */,
 				FC4D688A17167036002A73AD /* ThreeDimVC.m in Sources */,
 				FC4EE0F617231A1700536B4A /* CameraViewController.m in Sources */,
+				FC92DD7F173083BF004F8189 /* CustomBarButtonItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

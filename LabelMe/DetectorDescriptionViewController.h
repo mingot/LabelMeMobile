@@ -31,32 +31,29 @@
 @property (strong, nonatomic) ModalTVC *modalTVC;
 @property (strong, nonatomic) SendingView *sendingView;
 
-@property (weak, nonatomic) IBOutlet UIButton *executeButton;
-@property (weak, nonatomic) IBOutlet UIButton *trainButton;
-@property (weak, nonatomic) IBOutlet UIButton *saveButton;
-
 @property (weak, nonatomic) IBOutlet UITextField *nameTextField;
 @property (weak, nonatomic) IBOutlet UILabel *targetClassLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *detectorView;
 @property (weak, nonatomic) IBOutlet UIImageView *detectorHogView;
-@property (weak, nonatomic) IBOutlet UIToolbar *bottomToolbar;
 @property (weak, nonatomic) IBOutlet UILabel *descriptionLabel;
 
-//bottom bar buttons
+//bottom toolbar
+@property (weak, nonatomic) IBOutlet UIToolbar *bottomToolbar;
 @property (strong, nonatomic) UIBarButtonItem *executeButtonBar;
 @property (strong, nonatomic) UIBarButtonItem *trainButtonBar;
 @property (strong, nonatomic) UIBarButtonItem *saveButtonBar;
 @property (strong, nonatomic) UIBarButtonItem *infoButtonBar;
+@property (strong, nonatomic) UIBarButtonItem *undoButtonBar;
 
 @property (strong, nonatomic) Classifier *svmClassifier;
+@property (strong, nonatomic) Classifier *previousSvmClassifier; //to undo
+
+//useful information
 @property (strong, nonatomic) NSString *userPath;
 @property (strong, nonatomic) NSArray *resourcesPaths;
-
-//usefull information
 @property (strong, nonatomic) NSArray *availableObjectClasses;
 @property (strong, nonatomic) NSArray *availablePositiveImagesNames;
 @property (strong, nonatomic) NSMutableArray *selectedPositiveImageIndexes;
-
 @property (strong, nonatomic) NSMutableArray *selectedPostiveImageNames; //to save with the svm
 
 
@@ -64,6 +61,7 @@
 - (IBAction)trainAction:(id)sender;
 - (IBAction)saveAction:(id)sender;
 - (IBAction)infoAction:(id)sender;
+- (IBAction)undoAction:(id)sender;
 
 
 @end
