@@ -51,6 +51,7 @@
 @property (nonatomic,strong) NSArray *userPaths;
 
 
+
 @property (nonatomic,strong) CLLocationManager *locationMng;
 
 -(IBAction)buttonClicked:(id)sender;

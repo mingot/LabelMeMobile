@@ -173,38 +173,18 @@
     [self.tableViewGrid setBackgroundView:nil];
     self.tableViewGrid.tag = 0;
 
-    //TODO: do not duplicate the button
-    //create a UIButton at table footer (More images)
-    UIButton *btnDeco = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    btnDeco.frame = CGRectMake(0, 0, 280, 40);
-    [btnDeco setTitle:@"More Images" forState:UIControlStateNormal];
-    btnDeco.backgroundColor = [UIColor clearColor];
-    [btnDeco setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    [btnDeco addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
-    
-    UIButton *btnDeco2 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    btnDeco2.frame = CGRectMake(0, 0, 280, 40);
-    [btnDeco2 setTitle:@"More Images" forState:UIControlStateNormal];
-    btnDeco2.backgroundColor = [UIColor clearColor];
-    [btnDeco2 setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    [btnDeco2 addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
-    
-    UIButton *btnDeco3 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    btnDeco3.frame = CGRectMake(0, 50, 280, 40);
-    [btnDeco3 setTitle:@"More Labels" forState:UIControlStateNormal];
-    btnDeco3.backgroundColor = [UIColor clearColor];
-    [btnDeco3 setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    [btnDeco3 addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
     
     //create a footer view on the bottom of the tableview
     UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
     UIView *footerView2 = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
-    [footerView addSubview:btnDeco];
-    [footerView addSubview:btnDeco3];
-    [footerView2 addSubview:btnDeco2];
+    [footerView addSubview:[self generateGetImagesButtonWithTitle:@"More Images"]];
+    [footerView addSubview:[self generateGetImagesButtonWithTitle:@"More Labels"]];
+    [footerView2 addSubview:[self generateGetImagesButtonWithTitle:@"More Images"]];
+    [footerView2 addSubview:[self generateGetImagesButtonWithTitle:@"More Labels"]];
     self.tableView.tableFooterView = footerView2;
     self.tableViewGrid.tableFooterView = footerView;
 
+    
     UIButton *btnDeco4 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     btnDeco4.frame = CGRectMake(10, 200, 280, 40);
     [btnDeco4 setTitle:@"More Labels" forState:UIControlStateNormal];
@@ -238,9 +218,6 @@
     [self.view addSubview:self.tableViewGrid];
     [self.view addSubview:noImages];
     [self.view addSubview:sendingView];
-    
-    
-
 
     [view1.layer setShadowColor:[UIColor blackColor].CGColor];
     [view1.layer setShadowOffset:CGSizeMake(0, 1)];
@@ -305,7 +282,7 @@
     if(self.items.count == 0) {
         noImages.hidden = NO;
         self.tableView.hidden = YES;
-        self.tableView.hidden = NO;
+        self.tableViewGrid.hidden = YES;
     }
     else noImages.hidden = YES;
 }
@@ -475,7 +452,7 @@
 
 -(void)imageDidSelectedWithIndex:(int)selectedImage
 {
-    NSString *path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.items objectAtIndex:selectedImage]   ];
+    NSString *path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.items objectAtIndex:selectedImage]];
     NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];    
     
     NSLog(@"image: %@",[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:IMAGES],[self.items objectAtIndex:selectedImage]]);
@@ -570,8 +547,18 @@
 
 -(IBAction) moreImagesAction:(id)sender
 {
-    NSString *buttonTitle = [(UIButton *)sender titleLabel].text;
     
+    //start spin indicator for the activity
+    UIButton *button = (UIButton *)sender;
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] init];
+    for(id subview in [button subviews])
+        if([subview isKindOfClass:[UIActivityIndicatorView class]])
+            indicator = (UIActivityIndicatorView *)subview;
+    [indicator startAnimating];
+
+    
+    NSString *buttonTitle = button.titleLabel.text;
+
     NSString *query = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=mingot";
     NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
     NSError *error = nil;
@@ -673,14 +660,15 @@
         
     }
     
+    [indicator stopAnimating];
+    
     //present the modal depending on the sender button: show images or labels
     if(self.downloadedThumbnails.count>0){
         if([buttonTitle isEqualToString:@"More Images"]){
-            self.modalTVC.showCancelButton = YES;
             self.modalTVC = [[ModalTVC alloc] init];
+            self.modalTVC.showCancelButton = YES;
             self.modalTVC.delegate = self;
             self.modalTVC.modalTitle = @"Choose Images";
-            self.modalTVC.multipleChoice = NO;
             self.modalTVC.data = self.downloadedThumbnails;
             [self.modalTVC.view setNeedsDisplay];
             [self presentModalViewController:self.modalTVC animated:YES];
@@ -692,8 +680,8 @@
                 NSArray *indexes = [self.downloadedLabelsMap objectForKey:key];
                 [labels addObject:[NSString stringWithFormat:@"%@ (%d)",key,indexes.count]];
             }
-            self.modalTVC.showCancelButton = YES;
             self.modalTVC = [[ModalTVC alloc] init];
+            self.modalTVC.showCancelButton = YES;
             self.modalTVC.delegate = self;
             self.modalTVC.modalTitle = @"Choose Labels";
             self.modalTVC.multipleChoice = NO;
@@ -853,11 +841,6 @@
     dispatch_release(savingQueue);
     
 }
-
-
-
-
-
 
 
 #pragma mark -
@@ -1199,8 +1182,7 @@
     dispatch_async(queue, ^(void){
         __block int i=0;
         for(NSNumber *selectedIndex in selectedItems){
-            
-
+        
             NSString *imageName = [self.downloadedImageNames objectAtIndex:selectedIndex.intValue];
             
             //Save thumbnail
@@ -1219,17 +1201,24 @@
             [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
             
             dispatch_sync(dispatch_get_main_queue(), ^{
+                [self.tagViewController setImage:image];
+                [self.tagViewController setUsername:self.username];
+                [self.tagViewController.annotationView reset];
+                [self.tagViewController.annotationView.objects setArray:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue]];
+                [self.tagViewController setFilename:imageName];
+                self.tagViewController.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:self.tagViewController animated:NO];
+                
                 [sendingView incrementNum];
                 [sendingView.progressView setProgress:i/selectedItems.count];
                 i++;
             });
-            
         }
-        
         
         dispatch_sync(dispatch_get_main_queue(), ^{
             [self reloadGallery];
             sendingView.hidden = YES;
+            self.tableViewGrid.hidden = NO;
             [sendingView.activityIndicator stopAnimating];
             [sendingView reset];
         });
@@ -1239,6 +1228,8 @@
     dispatch_release(queue);
 
 }
+
+-(void) selectionCancelled{}
 
 
 #pragma mark
@@ -1279,5 +1270,24 @@
     return [NSArray arrayWithArray:files];
 }
 
+
+-(UIButton *) generateGetImagesButtonWithTitle:(NSString *) title
+{
+    //second button lower thant the first one
+    CGFloat ini = 0;
+    if([title isEqualToString:@"More Labels"]) ini = 50;
+    
+    UIButton *btnDeco = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    btnDeco.frame = CGRectMake(0, ini, 280, 40);
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    indicator.center = CGPointMake(btnDeco.bounds.size.width - btnDeco.bounds.size.height / 2 , btnDeco.bounds.size.height / 2);
+    [btnDeco addSubview: indicator];
+    btnDeco.backgroundColor = [UIColor clearColor];
+    [btnDeco setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+    [btnDeco addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
+    [btnDeco setTitle:title forState:UIControlStateNormal];
+    
+    return btnDeco;
+}
 
 @end

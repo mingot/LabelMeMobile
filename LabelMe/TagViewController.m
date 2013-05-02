@@ -203,26 +203,27 @@
     
     [self.annotationView setNeedsDisplay];
 	keyboardVisible = NO;
+    
+    [self.navigationController popViewControllerAnimated:NO];
 }
 
 - (void) viewWillDisappear:(BOOL)animated
 {    
 	[super viewWillDisappear:animated];
-    if (!self.annotationView.userInteractionEnabled) {
-        self.annotationView.userInteractionEnabled=YES;
-        //self.scrollView.frame = CGRectMake(self.view.frame.origin.x , self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
+    
+    if (!self.annotationView.userInteractionEnabled){
+        self.annotationView.userInteractionEnabled = YES;
         self.scrollView.frame = CGRectMake(0 , 0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
         [self.label resignFirstResponder];
     }
     
     [self.labelsView setHidden:YES];
     [labelsButtonView setSelected:NO];
-    if (![self.sendingView isHidden])
-        [self.sendingView setHidden:YES];
-    
+    if (![self.sendingView isHidden]) [self.sendingView setHidden:YES];
     [self.scrollView setZoomScale:1.0 animated:NO];
-
     [self.annotationView setLINEWIDTH:1.0];
+    
+    //save thumbnail and dictionary
     [self saveThumbnail];
     [self saveDictionary];
     [self.imageView setImage:nil];
@@ -571,7 +572,7 @@
 
 #pragma mark -
 #pragma mark Save State
--(BOOL)saveThumbnail
+-(BOOL) saveThumbnail
 {
     [self.annotationView setSelectedBox:-1];
     [self.annotationView setNeedsDisplay];
@@ -591,13 +592,10 @@
 //       thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
 //
 //    else thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
-
     
     CGImageRelease(imageRef);
-
     NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
-    if([[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil])
-        return YES;
+    if([[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil]) return YES;
     else return NO;
 }
 

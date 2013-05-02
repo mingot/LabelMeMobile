@@ -394,7 +394,6 @@
     
     //set the tabBar
     self.tabBarController =[[UITabBarController alloc] init];
-    self.tabBarController.delegate = self;
     self.tabBarController.viewControllers = @[[[UINavigationController alloc] initWithRootViewController:self.galleryViewController], [[UINavigationController alloc] initWithRootViewController:self.detectorGalleryController],[[UINavigationController alloc] initWithRootViewController:self.settingsViewController]];
     
     
@@ -403,9 +402,7 @@
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         [sConnection downloadProfilePictureToUsername:self.usernameField.text];
     }
-    
-//    //print names of all images in iphone collection
-//    [sConnection downloadNamesForUsername:self.usernameField.text];
+
     
     sendingView.hidden = YES;
     [sendingView.activityIndicator stopAnimating];

@@ -44,8 +44,8 @@
 // average per pixel image
 -(UIImage *) imageAveraging:(NSArray *) images;
 
-//loads or creat a Classifier object
--(void) loadClassifier;
+
+- (void) loadDetectorInfo;
 
 
 @end
@@ -152,19 +152,19 @@
     
     UIImage *chatImage = [UIImage imageNamed:@"execute.png"];
     
-    UIButton *chatButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [chatButton setBackgroundImage:chatImage forState:UIControlStateNormal];
-    [chatButton setTitle:@"execute" forState:UIControlStateNormal];
-    chatButton.titleLabel.font = [UIFont systemFontOfSize:10];
-    chatButton.frame = CGRectMake(0, 0, 70, 50);
-    [chatButton setTitleEdgeInsets:UIEdgeInsetsMake(30,0,0,0)];
-    [chatButton setImageEdgeInsets:UIEdgeInsetsMake(30,20,20,20)];
-    UIBarButtonItem *barButton= [[UIBarButtonItem alloc] initWithCustomView:chatButton];
+//    UIButton *chatButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [chatButton setBackgroundImage:chatImage forState:UIControlStateNormal];
+//    [chatButton setTitle:@"execute" forState:UIControlStateNormal];
+//    chatButton.titleLabel.font = [UIFont systemFontOfSize:10];
+//    chatButton.frame = CGRectMake(0, 0, 70, 50);
+//    [chatButton setTitleEdgeInsets:UIEdgeInsetsMake(30,0,0,0)];
+//    [chatButton setImageEdgeInsets:UIEdgeInsetsMake(30,20,20,20)];
+//    UIBarButtonItem *barButton= [[UIBarButtonItem alloc] initWithCustomView:chatButton];
     
-//    UIButton *executeButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
-//    [executeButtonView setImage:[UIImage imageNamed:@"execute.png"] forState:UIControlStateNormal];
-//    [executeButtonView addTarget:self action:@selector(executeAction:) forControlEvents:UIControlEventTouchUpInside];
-//    self.executeButtonBar = [[UIBarButtonItem alloc] initWithCustomView:executeButtonView];
+    UIButton *executeButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
+    [executeButtonView setImage:[UIImage imageNamed:@"execute.png"] forState:UIControlStateNormal];
+    [executeButtonView addTarget:self action:@selector(executeAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.executeButtonBar = [[UIBarButtonItem alloc] initWithCustomView:executeButtonView];
     UIButton *trainButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [trainButtonView setImage:[UIImage imageNamed:@"train.png"] forState:UIControlStateNormal];
     [trainButtonView addTarget:self action:@selector(trainAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -177,14 +177,12 @@
     [infoButtonView setImage:[UIImage imageNamed:@"labelsList.png"] forState:UIControlStateNormal];
     [infoButtonView addTarget:self action:@selector(infoAction:) forControlEvents:UIControlEventTouchUpInside];
     self.infoButtonBar = [[UIBarButtonItem alloc] initWithCustomView:infoButtonView];
-    
     UIButton *undoButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [undoButtonView setImage:[UIImage imageNamed:@"undo.png"] forState:UIControlStateNormal];
     [undoButtonView addTarget:self action:@selector(undoAction:) forControlEvents:UIControlEventTouchUpInside];
     self.undoButtonBar = [[UIBarButtonItem alloc] initWithCustomView:undoButtonView];
-    
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    [self.bottomToolbar setItems:[NSArray arrayWithObjects:barButton,flexibleSpace,self.trainButtonBar,flexibleSpace, self.saveButtonBar,flexibleSpace, self.infoButtonBar,flexibleSpace,self.undoButtonBar,nil]];
+    [self.bottomToolbar setItems:[NSArray arrayWithObjects:self.executeButtonBar,flexibleSpace,self.trainButtonBar,flexibleSpace, self.saveButtonBar,flexibleSpace, self.infoButtonBar,flexibleSpace,self.undoButtonBar,nil]];
     
     self.undoButtonBar.enabled = NO;
 
@@ -206,8 +204,6 @@
         
     }else{
         NSLog(@"Loading classifier");
-        self.detectorHogView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
-        self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];
         self.saveButtonBar.enabled = NO;
         self.previousSvmClassifier = self.svmClassifier;
     }
@@ -233,7 +229,7 @@
 -(void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self getAndSetDescriptionLabel];
+    [self loadDetectorInfo];
     
 }
 
@@ -328,7 +324,7 @@
     //reload classifier
     self.detectorHogView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
     self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];
-    [self getAndSetDescriptionLabel];
+    [self loadDetectorInfo];
     
 }
 
@@ -428,7 +424,9 @@
             [self trainForImagesNames:traingImagesNames];
             [self testForImagesNames:testImagesNames];
             dispatch_sync(dispatch_get_main_queue(), ^{
+                [self loadDetectorInfo];
                 [self.sendingView setHidden:YES];
+                
             });
         });
     }
@@ -517,7 +515,7 @@
     self.saveButtonBar.enabled = YES;
     self.sendingView.hidden = YES;
     [self.sendingView.activityIndicator stopAnimating];
-    [self getAndSetDescriptionLabel];
+    [self loadDetectorInfo];
     if(self.previousSvmClassifier != nil) self.undoButtonBar.enabled = YES;
 }
 
@@ -603,8 +601,14 @@
 
 }
 
-- (void) getAndSetDescriptionLabel
+- (void) loadDetectorInfo
 {
+    
+    //images
+    self.detectorHogView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
+    self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];
+    
+    //description
     NSMutableString *description = [NSMutableString stringWithFormat:@""];
     [description appendFormat:@"NAME: %@\n", self.svmClassifier.name];
     [description appendFormat:@"CLASS: %@\n", self.svmClassifier.targetClass];
@@ -613,9 +617,5 @@
     self.descriptionLabel.text = [NSString stringWithString:description];
 }
 
--(void) loadClassifier
-{
-    
-}
 
 @end
