@@ -348,11 +348,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 }
 
 
-- (IBAction)settingsButtonAction:(id)sender
+- (IBAction)settingsButtonAction:(UIButton *)button
 {
-    UIButton *button = (UIButton *)sender;
-    
-    if([button.titleLabel.text isEqualToString:@"Score"]) self.score = self.score ? NO:YES;
+    if([button.titleLabel.text isEqualToString:@"Score"]) self.score = self.score ? NO:YES; 
     else if([button.titleLabel.text isEqualToString:@"FPS"]) self.fps = self.fps ? NO:YES;
     else if([button.titleLabel.text isEqualToString:@"Scale"]) self.scale = self.scale ? NO:YES;
     else if ([button.titleLabel.text isEqualToString:@"Switch"]) [self switchCameras:self];
@@ -361,8 +359,17 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         if(!self.hog) {self.HOGimageView.image = nil; self.HOGimageView.hidden = YES;}
         else self.HOGimageView.hidden = NO;
     }
-
+    
+    //highlight button when pressed
+    [self performSelector:@selector(flipButton:) withObject:button afterDelay:0.0];
 }
+
+-(void) flipButton: (UIButton *)button
+{
+    button.highlighted = button.selected ? NO:YES;
+    button.selected = button.selected ? NO:YES;
+}
+
 
 - (IBAction)switchCameras:(id)sender
 

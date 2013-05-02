@@ -13,7 +13,6 @@
 
 @protocol CameraViewControllerDeledate <NSObject>
 
-- (void) cancelPhotoCapture;
 - (void) addImageCaptured:(UIImage *)image;
 
 @end
@@ -31,11 +30,10 @@
 @property (nonatomic, strong) AVCaptureStillImageOutput *stillImageOutput;
 
 //xib
-@property (weak, nonatomic) IBOutlet UILabel *numberImagesLabel;
-@property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UIButton *captureButton;
+@property (weak, nonatomic) IBOutlet UIImageView *thumbnailCaptureImageView;
+
 - (IBAction)captureAction:(id)sender;
-- (IBAction)cancelAction:(id)sender;
 - (IBAction)toggleFrontAction:(id)sender;
 
 

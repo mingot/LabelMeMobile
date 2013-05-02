@@ -61,6 +61,7 @@
 @property (strong,nonatomic) UIView *composeView;
 @property (strong,nonatomic) SendingView *sendingView;
 
+@property BOOL forThumbnailUpdating;
 
 - (void) keyboardDidShow:(NSNotification *)notif;
 - (void) keyboardDidHide:(NSNotification *)notif;

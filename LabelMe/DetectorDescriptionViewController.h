@@ -41,7 +41,6 @@
 @property (weak, nonatomic) IBOutlet UIToolbar *bottomToolbar;
 @property (strong, nonatomic) UIBarButtonItem *executeButtonBar;
 @property (strong, nonatomic) UIBarButtonItem *trainButtonBar;
-@property (strong, nonatomic) UIBarButtonItem *saveButtonBar;
 @property (strong, nonatomic) UIBarButtonItem *infoButtonBar;
 @property (strong, nonatomic) UIBarButtonItem *undoButtonBar;
 

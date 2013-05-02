@@ -177,20 +177,12 @@
     //create a footer view on the bottom of the tableview
     UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
     UIView *footerView2 = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
-    [footerView addSubview:[self generateGetImagesButtonWithTitle:@"More Images"]];
-    [footerView addSubview:[self generateGetImagesButtonWithTitle:@"More Labels"]];
-    [footerView2 addSubview:[self generateGetImagesButtonWithTitle:@"More Images"]];
-    [footerView2 addSubview:[self generateGetImagesButtonWithTitle:@"More Labels"]];
+    [footerView addSubview:[self generateGetImagesButtonWithTitle:@"More Images" atRect:CGRectMake(0, 0, 280, 40)]];
+    [footerView addSubview:[self generateGetImagesButtonWithTitle:@"More Labels" atRect:CGRectMake(0, 50, 280, 40)]];
+    [footerView2 addSubview:[self generateGetImagesButtonWithTitle:@"More Images" atRect:CGRectMake(0, 0, 280, 40)]];
+    [footerView2 addSubview:[self generateGetImagesButtonWithTitle:@"More Labels" atRect:CGRectMake(0, 50, 280, 40)]];
     self.tableView.tableFooterView = footerView2;
     self.tableViewGrid.tableFooterView = footerView;
-
-    
-    UIButton *btnDeco4 = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    btnDeco4.frame = CGRectMake(10, 200, 280, 40);
-    [btnDeco4 setTitle:@"More Labels" forState:UIControlStateNormal];
-    btnDeco4.backgroundColor = [UIColor clearColor];
-    [btnDeco4 setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    [btnDeco4 addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchDown];//UIControlEventTouchUpInside];
     
     //no images view
     noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
@@ -204,7 +196,8 @@
     noImages.shadowOffset = CGSizeMake(0.0, 1.0);
     noImages.text = @"You do not have images, \nstart taking pics and labeling or download from web!";
     [noImages setTextAlignment:NSTextAlignmentCenter];
-    [noImages addSubview:btnDeco4];
+    [noImages addSubview:[self generateGetImagesButtonWithTitle:@"More Images" atRect:CGRectMake(10, 200, 280, 40)]];
+    [noImages addSubview:[self generateGetImagesButtonWithTitle:@"More Labels" atRect:CGRectMake(10, 250, 280, 40)]];
     [noImages setUserInteractionEnabled:YES];
     
     //sending view
@@ -413,6 +406,7 @@
 
 -(IBAction)addImage:(id)sender
 {
+    self.cameraVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.cameraVC animated:YES];
 
 }
@@ -797,11 +791,6 @@
 
 #pragma mark
 #pragma mark - CameraVC Delegate
-
-- (void) cancelPhotoCapture
-{
-    NSLog(@"Cancel Capture");
-}
 
 -(void) addImageCaptured:(UIImage *)image
 {
@@ -1206,7 +1195,7 @@
                 [self.tagViewController.annotationView reset];
                 [self.tagViewController.annotationView.objects setArray:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue]];
                 [self.tagViewController setFilename:imageName];
-                self.tagViewController.hidesBottomBarWhenPushed = YES;
+                self.tagViewController.forThumbnailUpdating = YES;
                 [self.navigationController pushViewController:self.tagViewController animated:NO];
                 
                 [sendingView incrementNum];
@@ -1271,14 +1260,14 @@
 }
 
 
--(UIButton *) generateGetImagesButtonWithTitle:(NSString *) title
+-(UIButton *) generateGetImagesButtonWithTitle:(NSString *)title atRect:(CGRect)rect
 {
     //second button lower thant the first one
     CGFloat ini = 0;
     if([title isEqualToString:@"More Labels"]) ini = 50;
     
     UIButton *btnDeco = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    btnDeco.frame = CGRectMake(0, ini, 280, 40);
+    btnDeco.frame = rect;//CGRectMake(0, ini, 280, 40);
     UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     indicator.center = CGPointMake(btnDeco.bounds.size.width - btnDeco.bounds.size.height / 2 , btnDeco.bounds.size.height / 2);
     [btnDeco addSubview: indicator];

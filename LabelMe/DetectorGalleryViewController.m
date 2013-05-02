@@ -85,6 +85,18 @@
 {
     _selectedRow = self.detectors;
     
+    //check if there is any image
+    NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[self.userPath stringByAppendingPathComponent:@"thumbnail"] error:NULL];
+    if(imagesList.count == 0){
+        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
+                                                             message:@"No images to learn from"
+                                                            delegate:nil
+                                                   cancelButtonTitle:@"OK"
+                                                   otherButtonTitles:nil];
+        [errorAlert show];
+        return;
+    }
+        
     Classifier *newDetector = [[Classifier alloc] init];
     newDetector.name = @"New Detector";
     newDetector.targetClass = @"Not Set";
@@ -94,6 +106,7 @@
     self.detectorController.view = nil; //to reexecute viewDidLoad
     self.detectorController.userPath = self.userPath;
     [self.navigationController pushViewController:self.detectorController animated:YES];
+    
     
 }
 

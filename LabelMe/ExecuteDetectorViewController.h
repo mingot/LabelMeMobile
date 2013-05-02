@@ -70,7 +70,7 @@
 //settings view
 @property (weak, nonatomic) IBOutlet UIView *settingsView;
 - (IBAction)showSettingsAction:(id)sender;
-- (IBAction)settingsButtonAction:(id)sender;
+- (IBAction)settingsButtonAction:(UIButton *)button;
 
 
 

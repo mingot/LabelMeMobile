@@ -150,8 +150,7 @@
     //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
     
-    UIImage *chatImage = [UIImage imageNamed:@"execute.png"];
-    
+//    UIImage *chatImage = [UIImage imageNamed:@"execute.png"];
 //    UIButton *chatButton = [UIButton buttonWithType:UIButtonTypeCustom];
 //    [chatButton setBackgroundImage:chatImage forState:UIControlStateNormal];
 //    [chatButton setTitle:@"execute" forState:UIControlStateNormal];
@@ -169,10 +168,6 @@
     [trainButtonView setImage:[UIImage imageNamed:@"train.png"] forState:UIControlStateNormal];
     [trainButtonView addTarget:self action:@selector(trainAction:) forControlEvents:UIControlEventTouchUpInside];
     self.trainButtonBar = [[UIBarButtonItem alloc] initWithCustomView:trainButtonView];
-    UIButton *saveButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
-    [saveButtonView setImage:[UIImage imageNamed:@"save.png"] forState:UIControlStateNormal];
-    [saveButtonView addTarget:self action:@selector(saveAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.saveButtonBar = [[UIBarButtonItem alloc] initWithCustomView:saveButtonView];
     UIButton *infoButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [infoButtonView setImage:[UIImage imageNamed:@"labelsList.png"] forState:UIControlStateNormal];
     [infoButtonView addTarget:self action:@selector(infoAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -182,7 +177,7 @@
     [undoButtonView addTarget:self action:@selector(undoAction:) forControlEvents:UIControlEventTouchUpInside];
     self.undoButtonBar = [[UIBarButtonItem alloc] initWithCustomView:undoButtonView];
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    [self.bottomToolbar setItems:[NSArray arrayWithObjects:self.executeButtonBar,flexibleSpace,self.trainButtonBar,flexibleSpace, self.saveButtonBar,flexibleSpace, self.infoButtonBar,flexibleSpace,self.undoButtonBar,nil]];
+    [self.bottomToolbar setItems:[NSArray arrayWithObjects:self.executeButtonBar,flexibleSpace,self.trainButtonBar, flexibleSpace, self.infoButtonBar,flexibleSpace,self.undoButtonBar,nil]];
     
     self.undoButtonBar.enabled = NO;
 
@@ -198,20 +193,19 @@
         self.modalTVC.delegate = self;
         self.modalTVC.modalTitle = @"Select Class";
         self.modalTVC.multipleChoice = NO;
+        self.availableObjectClasses = nil; //to reload
         self.modalTVC.data = self.availableObjectClasses;
         [self presentModalViewController:self.modalTVC animated:YES];
         self.firstTraingState = INITIATED;
         
     }else{
         NSLog(@"Loading classifier");
-        self.saveButtonBar.enabled = NO;
         self.previousSvmClassifier = self.svmClassifier;
     }
     
     //set buttons
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.nameTextField.enabled = NO;
-    self.saveButtonBar.enabled = NO;
 
     
     //sending view, responsible for the waiting view
@@ -285,6 +279,7 @@
     //save average image
     NSString *pathDetectorsBig = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
                                   [NSString stringWithFormat:@"%@_big.jpg",self.svmClassifier.name]];
+    self.detectorView.image = self.averageImage;
     [[NSFileManager defaultManager] createFileAtPath:pathDetectorsBig contents:UIImageJPEGRepresentation(self.averageImage, 1.0) attributes:nil];
     self.svmClassifier.averageImagePath = pathDetectorsBig;
     
@@ -296,7 +291,6 @@
     self.svmClassifier.updateDate = [NSDate date];
     
     [self.delegate updateDetector:self.svmClassifier];
-    self.saveButtonBar.enabled = NO;
 }
 
 - (IBAction)infoAction:(id)sender
@@ -426,6 +420,7 @@
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [self loadDetectorInfo];
                 [self.sendingView setHidden:YES];
+                [self saveAction:self];
                 
             });
         });
@@ -512,7 +507,6 @@
     
     //update view of the detector
     //self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
-    self.saveButtonBar.enabled = YES;
     self.sendingView.hidden = YES;
     [self.sendingView.activityIndicator stopAnimating];
     [self loadDetectorInfo];
@@ -588,6 +582,9 @@
         //average
         for(int i=0; i<height*width*4; i++)
             imageResult[i] += imagePointer[i]*1.0/images.count;
+        
+        //enhancement: increase contrast by ajusting max and min to 255 and 0 respectively
+        
     }
     
     //construct final image

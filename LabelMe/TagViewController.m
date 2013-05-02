@@ -204,7 +204,7 @@
     [self.annotationView setNeedsDisplay];
 	keyboardVisible = NO;
     
-    [self.navigationController popViewControllerAnimated:NO];
+    if(self.forThumbnailUpdating) {self.forThumbnailUpdating=NO; [self.navigationController popViewControllerAnimated:NO];}
 }
 
 - (void) viewWillDisappear:(BOOL)animated

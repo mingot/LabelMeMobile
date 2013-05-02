@@ -22,7 +22,6 @@
 @synthesize delegate = _delegate;
 @synthesize captureSession = _captureSession;
 @synthesize prevLayer = _prevLayer;
-@synthesize numberImagesLabel = _numberImagesLabel;
 
 //private
 @synthesize isUsingFrontFacingCamera = _isUsingFrontFacingCamera;
@@ -30,23 +29,21 @@
 
 
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
     self.isUsingFrontFacingCamera = NO;
     self.numberImages = 0;
-    self.numberImagesLabel.text = [NSString stringWithFormat:@"%d", self.numberImages];
+    
+    //switch cameras button
+    UIBarButtonItem *switchCameraButton = [[UIBarButtonItem alloc] initWithTitle:@"switch" style:UIBarButtonItemStyleBordered target:self action:@selector(toggleFrontAction:)];
+    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbarBg"]resizableImageWithCapInsets:UIEdgeInsetsZero ] forBarMetrics:UIBarMetricsDefault];
+    [switchCameraButton setStyle:UIBarButtonItemStyleBordered];
+    [self.navigationItem setRightBarButtonItem:switchCameraButton];
+    
+    [self.thumbnailCaptureImageView.layer setBorderColor: [[UIColor blackColor] CGColor]];
+    [self.thumbnailCaptureImageView.layer setBorderWidth: 2.0];
     
     // ********  CAMERA CAPTURE  ********
     //Capture input specifications
@@ -98,11 +95,6 @@
 #pragma mark - IBActions
 
 
-- (IBAction)cancelAction:(id)sender
-{
-    [self.delegate cancelPhotoCapture];
-}
-
 - (IBAction)captureAction:(id)sender
 {
     
@@ -129,8 +121,8 @@
          NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
          UIImage *image = [[UIImage alloc] initWithData:imageData];
         
+        self.thumbnailCaptureImageView.image = image;
         self.numberImages++;
-        self.numberImagesLabel.text = [NSString stringWithFormat:@"%d",self.numberImages];
         [self.delegate addImageCaptured:image];
 	 }];
 }
@@ -157,4 +149,8 @@
 }
 
 
+- (void)viewDidUnload {
+    [self setThumbnailCaptureImageView:nil];
+    [super viewDidUnload];
+}
 @end
