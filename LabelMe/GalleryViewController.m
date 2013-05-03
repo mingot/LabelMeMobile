@@ -172,17 +172,10 @@
     self.tableViewGrid.backgroundColor = [UIColor clearColor];
     [self.tableViewGrid setBackgroundView:nil];
     self.tableViewGrid.tag = 0;
-
     
     //create a footer view on the bottom of the tableview
-    UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
-    UIView *footerView2 = [[UIView alloc] initWithFrame:CGRectMake(20, 0, 280, 100)];
-    [footerView addSubview:[self generateGetImagesButtonWithTitle:@"More Images" atRect:CGRectMake(0, 0, 280, 40)]];
-    [footerView addSubview:[self generateGetImagesButtonWithTitle:@"More Labels" atRect:CGRectMake(0, 50, 280, 40)]];
-    [footerView2 addSubview:[self generateGetImagesButtonWithTitle:@"More Images" atRect:CGRectMake(0, 0, 280, 40)]];
-    [footerView2 addSubview:[self generateGetImagesButtonWithTitle:@"More Labels" atRect:CGRectMake(0, 50, 280, 40)]];
-    self.tableView.tableFooterView = footerView2;
-    self.tableViewGrid.tableFooterView = footerView;
+    self.tableView.tableFooterView = [self footerViewCreationAtHeight:0];
+    self.tableViewGrid.tableFooterView = [self footerViewCreationAtHeight:0];
     
     //no images view
     noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
@@ -196,16 +189,15 @@
     noImages.shadowOffset = CGSizeMake(0.0, 1.0);
     noImages.text = @"You do not have images, \nstart taking pics and labeling or download from web!";
     [noImages setTextAlignment:NSTextAlignmentCenter];
-    [noImages addSubview:[self generateGetImagesButtonWithTitle:@"More Images" atRect:CGRectMake(10, 200, 280, 40)]];
-    [noImages addSubview:[self generateGetImagesButtonWithTitle:@"More Labels" atRect:CGRectMake(10, 250, 280, 40)]];
+    [noImages addSubview:[self footerViewCreationAtHeight:190]];
     [noImages setUserInteractionEnabled:YES];
     
     //sending view
     sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     [sendingView setHidden:YES];
-    [self.tabBarController.tabBar setUserInteractionEnabled:YES];
     sendingView.delegate = self;
     sendingView.label.text = @"Uploading image to server";
+
     
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.tableViewGrid];
@@ -234,6 +226,7 @@
         [self.profilePicture setImage:[UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]] ];
     else [self.profilePicture setImage:[UIImage imageNamed:@"silueta.png"]];
     
+    [self reloadGallery];
 }
 
 
@@ -254,8 +247,6 @@
         
         [self.navigationController setToolbarHidden:YES];
     }
-    
-    [self reloadGallery];
 }
 
 
@@ -268,16 +259,16 @@
     //get sorted files by date of modification of the image
     self.items = [self getOrderedListOfFilesForPath:[self.paths objectAtIndex:IMAGES]];
     
-    [self.tableViewGrid setRowHeight:(0.225*self.view.frame.size.width*ceil((float)self.items.count/4) + 0.0375*self.view.frame.size.width)];
-    [self.tableView reloadData];
-    [self.tableViewGrid reloadData];
-    
     if(self.items.count == 0) {
         noImages.hidden = NO;
         self.tableView.hidden = YES;
         self.tableViewGrid.hidden = YES;
     }
     else noImages.hidden = YES;
+    
+    [self.tableViewGrid setRowHeight:(0.225*self.view.frame.size.width*ceil((float)self.items.count/4) + 0.0375*self.view.frame.size.width)];
+    [self.tableView reloadData];
+    [self.tableViewGrid reloadData];
 }
 
 
@@ -587,7 +578,6 @@
             if(thumbImage!=nil) [self.downloadedThumbnails addObject:thumbImage];
             else [self.downloadedThumbnails addObject:[UIImage imageNamed:@"image_not_found.png"]];
             
-            
             //get and save images urls
             NSString *imageUrl = [element objectForKey:@"image"];
             NSLog(@"image url %@", imageUrl);
@@ -658,7 +648,7 @@
     
     //present the modal depending on the sender button: show images or labels
     if(self.downloadedThumbnails.count>0){
-        if([buttonTitle isEqualToString:@"More Images"]){
+        if([buttonTitle isEqualToString:@"Server Images"]){
             self.modalTVC = [[ModalTVC alloc] init];
             self.modalTVC.showCancelButton = YES;
             self.modalTVC.delegate = self;
@@ -666,7 +656,7 @@
             self.modalTVC.data = self.downloadedThumbnails;
             [self.modalTVC.view setNeedsDisplay];
             [self presentModalViewController:self.modalTVC animated:YES];
-        }else if([buttonTitle isEqualToString:@"More Labels"]){
+        }else if([buttonTitle isEqualToString:@"Server Labels"]){
             
             //get the labels
             NSMutableArray *labels = [[NSMutableArray alloc] init];
@@ -825,10 +815,10 @@
         [tagViewController saveImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
         dispatch_sync(dispatch_get_main_queue(), ^{
             [self reloadGallery];
+            self.tableViewGrid.hidden = NO;
         });
     });
     dispatch_release(savingQueue);
-    
 }
 
 
@@ -1134,11 +1124,13 @@
 
     [self.editButton setEnabled:YES];
     [sendingView.activityIndicator stopAnimating];
-
+    
     
 }
 
-#pragma mark    
+
+
+#pragma mark
 #pragma mark - ModalTVC Delegate
 
 
@@ -1147,10 +1139,12 @@
     dispatch_queue_t queue = dispatch_queue_create("DownloadQueue", NULL);
 
     //sending view preparation
+//    self.navigationController.navigationBarHidden = YES;
     sendingView.total = selectedItems.count;
     [sendingView setHidden:NO];
     [sendingView.activityIndicator startAnimating];
     [sendingView.progressView setProgress:0];
+    
     
     
     NSMutableArray *newIndexes = [[NSMutableArray alloc] init];
@@ -1199,7 +1193,8 @@
                 [self.navigationController pushViewController:self.tagViewController animated:NO];
                 
                 [sendingView incrementNum];
-                [sendingView.progressView setProgress:i/selectedItems.count];
+                [sendingView.progressView setProgress:i*1.0/selectedItems.count];
+                NSLog(@"Progress:%f", i*1.0/selectedItems.count);
                 i++;
             });
         }
@@ -1207,6 +1202,7 @@
         dispatch_sync(dispatch_get_main_queue(), ^{
             [self reloadGallery];
             sendingView.hidden = YES;
+            self.navigationController.navigationBarHidden = NO;
             self.tableViewGrid.hidden = NO;
             [sendingView.activityIndicator stopAnimating];
             [sendingView reset];
@@ -1277,6 +1273,43 @@
     [btnDeco setTitle:title forState:UIControlStateNormal];
     
     return btnDeco;
+}
+
+
+- (UIView *) footerViewCreationAtHeight:(int)height
+{
+    UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(0, height, self.view.frame.size.width, 110)];
+    
+    UIButton *cameraButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    cameraButton.frame = CGRectMake(10, 10, 280, 50);
+//    [cameraButton setImage:[UIImage imageNamed:@"camera.png"] forState:UIControlStateNormal];
+    cameraButton.contentMode = UIViewContentModeCenter;
+    [cameraButton addTarget:self action:@selector(addImage:) forControlEvents:UIControlEventTouchUpInside];
+    [cameraButton setTitle:@"Camera" forState:UIControlStateNormal];
+    
+    UIButton *imagesButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    imagesButton.frame = CGRectMake(10, cameraButton.frame.origin.y + cameraButton.frame.size.height +5, 130, 40);
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    indicator.center = CGPointMake(imagesButton.bounds.size.width - imagesButton.bounds.size.height / 2 , imagesButton.bounds.size.height / 2);
+    [imagesButton addSubview: indicator];
+    imagesButton.backgroundColor = [UIColor clearColor];
+    [imagesButton addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
+    [imagesButton setTitle:@"Server Images" forState:UIControlStateNormal];
+    
+    UIButton *labelsButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    labelsButton.frame = CGRectMake(160, cameraButton.frame.origin.y + cameraButton.frame.size.height+5, 130, 40);
+    UIActivityIndicatorView *indicator2 = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    indicator2.center = CGPointMake(labelsButton.bounds.size.width - labelsButton.bounds.size.height / 2 , labelsButton.bounds.size.height / 2);
+    [labelsButton addSubview: indicator2];
+    labelsButton.backgroundColor = [UIColor clearColor];
+    [labelsButton addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
+    [labelsButton setTitle:@"Server Labels" forState:UIControlStateNormal];
+    
+    [footerView addSubview:cameraButton];
+    [footerView addSubview:imagesButton];
+    [footerView addSubview:labelsButton];
+    
+    return footerView;
 }
 
 @end

@@ -10,6 +10,7 @@
 #import "TrainDetectorViewController.h"
 #import "ExecuteDetectorViewController.h"
 #import "ShowTrainingSetViewController.h"
+#import "LogVC.h"
 #import "ModalTVC.h"
 #import "SendingView.h"
 #import "Classifier.h"
@@ -28,6 +29,7 @@
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
 @property (strong, nonatomic) ShowTrainingSetViewController *trainingSetController;
+@property (strong, nonatomic) LogVC *logVC;
 @property (strong, nonatomic) ModalTVC *modalTVC;
 @property (strong, nonatomic) SendingView *sendingView;
 

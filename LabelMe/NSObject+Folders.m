@@ -61,7 +61,7 @@
         [dict setObject:username forKey:@"username"];
         [dict setObject:@"" forKey:@"datesignup"];
         [dict setObject:@"" forKey:@"institution"];
-        [dict setObject:[NSNumber numberWithBool:YES] forKey:@"cameraroll"];
+        [dict setObject:[NSNumber numberWithBool:NO] forKey:@"cameraroll"];
         [dict setObject:[NSNumber numberWithFloat:0] forKey:@"resolution"];
         [dict setObject:[NSNumber numberWithBool:NO] forKey:@"wifi"];
         [dict setObject:[NSNumber numberWithBool:YES] forKey:@"signinauto"];

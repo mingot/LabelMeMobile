@@ -12,7 +12,7 @@
 
 #import "UIImage+Resize.h"
 #import "UIImage+HOG.h"
-#import "CustomBarButtonItem.h"
+
 
 
 #define IMAGES 0
@@ -44,7 +44,7 @@
 // average per pixel image
 -(UIImage *) imageAveraging:(NSArray *) images;
 
-
+//reload the detector images (average and hog) and show info, about the current detector in memory
 - (void) loadDetectorInfo;
 
 
@@ -79,6 +79,7 @@
 
 -(NSArray *) availablePositiveImagesNames
 {
+    //get the images for the selected class (self.svmClassifier.targetClass)
     if(!_availablePositiveImagesNames){
         NSMutableArray *list = [[NSMutableArray alloc] init];
         
@@ -97,30 +98,6 @@
     return _availablePositiveImagesNames;
 }
     
-
--(NSArray *) availableObjectClasses
-{
-    if(!_availableObjectClasses){
-        NSMutableArray *list = [[NSMutableArray alloc] init];
-
-        NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.resourcesPaths objectAtIndex:THUMB]] error:NULL];
-        
-        for(NSString *imageName in imagesList){
-            NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
-            NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
-            for(Box *box in objects)
-                if([list indexOfObject:box.label] == NSNotFound)
-                    [list addObject:box.label];
-        }
-        
-        _availableObjectClasses = [NSArray arrayWithArray:list];
-    }
-    
-    return _availableObjectClasses;
-}
-
-
-
 
 #pragma mark
 #pragma mark - Life cycle
@@ -141,6 +118,7 @@
     //load views
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
+    self.logVC = [[LogVC alloc] initWithNibName:@"logVC" bundle:nil];
     
     //set labels
     self.targetClassLabel.text = self.svmClassifier.targetClass;
@@ -160,6 +138,7 @@
 //    [chatButton setImageEdgeInsets:UIEdgeInsetsMake(30,20,20,20)];
 //    UIBarButtonItem *barButton= [[UIBarButtonItem alloc] initWithCustomView:chatButton];
     
+    //bottombar
     UIButton *executeButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [executeButtonView setImage:[UIImage imageNamed:@"execute.png"] forState:UIControlStateNormal];
     [executeButtonView addTarget:self action:@selector(executeAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -184,8 +163,7 @@
 
     //Check if the classifier exists.
     if(self.svmClassifier.weights == nil){
-        NSLog(@"No classifier");
-        self.executeButtonBar.enabled = NO;
+        NSLog(@"New classifier");
         
         //show modal to select the target class
         self.modalTVC = [[ModalTVC alloc] init];
@@ -193,17 +171,18 @@
         self.modalTVC.delegate = self;
         self.modalTVC.modalTitle = @"Select Class";
         self.modalTVC.multipleChoice = NO;
-        self.availableObjectClasses = nil; //to reload
         self.modalTVC.data = self.availableObjectClasses;
         [self presentModalViewController:self.modalTVC animated:YES];
         self.firstTraingState = INITIATED;
         
     }else{
-        NSLog(@"Loading classifier");
-        self.previousSvmClassifier = self.svmClassifier;
+        NSLog(@"Loading old classifier");
+        //storing the previous classifier using the nscoding for object copy
+        self.previousSvmClassifier = [[Classifier alloc] init];
+        self.previousSvmClassifier = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.svmClassifier]];
     }
     
-    //set buttons
+    //EDIT: set buttons
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.nameTextField.enabled = NO;
 
@@ -212,10 +191,6 @@
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     self.sendingView.delegate = self;
     self.sendingView.hidden = YES;
-    self.sendingView.progressView.hidden = NO;
-    self.sendingView.label.numberOfLines = 0;
-    self.sendingView.label.frame = CGRectMake(20,20,300,400);
-    self.sendingView.label.font = [UIFont fontWithName:@"AmericanTypewriter" size:10];
     [self.view addSubview:self.sendingView];
     
 }
@@ -251,6 +226,7 @@
 {
     
     [self.sendingView.progressView setProgress:0 animated:YES];
+    [self.logVC.progressView setProgress:0 animated:YES];
     
     //show modal to select training positives for the selected class
     self.modalTVC = [[ModalTVC alloc] init];
@@ -295,6 +271,7 @@
 
 - (IBAction)infoAction:(id)sender
 {
+    self.navigationController.navigationBarHidden = YES;
     self.sendingView.hidden = NO;
     self.sendingView.cancelButton.hidden = NO;
     self.sendingView.cancelButton.titleLabel.text = @"Done";
@@ -314,12 +291,9 @@
 {
     self.svmClassifier = self.previousSvmClassifier;
     self.undoButtonBar.enabled = NO;
-    
-    //reload classifier
-    self.detectorHogView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
-    self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];
+    [self saveAction:self];
     [self loadDetectorInfo];
-    
+
 }
 
 #pragma mark
@@ -350,6 +324,7 @@
 - (void) cancel
 {
     self.sendingView.hidden = YES;
+    self.navigationController.navigationBarHidden = NO;
 }
 
 #pragma mark
@@ -402,6 +377,7 @@
         
         //show debug indicator on screen
         self.sendingView.hidden = NO;
+        self.navigationController.navigationBarHidden = YES;
         [self.sendingView.activityIndicator startAnimating];
         self.sendingView.cancelButton.hidden = YES;
 
@@ -410,7 +386,6 @@
         int hog = [(NSNumber *)[dict objectForKey:@"hogdimension"] intValue];
         if(hog==0) hog = 4; //minimum hog
         self.svmClassifier.maxHog = hog;
-
         
         //train in a different thread
         dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
@@ -421,7 +396,8 @@
                 [self loadDetectorInfo];
                 [self.sendingView setHidden:YES];
                 [self saveAction:self];
-                
+                self.navigationController.navigationBarHidden = NO;
+                [self.view setNeedsDisplay];
             });
         });
     }
@@ -480,7 +456,7 @@
     
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
         
-    //obtain the image average of the groundtruth images and save them
+    //obtain the image average of the groundtruth images 
     NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
     for(BoundingBox *cp in trainingSet.groundTruthBoundingBoxes){
         UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
@@ -498,15 +474,8 @@
     [self.svmClassifier train:trainingSet];
     [self.sendingView showMessage:@"Finished training"];
     [self updateProgress:1];
-
-    //Show hog images of positive instances (if any)
-    if(self.svmClassifier.imageListAux.count!=0){
-        self.trainingSetController.listOfImages = self.svmClassifier.imageListAux;
-        [self.navigationController pushViewController:self.trainingSetController animated:YES];
-    }
     
     //update view of the detector
-    //self.detectorView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
     self.sendingView.hidden = YES;
     [self.sendingView.activityIndicator stopAnimating];
     [self loadDetectorInfo];
@@ -582,10 +551,20 @@
         //average
         for(int i=0; i<height*width*4; i++)
             imageResult[i] += imagePointer[i]*1.0/images.count;
-        
-        //enhancement: increase contrast by ajusting max and min to 255 and 0 respectively
-        
     }
+    
+    //enhancement: increase contrast by ajusting max and min to 255 and 0 respectively
+    int max=0, min=255;
+    for(int i=0; i<height*width*4; i++){
+        max = imageResult[i]>max ? imageResult[i]:max;
+        min = imageResult[i]<min ? imageResult[i]:min;
+    }
+    
+    for(int i=0; i<height*width*4; i++){
+        imageResult[i] = (imageResult[i]-min)*(255/(max-min));
+    }
+    
+
     
     //construct final image
     CGContextRef contextResult = CGBitmapContextCreate(imageResult, width, height, 8, 4*width,

@@ -7,19 +7,79 @@
 //
 
 #import "DetectorGalleryViewController.h"
+#import "Box.h"
 
 
-
-#pragma mark
-#pragma mark -  Initialization and lifecycle
+#define IMAGES 0
+#define THUMB 1
+#define OBJECTS 2
+#define DETECTORS 3
 
 @implementation DetectorGalleryViewController
+
 
 @synthesize detectors = _detectors;
 @synthesize tableView = _tableView;
 @synthesize detectorController = _detectorController;
-@synthesize userPath = _userPath;
 @synthesize username = _username;
+@synthesize resourcesPaths = _resourcesPaths;
+@synthesize availableObjectClasses = _availableObjectClasses;
+@synthesize userPath = _userPath;
+
+
+
+#pragma mark
+#pragma mark - Setters and Getters
+
+- (NSString *) userPath
+{
+    if(!_userPath){
+        NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+        _userPath = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,self.username];
+    }
+    
+    return _userPath;
+}
+
+-(NSArray *) resourcesPaths
+{
+    if(!_resourcesPaths){
+        _resourcesPaths = [NSArray arrayWithObjects:
+                               [self.userPath stringByAppendingPathComponent:@"images"],
+                               [self.userPath stringByAppendingPathComponent:@"thumbnail"],
+                               [self.userPath stringByAppendingPathComponent:@"annotations"],
+                               [self.userPath stringByAppendingPathComponent:@"Detectors"],
+                               self.userPath, nil];
+    }
+    
+    return _resourcesPaths;
+}
+
+
+-(NSArray *) availableObjectClasses
+{
+    if(!_availableObjectClasses){
+        NSMutableArray *list = [[NSMutableArray alloc] init];
+        
+        
+        NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.resourcesPaths objectAtIndex:THUMB]] error:NULL];
+        
+        for(NSString *imageName in imagesList){
+            NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
+            NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
+            for(Box *box in objects)
+                if([list indexOfObject:box.label] == NSNotFound)
+                    [list addObject:box.label];
+        }
+        
+        _availableObjectClasses = [NSArray arrayWithArray:list];
+    }
+    
+    return _availableObjectClasses;
+}
+
+#pragma mark
+#pragma mark -  Initialization and lifecycle
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -35,8 +95,7 @@
 - (void)viewDidLoad
 {
     //load detectors and create directory if it does not exist
-    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    self.userPath = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,self.username];
+    
     NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"];
     self.detectors = [NSKeyedUnarchiver unarchiveObjectWithFile:detectorsPath];
     if(!self.detectors) {
@@ -85,11 +144,22 @@
 {
     _selectedRow = self.detectors;
     
-    //check if there is any image
+    //check if there for no images or no labels to show error
+    self.availableObjectClasses = nil; //reload
     NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[self.userPath stringByAppendingPathComponent:@"thumbnail"] error:NULL];
+    
     if(imagesList.count == 0){
         UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
                                                              message:@"No images to learn from"
+                                                            delegate:nil
+                                                   cancelButtonTitle:@"OK"
+                                                   otherButtonTitles:nil];
+        [errorAlert show];
+        return;
+        
+    }else if(self.availableObjectClasses.count == 0){
+        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
+                                                             message:@"No labels found"
                                                             delegate:nil
                                                    cancelButtonTitle:@"OK"
                                                    otherButtonTitles:nil];
@@ -100,6 +170,7 @@
     Classifier *newDetector = [[Classifier alloc] init];
     newDetector.name = @"New Detector";
     newDetector.targetClass = @"Not Set";
+    self.detectorController.availableObjectClasses = self.availableObjectClasses;
     self.detectorController.hidesBottomBarWhenPushed = YES;
     self.detectorController.delegate = self;
     self.detectorController.svmClassifier = newDetector;

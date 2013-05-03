@@ -22,17 +22,19 @@
 {
     int total;
     int num;
-    
 }
 
 
 @property (nonatomic, weak) id <SendingViewDelegate> delegate;
-@property (nonatomic, strong) UIProgressView *progressView;
-@property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
+
+@property (strong, nonatomic)  UIProgressView *progressView;
+@property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
+@property (strong, nonatomic) UIButton *cancelButton;
+@property (strong, nonatomic) UILabel *label;
+
 @property (nonatomic, strong) UITextView *textView;
-@property (nonatomic, strong) UILabel *label;
-@property (nonatomic, strong) UIButton *cancelButton;
 @property (nonatomic, strong) NSString *filename;
+
 //stack of messages to ouput in the sending view
 @property (nonatomic, strong) NSMutableArray *messagesStack;
 
@@ -41,5 +43,7 @@
 -(void)incrementNum;
 -(void)reset;
 -(void)showMessage:(NSString *)message;
+
+- (IBAction)cancelAction:(id)sender;
 
 @end

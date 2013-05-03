@@ -13,8 +13,9 @@
 #import "SendingView.h"
 #import "ModalTVC.h"
 #import "CameraViewController.h"
+#import "LogVC.h"
 
-@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalTVCDelegate, CameraViewControllerDeledate>
+@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalTVCDelegate, CameraViewControllerDeledate, LogVCDelegate>
 {    
     ServerConnection *serverConnection;
     SendingView *sendingView;

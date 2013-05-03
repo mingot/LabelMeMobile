@@ -18,9 +18,11 @@
 @property (nonatomic, strong) NSMutableArray *detectors; //Classifier
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) DetectorDescriptionViewController *detectorController;
-@property (nonatomic, strong) NSString *userPath;
-@property (nonatomic, strong) NSString *username;
 
+@property (nonatomic, strong) NSString *username;
+@property (nonatomic, strong) NSString *userPath;
+@property (strong, nonatomic) NSArray *resourcesPaths;
+@property (strong, nonatomic) NSArray *availableObjectClasses;
 
 //top toolbar actions
 - (IBAction) edit:(id)sender;

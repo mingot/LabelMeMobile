@@ -63,6 +63,7 @@
     isUsingFrontFacingCamera = NO;
     fps = 0.0;
     num = 0;
+    self.title = self.svmClassifier.targetClass;
     
     //image poistion detection
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
@@ -217,13 +218,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         float scoreFloat = -1;
         if (nmsArray.count > 0){
             BoundingBox *score = (BoundingBox *)[nmsArray objectAtIndex:0];
-            [self performSelectorOnMainThread:@selector(setTitle:) withObject:[NSString stringWithFormat:@"%3f",score.score] waitUntilDone:YES];
             scoreFloat = score.score;
             if(score.score > self.maxDetectionScore) self.maxDetectionScore = score.score;
             if(self.isRecording) [self takePicture:nmsArray for:[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight]];
             level = score.pyramidLevel;
             
-        } else [self performSelectorOnMainThread:@selector(setTitle:) withObject:@"No detection." waitUntilDone:YES];
+        } 
         
         
         
@@ -241,7 +241,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         fps = (fps*num + -1.0/[start timeIntervalSinceNow])/(num+1);
         num++;
         NSMutableString *screenLabelText = [[NSMutableString alloc] initWithString:@""];
-        if(self.score) [screenLabelText appendString:[NSString stringWithFormat:@"score:%.1f\n", scoreFloat]];
+        if(self.score) [screenLabelText appendString:[NSString stringWithFormat:@"score:%.2f\n", scoreFloat]];
         if(self.fps) [screenLabelText appendString: [NSString stringWithFormat:@"FPS: %.1f\n",-1.0/[start timeIntervalSinceNow]]];
         if(self.scale) [screenLabelText appendString: [NSString stringWithFormat:@"scale: %d\n",level]];
         [self.infoLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithString:screenLabelText] waitUntilDone:YES];

@@ -23,19 +23,15 @@ using namespace cv;
 #define MAX_IMAGE_SIZE 300.0
 
 
-
 @interface Classifier ()
 {
     int numOfFeatures;
     int numSupportVectors;
     float diff;
     int levelsPyramid[10]; //how many bb of each level do we obtain
-
 }
 
-
 @property BOOL isLearning;
-
 
 //pyramid limits for detection in execution
 @property int iniPyramid;
@@ -260,15 +256,12 @@ using namespace cv;
         if(!found){
             imageHog = [[im scaleImageTo:scaleLevel] obtainHogFeatures];
             if(self.isLearning){
-//                [self.imagesHogPyramid addObject:imageHog];
                 imageHogIndex = imageIndex*numberPyramids + i + self.iniPyramid;
                 [self.imagesHogPyramid replaceObjectAtIndex:imageHogIndex withObject:imageHog];
-//                NSLog(@"Not found, saving scale: %zd at index: %d",i,imageHogIndex );
             }
         }else{
             imageHogIndex = (imageIndex*numberPyramids + i + self.iniPyramid);
             imageHog = (HogFeature *)[self.imagesHogPyramid objectAtIndex:imageHogIndex];
-//            NSLog(@"Found it scale: %zd at index:%d", i , imageHogIndex);
         }
         dispatch_sync(dispatch_get_main_queue(), ^{
             [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i+self.iniPyramid forIndex:imageHogIndex]];
@@ -277,7 +270,7 @@ using namespace cv;
     dispatch_release(pyramidQueue);
 
     
-//    //pyramid
+//    //DETECTION WITHOUT PARALLELIZATION
 //    UIImage *im = [image scaleImageTo:initialScale/pow(scale,self.iniPyramid)];
 //    for (int i=self.iniPyramid; i<self.finPyramid; i++){
 //        HogFeature *imageHog;
@@ -315,9 +308,6 @@ using namespace cv;
         self.iniPyramid = 0;
         self.finPyramid = numberPyramids;
     }
-    
-//    self.iniPyramid = 0;
-//    self.finPyramid = numberPyramids;
     
     // Change the resulting orientation of the bounding boxes if the phone orientation requires it
     if(!self.isLearning && UIInterfaceOrientationIsLandscape(orientation)){
@@ -516,7 +506,6 @@ using namespace cv;
     trainingSet.labels[index] = p.label;
     
     //features
-//    double *ramonet = (double *) malloc(self.sizesP[0]*self.sizesP[1]*self.sizesP[2]*sizeof(double));
     int boundingBoxPosition = p.locationOnImageHog.y + p.locationOnImageHog.x*imageHog.numBlocksY;
     for(int f=0; f<self.sizesP[2]; f++)
         for(int i=0; i<self.sizesP[1]; i++)
@@ -524,18 +513,10 @@ using namespace cv;
                 int sweeping1 = j + i*self.sizesP[0] + f*self.sizesP[0]*self.sizesP[1];
                 int sweeping2 = j + i*imageHog.numBlocksY + f*imageHog.numBlocksX*imageHog.numBlocksY;
                 trainingSet.imageFeatures[index*numOfFeatures + sweeping1] = (float) imageHog.features[boundingBoxPosition + sweeping2];
-//                ramonet[sweeping1] = imageHog.features[boundingBoxPosition + sweeping2];
             }
-//    if(p.label == 1){
-//        [self.imageListAux addObject:[UIImage hogImageFromFeature:imageHog]];
-//        [self.imageListAux addObject:[UIImage hogImageFromFeatures:ramonet withSize:self.sizesP]];
-//        NSLog(@"********ADDED IMAGE**********");
-//        NSLog(@"on image: %d, %d with template size: %d, %d", imageHog.numBlocksX, imageHog.numBlocksY, self.sizesP[0], self.sizesP[1]);
-//        NSLog(@"(x,y): (%f,%f)", p.locationOnImageHog.x, p.locationOnImageHog.y);
-//    }
+
     
     trainingSet.numberOfTrainingExamples++;
-//    free(ramonet);
 }
 
 
@@ -583,6 +564,7 @@ using namespace cv;
     });
     dispatch_release(trainingQueue);
     
+// TRAINING WITHOUT PARALLELIZATION
 //    for(int i=0; i<trainingSet.images.count; i++){
 //        UIImage *image = [trainingSet.images objectAtIndex:i];
 //        NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp learningImageIndex:i];
