@@ -162,7 +162,6 @@
     [dict removeObjectForKey:@"hogdimension"];
     [dict setObject:[NSNumber numberWithDouble:stepper.value] forKey:@"hogdimension"];
 
-    NSLog(@"%f", stepper.value);
     [self.tableView reloadData];
     
     [dict writeToFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"] atomically:NO];
@@ -408,7 +407,7 @@
         NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
         UIStepper *stepper = [[UIStepper alloc] initWithFrame:CGRectZero];
         stepper.value = [(NSNumber *)[dict objectForKey:@"hogdimension"] doubleValue];
-        stepper.maximumValue = 12;
+        stepper.maximumValue = 14;
         stepper.minimumValue = 4;
         
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];

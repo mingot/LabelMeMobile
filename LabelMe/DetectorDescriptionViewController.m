@@ -265,6 +265,8 @@
     self.svmClassifier.averageImageThumbPath = pathDetectorsThumb;
     self.svmClassifier.updateDate = [NSDate date];
     
+    [self loadDetectorInfo];
+    
     [self.delegate updateDetector:self.svmClassifier];
 }
 
@@ -393,13 +395,11 @@
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [self.sendingView.activityIndicator stopAnimating];
                 self.sendingView.cancelButton.hidden = NO;
-                [self loadDetectorInfo];
                 if(self.trainingWentGood) [self saveAction:self];
                 else {
                     self.navigationController.navigationBarHidden = NO;
                     [self.navigationController popViewControllerAnimated:YES];
                 }
-//                [self.view setNeedsDisplay];
             });
         });
     }
@@ -487,7 +487,7 @@
         [self.sendingView showMessage:@"Error training"];
         dispatch_sync(dispatch_get_main_queue(), ^{
             UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error Training"
-                                                                 message:@"Shape on training set not allowed"
+                                                                 message:@"Shape on training set not allowed.\n Make sure all the labels have a similar shape and that are not too big."
                                                                 delegate:nil
                                                        cancelButtonTitle:@"OK"
                                                        otherButtonTitles:nil];
@@ -602,12 +602,17 @@
     self.detectorHogView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
     self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];
     
+    //nsdate treatment
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"mm/dd/yyyy - hh:mm"];
+    [formatter setTimeZone:[NSTimeZone localTimeZone]]; //time zone
+    
     //description
     NSMutableString *description = [NSMutableString stringWithFormat:@""];
     [description appendFormat:@"NAME: %@\n", self.svmClassifier.name];
     [description appendFormat:@"CLASS: %@\n", self.svmClassifier.targetClass];
     [description appendFormat:@"NUMBER IMAGES: %d\n", self.svmClassifier.imagesUsedTraining.count];
-    [description appendFormat:@"LAST TRAINED: %@", self.svmClassifier.updateDate];
+    [description appendFormat:@"LAST TRAINED: %@", [formatter stringFromDate:self.svmClassifier.updateDate]];
     self.descriptionLabel.text = [NSString stringWithString:description];
 }
 

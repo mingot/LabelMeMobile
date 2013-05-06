@@ -541,147 +541,147 @@
         if([subview isKindOfClass:[UIActivityIndicatorView class]])
             indicator = (UIActivityIndicatorView *)subview;
     [indicator startAnimating];
-
     
-    NSString *buttonTitle = button.titleLabel.text;
+    
+    dispatch_queue_t q = dispatch_queue_create("q", NULL);
+    dispatch_async(q, ^{
+        NSString *buttonTitle = button.titleLabel.text;
 
-    NSString *query = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=mingot";
-    NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *error = nil;
-    NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
-    if (error) NSLog(@"[%@ %@] JSON error: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), error.localizedDescription);
+        NSString *query = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=mingot";
+        NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *error = nil;
+        NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
+        if (error) NSLog(@"[%@ %@] JSON error: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), error.localizedDescription);
 
-    self.downloadedThumbnails = [[NSMutableArray alloc] init];
-    self.downloadedAnnotations = [[NSMutableArray alloc] init];
-    self.downloadedImageUrls = [[NSMutableArray alloc] init];
-    self.downloadedImageNames = [[NSMutableArray alloc] init];
-    self.downloadedLabelsMap = [[NSMutableDictionary alloc] init];
+        self.downloadedThumbnails = [[NSMutableArray alloc] init];
+        self.downloadedAnnotations = [[NSMutableArray alloc] init];
+        self.downloadedImageUrls = [[NSMutableArray alloc] init];
+        self.downloadedImageNames = [[NSMutableArray alloc] init];
+        self.downloadedLabelsMap = [[NSMutableDictionary alloc] init];
 
-    NSArray *colors = [[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
+        NSArray *colors = [[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
 
-    //select NUM images not currently present in iphone
-    for (NSDictionary *element in results) {
-        
-        //get the name of the image
-        NSString *imageName = [element objectForKey:@"name"];
-
-        
-        if([self.items indexOfObject:imageName] == NSNotFound){
+        //select NUM images not currently present in iphone
+        for (NSDictionary *element in results) {
             
-            //save the name of the image
-            [self.downloadedImageNames addObject:imageName];
-            NSLog(@"found image %@ and inserting", imageName);
-           
-            //get and save thumb
-            NSString *thumbUrl = [element objectForKey:@"thumb"];
-            UIImage *thumbImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:thumbUrl]]];
-            NSLog(@"thumb %@", thumbImage);
-            if(thumbImage!=nil) [self.downloadedThumbnails addObject:thumbImage];
-            else [self.downloadedThumbnails addObject:[UIImage imageNamed:@"image_not_found.png"]];
-            
-            //get and save images urls
-            NSString *imageUrl = [element objectForKey:@"image"];
-            NSLog(@"image url %@", imageUrl);
-            [self.downloadedImageUrls addObject:imageUrl];
+            //get the name of the image
+            NSString *imageName = [element objectForKey:@"name"];
 
             
-            //get and save annotations
-            NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
-            NSDictionary *annotation = (NSDictionary *) [element objectForKey:@"annotation"];
-            NSDictionary *imageSize = (NSDictionary *) [annotation objectForKey:@"imagesize"];
-            
-            
-            id objects = [annotation objectForKey:@"object"];
-            NSArray *boxes;
-            if([objects isKindOfClass:[NSArray class]]) boxes = (NSArray *) objects;
-            else boxes = [[NSArray alloc] initWithObjects:(NSDictionary *)objects, nil];
-            
-            for(NSDictionary *box in boxes){
+            if([self.items indexOfObject:imageName] == NSNotFound){
                 
-                //label: insert into the map to download specific images for a given label
-                NSString *label = [(NSString *) [box objectForKey:@"name"] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-                NSMutableArray *imageIndexes = [self.downloadedLabelsMap objectForKey:label];
-                if(imageIndexes==nil){
-                    imageIndexes = [[NSMutableArray alloc] initWithObjects:[NSNumber numberWithInt:self.downloadedImageNames.count-1], nil];
-                    [self.downloadedLabelsMap setObject:imageIndexes forKey:label];
+                //save the name of the image
+                [self.downloadedImageNames addObject:imageName];
+               
+                //get and save thumb
+                NSString *thumbUrl = [element objectForKey:@"thumb"];
+                UIImage *thumbImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:thumbUrl]]];
+                if(thumbImage!=nil) [self.downloadedThumbnails addObject:thumbImage];
+                else [self.downloadedThumbnails addObject:[UIImage imageNamed:@"image_not_found.png"]];
                 
-                }else [imageIndexes addObject:[NSNumber numberWithInt:self.downloadedImageNames.count-1]];
+                //get and save images urls
+                NSString *imageUrl = [element objectForKey:@"image"];
+                [self.downloadedImageUrls addObject:imageUrl];
+
+                
+                //get and save annotations
+                NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
+                NSDictionary *annotation = (NSDictionary *) [element objectForKey:@"annotation"];
+                NSDictionary *imageSize = (NSDictionary *) [annotation objectForKey:@"imagesize"];
                 
                 
-                NSDictionary *polygon = (NSDictionary *)[box objectForKey:@"polygon"];
-                NSArray *points = (NSArray *)[polygon objectForKey:@"pt"];
+                id objects = [annotation objectForKey:@"object"];
+                NSArray *boxes;
+                if([objects isKindOfClass:[NSArray class]]) boxes = (NSArray *) objects;
+                else boxes = [[NSArray alloc] initWithObjects:(NSDictionary *)objects, nil];
                 
-                CGFloat xmin=100000, xmax=0, ymin=100000, ymax=0;
-                for(NSDictionary *point in points){
-                    int x = [[(NSString *)[point objectForKey:@"x"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] floatValue];
-                    int y = [[(NSString *)[point objectForKey:@"y"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] floatValue];
-                    xmin = x<xmin ? x:xmin;
-                    xmax = x>xmax ? x:xmax;
-                    ymin = y<ymin ? y:ymin;
-                    ymax = y>ymax ? y:ymax;
+                for(NSDictionary *box in boxes){
+                    
+                    //label: insert into the map to download specific images for a given label
+                    NSString *label = [(NSString *) [box objectForKey:@"name"] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                    NSMutableArray *imageIndexes = [self.downloadedLabelsMap objectForKey:label];
+                    if(imageIndexes==nil){
+                        imageIndexes = [[NSMutableArray alloc] initWithObjects:[NSNumber numberWithInt:self.downloadedImageNames.count-1], nil];
+                        [self.downloadedLabelsMap setObject:imageIndexes forKey:label];
+                    
+                    }else [imageIndexes addObject:[NSNumber numberWithInt:self.downloadedImageNames.count-1]];
+                    
+                    
+                    NSDictionary *polygon = (NSDictionary *)[box objectForKey:@"polygon"];
+                    NSArray *points = (NSArray *)[polygon objectForKey:@"pt"];
+                    
+                    CGFloat xmin=100000, xmax=0, ymin=100000, ymax=0;
+                    for(NSDictionary *point in points){
+                        int x = [[(NSString *)[point objectForKey:@"x"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] floatValue];
+                        int y = [[(NSString *)[point objectForKey:@"y"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] floatValue];
+                        xmin = x<xmin ? x:xmin;
+                        xmax = x>xmax ? x:xmax;
+                        ymin = y<ymin ? y:ymin;
+                        ymax = y>ymax ? y:ymax;
+                    }
+                    
+                    //box construction
+                    Box *box = [[Box alloc] initWithPoints:CGPointMake(xmin*1.0, ymin*1.0) :CGPointMake(xmax*1.0, ymax*1.0)];
+                    box.label = label;
+                    box.sent = YES;
+                    box.color = [colors objectAtIndex:arc4random() % colors.count];  //choose random color
+                    box->UPPERBOUND = 0;
+                    box->LOWERBOUND = [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
+                    box->LEFTBOUND = 0;
+                    box->RIGHTBOUND = [[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
+                    box.downloadDate = [NSDate date];
+                    
+                    [boundingBoxes addObject:box];
+                    
                 }
                 
-                //box construction
-                Box *box = [[Box alloc] initWithPoints:CGPointMake(xmin*1.0, ymin*1.0) :CGPointMake(xmax*1.0, ymax*1.0)];
-                box.label = label;
-                box.sent = YES;
-                box.color = [colors objectAtIndex:arc4random() % colors.count];  //choose random color
-                box->UPPERBOUND = 0;
-                box->LOWERBOUND = [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
-                box->LEFTBOUND = 0;
-                box->RIGHTBOUND = [[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
-                box.downloadDate = [NSDate date];
-                
-                [boundingBoxes addObject:box];
-                
-                //NSLog(@"POINTS: (%f,%f), (%f,%f)", box.upperLeft.x,box.upperLeft.y, box.lowerRight.x, box.lowerRight.y);
-                //NSLog(@"BOUNDS: %f, %f",box->LOWERBOUND, box->RIGHTBOUND);
-                
+                //save the dictionary
+                [self.downloadedAnnotations addObject:boundingBoxes];
             }
             
-            //save the dictionary
-            [self.downloadedAnnotations addObject:boundingBoxes];
         }
         
-    }
-    
-    [indicator stopAnimating];
-    
-    //present the modal depending on the sender button: show images or labels
-    if(self.downloadedThumbnails.count>0){
-        if([buttonTitle isEqualToString:@"Server Images"]){
-            self.modalTVC = [[ModalTVC alloc] init];
-            self.modalTVC.showCancelButton = YES;
-            self.modalTVC.delegate = self;
-            self.modalTVC.modalTitle = @"Choose Images";
-            self.modalTVC.data = self.downloadedThumbnails;
-            [self.modalTVC.view setNeedsDisplay];
-            [self presentModalViewController:self.modalTVC animated:YES];
-        }else if([buttonTitle isEqualToString:@"Server Labels"]){
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [indicator stopAnimating];
             
-            //get the labels
-            NSMutableArray *labels = [[NSMutableArray alloc] init];
-            for(NSString *key in self.downloadedLabelsMap){
-                NSArray *indexes = [self.downloadedLabelsMap objectForKey:key];
-                [labels addObject:[NSString stringWithFormat:@"%@ (%d)",key,indexes.count]];
+            //present the modal depending on the sender button: show images or labels
+            if(self.downloadedThumbnails.count>0){
+                if([buttonTitle isEqualToString:@"Server Images"]){
+                    self.modalTVC = [[ModalTVC alloc] init];
+                    self.modalTVC.showCancelButton = YES;
+                    self.modalTVC.delegate = self;
+                    self.modalTVC.modalTitle = @"Choose Images";
+                    self.modalTVC.data = self.downloadedThumbnails;
+                    [self.modalTVC.view setNeedsDisplay];
+                    [self presentModalViewController:self.modalTVC animated:YES];
+                }else if([buttonTitle isEqualToString:@"Server Labels"]){
+                    
+                    //get the labels
+                    NSMutableArray *labels = [[NSMutableArray alloc] init];
+                    for(NSString *key in self.downloadedLabelsMap){
+                        NSArray *indexes = [self.downloadedLabelsMap objectForKey:key];
+                        [labels addObject:[NSString stringWithFormat:@"%@ (%d)",key,indexes.count]];
+                    }
+                    self.modalTVC = [[ModalTVC alloc] init];
+                    self.modalTVC.showCancelButton = YES;
+                    self.modalTVC.delegate = self;
+                    self.modalTVC.modalTitle = @"Choose Labels";
+                    self.modalTVC.multipleChoice = YES;
+                    self.modalTVC.data = [NSArray arrayWithArray:labels];
+                    [self.modalTVC.view setNeedsDisplay];
+                    [self presentModalViewController:self.modalTVC animated:YES];
+                }
+            }else{
+                UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
+                                                                     message:@"You have all the images"
+                                                                    delegate:nil
+                                                           cancelButtonTitle:@"OK"
+                                                           otherButtonTitles:nil];
+                [errorAlert show];
             }
-            self.modalTVC = [[ModalTVC alloc] init];
-            self.modalTVC.showCancelButton = YES;
-            self.modalTVC.delegate = self;
-            self.modalTVC.modalTitle = @"Choose Labels";
-            self.modalTVC.multipleChoice = NO;
-            self.modalTVC.data = [NSArray arrayWithArray:labels];
-            [self.modalTVC.view setNeedsDisplay];
-            [self presentModalViewController:self.modalTVC animated:YES];
-        }
-    }else{
-        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
-                                                             message:@"You have all the images"
-                                                            delegate:nil
-                                                   cancelButtonTitle:@"OK"
-                                                   otherButtonTitles:nil];
-        [errorAlert show];
-    }
+        });
+        
+    });
 
 }
 
@@ -1126,7 +1126,6 @@
     [self.editButton setEnabled:YES];
     [sendingView.activityIndicator stopAnimating];
     
-    
 }
 
 
@@ -1147,7 +1146,7 @@
     [sendingView.progressView setProgress:0];
     
     
-    
+    //get the images when the label is choosen
     NSMutableArray *newIndexes = [[NSMutableArray alloc] init];
     if([identifier isEqualToString:@"Choose Labels"]){
         NSArray *labels = [self.downloadedLabelsMap allKeys];
@@ -1159,13 +1158,18 @@
         newIndexes = [[[NSSet setWithArray:newIndexes] allObjects] mutableCopy];
         
         selectedItems = newIndexes;
+        sendingView.total = selectedItems.count;
     }
     
+
     
+//    dispatch_apply(count, queue, ^(size_t i) {
+//        printf("%u\n",i);
+//    });
     
     dispatch_async(queue, ^(void){
         __block int i=0;
-        for(NSNumber *selectedIndex in selectedItems){
+        for(NSNumber *selectedIndex in selectedItems){ //for each image selected
         
             NSString *imageName = [self.downloadedImageNames objectAtIndex:selectedIndex.intValue];
             
@@ -1178,7 +1182,7 @@
             [NSKeyedArchiver archiveRootObject:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue] toFile:pathObject];
 
             
-            //download and save images in a new thread
+            //download and save images 
             UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[self.downloadedImageUrls objectAtIndex:selectedIndex.intValue]]]];
 
             NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
@@ -1195,7 +1199,6 @@
                 
                 [sendingView incrementNum];
                 [sendingView.progressView setProgress:i*1.0/selectedItems.count];
-                NSLog(@"Progress:%f", i*1.0/selectedItems.count);
                 i++;
             });
         }

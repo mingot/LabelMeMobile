@@ -437,31 +437,6 @@ static BOOL didSignIn = NO;
 
 }
 
--(void)downloadNamesForUsername:(NSString *)username //neeed the current images loaded in the server
-{
-
-    NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:self.downloadNamesURL] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *error = nil;
-    NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
-    if (error) NSLog(@"[%@ %@] JSON error: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), error.localizedDescription);
-    NSLog(@"received %@",  results);
-    
-    
-    NSArray *currentImages = [[NSArray alloc] initWithObjects:@"caca.jpg","unaltracaca.jpg", nil];
-    int count = 10;
-    
-    //select NUM images not currently present in iphone
-    for (NSString* key in results) {
-        NSDictionary *value = (NSDictionary *)[results objectForKey:key];
-        //get the name of the image
-        NSString *imageName = [value objectForKey:@"name"];
-        if([currentImages indexOfObject:imageName] != NSNotFound){
-            
-            count --;
-        }
-        
-    }
-}
 
 
 -(void)uploadProfilePicture:(UIImage *)ppicture

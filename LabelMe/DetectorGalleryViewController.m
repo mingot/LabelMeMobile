@@ -96,7 +96,7 @@
 {
     //load detectors and create directory if it does not exist
     
-    NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"];
+    NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"];
     self.detectors = [NSKeyedUnarchiver unarchiveObjectWithFile:detectorsPath];
     if(!self.detectors) {
         [[NSFileManager defaultManager] createDirectoryAtPath:[self.userPath stringByAppendingPathComponent:@"Detectors"] withIntermediateDirectories:YES attributes:nil error:nil];
@@ -238,7 +238,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [self.detectors removeObjectAtIndex:indexPath.row];
         [self.tableView reloadData];
-        if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"]])
+        if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"]])
             NSLog(@"Unable to save the classifiers");
         
     }else if (editingStyle == UITableViewCellEditingStyleInsert) {
@@ -291,7 +291,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     else [self.detectors addObject:updatedDetector];
 
     NSLog(@"updating detector at position: %d", _selectedRow);
-    if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors02.pch"]]){
+    if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"]]){
         NSLog(@"Unable to save the classifiers");
     }
     

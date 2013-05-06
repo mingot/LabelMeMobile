@@ -186,14 +186,13 @@ using namespace cv;
 
         [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter++]];
         
-        //Get Bounding Boxes from detection and check if more than 0 positives to train
+        //Get Bounding Boxes from detection
         [self getBoundingBoxesForTrainingWith:trainingSet];
         
+        //check for positive bb found, other wise, break
+        if(self.numberOfPositives.intValue < 2 || self.numberOfPositives.intValue == trainingSet.numberOfTrainingExamples) return 0;
+        
         //Train the SVM, update weights and store support vectors and labels
-        if(self.numberOfPositives.intValue == 0){
-            NSLog(@"ERROR: 0 positives found");
-            return 0;
-        }
         [self trainSVMAndGetWeights:trainingSet];
         
         diff = [self computeDifferenceOfWeights];
@@ -251,11 +250,9 @@ using namespace cv;
         //Locate pyramids in buffer
         found = YES;
         if([self.receivedImageIndex indexOfObject:[NSNumber numberWithInt:imageIndex]] == NSNotFound || self.receivedImageIndex.count == 0){
-            NSLog(@"Adding imageIndex:%d",imageIndex);
             [self.receivedImageIndex addObject:[NSNumber numberWithInt:imageIndex]];
             found = NO;
         }
-        else NSLog(@"ImageIndex %d found!", imageIndex);
     }
     
     dispatch_queue_t pyramidQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);

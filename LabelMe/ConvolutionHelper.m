@@ -72,8 +72,8 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     b = (min(self.ymax, cp.ymax) - max(self.ymin, cp.ymin));
     intersectionArea = (a>0 && b>0) ? a*b : 0;
     unionArea = area1 + area2 - intersectionArea;
-    if (intersectionArea == area1 || intersectionArea == area2) //one bb contain the other
-        intersectionArea = unionArea;
+//    if (intersectionArea == area1 || intersectionArea == area2) //one bb contain the other
+//        intersectionArea = unionArea;
     
     return intersectionArea/unionArea>0 ? intersectionArea/unionArea : 0;
 }

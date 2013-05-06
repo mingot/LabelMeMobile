@@ -57,7 +57,6 @@
 -(void)sendPhoto:(UIImage *) photo filename: (NSString *)filename path:(NSString *)objectpath withSize:(CGPoint)size andAnnotation:(NSMutableArray *) annotation;
 -(void)updateAnnotationFrom:(NSString *)filename withSize:(CGPoint)size : (NSMutableArray *) annotation;
 -(void)downloadProfilePictureToUsername:(NSString *) username;
--(void)downloadNamesForUsername:(NSString *)username;
 -(void)uploadProfilePicture:(UIImage *)ppicture;
 -(void)cancelRequestFor:(int)req;
 @end
