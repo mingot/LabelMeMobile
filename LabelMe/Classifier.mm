@@ -33,9 +33,11 @@ using namespace cv;
 
 @property BOOL isLearning;
 
+
 //pyramid limits for detection in execution
 @property int iniPyramid;
 @property int finPyramid;
+
 
 //detector buffer (when training)
 @property (strong, nonatomic) NSMutableArray *receivedImageIndex;
@@ -50,7 +52,7 @@ using namespace cv;
 //make the convolution of the classifier with the image and return de detected bounding boxes
 - (NSArray *) getBoundingBoxesIn:(HogFeature *)imageHog forPyramid:(int)pyramidLevel forIndex:(int)imageHogIndex;
 
-//add a selected bounding box to the training buffer
+//add a selected bounding box (its correspondent hog features) to the training buffer
 -(void) addExample:(BoundingBox *)p to:(TrainingSet *)trainingSet;
 
 
@@ -142,7 +144,7 @@ using namespace cv;
     }
 }
 
-- (void) train:(TrainingSet *) trainingSet;
+- (int) train:(TrainingSet *) trainingSet;
 {
     NSDate *start = [NSDate date];
     free(self.weightsP);
@@ -158,8 +160,9 @@ using namespace cv;
     
     // Get the template size and get hog feautures dimension
     float ratio = trainingSet.templateSize.width/trainingSet.templateSize.height;
-    self.sizesP[0] = round(40*trainingSet.areaRatio + 4); //Determined empirically to ajust the size of the template according to the size in the training set
-//    self.sizesP[0] = self.maxHog; //set in user preferences
+    self.scaleFactor = [NSNumber numberWithDouble:self.maxHog*6*sqrt(ratio/trainingSet.areaRatio)];
+//    self.sizesP[0] = round(40*trainingSet.areaRatio + 4); //Determined empirically to ajust the size of the template according to the size in the training set
+    self.sizesP[0] = self.maxHog; //set in user preferences
     NSLog(@"MAX HOG:%d", self.maxHog);
     self.sizesP[1] = round(self.sizesP[0]*ratio);
     self.sizesP[2] = 31;
@@ -183,10 +186,14 @@ using namespace cv;
 
         [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter++]];
         
-        //Get Bounding Boxes from detection
+        //Get Bounding Boxes from detection and check if more than 0 positives to train
         [self getBoundingBoxesForTrainingWith:trainingSet];
         
         //Train the SVM, update weights and store support vectors and labels
+        if(self.numberOfPositives.intValue == 0){
+            NSLog(@"ERROR: 0 positives found");
+            return 0;
+        }
         [self trainSVMAndGetWeights:trainingSet];
         
         diff = [self computeDifferenceOfWeights];
@@ -205,6 +212,7 @@ using namespace cv;
     free(self.weightsPLast);
     free(trainingSet.imageFeatures);
     free(trainingSet.labels);
+    return 1; //success
 }
 
 
@@ -223,7 +231,10 @@ using namespace cv;
     if(!self.isLearning && UIDeviceOrientationIsLandscape(orientation))
         image = [UIImage imageWithCGImage:image.CGImage scale:1.0 orientation: UIImageOrientationUp];
 
-    double initialScale = MAX_IMAGE_SIZE/image.size.height;
+    
+    
+//    double initialScale = MAX_IMAGE_SIZE/image.size.height;
+    double initialScale = self.scaleFactor.doubleValue/sqrt(image.size.width*image.size.width);
     double scale = pow(2, 1.0/numberPyramids);
 
     //Pyramid limits
@@ -378,6 +389,7 @@ using namespace cv;
         self.averageImagePath = [aDecoder decodeObjectForKey:@"averageImagePath"];
         self.averageImageThumbPath = [aDecoder decodeObjectForKey:@"averageImageThumbPath"];
         self.updateDate = [aDecoder decodeObjectForKey:@"updateDate"];
+        self.scaleFactor = [aDecoder decodeObjectForKey:@"scaleFactor"];
         
         self.sizesP = (int *) malloc(3*sizeof(int));
         self.sizesP[0] = [(NSNumber *) [self.sizes objectAtIndex:0] intValue];
@@ -420,6 +432,8 @@ using namespace cv;
     [aCoder encodeObject:self.averageImagePath forKey:@"averageImagePath"];
     [aCoder encodeObject:self.averageImageThumbPath forKey:@"averageImageThumbPath"];
     [aCoder encodeObject:self.updateDate forKey:@"updateDate"];
+    [aCoder encodeObject:self.scaleFactor forKey:@"scaleFactor"];
+    
 }
 
 
@@ -531,7 +545,8 @@ using namespace cv;
     dispatch_apply(trainingSet.images.count, trainingQueue, ^(size_t i) {
         UIImage *image = [trainingSet.images objectAtIndex:i];
         NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp learningImageIndex:i];
-        dispatch_sync(dispatch_get_main_queue(),^{[self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %zd: %d", i, newBoundingBoxes.count]];});
+        dispatch_sync(dispatch_get_main_queue(),^{
+            [self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %zd: %d", i, newBoundingBoxes.count]];});
         int quota = MAX_QUOTA;
         NSArray *selectedGT = trainingSet.groundTruthBoundingBoxes;
         NSMutableArray *aux = [selectedGT mutableCopy];

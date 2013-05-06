@@ -11,7 +11,7 @@
 @protocol LogVCDelegate <NSObject>
 
 
-- (void) cancel;
+- (void) cancelLogVC;
 
 @end
 
@@ -27,6 +27,6 @@
 @property (strong, nonatomic) NSMutableArray *messagesStack;
 
 - (IBAction)cancelAction:(id)sender;
-
+-(void)showMessage:(NSString *)message;
 
 @end

@@ -194,6 +194,7 @@
     
     //sending view
     sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
+    [sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [sendingView setHidden:YES];
     sendingView.delegate = self;
     sendingView.label.text = @"Uploading image to server";

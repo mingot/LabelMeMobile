@@ -37,6 +37,7 @@
 
 - (IBAction)cancelAction:(id)sender
 {
-    [self.delegate cancel];
+    [self dismissModalViewControllerAnimated:YES];
+    [self.delegate cancelLogVC];
 }
 @end

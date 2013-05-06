@@ -30,8 +30,10 @@
 
 @interface DetectorDescriptionViewController()
 
+@property BOOL trainingWentGood;
 @property (strong, nonatomic) UIImage *averageImage;
 @property int firstTraingState; //0: not first training, 1: first training initiated, 2: first training interrupted
+
 
 
 // wrapper to call the detector for training and testing
@@ -118,7 +120,7 @@
     //load views
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
-    self.logVC = [[LogVC alloc] initWithNibName:@"logVC" bundle:nil];
+    self.logVC = [[LogVC alloc] initWithNibName:@"LogVC" bundle:nil];
     
     //set labels
     self.targetClassLabel.text = self.svmClassifier.targetClass;
@@ -189,6 +191,7 @@
     
     //sending view, responsible for the waiting view
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
+    [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
     self.sendingView.delegate = self;
     self.sendingView.hidden = YES;
     [self.view addSubview:self.sendingView];
@@ -208,7 +211,6 @@
     else if(self.firstTraingState == INITIATED){
         [self trainAction:self];
     }
-    
 }
 
 
@@ -224,9 +226,6 @@
 
 - (IBAction)trainAction:(id)sender
 {
-    
-    [self.sendingView.progressView setProgress:0 animated:YES];
-    [self.logVC.progressView setProgress:0 animated:YES];
     
     //show modal to select training positives for the selected class
     self.modalTVC = [[ModalTVC alloc] init];
@@ -274,7 +273,6 @@
     self.navigationController.navigationBarHidden = YES;
     self.sendingView.hidden = NO;
     self.sendingView.cancelButton.hidden = NO;
-    self.sendingView.cancelButton.titleLabel.text = @"Done";
     [self.sendingView.messagesStack removeAllObjects];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Detector %@", self.svmClassifier.name]];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images:%d", self.svmClassifier.imagesUsedTraining.count]];
@@ -363,19 +361,19 @@
         //not first training any more
         self.firstTraingState = NOT_FIRST;
         
+        //split train and test
         NSMutableArray *traingImagesNames = [[NSMutableArray alloc] init];
         NSMutableArray *testImagesNames = [[NSMutableArray alloc]init];
-        
         for(int i=0;i<self.availablePositiveImagesNames.count;i++){
             NSUInteger index = [selectedItems indexOfObject:[NSNumber numberWithInt:i]];
             if(index != NSNotFound) [traingImagesNames addObject:[self.availablePositiveImagesNames objectAtIndex:i]];
             else [testImagesNames addObject:[self.availablePositiveImagesNames objectAtIndex:i]];
         }
-    
         if(testImagesNames.count == 0) testImagesNames = traingImagesNames;
         
-        
-        //show debug indicator on screen
+        //SENDING VIEW initialization
+        [self.sendingView.progressView setProgress:0 animated:YES];
+        [self.logVC.progressView setProgress:0 animated:YES];
         self.sendingView.hidden = NO;
         self.navigationController.navigationBarHidden = YES;
         [self.sendingView.activityIndicator startAnimating];
@@ -391,13 +389,17 @@
         dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
         dispatch_async(myQueue, ^{
             [self trainForImagesNames:traingImagesNames];
-            [self testForImagesNames:testImagesNames];
+            if(self.trainingWentGood)[self testForImagesNames:testImagesNames];
             dispatch_sync(dispatch_get_main_queue(), ^{
+                [self.sendingView.activityIndicator stopAnimating];
+                self.sendingView.cancelButton.hidden = NO;
                 [self loadDetectorInfo];
-                [self.sendingView setHidden:YES];
-                [self saveAction:self];
-                self.navigationController.navigationBarHidden = NO;
-                [self.view setNeedsDisplay];
+                if(self.trainingWentGood) [self saveAction:self];
+                else {
+                    self.navigationController.navigationBarHidden = NO;
+                    [self.navigationController popViewControllerAnimated:YES];
+                }
+//                [self.view setNeedsDisplay];
             });
         });
     }
@@ -406,6 +408,14 @@
 - (void) selectionCancelled
 {
     if(self.firstTraingState != NOT_FIRST) self.firstTraingState = INTERRUPTED;
+}
+
+#pragma mark
+#pragma mark - LogVC delegate
+
+- (void) cancelLogVC
+{
+    NSLog(@"Modal cancelled");
 }
 
 #pragma mark
@@ -471,15 +481,27 @@
     //learn
     [self updateProgress:0.05];
     [self.sendingView showMessage:@"Training begins!"];
-    [self.svmClassifier train:trainingSet];
-    [self.sendingView showMessage:@"Finished training"];
-    [self updateProgress:1];
-    
-    //update view of the detector
-    self.sendingView.hidden = YES;
-    [self.sendingView.activityIndicator stopAnimating];
-    [self loadDetectorInfo];
-    if(self.previousSvmClassifier != nil) self.undoButtonBar.enabled = YES;
+    int successTraining = [self.svmClassifier train:trainingSet];
+    if(!successTraining){
+        self.trainingWentGood = NO;
+        [self.sendingView showMessage:@"Error training"];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error Training"
+                                                                 message:@"Shape on training set not allowed"
+                                                                delegate:nil
+                                                       cancelButtonTitle:@"OK"
+                                                       otherButtonTitles:nil];
+            [errorAlert show];
+        });
+        
+    }else{
+        self.trainingWentGood = YES;
+        [self.sendingView showMessage:@"Finished training"];
+        [self updateProgress:1];
+        
+        //update view of the detector
+        if(self.previousSvmClassifier != nil) self.undoButtonBar.enabled = YES;
+    }
 }
 
 
@@ -560,11 +582,8 @@
         min = imageResult[i]<min ? imageResult[i]:min;
     }
     
-    for(int i=0; i<height*width*4; i++){
+    for(int i=0; i<height*width*4; i++)
         imageResult[i] = (imageResult[i]-min)*(255/(max-min));
-    }
-    
-
     
     //construct final image
     CGContextRef contextResult = CGBitmapContextCreate(imageResult, width, height, 8, 4*width,
@@ -574,7 +593,6 @@
     CGContextRelease(contextResult);
     UIImage *image = [UIImage imageWithCGImage:imageResultRef scale:1.0 orientation:UIImageOrientationUp];
     return image;
-
 }
 
 - (void) loadDetectorInfo

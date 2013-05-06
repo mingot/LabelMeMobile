@@ -23,7 +23,7 @@
 
 
 
-@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate, ModalTVCDelegate>
+@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate,ModalTVCDelegate, LogVCDelegate>
 
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
 

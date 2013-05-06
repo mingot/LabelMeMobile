@@ -19,6 +19,7 @@
 @synthesize cancelButton = _cancelButton;
 @synthesize messagesStack = _messagesStack;
 
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -53,8 +54,6 @@
         self.cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.cancelButton setFrame:CGRectMake(self.progressView.frame.origin.x + self.progressView.frame.size.width/4, self.label.frame.origin.y + self.label.frame.size.height+10, self.progressView.frame.size.width/2, 30)];
         [self.cancelButton addTarget:self.delegate action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
-        [self.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-        //[self.cancelButton setBackgroundColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
         [self.cancelButton setBackgroundImage:barImage forState:UIControlStateNormal];
         [self.cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.cancelButton.tintColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];

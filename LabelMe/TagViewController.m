@@ -138,14 +138,19 @@
     [self.labelsView setDataSource:self];
     [self.labelsView setRowHeight:30];
     [self.scrollView addSubview:self.composeView];
-     self.sendingView = [[SendingView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height)];
+    
+    //sending view
+    self.sendingView = [[SendingView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height)];
     [self.sendingView setHidden:YES];
+    self.sendingView.label.text = @"Uploading to the server...";
+    [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+    self.sendingView.delegate = self;
+    
     [self.scrollView addSubview:self.label];
     [self.scrollView addSubview:self.labelsView];
     [self.scrollView addSubview:self.sendingView];
 
-    self.sendingView.delegate = self;
-
+    
     [self.label setKeyboardAppearance:UIKeyboardAppearanceAlert];
 
     self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];

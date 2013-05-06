@@ -18,6 +18,8 @@
 //ratio between the average area of the bounding boxes inside the images
 @property float areaRatio;
 
+
+
 @property float *imageFeatures; //the features for the wole trainingset
 @property float *labels; //the corresponding labels
 @property int numberOfTrainingExamples; // bounding boxes + support vectors added

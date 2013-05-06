@@ -25,7 +25,6 @@
 
 @property (strong, nonatomic) id<ClassifierDelegate> delegate;
 
-
 @property int *sizesP;
 @property double *weightsP;
 @property NSMutableArray *imageListAux;
@@ -44,6 +43,7 @@
 @property (strong, nonatomic) NSString *averageImagePath;
 @property (strong, nonatomic) NSString *averageImageThumbPath;
 @property (strong, nonatomic) NSDate *updateDate;
+@property (strong, nonatomic) NSNumber *scaleFactor; //average ratio height/width of the positive bb of the training set
 
 
 //Initialization of the classifier given the weight vectors of it
@@ -51,8 +51,8 @@
 
 - (id) initWithCoder:(NSCoder *)aDecoder;
 
-//Train the classifier given an initial set formed by Images and ground truth bounding boxes containing positive examples
-- (void) train:(TrainingSet *) trainingSet;
+//Train the classifier given an initial set formed by Images and ground truth bounding boxes containing positive examples. Returns 1 == success, 0 == fail
+- (int) train:(TrainingSet *) trainingSet;
 
 //Detect object in the image and return array of convolution points for the indicated number of pyramids and detection threshold
 - (NSArray *) detect:(UIImage *) image

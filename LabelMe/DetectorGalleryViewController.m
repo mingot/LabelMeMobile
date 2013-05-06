@@ -124,20 +124,19 @@
 
 - (IBAction) edit:(id)sender
 {
+    UIBarButtonItem *button = self.navigationItem.rightBarButtonItem;
     if(self.editing){
         [super setEditing:NO animated:NO];
         [self.tableView setEditing:NO animated:NO];
-        [self.tableView reloadData];
-        [self.navigationItem.leftBarButtonItem setTitle:@"Edit"];
-        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStylePlain];
+        button.title = @"Edit";
         
     }else{
         [super setEditing:YES animated:YES];
         [self.tableView setEditing:YES animated:YES];
-        [self.tableView reloadData];
-        [self.navigationItem.leftBarButtonItem setTitle:@"Done"];
-        [self.navigationItem.leftBarButtonItem setStyle:UIBarButtonItemStyleDone];
+        button.title = @"Done";
     }
+    [self.tableView reloadData];
+    self.navigationItem.rightBarButtonItem = button;
 }
 
 - (IBAction)addDetector:(id)sender
