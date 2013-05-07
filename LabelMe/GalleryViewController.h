@@ -13,20 +13,25 @@
 #import "SendingView.h"
 #import "ModalTVC.h"
 #import "CameraViewController.h"
-#import "LogVC.h"
 
-@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalTVCDelegate, CameraViewControllerDeledate, LogVCDelegate>
-{    
-    ServerConnection *serverConnection;
-    SendingView *sendingView;
-
-    UILabel *noImages;
+@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalTVCDelegate, CameraViewControllerDeledate>
+{
     int selectedTableIndex;
     int photosWithErrors;
-    IBOutlet UIView *view1;
+    
 }
 
 
+@property (nonatomic, strong) ServerConnection *serverConnection;
+@property (nonatomic,strong) CLLocationManager *locationMng;
+@property (nonatomic,strong) NSArray *paths;
+@property (nonatomic,strong) NSString *username;
+@property (nonatomic,strong) NSArray *userPaths;
+
+//view
+@property (nonatomic, strong) IBOutlet UIView *view1;
+@property (nonatomic, strong) UILabel *noImages;
+@property (nonatomic, strong) SendingView *sendingView;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *editButton;
 @property (nonatomic,strong) IBOutlet UIToolbar *bottomToolbar;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *deleteButton;
@@ -37,23 +42,17 @@
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
 @property (nonatomic,strong) IBOutlet UITableView *tableViewGrid;
 
-
-@property (nonatomic,strong) NSArray *paths;
+//table
 @property (nonatomic,strong) NSArray *items;
-
 @property (nonatomic,strong) NSMutableArray *selectedItems;
 @property (nonatomic,strong) NSMutableArray *selectedItemsSend;
 @property (nonatomic,strong) NSMutableArray *selectedItemsDelete;
 
+
 @property (nonatomic,strong) TagViewController *tagViewController;
 @property (nonatomic,strong) CameraViewController *cameraVC;
 @property (nonatomic,strong) ModalTVC *modalTVC;
-@property (nonatomic,strong) NSString *username;
-@property (nonatomic,strong) NSArray *userPaths;
 
-
-
-@property (nonatomic,strong) CLLocationManager *locationMng;
 
 -(IBAction)buttonClicked:(id)sender;
 -(IBAction)deleteAction:(id)sender;

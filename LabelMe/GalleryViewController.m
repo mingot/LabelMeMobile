@@ -13,63 +13,115 @@
 #import "GalleryViewController.h"
 #import "Constants.h"
 #import "Box.h"
-#import "ServerConnection.h"
 #import "CustomBadge.h"
+
 #import "UIImage+Resize.h"
+#import "UIImage+Border.h"
 #import "NSObject+ShowAlert.h"
 #import "NSObject+Folders.h"
-#import "Box.h"
 
 
 
 @interface GalleryViewController()
-
-//Return the list of files of path ordered by modification date
-- (NSArray *) getOrderedListOfFilesForPath:(NSString *)path;
-
 
 //arrays to store information about downloaded images from server
 @property (nonatomic, strong) NSMutableArray *downloadedThumbnails;
 @property (nonatomic, strong) NSMutableArray *downloadedAnnotations;
 @property (nonatomic, strong) NSMutableArray *downloadedImageUrls;
 @property (nonatomic, strong) NSMutableArray *downloadedImageNames;
-@property (nonatomic, strong) NSMutableDictionary *downloadedLabelsMap; //label -> array with indexes 
+@property (nonatomic, strong) NSMutableDictionary *downloadedLabelsMap; //label -> array with indexes
+@property (nonatomic, strong) NSMutableDictionary *labelsDictionary; //dictionary: label -> array of filenames containing label
+
 
 @end
 
 
 
-
-
 @implementation GalleryViewController
-
-@synthesize editButton = _editButton;
-@synthesize bottomToolbar = _bottomToolbar;
-@synthesize deleteButton = _deleteButton;
-@synthesize sendButton = _sendButton;
-@synthesize usernameLabel = _usernameLabel;
-@synthesize profilePicture = _profilePicture;
-
-@synthesize listButton = _listButton;
-@synthesize paths = _paths;
-@synthesize items = _items;
-@synthesize selectedItems = _selectedItems;
-@synthesize selectedItemsSend = _selectedItemsSend;
-@synthesize selectedItemsDelete = _selectedItemsDelete;
-@synthesize tagViewController = _tagViewController;
-@synthesize tableView = _tableView;
-@synthesize tableViewGrid = _tableViewGrid;
-@synthesize username = _username;
 
 
 
 #pragma mark
-#pragma mark - setters and getters
+#pragma mark - Getters 
+
+- (NSArray *) paths
+{
+    if(!_paths){
+        
+        NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+        NSString *path = [documentsDirectory stringByAppendingPathComponent:self.username];
+        
+        _paths = [NSArray arrayWithObjects:[path stringByAppendingPathComponent:@"images"],[path stringByAppendingPathComponent:@"thumbnail"],[path stringByAppendingPathComponent:@"annotations"],path, nil];
+    }
+    return _paths;
+}
+
+
+- (NSArray *) items
+{
+    if(!_items){
+        NSString *path = [self.paths objectAtIndex:IMAGES];
+        NSMutableArray *files = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL] mutableCopy];
+        NSMutableArray *filesAndProperties = [NSMutableArray arrayWithCapacity:[files count]];
+        
+        for(NSString *file in files) {
+            NSString *filePath = [path stringByAppendingPathComponent:file];
+            NSDictionary *properties = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil];
+            NSDate *modDate = (NSDate *)[properties objectForKey:NSFileModificationDate];
+            [filesAndProperties addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                                           file, @"path",
+                                           modDate, @"lastModDate",nil]];
+            
+        }
+        
+        // sort using a block
+        // order inverted as we want latest date first
+        NSArray *sortedFiles = [filesAndProperties sortedArrayUsingComparator:^(id path1, id path2){
+            
+            // compare
+            NSComparisonResult comp = [[path1 objectForKey:@"lastModDate"] compare:
+                                       [path2 objectForKey:@"lastModDate"]];
+            // invert ordering
+            return comp == NSOrderedAscending ? NSOrderedDescending : NSOrderedAscending;
+        }];
+        
+        [files removeAllObjects];
+        for(NSDictionary *sortFile in sortedFiles)
+            [files addObject:(NSString *)[sortFile objectForKey:@"path"]];
+        
+        _items = [NSArray arrayWithArray:files];
+        
+    }
+    return _items;
+}
+
+-(NSMutableDictionary *) labelsDictioanary
+{
+    if(!_labelsDictionary){
+     
+        _labelsDictionary = [[NSMutableDictionary alloc] init];
+        for(NSString *filename in self.items){
+            
+            //get the boxes
+            NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
+            NSArray *boxes = [[NSArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
+            
+            for(Box *box in boxes){
+                NSMutableArray *currentFilenames = (NSMutableArray *)[_labelsDictionary objectForKey:box.label];
+                if(!currentFilenames) currentFilenames = [[NSMutableArray alloc] init];
+                [currentFilenames addObject:filename];
+                [_labelsDictionary setObject:currentFilenames forKey:box.label];
+            }
+        }
+    }
+    
+    return _labelsDictionary;
+}
 
 
 
-#pragma mark -
-#pragma mark lifecycle
+#pragma mark
+#pragma mark - lifecycle
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -77,12 +129,11 @@
     if (self) {
         
         //objects initialization
-        self.items = [[NSArray alloc] init];
         self.selectedItems = [[NSMutableArray alloc]init];
         self.selectedItemsSend = [[NSMutableArray alloc]init];
         self.selectedItemsDelete = [[NSMutableArray alloc]init];
-        self.username = [[NSString alloc] init];
-        serverConnection = [[ServerConnection alloc] init];
+        self.serverConnection = [[ServerConnection alloc] init];
+        
         
         //tab bar
         self.tabBarItem= [[UITabBarItem alloc]initWithTitle:@"Label" image:nil tag:0];
@@ -93,7 +144,7 @@
         self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStyleBordered target:self action:@selector(deleteAction:)];
         self.editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(editAction:)];
         
-        serverConnection.delegate = self;
+        self.serverConnection.delegate = self;
         self.modalTVC = [[ModalTVC alloc] initWithNibName:@"ModalTVC" bundle:nil];
         self.cameraVC = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
         self.cameraVC.delegate = self;
@@ -110,10 +161,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+    NSLog(@"viwedidload");
     self.usernameLabel.text = self.username;
     [self.usernameLabel setTextColor:[UIColor colorWithRed:51/255.0f green:51/255.0f blue:51/255.0f alpha:1.0]];
-    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
     photosWithErrors = 0;
 
     
@@ -125,7 +175,7 @@
     UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"];
     
     //profile picture
-    self.profilePicture = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, view1.frame.size.width, view1.frame.size.height)];
+    self.profilePicture = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.view1.frame.size.width, self.view1.frame.size.height)];
     self.profilePicture.layer.masksToBounds = YES;
     self.profilePicture.layer.cornerRadius = 6.0;
     [self.profilePicture setContentMode:UIViewContentModeScaleAspectFit];
@@ -178,40 +228,40 @@
     self.tableViewGrid.tableFooterView = [self footerViewCreationAtHeight:0];
     
     //no images view
-    noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
-    [noImages setBackgroundColor:[UIColor whiteColor]];
-    noImages.layer.masksToBounds = YES;
-    noImages.layer.cornerRadius = 10.0;
-    noImages.layer.shadowColor = [UIColor grayColor].CGColor;
-    noImages.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
-    noImages.shadowColor = [UIColor grayColor];
-    [noImages setNumberOfLines:2];
-    noImages.shadowOffset = CGSizeMake(0.0, 1.0);
-    noImages.text = @"You do not have images, \nstart taking pics and labeling or download from web!";
-    [noImages setTextAlignment:NSTextAlignmentCenter];
-    [noImages addSubview:[self footerViewCreationAtHeight:190]];
-    [noImages setUserInteractionEnabled:YES];
+    self.noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
+    [self.noImages setBackgroundColor:[UIColor whiteColor]];
+    self.noImages.layer.masksToBounds = YES;
+    self.noImages.layer.cornerRadius = 10.0;
+    self.noImages.layer.shadowColor = [UIColor grayColor].CGColor;
+    self.noImages.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
+    self.noImages.shadowColor = [UIColor grayColor];
+    [self.noImages setNumberOfLines:2];
+    self.noImages.shadowOffset = CGSizeMake(0.0, 1.0);
+    self.noImages.text = @"You do not have images, \nstart taking pics and labeling or download from web!";
+    [self.noImages setTextAlignment:NSTextAlignmentCenter];
+    [self.noImages addSubview:[self footerViewCreationAtHeight:190]];
+    [self.noImages setUserInteractionEnabled:YES];
     
     //sending view
-    sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
-    [sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-    [sendingView setHidden:YES];
-    sendingView.delegate = self;
-    sendingView.label.text = @"Uploading image to server";
+    self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
+    [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+    [self.sendingView setHidden:YES];
+    self.sendingView.delegate = self;
+    self.sendingView.label.text = @"Uploading image to server";
 
     
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.tableViewGrid];
-    [self.view addSubview:noImages];
-    [self.view addSubview:sendingView];
+    [self.view addSubview:self.noImages];
+    [self.view addSubview:self.sendingView];
 
-    [view1.layer setShadowColor:[UIColor blackColor].CGColor];
-    [view1.layer setShadowOffset:CGSizeMake(0, 1)];
-    [view1.layer setShadowOpacity:0.9];
-    [view1.layer setShadowRadius:3.0];
-    [view1.layer setCornerRadius:6.0];
-    [view1 addSubview:self.profilePicture];
-    [view1 setClipsToBounds:NO];
+    [self.view1.layer setShadowColor:[UIColor blackColor].CGColor];
+    [self.view1.layer setShadowOffset:CGSizeMake(0, 1)];
+    [self.view1.layer setShadowOpacity:0.9];
+    [self.view1.layer setShadowRadius:3.0];
+    [self.view1.layer setCornerRadius:6.0];
+    [self.view1 addSubview:self.profilePicture];
+    [self.view1 setClipsToBounds:NO];
     
 
     
@@ -256,16 +306,15 @@
 
 -(void) reloadGallery
 {
-    
     //get sorted files by date of modification of the image
-    self.items = [self getOrderedListOfFilesForPath:[self.paths objectAtIndex:IMAGES]];
+    self.items = nil; //reload
     
     if(self.items.count == 0) {
-        noImages.hidden = NO;
+        self.noImages.hidden = NO;
         self.tableView.hidden = YES;
         self.tableViewGrid.hidden = YES;
     }
-    else noImages.hidden = YES;
+    else self.noImages.hidden = YES;
     
     [self.tableViewGrid setRowHeight:(0.225*self.view.frame.size.width*ceil((float)self.items.count/4) + 0.0375*self.view.frame.size.width)];
     [self.tableView reloadData];
@@ -302,48 +351,7 @@
 }
 
 
-- (UIImage *) addBorderTo:(UIImage *)image
-{
-    CGImageRef bgimage = [image CGImage];
-	float width = CGImageGetWidth(bgimage);
-	float height = CGImageGetHeight(bgimage);
-    // Create a temporary texture data buffer
-	void *data = malloc(width * height * 4);
-    
-	// Draw image to buffer
-	CGContextRef ctx = CGBitmapContextCreate(data,
-                                             width,
-                                             height,
-                                             8,
-                                             width * 4,
-                                             CGImageGetColorSpace(image.CGImage),
-                                             kCGImageAlphaPremultipliedLast);
-	CGContextDrawImage(ctx, CGRectMake(0, 0, (CGFloat)width, (CGFloat)height), bgimage);
-	//Set the stroke (pen) color
-	CGContextSetStrokeColorWithColor(ctx, [UIColor colorWithRed:(160/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0].CGColor);
-    
-	//Set the width of the pen mark
-	CGFloat borderWidth = (float)self.view.frame.size.width*0.4125*0.075;
-	CGContextSetLineWidth(ctx, borderWidth);
-    
-	//Start at 0,0 and draw a square
-    CGContextMoveToPoint(ctx, borderWidth/2, borderWidth/2);
-	CGContextAddLineToPoint(ctx, self.view.frame.size.width*0.4125-borderWidth/2, borderWidth/2);
-	CGContextAddLineToPoint(ctx, self.view.frame.size.width*0.4125-borderWidth/2, self.view.frame.size.width*0.4125-borderWidth/2);
-	CGContextAddLineToPoint(ctx, borderWidth/2,self.view.frame.size.width*0.4125-borderWidth/2);
-	CGContextAddLineToPoint(ctx, borderWidth/2, 0);
-	//Draw it
-	CGContextStrokePath(ctx);
-    
-    // write it to a new image
-	CGImageRef cgimage = CGBitmapContextCreateImage(ctx);
-	UIImage *newImage = [UIImage imageWithCGImage:cgimage];
-	CFRelease(cgimage);
-	CGContextRelease(ctx);
-    free(data);
-    
-	return newImage;
-}
+
 
 
 #pragma mark -
@@ -438,18 +446,22 @@
 
 -(void)imageDidSelectedWithIndex:(int)selectedImage
 {
-    NSString *path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.items objectAtIndex:selectedImage]];
-    NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];    
     
-    NSLog(@"image: %@",[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:IMAGES],[self.items objectAtIndex:selectedImage]]);
-    UIImage *img = [[UIImage alloc]initWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:IMAGES],[self.items objectAtIndex:selectedImage]]];
-    NSLog(@"size: %f x %f",img.size.width,img.size.height);
-    NSString *user = [[NSString alloc] initWithString:self.username];
-    NSString *filename = [[NSString alloc] initWithString:[self.items objectAtIndex:selectedImage]];
-    [self.tagViewController setImage:img];
-    [self.tagViewController setUsername:user];
+    NSString *filename = (NSString *)[self.items objectAtIndex:selectedImage];
+    
+    //boxes
+    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
+    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
+    
+    //image
+    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
+    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
+    
+    //load tagVC
+    [self.tagViewController setImage:image];
+    [self.tagViewController setUsername:self.username];
     [self.tagViewController.annotationView reset];
-    [self.tagViewController.annotationView.objects setArray:objects];
+    [self.tagViewController.annotationView.objects setArray:boxes];
     [self.tagViewController setFilename:filename];
     self.tagViewController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.tagViewController animated:YES];
@@ -459,9 +471,9 @@
 
 -(IBAction)listSendAction:(id)sender
 {
-    sendingView.total = self.selectedItemsSend.count;
-    [sendingView setHidden:NO];
-    [sendingView.activityIndicator startAnimating];
+    self.sendingView.total = self.selectedItemsSend.count;
+    [self.sendingView setHidden:NO];
+    [self.sendingView.activityIndicator startAnimating];
     
     [self.tabBarController.tabBar setUserInteractionEnabled:NO];
     photosWithErrors = 0;
@@ -490,13 +502,13 @@
 {
     [self.selectedItemsSend addObjectsFromArray:self.selectedItems];
     
-    [sendingView.activityIndicator startAnimating];
-    [sendingView setHidden:NO];
+    [self.sendingView.activityIndicator startAnimating];
+    [self.sendingView setHidden:NO];
     
     [self.tabBarController.tabBar setUserInteractionEnabled:NO];
 
     [self.editButton setEnabled:NO];
-    [sendingView setTotal:self.selectedItemsSend.count];
+    [self.sendingView setTotal:self.selectedItemsSend.count];
     photosWithErrors = 0;
     [self sendPhoto];
     [self.selectedItems removeAllObjects];
@@ -524,7 +536,7 @@
 
 -(IBAction)cancelAction:(id)sender
 {
-    [serverConnection cancelRequestFor:0];
+    [self.serverConnection cancelRequestFor:0];
 
     [self.selectedItemsSend removeAllObjects];
     [self.usernameLabel setHidden:NO];
@@ -773,10 +785,10 @@
     
     // Photo is not in the server
     if (num.intValue <0)
-        [serverConnection sendPhoto:image filename:[self.selectedItemsSend objectAtIndex:0] path:[self.paths objectAtIndex:OBJECTS] withSize:point andAnnotation:annotation];
+        [self.serverConnection sendPhoto:image filename:[self.selectedItemsSend objectAtIndex:0] path:[self.paths objectAtIndex:OBJECTS] withSize:point andAnnotation:annotation];
     
     // Photo is in the server, overwrite the annotation
-    else [serverConnection updateAnnotationFrom:[self.selectedItemsSend objectAtIndex:0] withSize:point :annotation];
+    else [self.serverConnection updateAnnotationFrom:[self.selectedItemsSend objectAtIndex:0] withSize:point :annotation];
     
 }
 
@@ -843,8 +855,8 @@
     [dict setObject:newdictnum forKey:filename];
     [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
     if (self.selectedItemsSend.count > 0) {
-        [sendingView.progressView setProgress:0];
-        [sendingView incrementNum];
+        [self.sendingView.progressView setProgress:0];
+        [self.sendingView incrementNum];
         [self sendPhoto];
     }
     else{
@@ -857,12 +869,12 @@
             }
 
         }
-        [sendingView reset];
-        [sendingView setHidden:YES];
+        [self.sendingView reset];
+        [self.sendingView setHidden:YES];
         [self.tabBarController.tabBar setUserInteractionEnabled:YES];
 
         [self.editButton setEnabled:YES];
-        [sendingView.activityIndicator stopAnimating];
+        [self.sendingView.activityIndicator stopAnimating];
 
     }
     [self reloadGallery];
@@ -871,7 +883,7 @@
 
 -(void)sendingProgress:(float)prog
 {
-    [sendingView.progressView setProgress:prog];
+    [self.sendingView.progressView setProgress:prog];
 }
 
 
@@ -880,8 +892,8 @@
     photosWithErrors++;
     [self.selectedItemsSend removeObjectAtIndex:0];
     if (self.selectedItemsSend.count > 0) {
-        [sendingView.progressView setProgress:0];
-        [sendingView incrementNum];
+        [self.sendingView.progressView setProgress:0];
+        [self.sendingView incrementNum];
         [self sendPhoto];
     }
     else if (photosWithErrors > 0 ){
@@ -891,9 +903,9 @@
         else{
             [self errorWithTitle:[NSString stringWithFormat:@"%d images could not be sent.",photosWithErrors] andDescription:@"Please, try again."];
         }
-        [sendingView reset];
-        [sendingView setHidden:YES];
-        [sendingView.activityIndicator stopAnimating];
+        [self.sendingView reset];
+        [self.sendingView setHidden:YES];
+        [self.sendingView.activityIndicator stopAnimating];
         
         [self.tabBarController.tabBar setUserInteractionEnabled:YES];
         [self.editButton setEnabled:YES];
@@ -921,12 +933,12 @@
     else{
         [self.usernameLabel setHidden:NO];
 
-        [sendingView reset];
-        [sendingView setHidden:YES];
+        [self.sendingView reset];
+        [self.sendingView setHidden:YES];
         [self.tabBarController.tabBar setUserInteractionEnabled:YES];
 
         [self.editButton setEnabled:YES];
-        [sendingView.activityIndicator stopAnimating];
+        [self.sendingView.activityIndicator stopAnimating];
 
     }
     [self reloadGallery];
@@ -938,6 +950,18 @@
 
 #pragma mark -
 #pragma mark TableView Delegate&Datasource
+
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
+{
+    NSArray *labels = [self.labelsDictioanary allKeys];
+    return labels.count;
+}
+
+-(NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    NSArray *labels = [self.labelsDictioanary allKeys];
+    return [labels objectAtIndex:section];
+}
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -1001,15 +1025,17 @@
 
                 [imview addSubview:imageView];
                 
+                //unselected image
                 UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width,0.45*self.view.frame.size.width));
                 [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
                 UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
                 UIGraphicsEndImageContext();
                 
+                //selected image
                 UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width));
                 imview.alpha = 0.65;
                 [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
-                UIImage *image2 = UIGraphicsGetImageFromCurrentImageContext();
+                UIImage *imageSelected = UIGraphicsGetImageFromCurrentImageContext();
                 UIGraphicsEndImageContext();
 
                 UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -1024,7 +1050,7 @@
                            action:@selector(buttonClicked:)
                  forControlEvents:UIControlEventTouchUpInside];
                 [button setImage:image forState:UIControlStateNormal];
-                [button setImage:[self addBorderTo:image2] forState:UIControlStateSelected];
+                [button setImage:[imageSelected addBorderForViewFrame:self.view.frame] forState:UIControlStateSelected];
                 
                 [cell addSubview:button];
             }
@@ -1116,15 +1142,15 @@
 #pragma mark SendingView
 -(void)cancel
 {
-    [serverConnection cancelRequestFor:0];
+    [self.serverConnection cancelRequestFor:0];
     [self.selectedItemsSend removeAllObjects];
-    [sendingView reset];
-    [sendingView.progressView setProgress:0];
-    [sendingView setHidden:YES];
+    [self.sendingView reset];
+    [self.sendingView.progressView setProgress:0];
+    [self.sendingView setHidden:YES];
     [self.tabBarController.tabBar setUserInteractionEnabled:YES];
 
     [self.editButton setEnabled:YES];
-    [sendingView.activityIndicator stopAnimating];
+    [self.sendingView.activityIndicator stopAnimating];
     
 }
 
@@ -1140,10 +1166,10 @@
 
     //sending view preparation
 //    self.navigationController.navigationBarHidden = YES;
-    sendingView.total = selectedItems.count;
-    [sendingView setHidden:NO];
-    [sendingView.activityIndicator startAnimating];
-    [sendingView.progressView setProgress:0];
+    self.sendingView.total = selectedItems.count;
+    [self.sendingView setHidden:NO];
+    [self.sendingView.activityIndicator startAnimating];
+    [self.sendingView.progressView setProgress:0];
     
     
     //get the images when the label is choosen
@@ -1158,7 +1184,7 @@
         newIndexes = [[[NSSet setWithArray:newIndexes] allObjects] mutableCopy];
         
         selectedItems = newIndexes;
-        sendingView.total = selectedItems.count;
+        self.sendingView.total = selectedItems.count;
     }
     
 
@@ -1197,19 +1223,19 @@
                 self.tagViewController.forThumbnailUpdating = YES;
                 [self.navigationController pushViewController:self.tagViewController animated:NO];
                 
-                [sendingView incrementNum];
-                [sendingView.progressView setProgress:i*1.0/selectedItems.count];
+                [self.sendingView incrementNum];
+                [self.sendingView.progressView setProgress:i*1.0/selectedItems.count];
                 i++;
             });
         }
         
         dispatch_sync(dispatch_get_main_queue(), ^{
             [self reloadGallery];
-            sendingView.hidden = YES;
+            self.sendingView.hidden = YES;
             self.navigationController.navigationBarHidden = NO;
             self.tableViewGrid.hidden = NO;
-            [sendingView.activityIndicator stopAnimating];
-            [sendingView reset];
+            [self.sendingView.activityIndicator stopAnimating];
+            [self.sendingView reset];
         });
         
     });
@@ -1224,40 +1250,6 @@
 #pragma mark
 #pragma mark -  Private Methods
 
-
-- (NSArray *) getOrderedListOfFilesForPath:(NSString *)path
-{
-    
-    NSMutableArray *files = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL] mutableCopy];
-    NSMutableArray *filesAndProperties = [NSMutableArray arrayWithCapacity:[files count]];
-    
-    for(NSString *file in files) {
-        NSString *filePath = [path stringByAppendingPathComponent:file];
-        NSDictionary *properties = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil];
-        NSDate *modDate = (NSDate *)[properties objectForKey:NSFileModificationDate];
-        [filesAndProperties addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-                                       file, @"path",
-                                       modDate, @"lastModDate",nil]];
-        
-    }
-    
-    // sort using a block
-    // order inverted as we want latest date first
-    NSArray *sortedFiles = [filesAndProperties sortedArrayUsingComparator:^(id path1, id path2){
-        
-                                // compare
-                                NSComparisonResult comp = [[path1 objectForKey:@"lastModDate"] compare:
-                                                           [path2 objectForKey:@"lastModDate"]];
-                                // invert ordering
-                                return comp == NSOrderedAscending ? NSOrderedDescending : NSOrderedAscending;
-                            }];
-    
-    [files removeAllObjects];
-    for(NSDictionary *sortFile in sortedFiles)
-        [files addObject:(NSString *)[sortFile objectForKey:@"path"]];
-    
-    return [NSArray arrayWithArray:files];
-}
 
 
 -(UIButton *) generateGetImagesButtonWithTitle:(NSString *)title atRect:(CGRect)rect
@@ -1286,7 +1278,6 @@
     
     UIButton *cameraButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     cameraButton.frame = CGRectMake(10, 10, 280, 50);
-//    [cameraButton setImage:[UIImage imageNamed:@"camera.png"] forState:UIControlStateNormal];
     cameraButton.contentMode = UIViewContentModeCenter;
     [cameraButton addTarget:self action:@selector(addImage:) forControlEvents:UIControlEventTouchUpInside];
     [cameraButton setTitle:@"Camera" forState:UIControlStateNormal];
@@ -1315,5 +1306,7 @@
     
     return footerView;
 }
+
+
 
 @end

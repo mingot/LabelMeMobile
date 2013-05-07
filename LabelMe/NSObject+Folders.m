@@ -75,9 +75,8 @@
 
 -(NSArray *) newArrayWithFolders: (NSString *)username
 {
-    
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *path = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,username ];
+    NSString *path = [documentsDirectory stringByAppendingPathComponent:username ];
 
     NSArray *paths = [NSArray arrayWithObjects:[path stringByAppendingPathComponent:@"images"],[path stringByAppendingPathComponent:@"thumbnail"],[path stringByAppendingPathComponent:@"annotations"],path, nil];
     return paths;
