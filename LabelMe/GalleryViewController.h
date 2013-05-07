@@ -12,9 +12,11 @@
 #import "ServerConnection.h"
 #import "SendingView.h"
 #import "ModalTVC.h"
+#import "ModalSectionsTVC.h"
+
 #import "CameraViewController.h"
 
-@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalTVCDelegate, CameraViewControllerDeledate>
+@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalTVCDelegate, ModalSectionsTVCDelegate, CameraViewControllerDeledate>
 {
     int selectedTableIndex;
     int photosWithErrors;
@@ -29,18 +31,22 @@
 @property (nonatomic,strong) NSArray *userPaths;
 
 //view
-@property (nonatomic, strong) IBOutlet UIView *view1;
+@property (nonatomic, strong) IBOutlet UIView *view1; //view in the place of the profile picture
+@property (nonatomic,strong) IBOutlet UILabel *usernameLabel;
 @property (nonatomic, strong) UILabel *noImages;
 @property (nonatomic, strong) SendingView *sendingView;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *editButton;
 @property (nonatomic,strong) IBOutlet UIToolbar *bottomToolbar;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *deleteButton;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *sendButton;
-@property (nonatomic,strong) IBOutlet UILabel *usernameLabel;
 @property (nonatomic,strong) IBOutlet UIImageView *profilePicture;
 @property (nonatomic,strong) IBOutlet UIButton *listButton;
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
 @property (nonatomic,strong) IBOutlet UITableView *tableViewGrid;
+@property (weak, nonatomic) IBOutlet UIButton *downloadButton;
+@property (weak, nonatomic) IBOutlet UIButton *cameraButton;
+
+
 
 //table
 @property (nonatomic,strong) NSArray *items;
@@ -52,6 +58,7 @@
 @property (nonatomic,strong) TagViewController *tagViewController;
 @property (nonatomic,strong) CameraViewController *cameraVC;
 @property (nonatomic,strong) ModalTVC *modalTVC;
+@property (nonatomic,strong) ModalSectionsTVC *modalSectionsTVC;
 
 
 -(IBAction)buttonClicked:(id)sender;
@@ -63,6 +70,7 @@
 -(IBAction)moreImagesAction:(id)sender;
 -(IBAction)imageSelectedAction:(UIButton *)button;
 -(IBAction)addImage:(id)sender;
+-(IBAction)downloadAction:(id)sender;
 
 
 @end

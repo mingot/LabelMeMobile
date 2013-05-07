@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@protocol ModalTVCDelegate <NSObject>
+@protocol ModalSectionsTVCDelegate <NSObject>
 
 //set the items the user selected
 - (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
@@ -18,20 +18,20 @@
 @end
 
 
-@interface ModalTVC : UIViewController <UITableViewDelegate,UITableViewDataSource>
+@interface ModalSectionsTVC : UIViewController <UITableViewDelegate,UITableViewDataSource>
 
 //model
-@property (strong, nonatomic) NSArray *data; //either NSStrings or UIImages
+@property (strong, nonatomic) NSDictionary *dataDictionary;//class->index
+@property (strong, nonatomic) NSArray *thumbnailImages;
 
 
-@property (strong, nonatomic) NSMutableArray *selectedItems; //indexes
-@property (strong, nonatomic) id<ModalTVCDelegate> delegate;
+@property (strong, nonatomic) NSMutableArray *selectedItems;
+@property (strong, nonatomic) id<ModalSectionsTVCDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
 @property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 //unique name to identify the modal
 @property (strong, nonatomic) NSString *modalTitle;
-@property BOOL multipleChoice;
 @property BOOL showCancelButton;
 
 

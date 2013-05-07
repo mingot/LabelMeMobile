@@ -90,7 +90,6 @@
             [files addObject:(NSString *)[sortFile objectForKey:@"path"]];
         
         _items = [NSArray arrayWithArray:files];
-        
     }
     return _items;
 }
@@ -156,6 +155,7 @@
         
         self.serverConnection.delegate = self;
         self.modalTVC = [[ModalTVC alloc] initWithNibName:@"ModalTVC" bundle:nil];
+        self.modalSectionsTVC = [[ModalSectionsTVC alloc] initWithNibName:@"ModalSectionsTVC" bundle:nil];
         self.cameraVC = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
         self.cameraVC.delegate = self;
         
@@ -418,6 +418,141 @@
 {
     self.cameraVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.cameraVC animated:YES];
+
+}
+
+- (IBAction)downloadAction:(id)sender
+{
+    
+    //start spin indicator for the activity
+    UIButton *button = (UIButton *)sender;
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] init];
+    for(id subview in [button subviews])
+        if([subview isKindOfClass:[UIActivityIndicatorView class]])
+            indicator = (UIActivityIndicatorView *)subview;
+    [indicator startAnimating];
+    
+    dispatch_queue_t q = dispatch_queue_create("q", NULL);
+    dispatch_async(q, ^{
+        NSString *buttonTitle = button.titleLabel.text;
+        
+        NSString *query = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=mingot";
+        NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *error = nil;
+        NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
+        if (error) NSLog(@"[%@ %@] JSON error: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), error.localizedDescription);
+        
+        self.downloadedThumbnails = [[NSMutableArray alloc] init];
+        self.downloadedAnnotations = [[NSMutableArray alloc] init];
+        self.downloadedImageUrls = [[NSMutableArray alloc] init];
+        self.downloadedImageNames = [[NSMutableArray alloc] init];
+        self.downloadedLabelsMap = [[NSMutableDictionary alloc] init];
+        
+        NSArray *colors = [[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
+        
+        //select NUM images not currently present in iphone
+        for (NSDictionary *element in results) {
+            
+            //get the name of the image
+            NSString *imageName = [element objectForKey:@"name"];
+            
+            if([self.items indexOfObject:imageName] == NSNotFound){
+                
+                //save the name of the image
+                [self.downloadedImageNames addObject:imageName];
+                
+                //get and save thumb
+                NSString *thumbUrl = [element objectForKey:@"thumb"];
+                UIImage *thumbImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:thumbUrl]]];
+                if(thumbImage!=nil) [self.downloadedThumbnails addObject:thumbImage];
+                else [self.downloadedThumbnails addObject:[UIImage imageNamed:@"image_not_found.png"]];
+                
+                //get and save images urls
+                NSString *imageUrl = [element objectForKey:@"image"];
+                [self.downloadedImageUrls addObject:imageUrl];
+                
+                
+                //get and save annotations
+                NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
+                NSDictionary *annotation = (NSDictionary *) [element objectForKey:@"annotation"];
+                NSDictionary *imageSize = (NSDictionary *) [annotation objectForKey:@"imagesize"];
+                
+                
+                id objects = [annotation objectForKey:@"object"];
+                NSArray *boxes;
+                if([objects isKindOfClass:[NSArray class]]) boxes = (NSArray *) objects;
+                else boxes = [[NSArray alloc] initWithObjects:(NSDictionary *)objects, nil];
+                
+                for(NSDictionary *box in boxes){
+                    
+                    //label: insert into the map to download specific images for a given label
+                    NSString *label = [(NSString *) [box objectForKey:@"name"] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                    NSMutableArray *imageIndexes = [self.downloadedLabelsMap objectForKey:label];
+                    if(imageIndexes==nil){
+                        imageIndexes = [[NSMutableArray alloc] initWithObjects:[NSNumber numberWithInt:self.downloadedImageNames.count-1], nil];
+                        [self.downloadedLabelsMap setObject:imageIndexes forKey:label];
+                        
+                    }else [imageIndexes addObject:[NSNumber numberWithInt:self.downloadedImageNames.count-1]];
+                    
+                    
+                    NSDictionary *polygon = (NSDictionary *)[box objectForKey:@"polygon"];
+                    NSArray *points = (NSArray *)[polygon objectForKey:@"pt"];
+                    
+                    CGFloat xmin=100000, xmax=0, ymin=100000, ymax=0;
+                    for(NSDictionary *point in points){
+                        int x = [[(NSString *)[point objectForKey:@"x"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] floatValue];
+                        int y = [[(NSString *)[point objectForKey:@"y"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] floatValue];
+                        xmin = x<xmin ? x:xmin;
+                        xmax = x>xmax ? x:xmax;
+                        ymin = y<ymin ? y:ymin;
+                        ymax = y>ymax ? y:ymax;
+                    }
+                    
+                    //box construction
+                    Box *box = [[Box alloc] initWithPoints:CGPointMake(xmin*1.0, ymin*1.0) :CGPointMake(xmax*1.0, ymax*1.0)];
+                    box.label = label;
+                    box.sent = YES;
+                    box.color = [colors objectAtIndex:arc4random() % colors.count];  //choose random color
+                    box->UPPERBOUND = 0;
+                    box->LOWERBOUND = [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
+                    box->LEFTBOUND = 0;
+                    box->RIGHTBOUND = [[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
+                    box.downloadDate = [NSDate date];
+                    
+                    [boundingBoxes addObject:box];
+                    
+                }
+                
+                //save the dictionary
+                [self.downloadedAnnotations addObject:boundingBoxes];
+            }
+        }
+        
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [indicator stopAnimating];
+            
+            //present the modal depending on the sender button: show images or labels
+            if(self.downloadedThumbnails.count>0){
+
+                self.modalSectionsTVC = [[ModalSectionsTVC alloc] init];
+                self.modalSectionsTVC.showCancelButton = YES;
+                self.modalSectionsTVC.delegate = self;
+                self.modalSectionsTVC.modalTitle = @"Choose Images";
+                self.modalSectionsTVC.thumbnailImages = self.downloadedThumbnails;
+                self.modalSectionsTVC.dataDictionary = self.downloadedLabelsMap;
+                [self presentModalViewController:self.modalSectionsTVC animated:YES];
+                    
+            }else{
+                UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
+                                                                     message:@"You have all the images"
+                                                                    delegate:nil
+                                                           cancelButtonTitle:@"OK"
+                                                           otherButtonTitles:nil];
+                [errorAlert show];
+            }
+        });
+        
+    });
 
 }
 
@@ -1330,4 +1465,9 @@
 
 
 
+- (void)viewDidUnload {
+    [self setDownloadButton:nil];
+    [self setCameraButton:nil];
+    [super viewDidUnload];
+}
 @end

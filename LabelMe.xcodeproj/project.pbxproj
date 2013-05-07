@@ -186,6 +186,9 @@
 		FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */; };
 		FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC610AF3170A36D800851AC2 /* CoreImage.framework */; };
 		FC8E89B1173930340018876D /* UIImage+Border.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B0173930340018876D /* UIImage+Border.m */; };
+		FC8E89B3173983640018876D /* download.png in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B2173983640018876D /* download.png */; };
+		FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B51739876D0018876D /* ModalSectionsTVC.m */; };
+		FC8E89B81739876D0018876D /* ModalSectionsTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */; };
 		FC92DD8117316C2D004F8189 /* undo.png in Resources */ = {isa = PBXBuildFile; fileRef = FC92DD8017316C2D004F8189 /* undo.png */; };
 		FC92DD8E1732F138004F8189 /* LogVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC92DD8C1732F138004F8189 /* LogVC.m */; };
 		FC92DD8F1732F138004F8189 /* LogVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC92DD8D1732F138004F8189 /* LogVC.xib */; };
@@ -430,6 +433,10 @@
 		FC610AF3170A36D800851AC2 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		FC8E89AF173930340018876D /* UIImage+Border.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Border.h"; sourceTree = "<group>"; };
 		FC8E89B0173930340018876D /* UIImage+Border.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Border.m"; sourceTree = "<group>"; };
+		FC8E89B2173983640018876D /* download.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = download.png; sourceTree = "<group>"; };
+		FC8E89B41739876D0018876D /* ModalSectionsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSectionsTVC.h; sourceTree = "<group>"; };
+		FC8E89B51739876D0018876D /* ModalSectionsTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSectionsTVC.m; sourceTree = "<group>"; };
+		FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ModalSectionsTVC.xib; sourceTree = "<group>"; };
 		FC92DD8017316C2D004F8189 /* undo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = undo.png; sourceTree = "<group>"; };
 		FC92DD8B1732F138004F8189 /* LogVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogVC.h; sourceTree = "<group>"; };
 		FC92DD8C1732F138004F8189 /* LogVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogVC.m; sourceTree = "<group>"; };
@@ -760,6 +767,7 @@
 		FC4B0A2D172F352D00A099A0 /* news */ = {
 			isa = PBXGroup;
 			children = (
+				FC8E89B2173983640018876D /* download.png */,
 				FC92DD9017343A32004F8189 /* camera2.png */,
 				FC92DD8017316C2D004F8189 /* undo.png */,
 				FC4B0A2E172F358600A099A0 /* train.png */,
@@ -790,6 +798,8 @@
 				FCED898117037A5F0027CBE1 /* ShowImageViewController.m */,
 				FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */,
 				FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */,
+				FC8E89B41739876D0018876D /* ModalSectionsTVC.h */,
+				FC8E89B51739876D0018876D /* ModalSectionsTVC.m */,
 				FCED895B17034CAF0027CBE1 /* DetectView.h */,
 				FCED895C17034CAF0027CBE1 /* DetectView.m */,
 				FCED896117034CD70027CBE1 /* ConvolutionHelper.h */,
@@ -842,6 +852,7 @@
 				FCED897D170375050027CBE1 /* ShowTrainingSetViewController.xib */,
 				FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */,
 				FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */,
+				FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */,
 				FC4EE0F517231A1700536B4A /* CameraViewController.xib */,
 			);
 			name = Detector;
@@ -1043,6 +1054,8 @@
 				FC92DD8117316C2D004F8189 /* undo.png in Resources */,
 				FC92DD8F1732F138004F8189 /* LogVC.xib in Resources */,
 				FC92DD9117343A32004F8189 /* camera2.png in Resources */,
+				FC8E89B3173983640018876D /* download.png in Resources */,
+				FC8E89B81739876D0018876D /* ModalSectionsTVC.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1093,6 +1106,7 @@
 				FC4EE0F617231A1700536B4A /* CameraViewController.m in Sources */,
 				FC92DD8E1732F138004F8189 /* LogVC.m in Sources */,
 				FC8E89B1173930340018876D /* UIImage+Border.m in Sources */,
+				FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
