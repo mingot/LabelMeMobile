@@ -12,8 +12,8 @@
 
 @interface ModalSectionsTVC()
 
-@property (nonatomic, strong) NSArray *labelsOrdered;
-@property (nonatomic, strong) NSMutableDictionary *buttonsDictionary;
+@property (nonatomic, strong) NSArray *labelsOrdered; //ordered labels names
+@property (nonatomic, strong) NSMutableDictionary *buttonsDictionary; //buttons stored to select all images when section name tapped
 
 - (void) toggleDoneButton;
 
@@ -35,7 +35,52 @@
 
 - (NSMutableDictionary *) buttonsDictionary
 {
-    if(!_buttonsDictionary) _buttonsDictionary = [[NSMutableDictionary alloc] init];
+    if(!_buttonsDictionary){
+        
+        _buttonsDictionary = [[NSMutableDictionary alloc] init];
+        for (NSString *label in self.labelsOrdered){
+            NSArray *indexes = [self.dataDictionary objectForKey:label];
+            NSMutableArray *buttons = [[NSMutableArray alloc] init];
+            for(int i=0; i<indexes.count; i++){
+                UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+                button.tag = [[indexes objectAtIndex:i] intValue];
+                
+                //button views generation
+                UIView *imview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width)];
+                UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0.0375*self.view.frame.size.width,0.4125*self.view.frame.size.width, 0.4125*self.view.frame.size.width)];
+                imageView.image = [self.thumbnailImages objectAtIndex:[[indexes objectAtIndex:i] intValue]];
+                [imview addSubview:imageView];
+                
+                //unselected image
+                UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width,0.45*self.view.frame.size.width));
+                [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
+                UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+                
+                //selected image
+                UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width));
+                imview.alpha = 0.65;
+                [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
+                UIImage *imageSelected = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+            
+                if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+                    button.frame = CGRectMake(0.05*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.225*self.view.frame.size.width, 0.225*self.view.frame.size.width);
+                
+                else button.frame = CGRectMake(0.07*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.2*self.view.frame.size.width, 0.2*self.view.frame.size.width);
+                
+                [button addTarget:self
+                           action:@selector(imageSelectedAction:)
+                 forControlEvents:UIControlEventTouchUpInside];
+                [button setImage:image forState:UIControlStateNormal];
+                [button setImage:[imageSelected addBorderForViewFrame:self.view.frame] forState:UIControlStateSelected];
+                
+                
+                [buttons addObject:button];
+            }
+            [_buttonsDictionary setObject:buttons forKey:label];
+        }
+    }
     return _buttonsDictionary;
 }
 
@@ -45,6 +90,9 @@
     if(!_selectedItems) _selectedItems = [[NSMutableArray alloc] init];
     return _selectedItems;
 }
+
+#pragma mark
+#pragma mark - view lifecycle
 
 - (void)viewDidLoad
 {
@@ -58,16 +106,6 @@
     self.cancelButton.hidden = !self.showCancelButton;
 }
 
-
--(IBAction)selectAllAction:(id)sender
-{
-    UIButton *senderButton = (UIButton *)sender;
-    NSString *label = [self.labelsOrdered objectAtIndex:senderButton.tag];
-    NSArray *buttons = [self.buttonsDictionary objectForKey:label];
-    
-    for(UIButton *button in buttons)
-        [self imageSelectedAction:button];
-}
 
 
 #pragma mark
@@ -83,7 +121,6 @@
     selectAll.tag = section;
     [selectAll addTarget:self action:@selector(selectAllAction:) forControlEvents:UIControlEventTouchUpInside];
     [headerView addSubview:selectAll];
-    
     
     return headerView;
 }
@@ -117,64 +154,15 @@
 {
 
     UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-    //select images for section
-    NSArray *items = [self.dataDictionary objectForKey:[self.labelsOrdered objectAtIndex:indexPath.section]];
-    NSMutableArray *buttons = [[NSMutableArray alloc] init];
-    
-    for(int i = 0; i < items.count; i++) {
-        @autoreleasepool {
-            
-            UIView *imview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width)];
-            UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0.0375*self.view.frame.size.width,0.4125*self.view.frame.size.width, 0.4125*self.view.frame.size.width)];
-            imageView.image = [self.thumbnailImages objectAtIndex:[[items objectAtIndex:i] intValue]];
-            [imview addSubview:imageView];
-            
-            //unselected image
-            UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width,0.45*self.view.frame.size.width));
-            [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
-            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-            
-            //selected image
-            UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width));
-            imview.alpha = 0.65;
-            [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
-            UIImage *imageSelected = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-            
-            NSUInteger index = [[items objectAtIndex:i] intValue];
-            UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-            button.tag = index;
-            
-            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-                button.frame = CGRectMake(0.05*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.225*self.view.frame.size.width, 0.225*self.view.frame.size.width);
-            
-            else button.frame = CGRectMake(0.07*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.2*self.view.frame.size.width, 0.2*self.view.frame.size.width);
-            
-            //if the cell is a selected item
-            if ([self.selectedItems indexOfObject:[NSNumber numberWithInt:i]] == NSNotFound)
-                button.selected = NO;
-            else button.selected = YES;
-            
-            [button addTarget:self
-                       action:@selector(imageSelectedAction:)
-             forControlEvents:UIControlEventTouchUpInside];
-            [button setImage:image forState:UIControlStateNormal];
-            [button setImage:[imageSelected addBorderForViewFrame:self.view.frame] forState:UIControlStateSelected];
-            
-            [cell addSubview:button];
-            [buttons addObject:button];
-        }
-    }
-    
-    //save button dictionary
     NSString *label = [self.labelsOrdered objectAtIndex:indexPath.section];
-    [self.buttonsDictionary setObject:buttons forKey:label];
+    NSMutableArray *buttons = [self.buttonsDictionary objectForKey:label];
+    
+    for(UIButton *button in buttons)
+        [cell addSubview:button];
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
     return cell;
-    
 }
 
 
@@ -189,6 +177,12 @@
     [self dismissModalViewControllerAnimated:YES];
 }
 
+
+- (IBAction)cancelAction:(id)sender {
+    [self dismissModalViewControllerAnimated:YES];
+    [self.delegate selectionCancelled];
+}
+
 - (IBAction)imageSelectedAction:(UIButton *)button
 {
     if(button.selected) [self.selectedItems removeObject:[NSNumber numberWithInt:button.tag]];
@@ -199,9 +193,15 @@
     [self toggleDoneButton];
 }
 
-- (IBAction)cancelAction:(id)sender {
-    [self dismissModalViewControllerAnimated:YES];
-    [self.delegate selectionCancelled];
+
+-(IBAction)selectAllAction:(id)sender
+{
+    UIButton *senderButton = (UIButton *)sender;
+    NSString *label = [self.labelsOrdered objectAtIndex:senderButton.tag];
+    NSArray *buttons = [self.buttonsDictionary objectForKey:label];
+    
+    for(UIButton *button in buttons)
+        [self imageSelectedAction:button];
 }
 
 #pragma mark

@@ -12,7 +12,6 @@
 
 //set the items the user selected
 - (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
-
 - (void) selectionCancelled;
 
 @end
@@ -21,12 +20,12 @@
 @interface ModalSectionsTVC : UIViewController <UITableViewDelegate,UITableViewDataSource>
 
 //model
-@property (strong, nonatomic) NSDictionary *dataDictionary;//class->index
+@property (strong, nonatomic) NSDictionary *dataDictionary;//class->index (on thumbnailImages)
 @property (strong, nonatomic) NSArray *thumbnailImages;
-
 
 @property (strong, nonatomic) NSMutableArray *selectedItems;
 @property (strong, nonatomic) id<ModalSectionsTVCDelegate> delegate;
+
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
 @property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -38,6 +37,7 @@
 - (IBAction)doneAction:(id)sender;
 - (IBAction)cancelAction:(id)sender;
 - (IBAction)imageSelectedAction:(UIButton *)button;
-
+//click the section name to select all the images of the section
+- (IBAction)selectAllAction:(id)sender;
 
 @end
