@@ -120,10 +120,8 @@
     //load views
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
-    self.logVC = [[LogVC alloc] initWithNibName:@"LogVC" bundle:nil];
     
     //set labels
-    self.targetClassLabel.text = self.svmClassifier.targetClass;
     self.nameTextField.text = self.svmClassifier.name;
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
     
@@ -187,7 +185,8 @@
     //EDIT: set buttons
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.nameTextField.enabled = NO;
-
+    self.nameTextField.hidden = YES;
+    self.nameTextField.text = self.svmClassifier.name;
     
     //sending view, responsible for the waiting view
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
@@ -289,11 +288,26 @@
 
 - (IBAction)undoAction:(id)sender
 {
-    self.svmClassifier = self.previousSvmClassifier;
-    self.undoButtonBar.enabled = NO;
-    [self saveAction:self];
-    [self loadDetectorInfo];
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Warning"
+                                                    message:@"Are you sure you want to undo the training?"
+                                                   delegate:self
+                                          cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ok", nil];
+    [alert show];
+}
 
+#pragma mark
+#pragma mark - UIAlertViewDelegate
+
+-(void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    if ([title isEqualToString:@"Ok"]) {
+        self.svmClassifier = self.previousSvmClassifier;
+        self.undoButtonBar.enabled = NO;
+        [self saveAction:self];
+        [self loadDetectorInfo];
+    }
 }
 
 #pragma mark
@@ -304,16 +318,21 @@
     [super setEditing:flag animated:animated];
     if (flag == YES){
         // Change views to edit mode.
-        NSLog(@"Now editing!");
         self.nameTextField.enabled = YES;
-        
+        self.nameTextField.hidden = NO;
+        self.descriptionLabel.text = @"Name:";
+
     }else {
-        // Save the changes if needed and change the views to noneditable.
-        NSLog(@"End editing");
+        self.nameTextField.enabled = NO;
+        self.nameTextField.hidden = YES,
+        
         self.svmClassifier.name = self.nameTextField.text;
         self.title = self.nameTextField.text;
         self.nameTextField.enabled = YES;
+        [self.delegate updateDetector:self.svmClassifier]; //update name in the detector tableview
         [self.view endEditing:YES];
+        
+        [self loadDetectorInfo];
     }
 }
 
@@ -352,7 +371,6 @@
     if([identifier isEqualToString:@"Select Class"]){
         NSNumber *sel = [selectedItems objectAtIndex:0];
         self.svmClassifier.targetClass = [self.availableObjectClasses objectAtIndex:sel.intValue];
-        self.targetClassLabel.text = self.svmClassifier.targetClass;
         self.svmClassifier.name = [NSString stringWithFormat:@"%@%@",self.svmClassifier.targetClass, [self uuid]];
         self.nameTextField.text = self.svmClassifier.name;
         
@@ -375,7 +393,6 @@
         
         //SENDING VIEW initialization
         [self.sendingView.progressView setProgress:0 animated:YES];
-        [self.logVC.progressView setProgress:0 animated:YES];
         self.sendingView.hidden = NO;
         self.navigationController.navigationBarHidden = YES;
         [self.sendingView.activityIndicator startAnimating];
@@ -410,13 +427,6 @@
     if(self.firstTraingState != NOT_FIRST) self.firstTraingState = INTERRUPTED;
 }
 
-#pragma mark
-#pragma mark - LogVC delegate
-
-- (void) cancelLogVC
-{
-    NSLog(@"Modal cancelled");
-}
 
 #pragma mark
 #pragma mark - Memory Management
@@ -617,4 +627,8 @@
 }
 
 
+- (void)viewDidUnload {
+    [self setNameTextField:nil];
+    [super viewDidUnload];
+}
 @end

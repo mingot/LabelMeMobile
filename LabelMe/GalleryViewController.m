@@ -293,9 +293,7 @@
     [self.tableViewGrid setBackgroundView:nil];
     self.tableViewGrid.tag = 0;
     
-    //create a footer view on the bottom of the tableview
-    self.tableView.tableFooterView = [self footerViewCreationAtHeight:0];
-    self.tableViewGrid.tableFooterView = [self footerViewCreationAtHeight:0];
+
     
     //no images view
     self.noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
@@ -309,7 +307,6 @@
     self.noImages.shadowOffset = CGSizeMake(0.0, 1.0);
     self.noImages.text = @"You do not have images, \nstart taking pics and labeling or download from web!";
     [self.noImages setTextAlignment:NSTextAlignmentCenter];
-    [self.noImages addSubview:[self footerViewCreationAtHeight:190]];
     [self.noImages setUserInteractionEnabled:YES];
     
     //sending view
@@ -763,7 +760,7 @@
     dispatch_async(q, ^{
         NSString *buttonTitle = button.titleLabel.text;
 
-        NSString *query = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=mingot";
+        NSString *query = [NSString stringWithFormat:@"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=%@",self.username];
         NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
         NSError *error = nil;
         NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
@@ -1317,9 +1314,8 @@
 
 
 
-
-#pragma mark -
-#pragma mark SendingView
+#pragma mark
+#pragma mark - SendingView
 -(void)cancel
 {
     [self.serverConnection cancelRequestFor:0];
@@ -1447,42 +1443,6 @@
     [btnDeco setTitle:title forState:UIControlStateNormal];
     
     return btnDeco;
-}
-
-
-- (UIView *) footerViewCreationAtHeight:(int)height
-{
-    UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(0, height, self.view.frame.size.width, 110)];
-    
-    UIButton *cameraButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    cameraButton.frame = CGRectMake(10, 10, 280, 50);
-    cameraButton.contentMode = UIViewContentModeCenter;
-    [cameraButton addTarget:self action:@selector(addImage:) forControlEvents:UIControlEventTouchUpInside];
-    [cameraButton setTitle:@"Camera" forState:UIControlStateNormal];
-    
-    UIButton *imagesButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    imagesButton.frame = CGRectMake(10, cameraButton.frame.origin.y + cameraButton.frame.size.height +5, 130, 40);
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    indicator.center = CGPointMake(imagesButton.bounds.size.width - imagesButton.bounds.size.height / 2 , imagesButton.bounds.size.height / 2);
-    [imagesButton addSubview: indicator];
-    imagesButton.backgroundColor = [UIColor clearColor];
-    [imagesButton addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
-    [imagesButton setTitle:@"Server Images" forState:UIControlStateNormal];
-    
-    UIButton *labelsButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    labelsButton.frame = CGRectMake(160, cameraButton.frame.origin.y + cameraButton.frame.size.height+5, 130, 40);
-    UIActivityIndicatorView *indicator2 = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    indicator2.center = CGPointMake(labelsButton.bounds.size.width - labelsButton.bounds.size.height / 2 , labelsButton.bounds.size.height / 2);
-    [labelsButton addSubview: indicator2];
-    labelsButton.backgroundColor = [UIColor clearColor];
-    [labelsButton addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
-    [labelsButton setTitle:@"Server Labels" forState:UIControlStateNormal];
-    
-    [footerView addSubview:cameraButton];
-    [footerView addSubview:imagesButton];
-    [footerView addSubview:labelsButton];
-    
-    return footerView;
 }
 
 

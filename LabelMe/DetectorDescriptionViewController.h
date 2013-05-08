@@ -10,7 +10,6 @@
 #import "TrainDetectorViewController.h"
 #import "ExecuteDetectorViewController.h"
 #import "ShowTrainingSetViewController.h"
-#import "LogVC.h"
 #import "ModalTVC.h"
 #import "SendingView.h"
 #import "Classifier.h"
@@ -23,21 +22,19 @@
 
 
 
-@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate,ModalTVCDelegate, LogVCDelegate>
+@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate,ModalTVCDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
 @property (strong, nonatomic) ShowTrainingSetViewController *trainingSetController;
-@property (strong, nonatomic) LogVC *logVC;
 @property (strong, nonatomic) ModalTVC *modalTVC;
 @property (strong, nonatomic) SendingView *sendingView;
 
-@property (weak, nonatomic) IBOutlet UITextField *nameTextField;
-@property (weak, nonatomic) IBOutlet UILabel *targetClassLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *detectorView;
 @property (weak, nonatomic) IBOutlet UIImageView *detectorHogView;
 @property (weak, nonatomic) IBOutlet UILabel *descriptionLabel;
+@property (weak, nonatomic) IBOutlet UITextField *nameTextField;
 
 //bottom toolbar
 @property (weak, nonatomic) IBOutlet UIToolbar *bottomToolbar;
