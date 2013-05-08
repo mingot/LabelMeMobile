@@ -32,9 +32,10 @@
 @property (nonatomic, strong) NSMutableDictionary *downloadedLabelsMap; //label -> array with indexes
 @property (nonatomic, strong) NSMutableDictionary *labelsDictionary; //dictionary: label -> array of filenames containing label
 
+@property (nonatomic, strong) NSArray *labelsOrdered; //ordered labels names
+@property (nonatomic, strong) NSMutableDictionary *buttonsDictionary; //buttons stored to select all images when section name tapped
 
 @end
-
 
 
 @implementation GalleryViewController
@@ -94,7 +95,7 @@
     return _items;
 }
 
--(NSMutableDictionary *) labelsDictioanary
+-(NSMutableDictionary *) labelsDictionary
 {
     if(!_labelsDictionary){
      
@@ -125,6 +126,65 @@
     
     return _labelsDictionary;
 }
+
+
+- (NSArray *) labelsOrdered
+{
+    if(!_labelsOrdered) _labelsOrdered = [[self.labelsDictionary allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    return _labelsOrdered;
+}
+
+- (NSMutableDictionary *) buttonsDictionary
+{
+    if(!_buttonsDictionary){
+        
+        _buttonsDictionary = [[NSMutableDictionary alloc] init];
+        for (NSString *label in self.labelsOrdered){
+            NSArray *indexes = [self.labelsDictionary objectForKey:label];
+            NSMutableArray *buttons = [[NSMutableArray alloc] init];
+            for(int i=0; i<indexes.count; i++){
+                UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+                button.tag = [self.items indexOfObject:[indexes objectAtIndex:i]];
+
+                //button views generation
+                UIView *imview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width)];
+                UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0.0375*self.view.frame.size.width,0.4125*self.view.frame.size.width, 0.4125*self.view.frame.size.width)];
+                imageView.image = [UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[indexes objectAtIndex:i]]];
+                [imview addSubview:imageView];
+                
+                //unselected image
+                UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width,0.45*self.view.frame.size.width));
+                [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
+                UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+                
+                //selected image
+                UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width));
+                imview.alpha = 0.65;
+                [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
+                UIImage *imageSelected = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+                
+                if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+                    button.frame = CGRectMake(0.05*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.225*self.view.frame.size.width, 0.225*self.view.frame.size.width);
+                
+                else button.frame = CGRectMake(0.07*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.2*self.view.frame.size.width, 0.2*self.view.frame.size.width);
+                
+                [button addTarget:self
+                           action:@selector(buttonClicked:)
+                 forControlEvents:UIControlEventTouchUpInside];
+                [button setImage:image forState:UIControlStateNormal];
+                [button setImage:[imageSelected addBorderForViewFrame:self.view.frame] forState:UIControlStateSelected];
+                
+                
+                [buttons addObject:button];
+            }
+            [_buttonsDictionary setObject:buttons forKey:label];
+        }
+    }
+    return _buttonsDictionary;
+}
+
 
 
 
@@ -319,6 +379,8 @@
     //get sorted files by date of modification of the image
     self.items = nil; //reload
     self.labelsDictionary = nil;
+    self.buttonsDictionary = nil;
+    self.labelsOrdered = nil;
     
     if(self.items.count == 0) {
         self.noImages.hidden = NO;
@@ -1096,24 +1158,21 @@
 -(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
 {
     if(tableView.tag==0){
-        NSArray *labels = [self.labelsDictioanary allKeys];
-        return labels.count;
+        return self.labelsOrdered.count;
     }else return 1;
 }
 
 -(NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
     if(tableView.tag==0){
-        NSArray *labels = [[self.labelsDictioanary allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-        return [labels objectAtIndex:section];
+        return [self.labelsOrdered objectAtIndex:section];
     }else return @"";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if(tableView.tag==0){
-        NSArray *labels = [[self.labelsDictionary allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-        NSArray *items = [self.labelsDictionary objectForKey:[labels objectAtIndex:indexPath.section]];
+        NSArray *items = [self.labelsDictionary objectForKey:[self.labelsOrdered objectAtIndex:indexPath.section]];
         return (0.225*self.view.frame.size.width*ceil((float)items.count/4) + 0.0375*self.view.frame.size.width);
     }else return tableView.rowHeight;
 }
@@ -1170,49 +1229,12 @@
     
     //grid
     if (tableView.tag == 0) {
-        //select images for section
-        NSArray *labels = [[self.labelsDictionary allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-        NSArray *items = [self.labelsDictionary objectForKey:[labels objectAtIndex:indexPath.section]];
+        
+        NSArray *buttons = [self.buttonsDictionary  objectForKey:[self.labelsOrdered objectAtIndex:indexPath.section]];
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-        for(int i = 0; i < items.count; i++) {
-            @autoreleasepool {
-                UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0.0375*self.view.frame.size.width,0.4125*self.view.frame.size.width, 0.4125*self.view.frame.size.width)];
-                imageView.image = [UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[items objectAtIndex:i]]];
-                UIView *imview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width)];
-
-                [imview addSubview:imageView];
-                
-                //unselected image
-                UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width,0.45*self.view.frame.size.width));
-                [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
-                UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-                UIGraphicsEndImageContext();
-                
-                //selected image
-                UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width));
-                imview.alpha = 0.65;
-                [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
-                UIImage *imageSelected = UIGraphicsGetImageFromCurrentImageContext();
-                UIGraphicsEndImageContext();
-
-                UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
-                NSUInteger index = [self.items indexOfObject:[items objectAtIndex:i]];
-                button.tag = index;
-
-                if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-                    button.frame = CGRectMake(0.05*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.225*self.view.frame.size.width, 0.225*self.view.frame.size.width);
-                else button.frame = CGRectMake(0.07*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.2*self.view.frame.size.width, 0.2*self.view.frame.size.width);
-
-
-                [button addTarget:self
-                           action:@selector(buttonClicked:)
-                 forControlEvents:UIControlEventTouchUpInside];
-                [button setImage:image forState:UIControlStateNormal];
-                [button setImage:[imageSelected addBorderForViewFrame:self.view.frame] forState:UIControlStateSelected];
-                
-                [cell addSubview:button];
-            }
-        }
+        
+        for(UIButton *button in buttons) [cell addSubview:button];
+        
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
 
     //list
