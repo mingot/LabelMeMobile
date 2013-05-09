@@ -20,9 +20,10 @@
 #import "Classifier.h"
 #import "ShowTrainingSetViewController.h"
 #import "ThreeDimVC.h"
+#import "AYUIButton.h"
 
 
-@interface ExecuteDetectorViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate>
+@interface ExecuteDetectorViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate>
 {
     //settings
     int numMax;
@@ -50,8 +51,7 @@
 @property int numPyramids;
 @property double maxDetectionScore;
 
-//Core Location
-@property (nonatomic, strong) CLLocationManager *locMgr;
+
 
 //AVCapture
 @property (nonatomic, strong) AVCaptureSession *captureSession;
@@ -60,20 +60,20 @@
 //self views
 @property (nonatomic, weak) IBOutlet UIImageView *HOGimageView;
 @property (nonatomic, weak) IBOutlet DetectView *detectView;
-
 @property (weak, nonatomic) IBOutlet UISlider *detectionThresholdSliderButton;
+@property (weak, nonatomic) IBOutlet AYUIButton *settingsButton;
+@property (weak, nonatomic) IBOutlet AYUIButton *cancelButton;
+@property (weak, nonatomic) IBOutlet UITableView *settingsTableView;
+
 
 //info label
-@property (weak, nonatomic) IBOutlet UIView *infoView;
 @property (weak, nonatomic) IBOutlet UILabel *infoLabel;
 
 //settings view
 @property (weak, nonatomic) IBOutlet UIView *settingsView;
 - (IBAction)showSettingsAction:(id)sender;
-- (IBAction)settingsButtonAction:(UIButton *)button;
-
-
-
+- (IBAction)cancelAction:(id)sender;
 - (IBAction)switchCameras:(id)sender;
+- (IBAction)switchValueDidChange:(UISwitch *)sw;
 
 @end

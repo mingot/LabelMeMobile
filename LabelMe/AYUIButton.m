@@ -25,6 +25,17 @@
     return [backgroundStates objectForKey:[NSNumber numberWithInt:_state]];
 }
 
+- (void) transformButtonForCamera
+{
+    self.layer.cornerRadius = 10;
+    self.layer.borderColor = [[UIColor blackColor] CGColor];
+    self.layer.borderWidth = 1;
+    [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4]];
+    [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.8] forState:UIControlStateHighlighted];
+    [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4] forState:UIControlStateNormal];
+    [self setTitleColor:[self titleColorForState:UIControlStateNormal] forState:UIControlStateHighlighted];
+}
+
 #pragma mark -
 #pragma mark Touches
 

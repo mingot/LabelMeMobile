@@ -440,7 +440,7 @@
         [self.website setHidesBottomBarWhenPushed:YES];
         [self.navigationController pushViewController:self.website animated:YES];
     
-    //image resolution choos
+    //image resolution election
     }else if ((indexPath.section == 3) && (indexPath.row == 1)) {
         
         ResolutionViewController *resolutionVC = nil;

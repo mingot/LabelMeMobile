@@ -15,16 +15,17 @@
 
 @interface ExecuteDetectorViewController()
 {
-    float fps;
+    float fpsToShow;
     int num;
 }
 
+//states to show
 @property BOOL score;
 @property BOOL fps;
 @property BOOL scale;
 @property BOOL hog;
 
-
+@property (strong, nonatomic) NSArray *settingsStrings;
 
 @end
 
@@ -36,18 +37,29 @@
 @synthesize svmClassifier = _svmClassifier;
 @synthesize numPyramids = _numPyramids;
 @synthesize maxDetectionScore = _maxDetectionScore;
-@synthesize locMgr = _locMgr;
 @synthesize captureSession = _captureSession;
 @synthesize prevLayer = _prevLayer;
 @synthesize HOGimageView = _HOGimageView;
 @synthesize detectView = _detectView;
 @synthesize detectionThresholdSliderButton = _detectionThresholdSliderButton;
 
+
 //detection
 @synthesize trainingSetController = _trainingSetController;
 @synthesize imagesList = _imagesList;
 
 
+
+#pragma mark -
+#pragma mark Getters and Setters
+
+
+-(NSArray *) settingsStrings
+{
+    if(!_settingsStrings){
+        _settingsStrings = [[NSArray alloc] initWithObjects:@"Scale",@"FPS",@"Score",@"HOG",@"Front", nil];
+    }return _settingsStrings;
+}
 
 - (BOOL) shouldAutorotate
 {
@@ -61,9 +73,17 @@
     [super viewDidLoad];
     
     isUsingFrontFacingCamera = NO;
-    fps = 0.0;
+    fpsToShow = 0.0;
     num = 0;
     self.title = self.svmClassifier.targetClass;
+    
+    self.settingsTableView.hidden = YES;
+    self.settingsTableView.layer.cornerRadius = 10;
+    self.settingsTableView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.4];
+    
+    //buttons
+    [self.cancelButton transformButtonForCamera];
+    [self.settingsButton transformButtonForCamera];
     
     //image poistion detection
     self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
@@ -82,11 +102,7 @@
     //Initialization of model properties
     self.numPyramids = 10;
     self.maxDetectionScore = -0.9;
-    self.locMgr = [[CLLocationManager alloc] init];
-    self.locMgr.delegate = self;
-    self.locMgr.desiredAccuracy = kCLLocationAccuracyBest;
-    [self.locMgr startUpdatingLocation];
-    
+
     
     // ********  CAMERA CAPUTRE  ********
     //Capture input specifications
@@ -133,12 +149,14 @@
     [settingsButton setStyle:UIBarButtonItemStyleBordered];
     [self.navigationItem setRightBarButtonItem:settingsButton];
     
-    self.settingsView.hidden = YES;
-    
     //variable number of lines
     self.infoLabel.numberOfLines = 0;
 }
 
+- (void) viewWillAppear:(BOOL)animated
+{
+    self.navigationController.navigationBarHidden = YES;
+}
 
 - (void) viewDidAppear:(BOOL)animated
 {
@@ -226,7 +244,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         } 
         
         
-        
         //Put the HOG picture on screen
         if (self.hog){
             UIImage *image = [ [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight] scaleImageTo:230/480.0] convertToHogImage];
@@ -238,7 +255,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         CGImageRelease(imageRef);
         
         //update label with the current FPS
-        fps = (fps*num + -1.0/[start timeIntervalSinceNow])/(num+1);
+        fpsToShow = (fpsToShow*num + -1.0/[start timeIntervalSinceNow])/(num+1);
         num++;
         NSMutableString *screenLabelText = [[NSMutableString alloc] initWithString:@""];
         if(self.score) [screenLabelText appendString:[NSString stringWithFormat:@"score:%.2f\n", scoreFloat]];
@@ -277,16 +294,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #pragma mark -
 #pragma mark Memory management
 
-- (void)viewDidUnload {
-    [self setSettingsView:nil];
-    [self setInfoView:nil];
-    [self setStartRecordingButton:nil];
-    [self setShowImagesButton:nil];
-    [self setDetectionThresholdSliderButton:nil];
-    NSLog(@"viewdidunload");
-    
-	self.prevLayer = nil;
-}
 
 -(void)viewDidDisappear:(BOOL)animated{
     [self.captureSession stopRunning];
@@ -295,8 +302,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 
 
-#pragma mark
-#pragma mark - Position images
+#pragma mark -
+#pragma mark Position images
 
 - (IBAction)showImagesAction:(id)sender
 {
@@ -339,35 +346,21 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 }
 
 
-#pragma mark
-#pragma mark - IBActions
+#pragma mark -
+#pragma mark IBActions
 
 -(IBAction)showSettingsAction:(id)sender
 {
-    self.settingsView.hidden = self.settingsView.hidden ? NO:YES;
+    self.settingsTableView.hidden = self.settingsTableView.hidden? NO:YES;
 }
 
 
-- (IBAction)settingsButtonAction:(UIButton *)button
-{
-    if([button.titleLabel.text isEqualToString:@"Score"]) self.score = self.score ? NO:YES; 
-    else if([button.titleLabel.text isEqualToString:@"FPS"]) self.fps = self.fps ? NO:YES;
-    else if([button.titleLabel.text isEqualToString:@"Scale"]) self.scale = self.scale ? NO:YES;
-    else if ([button.titleLabel.text isEqualToString:@"Switch"]) [self switchCameras:self];
-    else if([button.titleLabel.text isEqualToString:@"HOG"]){
-        self.hog = self.hog ? NO:YES;
-        if(!self.hog) {self.HOGimageView.image = nil; self.HOGimageView.hidden = YES;}
-        else self.HOGimageView.hidden = NO;
-    }
-    
-    //highlight button when pressed
-    [self performSelector:@selector(flipButton:) withObject:button afterDelay:0.0];
-}
 
--(void) flipButton: (UIButton *)button
+
+- (IBAction)cancelAction:(id)sender
 {
-    button.highlighted = button.selected ? NO:YES;
-    button.selected = button.selected ? NO:YES;
+    self.navigationController.navigationBarHidden = NO;
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 
@@ -391,6 +384,53 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
     isUsingFrontFacingCamera = !isUsingFrontFacingCamera;
 }
+
+- (IBAction)switchValueDidChange:(UISwitch *)sw
+{
+    
+    NSString *label = [self.settingsStrings objectAtIndex:sw.tag];
+    if([label isEqualToString:@"HOG"]){
+        self.hog = sw.on;
+        if(!self.hog) {self.HOGimageView.image = nil; self.HOGimageView.hidden = YES;}
+        else self.HOGimageView.hidden = NO;
+    }else if([label isEqualToString:@"FPS"]){ self.fps = sw.on;
+    }else if([label isEqualToString:@"Scale"]){ self.scale = sw.on;
+    }else if([label isEqualToString:@"Score"]){ self.score = sw.on;
+    }else if([label isEqualToString:@"Front"]){
+        [self switchCameras:self];
+    }
+}
+
+
+#pragma mark -
+#pragma mark Table View Data Source and Delegate
+
+- (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
+{
+
+    return self.settingsStrings.count;
+}
+
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectZero];
+    [sw setOnTintColor:[UIColor colorWithRed:(180.0/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0]];
+    
+    NSString *label = [self.settingsStrings objectAtIndex:indexPath.row];
+    cell.textLabel.text = label;
+    cell.textLabel.backgroundColor = [UIColor clearColor];
+    [sw setOn:NO  animated:NO];
+    sw.tag = indexPath.row;
+    [sw addTarget:self action:@selector(switchValueDidChange:) forControlEvents:UIControlEventValueChanged];
+    cell.accessoryView = sw;
+    
+    return cell;
+}
+
+
 
 @end
 

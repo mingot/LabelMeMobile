@@ -16,8 +16,6 @@
 @property int numberImages;
 @property BOOL isUsingFrontFacingCamera;
 
--(AYUIButton *) setCameraButton: (AYUIButton *)button;
-
 @end
 
 
@@ -41,12 +39,13 @@
     self.isUsingFrontFacingCamera = NO;
     self.numberImages = 0;
     
-    self.captureButton = [self setCameraButton:self.captureButton];
+    
+    [self.captureButton transformButtonForCamera];
+    [self.switchButton transformButtonForCamera];
+    [self.cancelButton transformButtonForCamera];
     [self.captureButton setTitle:@"" forState:UIControlStateNormal];
     [self.captureButton setImage:[UIImage imageNamed:@"camera.png"] forState:UIControlStateNormal];
-    self.switchButton = [self setCameraButton:self.switchButton];
-    self.cancelButton = [self setCameraButton:self.cancelButton];
-    
+
     
     self.thumbnailCaptureImageView.layer.borderColor = [[UIColor blackColor] CGColor];
     self.thumbnailCaptureImageView.layer.borderWidth = 1;
@@ -167,20 +166,5 @@
 }
 
 
-#pragma mark -
-#pragma mark Private methods
-
-
--(AYUIButton *) setCameraButton: (AYUIButton *)button;
-{
-    button.layer.cornerRadius = 10;
-    button.layer.borderColor = [[UIColor blackColor] CGColor];
-    button.layer.borderWidth = 1;
-    [button setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4]];
-    [button setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.8] forState:UIControlStateHighlighted];
-    [button setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4] forState:UIControlStateNormal];
-    [button setTitleColor:[self.captureButton titleColorForState:UIControlStateNormal] forState:UIControlStateHighlighted];
-    return button;
-}
 
 @end
