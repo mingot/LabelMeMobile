@@ -7,9 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
 #import <CoreLocation/CoreLocation.h>
-
 #import "TagViewController.h"
 
 @interface CameraOverlayViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>

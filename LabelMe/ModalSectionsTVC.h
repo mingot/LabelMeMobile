@@ -29,6 +29,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
 @property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+
 //unique name to identify the modal
 @property (strong, nonatomic) NSString *modalTitle;
 @property BOOL showCancelButton;

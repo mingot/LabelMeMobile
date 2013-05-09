@@ -103,6 +103,9 @@
         self.doneButton.alpha = 0.6f;
     }
     
+    //round corners in the view
+    [self.tableView.layer setCornerRadius:6.0];
+    
     self.cancelButton.hidden = !self.showCancelButton;
 }
 
@@ -116,7 +119,9 @@
 {
     UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 200)];
     [headerView setBackgroundColor:[UIColor blackColor]];
-    UIButton *selectAll = [[UIButton alloc] initWithFrame:CGRectMake(0,0, 120, 30)];
+    
+//    UIView *headerView = [tableView headerViewForSection:section];
+    UIButton *selectAll = [[UIButton alloc] initWithFrame:CGRectMake(0,0,120,30 )];
     [selectAll setTitle:[self.labelsOrdered objectAtIndex:section] forState:UIControlStateNormal];
     selectAll.tag = section;
     [selectAll addTarget:self action:@selector(selectAllAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -125,6 +130,11 @@
     return headerView;
 }
 
+//- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+//{
+//    return 50; //
+//}
+
 -(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
 {
     return self.labelsOrdered.count;
@@ -132,7 +142,9 @@
 
 -(NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return [self.labelsOrdered objectAtIndex:section];
+    NSString *label = [self.labelsOrdered objectAtIndex:section];
+    NSArray *items = [self.dataDictionary objectForKey:label];
+    return [NSString stringWithFormat:@"%@ (%d)",label,items.count];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

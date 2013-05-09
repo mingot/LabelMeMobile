@@ -10,6 +10,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <CoreVideo/CoreVideo.h>
+#import "AYUIButton.h"
 
 @protocol CameraViewControllerDeledate <NSObject>
 
@@ -30,11 +31,14 @@
 @property (nonatomic, strong) AVCaptureStillImageOutput *stillImageOutput;
 
 //xib
-@property (weak, nonatomic) IBOutlet UIButton *captureButton;
+@property (weak, nonatomic) IBOutlet AYUIButton *captureButton;
+@property (weak, nonatomic) IBOutlet AYUIButton *switchButton;
+@property (weak, nonatomic) IBOutlet AYUIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UIImageView *thumbnailCaptureImageView;
 
 - (IBAction)captureAction:(id)sender;
 - (IBAction)toggleFrontAction:(id)sender;
+- (IBAction)cancelAction:(id)sender;
 
 
 @end

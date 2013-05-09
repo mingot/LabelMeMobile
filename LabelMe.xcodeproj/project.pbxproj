@@ -191,6 +191,7 @@
 		FC8E89B81739876D0018876D /* ModalSectionsTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */; };
 		FC92DD8117316C2D004F8189 /* undo.png in Resources */ = {isa = PBXBuildFile; fileRef = FC92DD8017316C2D004F8189 /* undo.png */; };
 		FC92DD9117343A32004F8189 /* camera2.png in Resources */ = {isa = PBXBuildFile; fileRef = FC92DD9017343A32004F8189 /* camera2.png */; };
+		FC9F9488173BE9880004598C /* AYUIButton.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F9487173BE9870004598C /* AYUIButton.m */; };
 		FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */; };
 		FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */; };
 		FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */; };
@@ -437,6 +438,8 @@
 		FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ModalSectionsTVC.xib; sourceTree = "<group>"; };
 		FC92DD8017316C2D004F8189 /* undo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = undo.png; sourceTree = "<group>"; };
 		FC92DD9017343A32004F8189 /* camera2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera2.png; sourceTree = "<group>"; };
+		FC9F9486173BE9860004598C /* AYUIButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYUIButton.h; sourceTree = "<group>"; };
+		FC9F9487173BE9870004598C /* AYUIButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYUIButton.m; sourceTree = "<group>"; };
 		FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalTVC.h; sourceTree = "<group>"; };
 		FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalTVC.m; sourceTree = "<group>"; };
 		FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ModalTVC.xib; sourceTree = "<group>"; };
@@ -489,39 +492,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A5480D6C16178868009F630D /* XIB files */ = {
-			isa = PBXGroup;
-			children = (
-				FCED897A170362270027CBE1 /* Detector */,
-				A558D63816134F79001DED8C /* SignInViewController_iPhone.xib */,
-				A54E1840164C77A000369509 /* SignInViewController_iPad.xib */,
-				A558D63F16136DD2001DED8C /* SignInViewController_iPhone5.xib */,
-				A564641C1614BA0D007D444E /* CreateAccountViewController_iPhone.xib */,
-				A564641F1614BAD0007D444E /* CreateAccountViewController_iPhone5.xib */,
-				A56464211614BAFF007D444E /* CreateAccountViewController_iPad.xib */,
-				A54E1842164C794000369509 /* GalleryViewController_iPad.xib */,
-				A5CAAF5016163A870095D703 /* GalleryViewController_iPhone.xib */,
-				A5DEA1061640D48B00DD58D6 /* GalleryViewController_iPhone5.xib */,
-				A5480D6A1617815B009F630D /* CameraOverlayViewController_iPhone.xib */,
-				A5480D6F16179557009F630D /* TagViewController_iPhone.xib */,
-				A5D91D0C1641D29A00EA0442 /* TagViewController_iPhone5.xib */,
-				A549B845165162F6000B41CB /* TagViewController_iPad.xib */,
-				A5A567741617D756008AFE2E /* SettingsViewController_iPhone.xib */,
-				A55FCD941652B4970004A9EE /* SettingsViewController_iPad.xib */,
-				A5DEA1081640D69E00DD58D6 /* SettingsViewController_iPhone5.xib */,
-				A5C8BFCE162F4EC4009A39E0 /* ResolutionViewController_iPhone.xib */,
-				A5DEA10A1640D6C000DD58D6 /* ResolutionViewController_iPhone5.xib */,
-				A55FCD971652B4D30004A9EE /* ResolutionViewController_iPad.xib */,
-				A56126F1165961B5001DDD17 /* WebsiteViewController_iPhone5.xib */,
-				A56126F4165961F7001DDD17 /* WebsiteViewController_iPad.xib */,
-				A5817E04165932720061FE67 /* WebsiteViewController_iPhone.xib */,
-				A537747A165C3E9900BF0649 /* CreditsViewController_iPhone.xib */,
-				A5377488165C506C00BF0649 /* CreditsViewController_iPad.xib */,
-				A537748A165C51C300BF0649 /* CreditsViewController_iPhone5.xib */,
-			);
-			name = "XIB files";
-			sourceTree = "<group>";
-		};
 		A5480D781617A364009F630D /* UIImage-categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -583,21 +553,15 @@
 		A558D61F16134E0C001DED8C /* LabelMe */ = {
 			isa = PBXGroup;
 			children = (
-				FC5C93B816FD017100637B69 /* Labelling */,
+				FC9F947E173AE34B0004598C /* Sign in */,
+				FC9F947F173AE3910004598C /* Image Gallery */,
+				FC9F9480173AE3DD0004598C /* Camera */,
 				FC5C93B716FD014200637B69 /* Detector */,
-				A558D63616134F79001DED8C /* SignInViewController.h */,
-				A558D63716134F79001DED8C /* SignInViewController.m */,
-				A564641A1614BA0D007D444E /* CreateAccountViewController.h */,
-				A564641B1614BA0D007D444E /* CreateAccountViewController.m */,
-				A558D6421613927F001DED8C /* ServerConnection.h */,
-				A558D64316139280001DED8C /* ServerConnection.m */,
-				A55A8447162CCFAA00C917DD /* Reachability.h */,
-				A55A8448162CCFAA00C917DD /* Reachability.m */,
-				A5949C7D1625E18500627709 /* CustomBadge.h */,
-				A5949C7E1625E18500627709 /* CustomBadge.m */,
+				FC9F9481173AE4340004598C /* Additional View Controllers */,
+				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
+				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
 				A558D62816134E0C001DED8C /* LabelMeAppDelegate.h */,
 				A558D62916134E0C001DED8C /* LabelMeAppDelegate.m */,
-				A5480D6C16178868009F630D /* XIB files */,
 				A558D64C1613A365001DED8C /* Categories */,
 				A558D64116138D37001DED8C /* Icons */,
 				A558D62016134E0C001DED8C /* Supporting Files */,
@@ -774,6 +738,7 @@
 		FC5C93B716FD014200637B69 /* Detector */ = {
 			isa = PBXGroup;
 			children = (
+				FCED897A170362270027CBE1 /* Detector XIB */,
 				FC5C93A316FCE39F00637B69 /* DetectorGalleryViewController.h */,
 				FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */,
 				FC5C93A816FCFA8F00637B69 /* DetectorDescriptionViewController.h */,
@@ -804,36 +769,93 @@
 			name = Detector;
 			sourceTree = "<group>";
 		};
-		FC5C93B816FD017100637B69 /* Labelling */ = {
+		FC9F947E173AE34B0004598C /* Sign in */ = {
+			isa = PBXGroup;
+			children = (
+				A558D63616134F79001DED8C /* SignInViewController.h */,
+				A558D63716134F79001DED8C /* SignInViewController.m */,
+				A558D63816134F79001DED8C /* SignInViewController_iPhone.xib */,
+				A54E1840164C77A000369509 /* SignInViewController_iPad.xib */,
+				A558D63F16136DD2001DED8C /* SignInViewController_iPhone5.xib */,
+				A564641A1614BA0D007D444E /* CreateAccountViewController.h */,
+				A564641B1614BA0D007D444E /* CreateAccountViewController.m */,
+				A564641C1614BA0D007D444E /* CreateAccountViewController_iPhone.xib */,
+				A564641F1614BAD0007D444E /* CreateAccountViewController_iPhone5.xib */,
+				A56464211614BAFF007D444E /* CreateAccountViewController_iPad.xib */,
+				A558D6421613927F001DED8C /* ServerConnection.h */,
+				A558D64316139280001DED8C /* ServerConnection.m */,
+				A55A8447162CCFAA00C917DD /* Reachability.h */,
+				A55A8448162CCFAA00C917DD /* Reachability.m */,
+			);
+			name = "Sign in";
+			sourceTree = "<group>";
+		};
+		FC9F947F173AE3910004598C /* Image Gallery */ = {
 			isa = PBXGroup;
 			children = (
 				A5CAAF4E16163A870095D703 /* GalleryViewController.h */,
 				A5CAAF4F16163A870095D703 /* GalleryViewController.m */,
-				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
-				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
-				A5480D6716176CEB009F630D /* CameraOverlayViewController.h */,
-				A5480D6816176CEB009F630D /* CameraOverlayViewController.m */,
-				FC4EE0F317231A1700536B4A /* CameraViewController.h */,
-				FC4EE0F417231A1700536B4A /* CameraViewController.m */,
-				A5A567721617D756008AFE2E /* SettingsViewController.h */,
-				A5A567731617D756008AFE2E /* SettingsViewController.m */,
-				A5C8BFCC162F4EC4009A39E0 /* ResolutionViewController.h */,
-				A5C8BFCD162F4EC4009A39E0 /* ResolutionViewController.m */,
-				A5817E02165932720061FE67 /* WebsiteViewController.h */,
-				A5817E03165932720061FE67 /* WebsiteViewController.m */,
-				A5377478165C3E9900BF0649 /* CreditsViewController.h */,
-				A5377479165C3E9900BF0649 /* CreditsViewController.m */,
+				A54E1842164C794000369509 /* GalleryViewController_iPad.xib */,
+				A5CAAF5016163A870095D703 /* GalleryViewController_iPhone.xib */,
+				A5DEA1061640D48B00DD58D6 /* GalleryViewController_iPhone5.xib */,
 				A52C36761617C99400FEF74D /* TagViewController.h */,
 				A52C36771617C99400FEF74D /* TagViewController.m */,
+				A5480D6F16179557009F630D /* TagViewController_iPhone.xib */,
+				A5D91D0C1641D29A00EA0442 /* TagViewController_iPhone5.xib */,
+				A549B845165162F6000B41CB /* TagViewController_iPad.xib */,
 				A5480D721617969A009F630D /* TagView.h */,
 				A5480D731617969A009F630D /* TagView.m */,
 				A5480D7516179D8E009F630D /* Box.h */,
 				A5480D7616179D8E009F630D /* Box.m */,
+				A5949C7D1625E18500627709 /* CustomBadge.h */,
+				A5949C7E1625E18500627709 /* CustomBadge.m */,
 			);
-			name = Labelling;
+			name = "Image Gallery";
 			sourceTree = "<group>";
 		};
-		FCED897A170362270027CBE1 /* Detector */ = {
+		FC9F9480173AE3DD0004598C /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				A5480D6716176CEB009F630D /* CameraOverlayViewController.h */,
+				A5480D6816176CEB009F630D /* CameraOverlayViewController.m */,
+				A5480D6A1617815B009F630D /* CameraOverlayViewController_iPhone.xib */,
+				FC4EE0F317231A1700536B4A /* CameraViewController.h */,
+				FC4EE0F417231A1700536B4A /* CameraViewController.m */,
+				FC9F9486173BE9860004598C /* AYUIButton.h */,
+				FC9F9487173BE9870004598C /* AYUIButton.m */,
+				FC4EE0F517231A1700536B4A /* CameraViewController.xib */,
+			);
+			name = Camera;
+			sourceTree = "<group>";
+		};
+		FC9F9481173AE4340004598C /* Additional View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				A5A567721617D756008AFE2E /* SettingsViewController.h */,
+				A5A567731617D756008AFE2E /* SettingsViewController.m */,
+				A5A567741617D756008AFE2E /* SettingsViewController_iPhone.xib */,
+				A55FCD941652B4970004A9EE /* SettingsViewController_iPad.xib */,
+				A5DEA1081640D69E00DD58D6 /* SettingsViewController_iPhone5.xib */,
+				A5C8BFCC162F4EC4009A39E0 /* ResolutionViewController.h */,
+				A5C8BFCD162F4EC4009A39E0 /* ResolutionViewController.m */,
+				A5C8BFCE162F4EC4009A39E0 /* ResolutionViewController_iPhone.xib */,
+				A5DEA10A1640D6C000DD58D6 /* ResolutionViewController_iPhone5.xib */,
+				A55FCD971652B4D30004A9EE /* ResolutionViewController_iPad.xib */,
+				A5817E02165932720061FE67 /* WebsiteViewController.h */,
+				A5817E03165932720061FE67 /* WebsiteViewController.m */,
+				A56126F1165961B5001DDD17 /* WebsiteViewController_iPhone5.xib */,
+				A56126F4165961F7001DDD17 /* WebsiteViewController_iPad.xib */,
+				A5817E04165932720061FE67 /* WebsiteViewController_iPhone.xib */,
+				A5377478165C3E9900BF0649 /* CreditsViewController.h */,
+				A5377479165C3E9900BF0649 /* CreditsViewController.m */,
+				A537747A165C3E9900BF0649 /* CreditsViewController_iPhone.xib */,
+				A5377488165C506C00BF0649 /* CreditsViewController_iPad.xib */,
+				A537748A165C51C300BF0649 /* CreditsViewController_iPhone5.xib */,
+			);
+			name = "Additional View Controllers";
+			sourceTree = "<group>";
+		};
+		FCED897A170362270027CBE1 /* Detector XIB */ = {
 			isa = PBXGroup;
 			children = (
 				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
@@ -845,9 +867,8 @@
 				FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */,
 				FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */,
 				FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */,
-				FC4EE0F517231A1700536B4A /* CameraViewController.xib */,
 			);
-			name = Detector;
+			name = "Detector XIB";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1097,6 +1118,7 @@
 				FC4EE0F617231A1700536B4A /* CameraViewController.m in Sources */,
 				FC8E89B1173930340018876D /* UIImage+Border.m in Sources */,
 				FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */,
+				FC9F9488173BE9880004598C /* AYUIButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

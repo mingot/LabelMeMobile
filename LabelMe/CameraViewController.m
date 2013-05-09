@@ -6,15 +6,20 @@
 //  Copyright (c) 2013 CSAIL. All rights reserved.
 //
 
-#import "CameraViewController.h"
 #import <ImageIO/ImageIO.h>
+#import "CameraViewController.h"
+#import "DDExpandableButton.h"
+
 
 @interface CameraViewController ()
 
 @property int numberImages;
 @property BOOL isUsingFrontFacingCamera;
 
+-(AYUIButton *) setCameraButton: (AYUIButton *)button;
+
 @end
+
 
 
 @implementation CameraViewController
@@ -36,14 +41,24 @@
     self.isUsingFrontFacingCamera = NO;
     self.numberImages = 0;
     
+    self.captureButton = [self setCameraButton:self.captureButton];
+    [self.captureButton setTitle:@"" forState:UIControlStateNormal];
+    [self.captureButton setImage:[UIImage imageNamed:@"camera.png"] forState:UIControlStateNormal];
+    self.switchButton = [self setCameraButton:self.switchButton];
+    self.cancelButton = [self setCameraButton:self.cancelButton];
+    
+    
+    self.thumbnailCaptureImageView.layer.borderColor = [[UIColor blackColor] CGColor];
+    self.thumbnailCaptureImageView.layer.borderWidth = 1;
+    self.thumbnailCaptureImageView.hidden = YES;
+
     //switch cameras button
     UIBarButtonItem *switchCameraButton = [[UIBarButtonItem alloc] initWithTitle:@"switch" style:UIBarButtonItemStyleBordered target:self action:@selector(toggleFrontAction:)];
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbarBg"]resizableImageWithCapInsets:UIEdgeInsetsZero ] forBarMetrics:UIBarMetricsDefault];
     [switchCameraButton setStyle:UIBarButtonItemStyleBordered];
     [self.navigationItem setRightBarButtonItem:switchCameraButton];
     
-    [self.thumbnailCaptureImageView.layer setBorderColor: [[UIColor blackColor] CGColor]];
-    [self.thumbnailCaptureImageView.layer setBorderWidth: 2.0];
+
     
     // ********  CAMERA CAPTURE  ********
     //Capture input specifications
@@ -82,17 +97,20 @@
     self.prevLayer.frame = self.view.frame;
     [self.captureSession startRunning];
 
-    //trick to bring buttons to the front
-    UIView *CameraView = [[UIView alloc] init];
-	[[self view] addSubview:CameraView];
-	[self.view sendSubviewToBack:CameraView];
-	[[CameraView layer] addSublayer:self.prevLayer];
+    //trick to put de capture previous layer at the back
+    UIView *cameraView = [[UIView alloc] init];
+    [self.view addSubview:cameraView];
+	[self.view sendSubviewToBack:cameraView];
+	[cameraView.layer addSublayer:self.prevLayer];
 }
 
+-(void) viewWillAppear:(BOOL)animated
+{
+    self.navigationController.navigationBarHidden = YES;
+}
 
-
-#pragma mark 
-#pragma mark - IBActions
+#pragma mark -
+#pragma mark IBActions
 
 
 - (IBAction)captureAction:(id)sender
@@ -110,13 +128,6 @@
 	
 	[self.stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler: ^(CMSampleBufferRef imageSampleBuffer, NSError *error){
         
-//		 CFDictionaryRef exifAttachments = CMGetAttachment(imageSampleBuffer, kCGImagePropertyExifDictionary, NULL);
-//		 if (exifAttachments)
-//		 
-//             // Do something with the attachments.
-//             NSLog(@"attachements: %@", exifAttachments);
-//		 
-//         else NSLog(@"no attachments");
         
          NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
          UIImage *image = [[UIImage alloc] initWithData:imageData];
@@ -124,6 +135,7 @@
         self.thumbnailCaptureImageView.image = image;
         self.numberImages++;
         [self.delegate addImageCaptured:image];
+        self.thumbnailCaptureImageView.hidden = NO;
 	 }];
 }
 
@@ -148,9 +160,27 @@
     self.isUsingFrontFacingCamera = !self.isUsingFrontFacingCamera;
 }
 
-
-- (void)viewDidUnload {
-    [self setThumbnailCaptureImageView:nil];
-    [super viewDidUnload];
+- (IBAction)cancelAction:(id)sender
+{
+    self.navigationController.navigationBarHidden = NO;
+    [self.navigationController popViewControllerAnimated:YES];
 }
+
+
+#pragma mark -
+#pragma mark Private methods
+
+
+-(AYUIButton *) setCameraButton: (AYUIButton *)button;
+{
+    button.layer.cornerRadius = 10;
+    button.layer.borderColor = [[UIColor blackColor] CGColor];
+    button.layer.borderWidth = 1;
+    [button setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4]];
+    [button setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.8] forState:UIControlStateHighlighted];
+    [button setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4] forState:UIControlStateNormal];
+    [button setTitleColor:[self.captureButton titleColorForState:UIControlStateNormal] forState:UIControlStateHighlighted];
+    return button;
+}
+
 @end

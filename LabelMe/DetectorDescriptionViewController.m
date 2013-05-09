@@ -629,6 +629,7 @@
 
 - (void)viewDidUnload {
     [self setNameTextField:nil];
+    [self setRamon:nil];
     [super viewDidUnload];
 }
 @end

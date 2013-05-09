@@ -189,8 +189,8 @@
 
 
 
-#pragma mark
-#pragma mark - lifecycle
+#pragma mark -
+#pragma mark lifecycle
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -256,8 +256,6 @@
     
     //buttons
     [self.editButton setStyle:UIBarButtonItemStyleBordered];
-    UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addImage:)];
-    self.navigationItem.leftBarButtonItem = plusButton;
     self.navigationItem.rightBarButtonItem = self.editButton;
     [self.deleteButton setTintColor:[UIColor redColor]];
     [self.deleteButton setWidth:self.view.frame.size.width/2 - 11];
@@ -993,14 +991,13 @@
     
 }
 
-#pragma mark
-#pragma mark - CameraVC Delegate
+#pragma mark -
+#pragma mark CameraVC Delegate
 
 -(void) addImageCaptured:(UIImage *)image
 {
     dispatch_queue_t savingQueue = dispatch_queue_create("saving_image", 0);
     dispatch_async(savingQueue, ^{
-        NSLog(@"adding image to gallery");
         
         NSDictionary *userDictionary = [[NSDictionary alloc] initWithContentsOfFile:[[self.userPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
         
@@ -1014,7 +1011,6 @@
         float max = newSize.width > newSize.height ? newSize.width : newSize.height;
         if ((resolution != 0.0) && (resolution < max))
             newSize = image.size.height > image.size.width ? CGSizeMake(resolution*0.75, resolution) : CGSizeMake(resolution, resolution*0.75);
-        NSLog(@"New size for the image %f %f", newSize.height, newSize.width);
         
         //save image into library if option enabled in settings
         if ([[userDictionary objectForKey:@"cameraroll"] boolValue]) UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
@@ -1162,7 +1158,9 @@
 -(NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
     if(tableView.tag==0){
-        return [self.labelsOrdered objectAtIndex:section];
+        NSString *label = [self.labelsOrdered objectAtIndex:section];
+        NSArray *items = [self.labelsDictionary objectForKey:label];
+        return [NSString stringWithFormat:@"%@ (%d)", label, items.count];
     }else return @"";
 }
 
@@ -1314,8 +1312,8 @@
 
 
 
-#pragma mark
-#pragma mark - SendingView
+#pragma mark -
+#pragma mark SendingView
 -(void)cancel
 {
     [self.serverConnection cancelRequestFor:0];
@@ -1332,8 +1330,8 @@
 
 
 
-#pragma mark
-#pragma mark - ModalTVC Delegate
+#pragma mark -
+#pragma mark ModalTVC Delegate
 
 
 - (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier
@@ -1423,8 +1421,8 @@
 -(void) selectionCancelled{}
 
 
-#pragma mark
-#pragma mark -  Private Methods
+#pragma mark -
+#pragma mark Private Methods
 
 -(UIButton *) generateGetImagesButtonWithTitle:(NSString *)title atRect:(CGRect)rect
 {

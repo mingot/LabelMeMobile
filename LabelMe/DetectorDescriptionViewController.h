@@ -25,6 +25,7 @@
 @interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate,ModalTVCDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
+@property (weak, nonatomic) IBOutlet UICollectionView *ramon;
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
 @property (strong, nonatomic) ShowTrainingSetViewController *trainingSetController;
