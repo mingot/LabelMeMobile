@@ -23,11 +23,6 @@
 
 @implementation SettingsViewController
 
-@synthesize tableView = _tableView;
-@synthesize username = _username;
-@synthesize popover = _popover;
-@synthesize website = _website;
-
 
 #pragma mark
 #pragma mark - View lifecycle

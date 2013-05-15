@@ -8,15 +8,16 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
+
 #import "TagViewController.h"
+#import "CameraViewController.h"
+#import "ModalSectionsTVC.h"
 #import "ServerConnection.h"
 #import "SendingView.h"
-#import "ModalTVC.h"
-#import "ModalSectionsTVC.h"
+#import "AYUIButton.h"
 
-#import "CameraViewController.h"
 
-@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalTVCDelegate, ModalSectionsTVCDelegate, CameraViewControllerDeledate>
+@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalSectionsTVCDelegate, CameraViewControllerDeledate>
 {
     int selectedTableIndex;
     int photosWithErrors;
@@ -40,10 +41,9 @@
 @property (nonatomic,strong) IBOutlet UIButton *listButton;
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
 @property (nonatomic,strong) IBOutlet UITableView *tableViewGrid;
-@property (weak, nonatomic) IBOutlet UIButton *downloadButton;
-@property (weak, nonatomic) IBOutlet UIButton *cameraButton;
-
-
+@property (weak, nonatomic) IBOutlet AYUIButton *downloadButton;
+@property (weak, nonatomic) IBOutlet AYUIButton *cameraButton;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 
 //table
 @property (nonatomic,strong) NSArray *items;
@@ -51,21 +51,19 @@
 @property (nonatomic,strong) NSMutableArray *selectedItemsSend;
 @property (nonatomic,strong) NSMutableArray *selectedItemsDelete;
 
-
+//controllers
 @property (nonatomic,strong) TagViewController *tagViewController;
 @property (nonatomic,strong) CameraViewController *cameraVC;
-@property (nonatomic,strong) ModalTVC *modalTVC;
 @property (nonatomic,strong) ModalSectionsTVC *modalSectionsTVC;
 
-
+//actions
 -(IBAction)buttonClicked:(id)sender;
 -(IBAction)deleteAction:(id)sender;
 -(IBAction)sendAction:(id)sender;
 -(IBAction)listAction:(id)sender;
 -(IBAction)cancelAction:(id)sender;
 -(IBAction)editAction:(id)sender;
--(IBAction)moreImagesAction:(id)sender;
--(IBAction)imageSelectedAction:(UIButton *)button;
+//-(IBAction)imageSelectedAction:(UIButton *)button;
 -(IBAction)addImage:(id)sender;
 -(IBAction)downloadAction:(id)sender;
 

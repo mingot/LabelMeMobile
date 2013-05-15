@@ -36,7 +36,6 @@
 @property int firstTraingState; //0: not first training, 1: first training initiated, 2: first training interrupted
 
 
-
 // wrapper to call the detector for training and testing
 -(void) trainForImagesNames:(NSArray *)imagesNames;
 -(void) testForImagesNames: (NSArray *) imagesNames;
@@ -61,8 +60,8 @@
 
 @synthesize delegate = _delegate;
 
+
 @synthesize executeController = _executeController;
-@synthesize trainingSetController = _trainingSetController;
 @synthesize modalTVC = _modalTVC;
 @synthesize sendingView = _sendingView;
 @synthesize svmClassifier = _svmClassifier;
@@ -120,7 +119,6 @@
     
     //load views
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
-    self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
     
     //set labels
     self.nameTextField.text = self.svmClassifier.name;
@@ -161,7 +159,6 @@
     //Check if the classifier exists.
     if(self.svmClassifier.weights == nil){
         NSLog(@"New classifier");
-        
         //show modal to select the target class
         self.modalTVC = [[ModalTVC alloc] init];
         self.modalTVC.showCancelButton = YES;
@@ -169,6 +166,7 @@
         self.modalTVC.modalTitle = @"Select Class";
         self.modalTVC.multipleChoice = NO;
         self.modalTVC.data = self.availableObjectClasses;
+        self.modalTVC.doneButtonTitle = @"Create";
         [self presentModalViewController:self.modalTVC animated:YES];
         self.firstTraingState = INITIATED;
         
@@ -225,7 +223,8 @@
     //show modal to select training positives for the selected class
     self.modalTVC = [[ModalTVC alloc] init];
     self.modalTVC.delegate = self;
-    self.modalTVC.modalTitle = @"Training Images";
+    self.modalTVC.modalTitle = @"Select Training Images";
+    self.modalTVC.doneButtonTitle = @"Train";
     self.modalTVC.multipleChoice = NO;
     self.availablePositiveImagesNames = nil; //to reset
     NSMutableArray *imagesList = [[NSMutableArray alloc] init];
@@ -372,7 +371,7 @@
         
         NSLog(@"selected class:%@", self.svmClassifier.targetClass);
         
-    }else if([identifier isEqualToString:@"Training Images"]){
+    }else if([identifier isEqualToString:@"Select Training Images"]){
         
         //not first training any more
         self.firstTraingState = NOT_FIRST;
@@ -469,6 +468,12 @@
             [self.svmClassifier.imagesUsedTraining addObject:imageName];
         }
     }
+    
+    //Add abstract pictures to the training set to generate false positives when the bb is very big
+    //guess the relationship with the artists :)
+    [trainingSet.images addObject:[UIImage imageNamed:@"picaso.jpg"]];
+    [trainingSet.images addObject:[UIImage imageNamed:@"dali.jpg"]];
+    [trainingSet.images addObject:[UIImage imageNamed:@"miro.jpg"]];
     
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
         

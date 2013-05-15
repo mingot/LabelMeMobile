@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AYUIButton.h"
 
 @protocol ModalSectionsTVCDelegate <NSObject>
 
@@ -26,10 +27,10 @@
 @property (strong, nonatomic) NSMutableArray *selectedItems;
 @property (strong, nonatomic) id<ModalSectionsTVCDelegate> delegate;
 
-@property (weak, nonatomic) IBOutlet UIButton *doneButton;
-@property (weak, nonatomic) IBOutlet UIButton *cancelButton;
+@property (weak, nonatomic) IBOutlet AYUIButton *doneButton;
+@property (weak, nonatomic) IBOutlet AYUIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-
+@property (weak, nonatomic) IBOutlet UILabel *selectionLabel;
 
 //unique name to identify the modal
 @property (strong, nonatomic) NSString *modalTitle;

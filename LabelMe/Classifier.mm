@@ -542,17 +542,23 @@ using namespace cv;
     dispatch_queue_t trainingQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_apply(trainingSet.images.count, trainingQueue, ^(size_t i) {
         UIImage *image = [trainingSet.images objectAtIndex:i];
+        
+        //run the detector on the current image
         NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp learningImageIndex:i];
-        dispatch_sync(dispatch_get_main_queue(),^{
-            [self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %zd: %d", i, newBoundingBoxes.count]];});
+        
+        dispatch_sync(dispatch_get_main_queue(),^{[self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %zd: %d", i, newBoundingBoxes.count]];});
+        
+        //max negative bounding boxes detected per image
         int quota = MAX_QUOTA;
         NSArray *selectedGT = trainingSet.groundTruthBoundingBoxes;
         NSMutableArray *aux = [selectedGT mutableCopy];
         
         for(BoundingBox *newBB in newBoundingBoxes){
             BOOL isNegative = NO;
+            BOOL GTFound = NO;
             for(BoundingBox *groundTruthBB in selectedGT){
                 if(groundTruthBB.imageIndex == i){
+                    GTFound = YES;
                     double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];
                     if (overlapArea > 0.8 && overlapArea<1){
                         newBB.label = 1;
@@ -565,10 +571,10 @@ using namespace cv;
                         }else NSLog(@"Training Buffer FULL!!");
                     }else if(overlapArea < 0.25 && quota>0) isNegative = YES;
                 }else [aux removeObject:groundTruthBB];
-                
             }
+            
             selectedGT = aux;
-            if(isNegative){
+            if(isNegative || (GTFound == NO)){
                 quota--;
                 newBB.label = -1;
                 dispatch_sync(dispatch_get_main_queue(), ^{[self addExample:newBB to:trainingSet];});

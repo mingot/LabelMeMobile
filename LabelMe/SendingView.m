@@ -12,14 +12,6 @@
 
 @implementation SendingView
 
-@synthesize progressView = _progressView;
-@synthesize activityIndicator = _activityIndicator;
-@synthesize label = _label;
-@synthesize filename = _filename;
-@synthesize cancelButton = _cancelButton;
-@synthesize messagesStack = _messagesStack;
-
-
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];

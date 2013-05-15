@@ -40,6 +40,13 @@
 }
 
 
-
+- (void) highlightButton
+{
+    AYUIButton *button = (AYUIButton *) self;
+    [button setBackgroundColor:self.backgroundColor forState:UIControlStateNormal];
+    CGFloat red, blue, green, alpha;
+    [self.backgroundColor getRed:&red green:&green blue:&blue alpha:&alpha];
+    [button setBackgroundColor:[UIColor colorWithRed:red green:green blue:blue alpha:alpha/2.0] forState:UIControlStateHighlighted];
+}
 
 @end

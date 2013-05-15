@@ -18,8 +18,6 @@
 #import "DetectView.h"
 #import "SettingsViewController.h"
 #import "Classifier.h"
-#import "ShowTrainingSetViewController.h"
-#import "ThreeDimVC.h"
 #import "AYUIButton.h"
 
 
@@ -31,27 +29,10 @@
 }
 
 
-//position detection
-@property (nonatomic, strong) ShowTrainingSetViewController *trainingSetController;
-@property (nonatomic, strong) ThreeDimVC *threeDimVC;
-@property (nonatomic, strong) NSMutableArray *imagesList;
-@property (nonatomic, strong) NSMutableArray *rollList;
-@property (nonatomic, strong) NSMutableDictionary *positionsDic;
-@property (weak, nonatomic) IBOutlet UIButton *showImagesButton;
-@property (nonatomic, strong) CMMotionManager *motionManager;
-@property BOOL isRecording;
-- (IBAction)showImagesAction:(id)sender;
-- (IBAction)showModelAction:(id)sender;
-- (IBAction)startRecordingAction:(id)sender;
-@property (weak, nonatomic) IBOutlet UIButton *startRecordingButton;
-
-
 //model properties
 @property (nonatomic,strong) Classifier *svmClassifier;
 @property int numPyramids;
 @property double maxDetectionScore;
-
-
 
 //AVCapture
 @property (nonatomic, strong) AVCaptureSession *captureSession;

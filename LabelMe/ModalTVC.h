@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AYUIButton.h"
+#import "UIButton+CustomViews.h"
 
 @protocol ModalTVCDelegate <NSObject>
 
@@ -23,12 +25,13 @@
 //model
 @property (strong, nonatomic) NSArray *data; //either NSStrings or UIImages
 
-
 @property (strong, nonatomic) NSMutableArray *selectedItems; //indexes
 @property (strong, nonatomic) id<ModalTVCDelegate> delegate;
-@property (weak, nonatomic) IBOutlet UIButton *doneButton;
-@property (weak, nonatomic) IBOutlet UIButton *cancelButton;
+@property (weak, nonatomic) IBOutlet AYUIButton *doneButton;
+@property (weak, nonatomic) IBOutlet AYUIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+@property (strong, nonatomic) NSString *doneButtonTitle;
 //unique name to identify the modal
 @property (strong, nonatomic) NSString *modalTitle;
 @property BOOL multipleChoice;

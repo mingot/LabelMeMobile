@@ -9,6 +9,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "ModalSectionsTVC.h"
 #import "UIImage+Border.h"
+#import "UIButton+CustomViews.h"
 
 @interface ModalSectionsTVC()
 
@@ -106,6 +107,10 @@
     //round corners in the view
     [self.tableView.layer setCornerRadius:6.0];
     
+    //buttons highlight
+    [self.doneButton highlightButton];
+    [self.cancelButton highlightButton];
+    
     self.cancelButton.hidden = !self.showCancelButton;
 }
 
@@ -114,26 +119,51 @@
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
 
-//modify view of the header to include a button to select all the pictures of the caregory
 - (UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 200)];
-    [headerView setBackgroundColor:[UIColor blackColor]];
     
-//    UIView *headerView = [tableView headerViewForSection:section];
-    UIButton *selectAll = [[UIButton alloc] initWithFrame:CGRectMake(0,0,120,30 )];
-    [selectAll setTitle:[self.labelsOrdered objectAtIndex:section] forState:UIControlStateNormal];
+    NSString *title;
+    if(tableView.tag==0){
+        NSString *label = [self.labelsOrdered objectAtIndex:section];
+        NSArray *items = [self.buttonsDictionary objectForKey:label];
+        title = [NSString stringWithFormat:@"%@ (%d)", label, items.count];
+    }else title = @"";
+    
+    // create the parent view that will hold header Label
+    UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10,0,tableView.frame.size.width,30)];
+    customView.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.3];
+    customView.layer.borderWidth = 1.0;
+    customView.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;;
+    
+    // create the label objects
+    UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    headerLabel.backgroundColor = [UIColor clearColor];
+    headerLabel.font = [UIFont boldSystemFontOfSize:12];
+    headerLabel.frame = CGRectMake(20,5,200,20);
+    headerLabel.text =  title;
+    headerLabel.textColor = [UIColor whiteColor];
+    
+    
+    //button to select them all
+    UIButton *selectAll = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width - 120,0,120,30)];
+    selectAll.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.6];
+    selectAll.titleLabel.font = [UIFont systemFontOfSize:12];
+    [selectAll setTitle:@"All" forState:UIControlStateNormal];
     selectAll.tag = section;
     [selectAll addTarget:self action:@selector(selectAllAction:) forControlEvents:UIControlEventTouchUpInside];
-    [headerView addSubview:selectAll];
+    [customView addSubview:selectAll];
     
-    return headerView;
+    
+    [customView addSubview:headerLabel];
+    
+    
+    return customView;
 }
 
-//- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-//{
-//    return 50; //
-//}
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 30; 
+}
 
 -(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -200,6 +230,9 @@
     if(button.selected) [self.selectedItems removeObject:[NSNumber numberWithInt:button.tag]];
     else [self.selectedItems addObject:[NSNumber numberWithInt:button.tag]];
     
+    if(self.selectedItems.count > 0) self.selectionLabel.text = [NSString stringWithFormat:@"%d Images selected",self.selectedItems.count];
+    else self.selectionLabel.text = @"Select Images to import";
+    
     button.selected = button.selected ? NO:YES;
     
     [self toggleDoneButton];
@@ -235,6 +268,7 @@
 
 - (void)viewDidUnload {
     [self setCancelButton:nil];
+    [self setSelectionLabel:nil];
     [super viewDidUnload];
 }
 @end

@@ -12,9 +12,6 @@
 
 @implementation ResolutionViewController
 
-@synthesize tableView = _tableView;
-@synthesize username = _username;
-
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {

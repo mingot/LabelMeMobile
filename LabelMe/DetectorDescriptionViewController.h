@@ -28,7 +28,6 @@
 @property (weak, nonatomic) IBOutlet UICollectionView *ramon;
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
-@property (strong, nonatomic) ShowTrainingSetViewController *trainingSetController;
 @property (strong, nonatomic) ModalTVC *modalTVC;
 @property (strong, nonatomic) SendingView *sendingView;
 

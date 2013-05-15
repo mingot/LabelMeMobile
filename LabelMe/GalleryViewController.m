@@ -41,15 +41,6 @@
 @end
 
 
-@implementation UINavigationBar (UINavigationBarCategory)
-- (void)drawRect:(CGRect)rect {
-    UIColor *color = [UIColor redColor];
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColor(context, CGColorGetComponents([color CGColor]));
-    CGContextFillRect(context, rect);
-}   
-@end
-
 @implementation GalleryViewController
 
 
@@ -214,26 +205,9 @@
         self.selectedItemsDelete = [[NSMutableArray alloc]init];
         self.serverConnection = [[ServerConnection alloc] init];
         
-        
         //tab bar
         self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Gallery" image:nil tag:0];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"home.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"homeActive.png"]];
-        
-        //buttons
-        self.sendButton = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleBordered target:self action:@selector(sendAction:)];
-        self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStyleBordered target:self action:@selector(deleteAction:)];
-        self.editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(editAction:)];
-    
-        
-        self.serverConnection.delegate = self;
-        self.modalTVC = [[ModalTVC alloc] initWithNibName:@"ModalTVC" bundle:nil];
-        self.modalSectionsTVC = [[ModalSectionsTVC alloc] initWithNibName:@"ModalSectionsTVC" bundle:nil];
-        self.cameraVC = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
-        self.cameraVC.delegate = self;
-        
-        //GPS settings
-        self.locationMng = [[CLLocationManager alloc] init];
-        self.locationMng.desiredAccuracy = kCLLocationAccuracyKilometer;
 
     }
     return self;
@@ -243,8 +217,25 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
     
+    self.serverConnection.delegate = self;
     photosWithErrors = 0;
+    
+    //Controllers
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        if ([UIScreen mainScreen].bounds.size.height == 568)
+            self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone5" bundle:nil];
+        else if ([UIScreen mainScreen].bounds.size.height == 480)
+            self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
+    }else self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPad" bundle:nil];
+    self.modalSectionsTVC = [[ModalSectionsTVC alloc] initWithNibName:@"ModalSectionsTVC" bundle:nil];
+    self.cameraVC = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
+    self.cameraVC.delegate = self;
+    
+    //GPS settings
+    self.locationMng = [[CLLocationManager alloc] init];
+    self.locationMng.desiredAccuracy = kCLLocationAccuracyKilometer;
     
     //bottom bar when edit pressed
     [self.navigationController.toolbar setBarStyle:UIBarStyleBlackTranslucent];
@@ -254,31 +245,24 @@
     UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
     titleView.image = titleImage;
     [self.navigationItem setTitleView:titleView];
-
     
-    //edit, send and delete buttons
-    self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(editAction:)]];
-    self.navigationItem.rightBarButtonItem = self.editButton;
+    //Buttons
+    self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStyleBordered target:self action:@selector(deleteAction:)];
     [self.deleteButton setTintColor:[UIColor redColor]];
     [self.deleteButton setWidth:self.view.frame.size.width/2 - 11];
     [self.deleteButton setEnabled:NO];
+    self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(editAction:)]];
+    self.navigationItem.rightBarButtonItem = self.editButton;
+    self.sendButton = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleBordered target:self action:@selector(sendAction:)];
     [self.sendButton setWidth:self.view.frame.size.width/2 - 11];
     [self.sendButton setEnabled:NO];
-    
-    //camera and download buttons
     self.downloadButton.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;
     self.downloadButton.layer.borderWidth = 2.0f;
+    [self.downloadButton highlightButton];
+    self.activityIndicator.hidden = YES;
     self.cameraButton.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;
     self.cameraButton.layer.borderWidth = 2.0f;
-    
-    //device selection for tagVC
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        if ([UIScreen mainScreen].bounds.size.height == 568)
-            self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone5" bundle:nil];
-        else if ([UIScreen mainScreen].bounds.size.height == 480)
-            self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
-    }else self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPad" bundle:nil];
-    
+    [self.cameraButton highlightButton];
     [self.listButton setImage:[UIImage imageNamed:@"listC.png"] forState:UIControlStateNormal];
     [self.listButton setImage:[UIImage imageNamed:@"gridC.png"] forState:UIControlStateSelected];
     
@@ -288,13 +272,11 @@
     self.tableView.hidden = YES;
     self.tableView.rowHeight = self.view.frame.size.width/4;
     self.tableView.tag = 1;
-    
     self.tableViewGrid.backgroundColor = [UIColor clearColor];
     [self.tableViewGrid setBackgroundView:nil];
     self.tableViewGrid.tag = 0;
     
-
-    //no images view
+    //noImages view
     self.noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
     [self.noImages setBackgroundColor:[UIColor whiteColor]];
     self.noImages.layer.masksToBounds = YES;
@@ -308,7 +290,7 @@
     [self.noImages setTextAlignment:NSTextAlignmentCenter];
     [self.noImages setUserInteractionEnabled:YES];
     
-    //sending view initialization
+    //sendingView 
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [self.sendingView setHidden:YES];
@@ -319,8 +301,6 @@
     [self.view addSubview:self.tableViewGrid];
     [self.view addSubview:self.noImages];
     [self.view addSubview:self.sendingView];
-
-    
     
     [self reloadGallery];
 }
@@ -472,12 +452,8 @@
 {
     
     //start spin indicator for the activity
-    UIButton *button = (UIButton *)sender;
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] init];
-    for(id subview in [button subviews])
-        if([subview isKindOfClass:[UIActivityIndicatorView class]])
-            indicator = (UIActivityIndicatorView *)subview;
-    [indicator startAnimating];
+    self.activityIndicator.hidden = NO;
+    [self.activityIndicator startAnimating];
     
     dispatch_queue_t q = dispatch_queue_create("q", NULL);
     dispatch_async(q, ^{
@@ -570,7 +546,6 @@
                     box.downloadDate = [NSDate date];
                     
                     [boundingBoxes addObject:box];
-                    
                 }
                 
                 //save the dictionary
@@ -579,7 +554,8 @@
         }
         
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [indicator stopAnimating];
+            self.activityIndicator.hidden = YES;
+            [self.activityIndicator stopAnimating];
             
             //present the modal depending on the sender button: show images or labels
             if(self.downloadedThumbnails.count>0){
@@ -734,159 +710,6 @@
 }
 
 
--(IBAction) moreImagesAction:(id)sender
-{
-    
-    //start spin indicator for the activity
-    UIButton *button = (UIButton *)sender;
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] init];
-    for(id subview in [button subviews])
-        if([subview isKindOfClass:[UIActivityIndicatorView class]])
-            indicator = (UIActivityIndicatorView *)subview;
-    [indicator startAnimating];
-    
-    
-    dispatch_queue_t q = dispatch_queue_create("q", NULL);
-    dispatch_async(q, ^{
-        NSString *buttonTitle = button.titleLabel.text;
-
-        NSString *query = [NSString stringWithFormat:@"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=%@",self.username];
-        NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
-        NSError *error = nil;
-        NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
-        if (error) NSLog(@"[%@ %@] JSON error: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), error.localizedDescription);
-
-        self.downloadedThumbnails = [[NSMutableArray alloc] init];
-        self.downloadedAnnotations = [[NSMutableArray alloc] init];
-        self.downloadedImageUrls = [[NSMutableArray alloc] init];
-        self.downloadedImageNames = [[NSMutableArray alloc] init];
-        self.downloadedLabelsMap = [[NSMutableDictionary alloc] init];
-
-        NSArray *colors = [[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
-
-        //select NUM images not currently present in iphone
-        for (NSDictionary *element in results) {
-            
-            //get the name of the image
-            NSString *imageName = [element objectForKey:@"name"];
-
-            
-            if([self.items indexOfObject:imageName] == NSNotFound){
-                
-                //save the name of the image
-                [self.downloadedImageNames addObject:imageName];
-               
-                //get and save thumb
-                NSString *thumbUrl = [element objectForKey:@"thumb"];
-                UIImage *thumbImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:thumbUrl]]];
-                if(thumbImage!=nil) [self.downloadedThumbnails addObject:thumbImage];
-                else [self.downloadedThumbnails addObject:[UIImage imageNamed:@"image_not_found.png"]];
-                
-                //get and save images urls
-                NSString *imageUrl = [element objectForKey:@"image"];
-                [self.downloadedImageUrls addObject:imageUrl];
-
-                
-                //get and save annotations
-                NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
-                NSDictionary *annotation = (NSDictionary *) [element objectForKey:@"annotation"];
-                NSDictionary *imageSize = (NSDictionary *) [annotation objectForKey:@"imagesize"];
-                
-                
-                id objects = [annotation objectForKey:@"object"];
-                NSArray *boxes;
-                if([objects isKindOfClass:[NSArray class]]) boxes = (NSArray *) objects;
-                else boxes = [[NSArray alloc] initWithObjects:(NSDictionary *)objects, nil];
-                
-                for(NSDictionary *box in boxes){
-                    
-                    //label: insert into the map to download specific images for a given label
-                    NSString *label = [(NSString *) [box objectForKey:@"name"] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-                    NSMutableArray *imageIndexes = [self.downloadedLabelsMap objectForKey:label];
-                    if(imageIndexes==nil){
-                        imageIndexes = [[NSMutableArray alloc] initWithObjects:[NSNumber numberWithInt:self.downloadedImageNames.count-1], nil];
-                        [self.downloadedLabelsMap setObject:imageIndexes forKey:label];
-                    
-                    }else [imageIndexes addObject:[NSNumber numberWithInt:self.downloadedImageNames.count-1]];
-                    
-                    
-                    NSDictionary *polygon = (NSDictionary *)[box objectForKey:@"polygon"];
-                    NSArray *points = (NSArray *)[polygon objectForKey:@"pt"];
-                    
-                    CGFloat xmin=100000, xmax=0, ymin=100000, ymax=0;
-                    for(NSDictionary *point in points){
-                        int x = [[(NSString *)[point objectForKey:@"x"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] floatValue];
-                        int y = [[(NSString *)[point objectForKey:@"y"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] floatValue];
-                        xmin = x<xmin ? x:xmin;
-                        xmax = x>xmax ? x:xmax;
-                        ymin = y<ymin ? y:ymin;
-                        ymax = y>ymax ? y:ymax;
-                    }
-                    
-                    //box construction
-                    Box *box = [[Box alloc] initWithPoints:CGPointMake(xmin*1.0, ymin*1.0) :CGPointMake(xmax*1.0, ymax*1.0)];
-                    box.label = label;
-                    box.sent = YES;
-                    box.color = [colors objectAtIndex:arc4random() % colors.count];  //choose random color
-                    box->UPPERBOUND = 0;
-                    box->LOWERBOUND = [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
-                    box->LEFTBOUND = 0;
-                    box->RIGHTBOUND = [[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
-                    box.downloadDate = [NSDate date];
-                    
-                    [boundingBoxes addObject:box];
-                    
-                }
-                
-                //save the dictionary
-                [self.downloadedAnnotations addObject:boundingBoxes];
-            }
-            
-        }
-        
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [indicator stopAnimating];
-            
-            //present the modal depending on the sender button: show images or labels
-            if(self.downloadedThumbnails.count>0){
-                if([buttonTitle isEqualToString:@"Server Images"]){
-                    self.modalTVC = [[ModalTVC alloc] init];
-                    self.modalTVC.showCancelButton = YES;
-                    self.modalTVC.delegate = self;
-                    self.modalTVC.modalTitle = @"Choose Images";
-                    self.modalTVC.data = self.downloadedThumbnails;
-                    [self.modalTVC.view setNeedsDisplay];
-                    [self presentModalViewController:self.modalTVC animated:YES];
-                }else if([buttonTitle isEqualToString:@"Server Labels"]){
-                    
-                    //get the labels
-                    NSMutableArray *labels = [[NSMutableArray alloc] init];
-                    for(NSString *key in self.downloadedLabelsMap){
-                        NSArray *indexes = [self.downloadedLabelsMap objectForKey:key];
-                        [labels addObject:[NSString stringWithFormat:@"%@ (%d)",key,indexes.count]];
-                    }
-                    self.modalTVC = [[ModalTVC alloc] init];
-                    self.modalTVC.showCancelButton = YES;
-                    self.modalTVC.delegate = self;
-                    self.modalTVC.modalTitle = @"Choose Labels";
-                    self.modalTVC.multipleChoice = YES;
-                    self.modalTVC.data = [NSArray arrayWithArray:labels];
-                    [self.modalTVC.view setNeedsDisplay];
-                    [self presentModalViewController:self.modalTVC animated:YES];
-                }
-            }else{
-                UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
-                                                                     message:@"You have all the images"
-                                                                    delegate:nil
-                                                           cancelButtonTitle:@"OK"
-                                                           otherButtonTitles:nil];
-                [errorAlert show];
-            }
-        });
-        
-    });
-
-}
 
 
 #pragma mark -
@@ -1351,7 +1174,7 @@
 
 
 #pragma mark -
-#pragma mark ModalTVC Delegate
+#pragma mark ModalSectionsTVC Delegate
 
 
 - (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier
@@ -1444,31 +1267,11 @@
 #pragma mark -
 #pragma mark Private Methods
 
--(UIButton *) generateGetImagesButtonWithTitle:(NSString *)title atRect:(CGRect)rect
-{
-    //second button lower thant the first one
-    CGFloat ini = 0;
-    if([title isEqualToString:@"More Labels"]) ini = 50;
-    
-    UIButton *btnDeco = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    btnDeco.frame = rect;//CGRectMake(0, ini, 280, 40);
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    indicator.center = CGPointMake(btnDeco.bounds.size.width - btnDeco.bounds.size.height / 2 , btnDeco.bounds.size.height / 2);
-    [btnDeco addSubview: indicator];
-    btnDeco.backgroundColor = [UIColor clearColor];
-    [btnDeco setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
-    [btnDeco addTarget:self action:@selector(moreImagesAction:) forControlEvents:UIControlEventTouchUpInside];
-    [btnDeco setTitle:title forState:UIControlStateNormal];
-    
-    return btnDeco;
-}
-
-
-
 
 - (void)viewDidUnload {
     [self setDownloadButton:nil];
     [self setCameraButton:nil];
+    [self setActivityIndicator:nil];
     [super viewDidUnload];
 }
 

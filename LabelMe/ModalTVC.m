@@ -21,25 +21,28 @@
 
 @implementation ModalTVC
 
-@synthesize data = _data;
-@synthesize selectedItems = _selectedItems;
-@synthesize tableView = _tableView;
-@synthesize delegate = _delegate;
-@synthesize multipleChoice = _multipleChoice;
-@synthesize modalTitle = _modalTitle;
-@synthesize cancelButton = _cancelButton;
 
 -(NSMutableArray *) selectedItems
 {
-    if(!_selectedItems){
-        _selectedItems = [[NSMutableArray alloc] init];
-    }
+    if(!_selectedItems) _selectedItems = [[NSMutableArray alloc] init];
     return _selectedItems;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    //UI
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgPattern2.png"]];
+    [self.doneButton highlightButton];
+    [self.cancelButton highlightButton];
+    self.tableView.layer.cornerRadius = 10;
+    self.titleLabel.text = self.modalTitle;
+    self.tableView.backgroundView = nil;
+    self.tableView.backgroundColor = [UIColor clearColor];
+    if(!self.doneButtonTitle) self.doneButtonTitle = @"Done";
+    [self.doneButton setTitle:self.doneButtonTitle forState:UIControlStateNormal];
+//    self.doneButton.titleLabel.text = self.doneButtonTitle;
     
     if(self.selectedItems.count == 0){
         self.doneButton.enabled = NO;
@@ -65,10 +68,6 @@
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    return  self.modalTitle;
-}
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
 {
@@ -221,6 +220,7 @@
 
 - (void)viewDidUnload {
     [self setCancelButton:nil];
+    [self setTitleLabel:nil];
     [super viewDidUnload];
 }
 @end

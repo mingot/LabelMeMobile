@@ -44,10 +44,6 @@
 @synthesize detectionThresholdSliderButton = _detectionThresholdSliderButton;
 
 
-//detection
-@synthesize trainingSetController = _trainingSetController;
-@synthesize imagesList = _imagesList;
-
 
 
 #pragma mark -
@@ -84,16 +80,6 @@
     //buttons
     [self.cancelButton transformButtonForCamera];
     [self.settingsButton transformButtonForCamera];
-    
-    //image poistion detection
-    self.trainingSetController = [[ShowTrainingSetViewController alloc] initWithNibName:@"ShowTrainingSetViewController" bundle:nil];
-    self.threeDimVC = [[ThreeDimVC alloc] initWithNibName:@"ThreeDimVC" bundle:nil];
-    self.imagesList = [[NSMutableArray alloc] init];
-    self.rollList = [[NSMutableArray alloc] init];
-    self.positionsDic = [[NSMutableDictionary alloc] init];
-    self.motionManager = [[CMMotionManager alloc] init];
-    [self.motionManager startDeviceMotionUpdates];
-    self.isRecording = NO;
     
     self.prevLayer = nil;
     
@@ -239,7 +225,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             BoundingBox *score = (BoundingBox *)[nmsArray objectAtIndex:0];
             scoreFloat = score.score;
             if(score.score > self.maxDetectionScore) self.maxDetectionScore = score.score;
-            if(self.isRecording) [self takePicture:nmsArray for:[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight]];
             level = score.pyramidLevel;
             
         } 
@@ -303,48 +288,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 
 
-#pragma mark -
-#pragma mark Position images
-
-- (IBAction)showImagesAction:(id)sender
-{
-    self.trainingSetController.listOfImages = self.imagesList;
-    [self.navigationController pushViewController:self.trainingSetController animated:YES];
-}
-
-- (IBAction)showModelAction:(id)sender
-{
-    //sort images
-    //load images in the model
-//    self.threeDimVC.imageList = self.imagesList;
-    self.threeDimVC.positionsDic = self.positionsDic;
-    [self.navigationController pushViewController:self.threeDimVC animated:YES];
-    
-}
-
-- (IBAction)startRecordingAction:(id)sender
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.isRecording = self.isRecording ? NO:YES;
-        self.startRecordingButton.titleLabel.text = self.isRecording ? @"start" : @"stop";
-        NSLog(self.isRecording ? @"Yes" : @"No");
-    });
-
-}
-
-- (void) takePicture:(NSArray *)nmsArray for:(UIImage *)image
-{
-    BoundingBox *bb = [nmsArray objectAtIndex:0];
-    CMAttitude *attitude = self.motionManager.deviceMotion.attitude;
-    NSLog(@"pitch: %f, yaw:%f, roll:%f", attitude.pitch, attitude.yaw, attitude.roll);
-    
-
-    NSString *key = [NSString stringWithFormat:@"%d/%d",(int)round(attitude.pitch*10), (int)round(attitude.roll*10)];
-    if(self.positionsDic.count == 0 || [self.positionsDic objectForKey:key]==nil){
-        [self.positionsDic setObject:[image croppedImage:[bb rectangleForImage:image]] forKey:key];
-        NSLog(@"Added key %@ and total: %d", key, self.positionsDic.count);
-    }
-}
 
 
 #pragma mark -

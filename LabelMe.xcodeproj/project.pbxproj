@@ -165,8 +165,6 @@
 		FC4B0A32172F358600A099A0 /* save.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2F172F358600A099A0 /* save.png */; };
 		FC4B0A33172F358600A099A0 /* execute.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A30172F358600A099A0 /* execute.png */; };
 		FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC4D68801716164E002A73AD /* CoreMotion.framework */; };
-		FC4D688A17167036002A73AD /* ThreeDimVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4D688817167036002A73AD /* ThreeDimVC.m */; };
-		FC4D688B17167036002A73AD /* ThreeDimVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC4D688917167036002A73AD /* ThreeDimVC.xib */; };
 		FC4EE0F617231A1700536B4A /* CameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4EE0F417231A1700536B4A /* CameraViewController.m */; };
 		FC4EE0F717231A1700536B4A /* CameraViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC4EE0F517231A1700536B4A /* CameraViewController.xib */; };
 		FC5C939A16FCB89900637B69 /* app login-11.png in Resources */ = {isa = PBXBuildFile; fileRef = FC5C939916FCB89900637B69 /* app login-11.png */; };
@@ -178,8 +176,6 @@
 		FC5C93A716FCE3A100637B69 /* DetectorGalleryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */; };
 		FC5C93AB16FCFA9200637B69 /* DetectorDescriptionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93A916FCFA9000637B69 /* DetectorDescriptionViewController.m */; };
 		FC5C93AC16FCFA9200637B69 /* DetectorDescriptionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */; };
-		FC5C93B016FCFE8F00637B69 /* TrainDetectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93AE16FCFE8D00637B69 /* TrainDetectorViewController.m */; };
-		FC5C93B116FCFE8F00637B69 /* TrainDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */; };
 		FC5C93B516FCFEAB00637B69 /* ExecuteDetectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */; };
 		FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */; };
 		FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC610AF3170A36D800851AC2 /* CoreImage.framework */; };
@@ -219,6 +215,12 @@
 		FC9F94D6174340E20004598C /* trainIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94CD174340E20004598C /* trainIcon.png */; };
 		FC9F94D7174340E20004598C /* trainIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94CE174340E20004598C /* trainIcon@2x.png */; };
 		FC9F94D8174340E20004598C /* viewAs.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94CF174340E20004598C /* viewAs.png */; };
+		FC9F94DB1743DBC90004598C /* greyNoiseBg.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94DA1743DBC90004598C /* greyNoiseBg.png */; };
+		FC9F94DE1743DE3A0004598C /* bgPattern1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94DC1743DE3A0004598C /* bgPattern1.jpg */; };
+		FC9F94DF1743DE3A0004598C /* bgPattern2.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94DD1743DE3A0004598C /* bgPattern2.png */; };
+		FC9F94E417443BAA0004598C /* dali.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94E117443BAA0004598C /* dali.jpg */; };
+		FC9F94E517443BAA0004598C /* miro.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94E217443BAA0004598C /* miro.jpg */; };
+		FC9F94E617443BAA0004598C /* picaso.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94E317443BAA0004598C /* picaso.jpg */; };
 		FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */; };
 		FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */; };
 		FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */; };
@@ -231,10 +233,6 @@
 		FCED8972170350F80027CBE1 /* bottle.txt in Resources */ = {isa = PBXBuildFile; fileRef = FCED8971170350F80027CBE1 /* bottle.txt */; };
 		FCED8974170353FB0027CBE1 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCED8973170353FB0027CBE1 /* CoreMedia.framework */; };
 		FCED8976170354010027CBE1 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCED8975170354010027CBE1 /* CoreVideo.framework */; };
-		FCED897E170375050027CBE1 /* ShowTrainingSetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED897C170375050027CBE1 /* ShowTrainingSetViewController.m */; };
-		FCED897F170375050027CBE1 /* ShowTrainingSetViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCED897D170375050027CBE1 /* ShowTrainingSetViewController.xib */; };
-		FCED898317037A5F0027CBE1 /* ShowImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED898117037A5F0027CBE1 /* ShowImageViewController.m */; };
-		FCED898417037A5F0027CBE1 /* ShowImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -429,9 +427,6 @@
 		FC4B0A2F172F358600A099A0 /* save.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = save.png; sourceTree = "<group>"; };
 		FC4B0A30172F358600A099A0 /* execute.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = execute.png; sourceTree = "<group>"; };
 		FC4D68801716164E002A73AD /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
-		FC4D688717167036002A73AD /* ThreeDimVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThreeDimVC.h; path = ../ThreeDimVC.h; sourceTree = "<group>"; };
-		FC4D688817167036002A73AD /* ThreeDimVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ThreeDimVC.m; path = ../ThreeDimVC.m; sourceTree = "<group>"; };
-		FC4D688917167036002A73AD /* ThreeDimVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ThreeDimVC.xib; path = ../ThreeDimVC.xib; sourceTree = "<group>"; };
 		FC4D6890171A37E4002A73AD /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		FC4EE0F317231A1700536B4A /* CameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraViewController.h; sourceTree = "<group>"; };
 		FC4EE0F417231A1700536B4A /* CameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraViewController.m; sourceTree = "<group>"; };
@@ -447,9 +442,6 @@
 		FC5C93A816FCFA8F00637B69 /* DetectorDescriptionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectorDescriptionViewController.h; sourceTree = "<group>"; };
 		FC5C93A916FCFA9000637B69 /* DetectorDescriptionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectorDescriptionViewController.m; sourceTree = "<group>"; };
 		FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetectorDescriptionViewController.xib; sourceTree = "<group>"; };
-		FC5C93AD16FCFE8C00637B69 /* TrainDetectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrainDetectorViewController.h; sourceTree = "<group>"; };
-		FC5C93AE16FCFE8D00637B69 /* TrainDetectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrainDetectorViewController.m; sourceTree = "<group>"; };
-		FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TrainDetectorViewController.xib; sourceTree = "<group>"; };
 		FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExecuteDetectorViewController.h; sourceTree = "<group>"; };
 		FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExecuteDetectorViewController.m; sourceTree = "<group>"; };
 		FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ExecuteDetectorViewController.xib; sourceTree = "<group>"; };
@@ -495,6 +487,12 @@
 		FC9F94CD174340E20004598C /* trainIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trainIcon.png; sourceTree = "<group>"; };
 		FC9F94CE174340E20004598C /* trainIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "trainIcon@2x.png"; sourceTree = "<group>"; };
 		FC9F94CF174340E20004598C /* viewAs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = viewAs.png; sourceTree = "<group>"; };
+		FC9F94DA1743DBC90004598C /* greyNoiseBg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = greyNoiseBg.png; sourceTree = "<group>"; };
+		FC9F94DC1743DE3A0004598C /* bgPattern1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bgPattern1.jpg; sourceTree = "<group>"; };
+		FC9F94DD1743DE3A0004598C /* bgPattern2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bgPattern2.png; sourceTree = "<group>"; };
+		FC9F94E117443BAA0004598C /* dali.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = dali.jpg; sourceTree = "<group>"; };
+		FC9F94E217443BAA0004598C /* miro.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = miro.jpg; sourceTree = "<group>"; };
+		FC9F94E317443BAA0004598C /* picaso.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = picaso.jpg; sourceTree = "<group>"; };
 		FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalTVC.h; sourceTree = "<group>"; };
 		FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalTVC.m; sourceTree = "<group>"; };
 		FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ModalTVC.xib; sourceTree = "<group>"; };
@@ -513,12 +511,6 @@
 		FCED8971170350F80027CBE1 /* bottle.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bottle.txt; sourceTree = "<group>"; };
 		FCED8973170353FB0027CBE1 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		FCED8975170354010027CBE1 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
-		FCED897B170375050027CBE1 /* ShowTrainingSetViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowTrainingSetViewController.h; sourceTree = "<group>"; };
-		FCED897C170375050027CBE1 /* ShowTrainingSetViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowTrainingSetViewController.m; sourceTree = "<group>"; };
-		FCED897D170375050027CBE1 /* ShowTrainingSetViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ShowTrainingSetViewController.xib; sourceTree = "<group>"; };
-		FCED898017037A5F0027CBE1 /* ShowImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowImageViewController.h; sourceTree = "<group>"; };
-		FCED898117037A5F0027CBE1 /* ShowImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowImageViewController.m; sourceTree = "<group>"; };
-		FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ShowImageViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -614,8 +606,6 @@
 				FC9F9480173AE3DD0004598C /* Camera */,
 				FC5C93B716FD014200637B69 /* Detector */,
 				FC9F9481173AE4340004598C /* Additional View Controllers */,
-				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
-				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
 				A558D62816134E0C001DED8C /* LabelMeAppDelegate.h */,
 				A558D62916134E0C001DED8C /* LabelMeAppDelegate.m */,
 				A558D64C1613A365001DED8C /* Categories */,
@@ -628,6 +618,7 @@
 		A558D62016134E0C001DED8C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				FC9F94E017443B9A0004598C /* Abstract */,
 				FC5C93A116FCB8C800637B69 /* app-login-A@2x-568h@2x.png */,
 				FC5C939F16FCB8BF00637B69 /* app-login-A@2x-Portrait.png */,
 				FC5C939D16FCB8AE00637B69 /* cruz.png */,
@@ -668,6 +659,7 @@
 		A558D64116138D37001DED8C /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				FC9F94D91743DBBE0004598C /* Backgrounds */,
 				FC9F94C217433D210004598C /* Camera */,
 				FC9F94BD17433B3F0004598C /* Settings */,
 				FC9F94B417433A830004598C /* Detectors */,
@@ -799,21 +791,15 @@
 		FC5C93B716FD014200637B69 /* Detector */ = {
 			isa = PBXGroup;
 			children = (
-				FCED897A170362270027CBE1 /* Detector XIB */,
 				FC5C93A316FCE39F00637B69 /* DetectorGalleryViewController.h */,
 				FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */,
+				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
 				FC5C93A816FCFA8F00637B69 /* DetectorDescriptionViewController.h */,
 				FC5C93A916FCFA9000637B69 /* DetectorDescriptionViewController.m */,
+				FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */,
 				FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */,
 				FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */,
-				FC4D688717167036002A73AD /* ThreeDimVC.h */,
-				FC4D688817167036002A73AD /* ThreeDimVC.m */,
-				FC5C93AD16FCFE8C00637B69 /* TrainDetectorViewController.h */,
-				FC5C93AE16FCFE8D00637B69 /* TrainDetectorViewController.m */,
-				FCED897B170375050027CBE1 /* ShowTrainingSetViewController.h */,
-				FCED897C170375050027CBE1 /* ShowTrainingSetViewController.m */,
-				FCED898017037A5F0027CBE1 /* ShowImageViewController.h */,
-				FCED898117037A5F0027CBE1 /* ShowImageViewController.m */,
+				FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */,
 				FCED895B17034CAF0027CBE1 /* DetectView.h */,
 				FCED895C17034CAF0027CBE1 /* DetectView.m */,
 				FCED896117034CD70027CBE1 /* ConvolutionHelper.h */,
@@ -883,10 +869,14 @@
 		FC9F9481173AE4340004598C /* Additional View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
+				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
 				FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */,
 				FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */,
+				FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */,
 				FC8E89B41739876D0018876D /* ModalSectionsTVC.h */,
 				FC8E89B51739876D0018876D /* ModalSectionsTVC.m */,
+				FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */,
 				A5A567721617D756008AFE2E /* SettingsViewController.h */,
 				A5A567731617D756008AFE2E /* SettingsViewController.m */,
 				A5A567741617D756008AFE2E /* SettingsViewController_iPhone.xib */,
@@ -986,20 +976,24 @@
 			name = Camera;
 			sourceTree = "<group>";
 		};
-		FCED897A170362270027CBE1 /* Detector XIB */ = {
+		FC9F94D91743DBBE0004598C /* Backgrounds */ = {
 			isa = PBXGroup;
 			children = (
-				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
-				FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */,
-				FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */,
-				FC4D688917167036002A73AD /* ThreeDimVC.xib */,
-				FC5C93AF16FCFE8E00637B69 /* TrainDetectorViewController.xib */,
-				FCED897D170375050027CBE1 /* ShowTrainingSetViewController.xib */,
-				FCED898217037A5F0027CBE1 /* ShowImageViewController.xib */,
-				FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */,
-				FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */,
+				FC9F94DC1743DE3A0004598C /* bgPattern1.jpg */,
+				FC9F94DD1743DE3A0004598C /* bgPattern2.png */,
+				FC9F94DA1743DBC90004598C /* greyNoiseBg.png */,
 			);
-			name = "Detector XIB";
+			name = Backgrounds;
+			sourceTree = "<group>";
+		};
+		FC9F94E017443B9A0004598C /* Abstract */ = {
+			isa = PBXGroup;
+			children = (
+				FC9F94E117443BAA0004598C /* dali.jpg */,
+				FC9F94E217443BAA0004598C /* miro.jpg */,
+				FC9F94E317443BAA0004598C /* picaso.jpg */,
+			);
+			name = Abstract;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1181,13 +1175,9 @@
 				A5B8F9F0166568E200D8F73A /* silueta@2x.png in Resources */,
 				FC5C93A716FCE3A100637B69 /* DetectorGalleryViewController.xib in Resources */,
 				FC5C93AC16FCFA9200637B69 /* DetectorDescriptionViewController.xib in Resources */,
-				FC5C93B116FCFE8F00637B69 /* TrainDetectorViewController.xib in Resources */,
 				FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */,
 				FCED8972170350F80027CBE1 /* bottle.txt in Resources */,
-				FCED897F170375050027CBE1 /* ShowTrainingSetViewController.xib in Resources */,
-				FCED898417037A5F0027CBE1 /* ShowImageViewController.xib in Resources */,
 				FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */,
-				FC4D688B17167036002A73AD /* ThreeDimVC.xib in Resources */,
 				FC4EE0F717231A1700536B4A /* CameraViewController.xib in Resources */,
 				FCE35A03172AD5AC00FFE98B /* image_not_found.png in Resources */,
 				FC4B0A2C172EC0C200A099A0 /* switch_camera.png in Resources */,
@@ -1225,6 +1215,12 @@
 				FC9F94D6174340E20004598C /* trainIcon.png in Resources */,
 				FC9F94D7174340E20004598C /* trainIcon@2x.png in Resources */,
 				FC9F94D8174340E20004598C /* viewAs.png in Resources */,
+				FC9F94DB1743DBC90004598C /* greyNoiseBg.png in Resources */,
+				FC9F94DE1743DE3A0004598C /* bgPattern1.jpg in Resources */,
+				FC9F94DF1743DE3A0004598C /* bgPattern2.png in Resources */,
+				FC9F94E417443BAA0004598C /* dali.jpg in Resources */,
+				FC9F94E517443BAA0004598C /* miro.jpg in Resources */,
+				FC9F94E617443BAA0004598C /* picaso.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1260,17 +1256,13 @@
 				A537747B165C3E9900BF0649 /* CreditsViewController.m in Sources */,
 				FC5C93A616FCE3A100637B69 /* DetectorGalleryViewController.m in Sources */,
 				FC5C93AB16FCFA9200637B69 /* DetectorDescriptionViewController.m in Sources */,
-				FC5C93B016FCFE8F00637B69 /* TrainDetectorViewController.m in Sources */,
 				FC5C93B516FCFEAB00637B69 /* ExecuteDetectorViewController.m in Sources */,
 				FCED895D17034CAF0027CBE1 /* DetectView.m in Sources */,
 				FCED896017034CCA0027CBE1 /* Classifier.mm in Sources */,
 				FCED896317034CD70027CBE1 /* ConvolutionHelper.m in Sources */,
 				FCED896817034D350027CBE1 /* UIImage+HOG.m in Sources */,
-				FCED897E170375050027CBE1 /* ShowTrainingSetViewController.m in Sources */,
-				FCED898317037A5F0027CBE1 /* ShowImageViewController.m in Sources */,
 				FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */,
 				FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */,
-				FC4D688A17167036002A73AD /* ThreeDimVC.m in Sources */,
 				FC4EE0F617231A1700536B4A /* CameraViewController.m in Sources */,
 				FC8E89B1173930340018876D /* UIImage+Border.m in Sources */,
 				FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */,
@@ -1383,10 +1375,7 @@
 				GCC_PREFIX_HEADER = "LabelMe/LabelMe-Prefix.pch";
 				INFOPLIST_FILE = "LabelMe/LabelMe-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../Downloads/DFVideoOut\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = LabelMe;
 				PROVISIONING_PROFILE = "C1210B35-1CF2-4D2E-8BC5-DB34D0355BE7";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1409,10 +1398,7 @@
 				GCC_PREFIX_HEADER = "LabelMe/LabelMe-Prefix.pch";
 				INFOPLIST_FILE = "LabelMe/LabelMe-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../Downloads/DFVideoOut\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = LabelMe;
 				PROVISIONING_PROFILE = "C1210B35-1CF2-4D2E-8BC5-DB34D0355BE7";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1435,10 +1421,7 @@
 				GCC_PREFIX_HEADER = "LabelMe/LabelMe-Prefix.pch";
 				INFOPLIST_FILE = "LabelMe/LabelMe-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../Downloads/DFVideoOut\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = LabelMe;
 				PROVISIONING_PROFILE = "C1210B35-1CF2-4D2E-8BC5-DB34D0355BE7";
 				TARGETED_DEVICE_FAMILY = "1,2";
