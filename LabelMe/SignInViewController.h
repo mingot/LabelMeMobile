@@ -12,7 +12,6 @@
 #import "SettingsViewController.h"
 #import "DetectorGalleryViewController.h"
 #import "CreateAccountViewController.h"
-#import "CameraOverlayViewController.h"
 #import "CameraViewController.h"
 #import "SendingView.h"
 

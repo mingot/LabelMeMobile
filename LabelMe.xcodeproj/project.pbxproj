@@ -95,7 +95,6 @@
 		A5DCC55F1628F5CB00AC9067 /* CreateAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A564641B1614BA0D007D444E /* CreateAccountViewController.m */; };
 		A5DCC5601628F5CB00AC9067 /* GalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5CAAF4F16163A870095D703 /* GalleryViewController.m */; };
 		A5DCC5611628F5CB00AC9067 /* NSObject+Folders.m in Sources */ = {isa = PBXBuildFile; fileRef = A5480D5F16173525009F630D /* NSObject+Folders.m */; };
-		A5DCC5621628F5CB00AC9067 /* CameraOverlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5480D6816176CEB009F630D /* CameraOverlayViewController.m */; };
 		A5DCC5631628F5CB00AC9067 /* TagView.m in Sources */ = {isa = PBXBuildFile; fileRef = A5480D731617969A009F630D /* TagView.m */; };
 		A5DCC5641628F5CB00AC9067 /* Box.m in Sources */ = {isa = PBXBuildFile; fileRef = A5480D7616179D8E009F630D /* Box.m */; };
 		A5DCC5651628F5CB00AC9067 /* UIImage+Alpha.m in Sources */ = {isa = PBXBuildFile; fileRef = A5480D7A1617A364009F630D /* UIImage+Alpha.m */; };
@@ -123,7 +122,6 @@
 		A5DCC57F1628F5CB00AC9067 /* uitabbar_selection_indicator.png in Resources */ = {isa = PBXBuildFile; fileRef = A5CAAF42161637D70095D703 /* uitabbar_selection_indicator.png */; };
 		A5DCC5801628F5CB00AC9067 /* selected_tabbar.png in Resources */ = {isa = PBXBuildFile; fileRef = A5CAAF48161639070095D703 /* selected_tabbar.png */; };
 		A5DCC5811628F5CB00AC9067 /* GalleryViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5CAAF5016163A870095D703 /* GalleryViewController_iPhone.xib */; };
-		A5DCC5841628F5CB00AC9067 /* CameraOverlayViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5480D6A1617815B009F630D /* CameraOverlayViewController_iPhone.xib */; };
 		A5DCC5851628F5CB00AC9067 /* TagViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5480D6F16179557009F630D /* TagViewController_iPhone.xib */; };
 		A5DCC5861628F5CB00AC9067 /* SettingsViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5A567741617D756008AFE2E /* SettingsViewController_iPhone.xib */; };
 		A5DCC5871628F5CB00AC9067 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = A5A567781617FC58008AFE2E /* Icon-72.png */; };
@@ -192,6 +190,35 @@
 		FC92DD8117316C2D004F8189 /* undo.png in Resources */ = {isa = PBXBuildFile; fileRef = FC92DD8017316C2D004F8189 /* undo.png */; };
 		FC92DD9117343A32004F8189 /* camera2.png in Resources */ = {isa = PBXBuildFile; fileRef = FC92DD9017343A32004F8189 /* camera2.png */; };
 		FC9F9488173BE9880004598C /* AYUIButton.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F9487173BE9870004598C /* AYUIButton.m */; };
+		FC9F9492174275890004598C /* detectorsTitle.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F948C174275890004598C /* detectorsTitle.png */; };
+		FC9F9493174275890004598C /* detectorsTitle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F948D174275890004598C /* detectorsTitle@2x.png */; };
+		FC9F9494174275890004598C /* galleryTitle.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F948E174275890004598C /* galleryTitle.png */; };
+		FC9F9495174275890004598C /* galleryTitle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F948F174275890004598C /* galleryTitle@2x.png */; };
+		FC9F9496174275890004598C /* serverTitle.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F9490174275890004598C /* serverTitle.png */; };
+		FC9F9497174275890004598C /* serverTitle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F9491174275890004598C /* serverTitle@2x.png */; };
+		FC9F949B174276210004598C /* cameraIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F9499174276210004598C /* cameraIcon.png */; };
+		FC9F949C174276210004598C /* cameraIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F949A174276210004598C /* cameraIcon@2x.png */; };
+		FC9F949F1742764A0004598C /* serverArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F949D1742764A0004598C /* serverArrow.png */; };
+		FC9F94A01742764A0004598C /* serverArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F949E1742764A0004598C /* serverArrow@2x.png */; };
+		FC9F94A7174290B40004598C /* LMUINavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F94A6174290B40004598C /* LMUINavigationController.m */; };
+		FC9F94B01742CB420004598C /* UIButton+CustomViews.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F94AF1742CB410004598C /* UIButton+CustomViews.m */; };
+		FC9F94B917433AC10004598C /* detectorIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94B517433AC10004598C /* detectorIcon.png */; };
+		FC9F94BA17433AC10004598C /* detectorIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94B617433AC10004598C /* detectorIcon@2x.png */; };
+		FC9F94BB17433AC10004598C /* detectorsDisabled.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94B717433AC10004598C /* detectorsDisabled.png */; };
+		FC9F94BC17433AC10004598C /* detectorsDisabled@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94B817433AC10004598C /* detectorsDisabled@2x.png */; };
+		FC9F94C017433B590004598C /* settingsDisabled.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94BE17433B590004598C /* settingsDisabled.png */; };
+		FC9F94C117433B590004598C /* settingsDisabled@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94BF17433B590004598C /* settingsDisabled@2x.png */; };
+		FC9F94C517433D330004598C /* switchCamera.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94C317433D330004598C /* switchCamera.png */; };
+		FC9F94C617433D330004598C /* switchCamera@2.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94C417433D330004598C /* switchCamera@2.png */; };
+		FC9F94D0174340E20004598C /* executeIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94C7174340E20004598C /* executeIcon.png */; };
+		FC9F94D1174340E20004598C /* executeIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94C8174340E20004598C /* executeIcon@2x.png */; };
+		FC9F94D2174340E20004598C /* infoIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94C9174340E20004598C /* infoIcon.png */; };
+		FC9F94D3174340E20004598C /* infoIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94CA174340E20004598C /* infoIcon@2x.png */; };
+		FC9F94D4174340E20004598C /* restoreIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94CB174340E20004598C /* restoreIcon.png */; };
+		FC9F94D5174340E20004598C /* restoreIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94CC174340E20004598C /* restoreIcon@2x.png */; };
+		FC9F94D6174340E20004598C /* trainIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94CD174340E20004598C /* trainIcon.png */; };
+		FC9F94D7174340E20004598C /* trainIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94CE174340E20004598C /* trainIcon@2x.png */; };
+		FC9F94D8174340E20004598C /* viewAs.png in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94CF174340E20004598C /* viewAs.png */; };
 		FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */; };
 		FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */; };
 		FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */; };
@@ -246,9 +273,6 @@
 		A5480D5E16173525009F630D /* NSObject+Folders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+Folders.h"; sourceTree = "<group>"; };
 		A5480D5F16173525009F630D /* NSObject+Folders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Folders.m"; sourceTree = "<group>"; };
 		A5480D6216175CE0009F630D /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
-		A5480D6716176CEB009F630D /* CameraOverlayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraOverlayViewController.h; sourceTree = "<group>"; };
-		A5480D6816176CEB009F630D /* CameraOverlayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraOverlayViewController.m; sourceTree = "<group>"; };
-		A5480D6A1617815B009F630D /* CameraOverlayViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CameraOverlayViewController_iPhone.xib; sourceTree = "<group>"; };
 		A5480D6F16179557009F630D /* TagViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagViewController_iPhone.xib; sourceTree = "<group>"; };
 		A5480D721617969A009F630D /* TagView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagView.h; sourceTree = "<group>"; };
 		A5480D731617969A009F630D /* TagView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagView.m; sourceTree = "<group>"; };
@@ -440,6 +464,37 @@
 		FC92DD9017343A32004F8189 /* camera2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera2.png; sourceTree = "<group>"; };
 		FC9F9486173BE9860004598C /* AYUIButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYUIButton.h; sourceTree = "<group>"; };
 		FC9F9487173BE9870004598C /* AYUIButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYUIButton.m; sourceTree = "<group>"; };
+		FC9F948C174275890004598C /* detectorsTitle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = detectorsTitle.png; sourceTree = "<group>"; };
+		FC9F948D174275890004598C /* detectorsTitle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "detectorsTitle@2x.png"; sourceTree = "<group>"; };
+		FC9F948E174275890004598C /* galleryTitle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = galleryTitle.png; sourceTree = "<group>"; };
+		FC9F948F174275890004598C /* galleryTitle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "galleryTitle@2x.png"; sourceTree = "<group>"; };
+		FC9F9490174275890004598C /* serverTitle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = serverTitle.png; sourceTree = "<group>"; };
+		FC9F9491174275890004598C /* serverTitle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "serverTitle@2x.png"; sourceTree = "<group>"; };
+		FC9F9499174276210004598C /* cameraIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cameraIcon.png; sourceTree = "<group>"; };
+		FC9F949A174276210004598C /* cameraIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cameraIcon@2x.png"; sourceTree = "<group>"; };
+		FC9F949D1742764A0004598C /* serverArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = serverArrow.png; sourceTree = "<group>"; };
+		FC9F949E1742764A0004598C /* serverArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "serverArrow@2x.png"; sourceTree = "<group>"; };
+		FC9F94A5174290B40004598C /* LMUINavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LMUINavigationController.h; sourceTree = "<group>"; };
+		FC9F94A6174290B40004598C /* LMUINavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LMUINavigationController.m; sourceTree = "<group>"; };
+		FC9F94AE1742CB400004598C /* UIButton+CustomViews.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIButton+CustomViews.h"; path = "../UIButton+CustomViews.h"; sourceTree = "<group>"; };
+		FC9F94AF1742CB410004598C /* UIButton+CustomViews.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIButton+CustomViews.m"; path = "../UIButton+CustomViews.m"; sourceTree = "<group>"; };
+		FC9F94B517433AC10004598C /* detectorIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = detectorIcon.png; sourceTree = "<group>"; };
+		FC9F94B617433AC10004598C /* detectorIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "detectorIcon@2x.png"; sourceTree = "<group>"; };
+		FC9F94B717433AC10004598C /* detectorsDisabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = detectorsDisabled.png; sourceTree = "<group>"; };
+		FC9F94B817433AC10004598C /* detectorsDisabled@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "detectorsDisabled@2x.png"; sourceTree = "<group>"; };
+		FC9F94BE17433B590004598C /* settingsDisabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settingsDisabled.png; sourceTree = "<group>"; };
+		FC9F94BF17433B590004598C /* settingsDisabled@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "settingsDisabled@2x.png"; sourceTree = "<group>"; };
+		FC9F94C317433D330004598C /* switchCamera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchCamera.png; sourceTree = "<group>"; };
+		FC9F94C417433D330004598C /* switchCamera@2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "switchCamera@2.png"; sourceTree = "<group>"; };
+		FC9F94C7174340E20004598C /* executeIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = executeIcon.png; sourceTree = "<group>"; };
+		FC9F94C8174340E20004598C /* executeIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "executeIcon@2x.png"; sourceTree = "<group>"; };
+		FC9F94C9174340E20004598C /* infoIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = infoIcon.png; sourceTree = "<group>"; };
+		FC9F94CA174340E20004598C /* infoIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "infoIcon@2x.png"; sourceTree = "<group>"; };
+		FC9F94CB174340E20004598C /* restoreIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = restoreIcon.png; sourceTree = "<group>"; };
+		FC9F94CC174340E20004598C /* restoreIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "restoreIcon@2x.png"; sourceTree = "<group>"; };
+		FC9F94CD174340E20004598C /* trainIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trainIcon.png; sourceTree = "<group>"; };
+		FC9F94CE174340E20004598C /* trainIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "trainIcon@2x.png"; sourceTree = "<group>"; };
+		FC9F94CF174340E20004598C /* viewAs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = viewAs.png; sourceTree = "<group>"; };
 		FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalTVC.h; sourceTree = "<group>"; };
 		FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalTVC.m; sourceTree = "<group>"; };
 		FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ModalTVC.xib; sourceTree = "<group>"; };
@@ -553,6 +608,7 @@
 		A558D61F16134E0C001DED8C /* LabelMe */ = {
 			isa = PBXGroup;
 			children = (
+				FC9F94A4174290680004598C /* UI */,
 				FC9F947E173AE34B0004598C /* Sign in */,
 				FC9F947F173AE3910004598C /* Image Gallery */,
 				FC9F9480173AE3DD0004598C /* Camera */,
@@ -612,6 +668,11 @@
 		A558D64116138D37001DED8C /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				FC9F94C217433D210004598C /* Camera */,
+				FC9F94BD17433B3F0004598C /* Settings */,
+				FC9F94B417433A830004598C /* Detectors */,
+				FC9F9498174275DD0004598C /* Gallery */,
+				FC9F948B1742757B0004598C /* Titles */,
 				FC4B0A2D172F352D00A099A0 /* news */,
 				A5B8F9ED166568E000D8F73A /* silueta.png */,
 				A5B8F9EE166568E100D8F73A /* silueta@2x.png */,
@@ -753,10 +814,6 @@
 				FCED897C170375050027CBE1 /* ShowTrainingSetViewController.m */,
 				FCED898017037A5F0027CBE1 /* ShowImageViewController.h */,
 				FCED898117037A5F0027CBE1 /* ShowImageViewController.m */,
-				FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */,
-				FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */,
-				FC8E89B41739876D0018876D /* ModalSectionsTVC.h */,
-				FC8E89B51739876D0018876D /* ModalSectionsTVC.m */,
 				FCED895B17034CAF0027CBE1 /* DetectView.h */,
 				FCED895C17034CAF0027CBE1 /* DetectView.m */,
 				FCED896117034CD70027CBE1 /* ConvolutionHelper.h */,
@@ -816,13 +873,8 @@
 		FC9F9480173AE3DD0004598C /* Camera */ = {
 			isa = PBXGroup;
 			children = (
-				A5480D6716176CEB009F630D /* CameraOverlayViewController.h */,
-				A5480D6816176CEB009F630D /* CameraOverlayViewController.m */,
-				A5480D6A1617815B009F630D /* CameraOverlayViewController_iPhone.xib */,
 				FC4EE0F317231A1700536B4A /* CameraViewController.h */,
 				FC4EE0F417231A1700536B4A /* CameraViewController.m */,
-				FC9F9486173BE9860004598C /* AYUIButton.h */,
-				FC9F9487173BE9870004598C /* AYUIButton.m */,
 				FC4EE0F517231A1700536B4A /* CameraViewController.xib */,
 			);
 			name = Camera;
@@ -831,6 +883,10 @@
 		FC9F9481173AE4340004598C /* Additional View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */,
+				FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */,
+				FC8E89B41739876D0018876D /* ModalSectionsTVC.h */,
+				FC8E89B51739876D0018876D /* ModalSectionsTVC.m */,
 				A5A567721617D756008AFE2E /* SettingsViewController.h */,
 				A5A567731617D756008AFE2E /* SettingsViewController.m */,
 				A5A567741617D756008AFE2E /* SettingsViewController_iPhone.xib */,
@@ -853,6 +909,81 @@
 				A537748A165C51C300BF0649 /* CreditsViewController_iPhone5.xib */,
 			);
 			name = "Additional View Controllers";
+			sourceTree = "<group>";
+		};
+		FC9F948B1742757B0004598C /* Titles */ = {
+			isa = PBXGroup;
+			children = (
+				FC9F948C174275890004598C /* detectorsTitle.png */,
+				FC9F948D174275890004598C /* detectorsTitle@2x.png */,
+				FC9F948E174275890004598C /* galleryTitle.png */,
+				FC9F948F174275890004598C /* galleryTitle@2x.png */,
+				FC9F9490174275890004598C /* serverTitle.png */,
+				FC9F9491174275890004598C /* serverTitle@2x.png */,
+			);
+			name = Titles;
+			sourceTree = "<group>";
+		};
+		FC9F9498174275DD0004598C /* Gallery */ = {
+			isa = PBXGroup;
+			children = (
+				FC9F949D1742764A0004598C /* serverArrow.png */,
+				FC9F949E1742764A0004598C /* serverArrow@2x.png */,
+				FC9F9499174276210004598C /* cameraIcon.png */,
+				FC9F949A174276210004598C /* cameraIcon@2x.png */,
+			);
+			name = Gallery;
+			sourceTree = "<group>";
+		};
+		FC9F94A4174290680004598C /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				FC9F9486173BE9860004598C /* AYUIButton.h */,
+				FC9F9487173BE9870004598C /* AYUIButton.m */,
+				FC9F94A5174290B40004598C /* LMUINavigationController.h */,
+				FC9F94A6174290B40004598C /* LMUINavigationController.m */,
+				FC9F94AE1742CB400004598C /* UIButton+CustomViews.h */,
+				FC9F94AF1742CB410004598C /* UIButton+CustomViews.m */,
+			);
+			name = UI;
+			sourceTree = "<group>";
+		};
+		FC9F94B417433A830004598C /* Detectors */ = {
+			isa = PBXGroup;
+			children = (
+				FC9F94C7174340E20004598C /* executeIcon.png */,
+				FC9F94C8174340E20004598C /* executeIcon@2x.png */,
+				FC9F94C9174340E20004598C /* infoIcon.png */,
+				FC9F94CA174340E20004598C /* infoIcon@2x.png */,
+				FC9F94CB174340E20004598C /* restoreIcon.png */,
+				FC9F94CC174340E20004598C /* restoreIcon@2x.png */,
+				FC9F94CD174340E20004598C /* trainIcon.png */,
+				FC9F94CE174340E20004598C /* trainIcon@2x.png */,
+				FC9F94CF174340E20004598C /* viewAs.png */,
+				FC9F94B517433AC10004598C /* detectorIcon.png */,
+				FC9F94B617433AC10004598C /* detectorIcon@2x.png */,
+				FC9F94B717433AC10004598C /* detectorsDisabled.png */,
+				FC9F94B817433AC10004598C /* detectorsDisabled@2x.png */,
+			);
+			name = Detectors;
+			sourceTree = "<group>";
+		};
+		FC9F94BD17433B3F0004598C /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				FC9F94BE17433B590004598C /* settingsDisabled.png */,
+				FC9F94BF17433B590004598C /* settingsDisabled@2x.png */,
+			);
+			name = Settings;
+			sourceTree = "<group>";
+		};
+		FC9F94C217433D210004598C /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				FC9F94C317433D330004598C /* switchCamera.png */,
+				FC9F94C417433D330004598C /* switchCamera@2.png */,
+			);
+			name = Camera;
 			sourceTree = "<group>";
 		};
 		FCED897A170362270027CBE1 /* Detector XIB */ = {
@@ -935,7 +1066,6 @@
 				A5DCC57F1628F5CB00AC9067 /* uitabbar_selection_indicator.png in Resources */,
 				A5DCC5801628F5CB00AC9067 /* selected_tabbar.png in Resources */,
 				A5DCC5811628F5CB00AC9067 /* GalleryViewController_iPhone.xib in Resources */,
-				A5DCC5841628F5CB00AC9067 /* CameraOverlayViewController_iPhone.xib in Resources */,
 				A5DCC5851628F5CB00AC9067 /* TagViewController_iPhone.xib in Resources */,
 				A5DCC5861628F5CB00AC9067 /* SettingsViewController_iPhone.xib in Resources */,
 				A5DCC5871628F5CB00AC9067 /* Icon-72.png in Resources */,
@@ -1068,6 +1198,33 @@
 				FC92DD9117343A32004F8189 /* camera2.png in Resources */,
 				FC8E89B3173983640018876D /* download.png in Resources */,
 				FC8E89B81739876D0018876D /* ModalSectionsTVC.xib in Resources */,
+				FC9F9492174275890004598C /* detectorsTitle.png in Resources */,
+				FC9F9493174275890004598C /* detectorsTitle@2x.png in Resources */,
+				FC9F9494174275890004598C /* galleryTitle.png in Resources */,
+				FC9F9495174275890004598C /* galleryTitle@2x.png in Resources */,
+				FC9F9496174275890004598C /* serverTitle.png in Resources */,
+				FC9F9497174275890004598C /* serverTitle@2x.png in Resources */,
+				FC9F949B174276210004598C /* cameraIcon.png in Resources */,
+				FC9F949C174276210004598C /* cameraIcon@2x.png in Resources */,
+				FC9F949F1742764A0004598C /* serverArrow.png in Resources */,
+				FC9F94A01742764A0004598C /* serverArrow@2x.png in Resources */,
+				FC9F94B917433AC10004598C /* detectorIcon.png in Resources */,
+				FC9F94BA17433AC10004598C /* detectorIcon@2x.png in Resources */,
+				FC9F94BB17433AC10004598C /* detectorsDisabled.png in Resources */,
+				FC9F94BC17433AC10004598C /* detectorsDisabled@2x.png in Resources */,
+				FC9F94C017433B590004598C /* settingsDisabled.png in Resources */,
+				FC9F94C117433B590004598C /* settingsDisabled@2x.png in Resources */,
+				FC9F94C517433D330004598C /* switchCamera.png in Resources */,
+				FC9F94C617433D330004598C /* switchCamera@2.png in Resources */,
+				FC9F94D0174340E20004598C /* executeIcon.png in Resources */,
+				FC9F94D1174340E20004598C /* executeIcon@2x.png in Resources */,
+				FC9F94D2174340E20004598C /* infoIcon.png in Resources */,
+				FC9F94D3174340E20004598C /* infoIcon@2x.png in Resources */,
+				FC9F94D4174340E20004598C /* restoreIcon.png in Resources */,
+				FC9F94D5174340E20004598C /* restoreIcon@2x.png in Resources */,
+				FC9F94D6174340E20004598C /* trainIcon.png in Resources */,
+				FC9F94D7174340E20004598C /* trainIcon@2x.png in Resources */,
+				FC9F94D8174340E20004598C /* viewAs.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1087,7 +1244,6 @@
 				A5DCC55F1628F5CB00AC9067 /* CreateAccountViewController.m in Sources */,
 				A5DCC5601628F5CB00AC9067 /* GalleryViewController.m in Sources */,
 				A5DCC5611628F5CB00AC9067 /* NSObject+Folders.m in Sources */,
-				A5DCC5621628F5CB00AC9067 /* CameraOverlayViewController.m in Sources */,
 				A5DCC5631628F5CB00AC9067 /* TagView.m in Sources */,
 				A5DCC5641628F5CB00AC9067 /* Box.m in Sources */,
 				A5DCC5651628F5CB00AC9067 /* UIImage+Alpha.m in Sources */,
@@ -1119,6 +1275,8 @@
 				FC8E89B1173930340018876D /* UIImage+Border.m in Sources */,
 				FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */,
 				FC9F9488173BE9880004598C /* AYUIButton.m in Sources */,
+				FC9F94A7174290B40004598C /* LMUINavigationController.m in Sources */,
+				FC9F94B01742CB420004598C /* UIButton+CustomViews.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

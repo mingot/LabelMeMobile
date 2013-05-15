@@ -20,6 +20,9 @@
 #import "NSObject+ShowAlert.h"
 #import "NSObject+Folders.h"
 
+#import "LMUINavigationController.h"
+#import "UIButton+CustomViews.h"
+
 
 
 @interface GalleryViewController()
@@ -38,8 +41,16 @@
 @end
 
 
-@implementation GalleryViewController
+@implementation UINavigationBar (UINavigationBarCategory)
+- (void)drawRect:(CGRect)rect {
+    UIColor *color = [UIColor redColor];
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColor(context, CGColorGetComponents([color CGColor]));
+    CGContextFillRect(context, rect);
+}   
+@end
 
+@implementation GalleryViewController
 
 
 #pragma mark
@@ -205,13 +216,14 @@
         
         
         //tab bar
-        self.tabBarItem = [[UITabBarItem alloc]initWithTitle:@"Label" image:nil tag:0];
+        self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Gallery" image:nil tag:0];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"home.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"homeActive.png"]];
         
         //buttons
         self.sendButton = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleBordered target:self action:@selector(sendAction:)];
         self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStyleBordered target:self action:@selector(deleteAction:)];
         self.editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(editAction:)];
+    
         
         self.serverConnection.delegate = self;
         self.modalTVC = [[ModalTVC alloc] initWithNibName:@"ModalTVC" bundle:nil];
@@ -231,44 +243,34 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    self.usernameLabel.text = self.username;
-    [self.usernameLabel setTextColor:[UIColor colorWithRed:51/255.0f green:51/255.0f blue:51/255.0f alpha:1.0]];
+    
     photosWithErrors = 0;
     
-    
+    //bottom bar when edit pressed
+    [self.navigationController.toolbar setBarStyle:UIBarStyleBlackTranslucent];
+
     //titleView: LabelMe Logo and title images
-    UIImage *titleImage = [UIImage imageNamed:@"logo-title.png"];
+    UIImage *titleImage = [UIImage imageNamed:@"galleryTitle.png"];
     UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
-    [titleView setImage:titleImage];
+    titleView.image = titleImage;
     [self.navigationItem setTitleView:titleView];
-    UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"];
+
     
-    //profile picture
-    self.profilePicture = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.view1.frame.size.width, self.view1.frame.size.height)];
-    self.profilePicture.layer.masksToBounds = YES;
-    self.profilePicture.layer.cornerRadius = 6.0;
-    [self.profilePicture setContentMode:UIViewContentModeScaleAspectFit];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]])
-        [self.profilePicture setImage:[UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]] ];
-    else [self.profilePicture setImage:[UIImage imageNamed:@"silueta.png"]];
-    
-    
-    //buttons
-    [self.editButton setStyle:UIBarButtonItemStyleBordered];
+    //edit, send and delete buttons
+    self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(editAction:)]];
     self.navigationItem.rightBarButtonItem = self.editButton;
     [self.deleteButton setTintColor:[UIColor redColor]];
     [self.deleteButton setWidth:self.view.frame.size.width/2 - 11];
-    [self.sendButton setWidth:self.view.frame.size.width/2 - 11];
     [self.deleteButton setEnabled:NO];
+    [self.sendButton setWidth:self.view.frame.size.width/2 - 11];
     [self.sendButton setEnabled:NO];
     
-    //navigation and tool bar
-    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
-    [self.navigationController.navigationBar setBackgroundImage:barImage forBarMetrics:UIBarMetricsDefault];
-    [self.navigationController.toolbar setBarStyle:UIBarStyleBlackTranslucent];
-    [self.navigationController.navigationBar setTintColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
-
+    //camera and download buttons
+    self.downloadButton.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;
+    self.downloadButton.layer.borderWidth = 2.0f;
+    self.cameraButton.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;
+    self.cameraButton.layer.borderWidth = 2.0f;
+    
     //device selection for tagVC
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if ([UIScreen mainScreen].bounds.size.height == 568)
@@ -292,7 +294,6 @@
     self.tableViewGrid.tag = 0;
     
 
-    
     //no images view
     self.noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
     [self.noImages setBackgroundColor:[UIColor whiteColor]];
@@ -307,28 +308,19 @@
     [self.noImages setTextAlignment:NSTextAlignmentCenter];
     [self.noImages setUserInteractionEnabled:YES];
     
-    //sending view
+    //sending view initialization
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [self.sendingView setHidden:YES];
     self.sendingView.delegate = self;
     self.sendingView.label.text = @"Uploading image to server";
 
-    
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.tableViewGrid];
     [self.view addSubview:self.noImages];
     [self.view addSubview:self.sendingView];
 
-    [self.view1.layer setShadowColor:[UIColor blackColor].CGColor];
-    [self.view1.layer setShadowOffset:CGSizeMake(0, 1)];
-    [self.view1.layer setShadowOpacity:0.9];
-    [self.view1.layer setShadowRadius:3.0];
-    [self.view1.layer setCornerRadius:6.0];
-    [self.view1 addSubview:self.profilePicture];
-    [self.view1 setClipsToBounds:NO];
     
-
     
     [self reloadGallery];
 }
@@ -336,19 +328,18 @@
 - (void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
-    //upload profile picture
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]])
-        [self.profilePicture setImage:[UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingPathComponent:@"profilepicture.jpg"]] ];
-    else [self.profilePicture setImage:[UIImage imageNamed:@"silueta.png"]];
-    
     [self reloadGallery];
+    
+    //solid color for the navigation bar
+    [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
 }
 
 
 - (void) viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+
+    //disable edit state if interrupted
     if ([self.editButton.title isEqual: @"Cancel"]) {
         [self.editButton setTitle:@"Edit"];
         [self.editButton setStyle:UIBarButtonItemStyleBordered];
@@ -426,20 +417,19 @@
 
 -(IBAction)editAction:(id)sender
 {
+    UIButton *editButton = [self.editButton valueForKey:@"view"];
     //grid
     if (!self.listButton.isSelected) {
-        if ([self.editButton.title isEqual: @"Edit"]) {
+        if ([editButton.titleLabel.text isEqual: @"Edit"]) {
             [self.listButton setHidden:YES];
-            [self.editButton setTitle:@"Cancel"];
+            [editButton setTitle:@"Cancel" forState:UIControlStateNormal];
             [self.navigationController setToolbarHidden:NO];
             NSArray *toolbarItems = [[NSArray alloc] initWithObjects:self.sendButton,self.deleteButton, nil];
             [self.navigationController.toolbar setItems:toolbarItems];
             [self.tableViewGrid setFrame:CGRectMake(self.tableViewGrid.frame.origin.x, self.tableViewGrid.frame.origin.y, self.tableViewGrid.frame.size.width, self.tableViewGrid.frame.size.height - self.navigationController.toolbar.frame.size.height)];
-            [self.editButton setStyle:UIBarButtonSystemItemCancel];
             
         }else{
-            [self.editButton setTitle:@"Edit"];
-            [self.editButton setStyle:UIBarButtonItemStyleBordered];
+            [editButton setTitle:@"Edit" forState:UIControlStateNormal];
             [self.listButton setHidden:NO];
             [self.sendButton setTitle:@"Send"];
             [self.deleteButton setTitle:@"Delete"];
@@ -491,9 +481,8 @@
     
     dispatch_queue_t q = dispatch_queue_create("q", NULL);
     dispatch_async(q, ^{
-        NSString *buttonTitle = button.titleLabel.text;
         
-        NSString *query = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=mingot";
+        NSString *query = [NSString stringWithFormat:@"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=%@", self.username];
         NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
         NSError *error = nil;
         NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
@@ -532,8 +521,9 @@
                 //get and save annotations
                 NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
                 NSDictionary *annotation = (NSDictionary *) [element objectForKey:@"annotation"];
-                NSDictionary *imageSize = (NSDictionary *) [annotation objectForKey:@"imagesize"];
-                
+                NSDictionary *imageSize;
+                if([annotation isKindOfClass:[NSDictionary class]]) imageSize = (NSDictionary *) [annotation objectForKey:@"imagesize"];
+                else continue; //skip image
                 
                 id objects = [annotation objectForKey:@"object"];
                 NSArray *boxes;
@@ -543,7 +533,10 @@
                 for(NSDictionary *box in boxes){
                     
                     //label: insert into the map to download specific images for a given label
-                    NSString *label = [(NSString *) [box objectForKey:@"name"] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                    NSString *label;
+                    if([[box objectForKey:@"name"] isKindOfClass:[NSString class]])
+                        label = [(NSString *) [box objectForKey:@"name"] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                    else continue; //skip box
                     NSMutableArray *imageIndexes = [self.downloadedLabelsMap objectForKey:label];
                     if(imageIndexes==nil){
                         imageIndexes = [[NSMutableArray alloc] initWithObjects:[NSNumber numberWithInt:self.downloadedImageNames.count-1], nil];
@@ -738,7 +731,6 @@
     [self.serverConnection cancelRequestFor:0];
 
     [self.selectedItemsSend removeAllObjects];
-    [self.usernameLabel setHidden:NO];
 }
 
 
@@ -1058,13 +1050,9 @@
     }
     else{
         if (photosWithErrors >0) {
-            if (photosWithErrors == 1) {
+            if (photosWithErrors == 1)
                 [self errorWithTitle:@"An image could not be sent" andDescription:@"Please, try again."];
-            }
-            else{
-                [self errorWithTitle:[NSString stringWithFormat:@"%d images could not be sent.",photosWithErrors] andDescription:@"Please, try again."];
-            }
-
+            else [self errorWithTitle:[NSString stringWithFormat:@"%d images could not be sent.",photosWithErrors] andDescription:@"Please, try again."];
         }
         [self.sendingView reset];
         [self.sendingView setHidden:YES];
@@ -1107,7 +1095,6 @@
         [self.tabBarController.tabBar setUserInteractionEnabled:YES];
         [self.editButton setEnabled:YES];
     }
-
 }
                  
 -(void)photoNotOnServer:(NSString *)filename
@@ -1129,7 +1116,6 @@
         [self sendPhoto];
     }
     else{
-        [self.usernameLabel setHidden:NO];
 
         [self.sendingView reset];
         [self.sendingView setHidden:YES];
@@ -1148,21 +1134,57 @@
 #pragma mark -
 #pragma mark TableView Delegate&Datasource
 
--(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
+- (UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    if(tableView.tag==0){
-        return self.labelsOrdered.count;
-    }else return 1;
-}
-
--(NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
+    
+    NSString *title;
     if(tableView.tag==0){
         NSString *label = [self.labelsOrdered objectAtIndex:section];
         NSArray *items = [self.labelsDictionary objectForKey:label];
-        return [NSString stringWithFormat:@"%@ (%d)", label, items.count];
-    }else return @"";
+        title = [NSString stringWithFormat:@"%@ (%d)", label, items.count];
+    }else title = @"";
+    
+    // create the parent view that will hold header Label
+    UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10,0,tableView.frame.size.width,30)];
+    customView.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.3];
+    customView.layer.borderWidth = 1.0;
+    customView.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;;
+    
+    // create the label objects
+    UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    headerLabel.backgroundColor = [UIColor clearColor];
+    headerLabel.font = [UIFont boldSystemFontOfSize:12];
+    headerLabel.frame = CGRectMake(20,5,200,20);
+    headerLabel.text =  title;
+    headerLabel.textColor = [UIColor whiteColor];
+    
+    
+    [customView addSubview:headerLabel];
+
+    
+    return customView;
 }
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 30; //
+}
+
+
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
+{
+    if(tableView.tag==0) return self.labelsOrdered.count;
+    else return 1;
+}
+
+//-(NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+//{
+//    if(tableView.tag==0){
+//        NSString *label = [self.labelsOrdered objectAtIndex:section];
+//        NSArray *items = [self.labelsDictionary objectForKey:label];
+//        return [NSString stringWithFormat:@"%@ (%d)", label, items.count];
+//    }else return @"";
+//}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -1177,10 +1199,8 @@
 {
     NSInteger ret = 0;
     
-    if (tableView.tag == 0 && (self.items.count>0))
-        ret = 1;
-    else if (tableView.tag == 1)
-        ret = self.items.count;
+    if (tableView.tag == 0 && (self.items.count>0)) ret = 1;
+    else if (tableView.tag == 1) ret = self.items.count;
     
     return ret;
 }
@@ -1445,9 +1465,11 @@
 
 
 
+
 - (void)viewDidUnload {
     [self setDownloadButton:nil];
     [self setCameraButton:nil];
     [super viewDidUnload];
 }
+
 @end

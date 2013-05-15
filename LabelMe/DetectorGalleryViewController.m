@@ -10,6 +10,9 @@
 #import "Box.h"
 
 
+#import "LMUINavigationController.h"
+#import "UIButton+CustomViews.h"
+
 #define IMAGES 0
 #define THUMB 1
 #define OBJECTS 2
@@ -86,7 +89,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Detector" image:nil tag:2];
-        [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"camera.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"cameraActive.png"]];
+        [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"detectorIcon.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"detectorsDisabled.png"]];
     }
     return self;
 }
@@ -95,7 +98,6 @@
 - (void)viewDidLoad
 {
     //load detectors and create directory if it does not exist
-    
     NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"];
     self.detectors = [NSKeyedUnarchiver unarchiveObjectWithFile:detectorsPath];
     if(!self.detectors) {
@@ -104,18 +106,25 @@
     }
     
     //view controller specifications and top toolbar setting
-    self.title = @"Detectors";
-    UIBarButtonItem *editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleBordered target:self action:@selector(edit:)];
-    [self.navigationItem setRightBarButtonItem:editButton];
-    UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addDetector:)];
+    UIImage *titleImage = [UIImage imageNamed:@"detectorsTitle.png"];
+    UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
+    titleView.image = titleImage;
+    [self.navigationItem setTitleView:titleView];
+    
+    
+    self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(edit:)]];
+    self.navigationItem.rightBarButtonItem = self.editButton;
+    UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton plusBarButtonWithTarget:self action:@selector(addDetector:)]];
     self.navigationItem.leftBarButtonItem = plusButton;
     self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
     
-    //navigation controller
-    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
-    [self.navigationController.navigationBar setTintColor:[UIColor colorWithRed:150/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
-    
     [super viewDidLoad];
+}
+
+-(void) viewWillAppear:(BOOL)animated
+{
+    //solid color for the navigation bar
+    [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
 }
 
 
@@ -124,19 +133,19 @@
 
 - (IBAction) edit:(id)sender
 {
-    UIBarButtonItem *button = self.navigationItem.rightBarButtonItem;
+    UIButton *button = [self.editButton valueForKey:@"view"];
+    
     if(self.editing){
         [super setEditing:NO animated:NO];
         [self.tableView setEditing:NO animated:NO];
-        button.title = @"Edit";
+        [button setTitle:@"Edit" forState:UIControlStateNormal];
         
     }else{
         [super setEditing:YES animated:YES];
         [self.tableView setEditing:YES animated:YES];
-        button.title = @"Done";
+        [button setTitle:@"Done" forState:UIControlStateNormal];
     }
     [self.tableView reloadData];
-    self.navigationItem.rightBarButtonItem = button;
 }
 
 - (IBAction)addDetector:(id)sender

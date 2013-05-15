@@ -16,6 +16,8 @@
 #import "UITextField+CorrectOrientation.h"
 #import "NSObject+ShowAlert.h"
 #import "NSString+checkValidity.h"
+#import "LMUINavigationController.h"
+#import "UIButton+CustomViews.h"
 
 
 @implementation TagViewController
@@ -62,14 +64,11 @@
 {
 
     [super viewDidLoad];
-
-    UIImage *titleImage = [UIImage imageNamed:@"logo-title.png"];
-    UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
-    titleView.image = titleImage;
-    self.navigationItem.titleView = titleView;
-
-    [self.navigationController.navigationBar setTintColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
     self.title = @"Annotation Tool";
+    
+    //back button
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Back" target:self.navigationController action:@selector(popViewControllerAnimated:)]];
+    self.navigationItem.leftBarButtonItem = backButton;
 
     //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
@@ -179,6 +178,9 @@
 - (void) viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
+    
+    //solid color for the navigation bar
+    [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
     
     [self selectedAnObject:NO];
 

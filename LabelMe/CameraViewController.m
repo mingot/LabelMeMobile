@@ -16,6 +16,8 @@
 @property int numberImages;
 @property BOOL isUsingFrontFacingCamera;
 
+
+
 @end
 
 
@@ -39,26 +41,17 @@
     self.isUsingFrontFacingCamera = NO;
     self.numberImages = 0;
     
-    
-    [self.captureButton transformButtonForCamera];
     [self.switchButton transformButtonForCamera];
+    [self.switchButton setImage:[UIImage imageNamed:@"switchCamera"] forState:UIControlStateNormal];
     [self.cancelButton transformButtonForCamera];
+    [self.captureButton transformButtonForCamera];
     [self.captureButton setTitle:@"" forState:UIControlStateNormal];
     [self.captureButton setImage:[UIImage imageNamed:@"camera.png"] forState:UIControlStateNormal];
-
+    self.captureButton.backgroundColor = [UIColor blackColor];
     
     self.thumbnailCaptureImageView.layer.borderColor = [[UIColor blackColor] CGColor];
     self.thumbnailCaptureImageView.layer.borderWidth = 1;
-    self.thumbnailCaptureImageView.hidden = YES;
-
-    //switch cameras button
-    UIBarButtonItem *switchCameraButton = [[UIBarButtonItem alloc] initWithTitle:@"switch" style:UIBarButtonItemStyleBordered target:self action:@selector(toggleFrontAction:)];
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbarBg"]resizableImageWithCapInsets:UIEdgeInsetsZero ] forBarMetrics:UIBarMetricsDefault];
-    [switchCameraButton setStyle:UIBarButtonItemStyleBordered];
-    [self.navigationItem setRightBarButtonItem:switchCameraButton];
-    
-
-    
+        
     // ********  CAMERA CAPTURE  ********
     //Capture input specifications
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput
@@ -97,7 +90,7 @@
     [self.captureSession startRunning];
 
     //trick to put de capture previous layer at the back
-    UIView *cameraView = [[UIView alloc] init];
+    UIView *cameraView = [[UIView alloc] initWithFrame:self.view.frame];
     [self.view addSubview:cameraView];
 	[self.view sendSubviewToBack:cameraView];
 	[cameraView.layer addSublayer:self.prevLayer];
@@ -134,7 +127,6 @@
         self.thumbnailCaptureImageView.image = image;
         self.numberImages++;
         [self.delegate addImageCaptured:image];
-        self.thumbnailCaptureImageView.hidden = NO;
 	 }];
 }
 
@@ -164,7 +156,5 @@
     self.navigationController.navigationBarHidden = NO;
     [self.navigationController popViewControllerAnimated:YES];
 }
-
-
 
 @end

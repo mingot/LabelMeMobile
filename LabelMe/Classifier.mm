@@ -21,6 +21,7 @@ using namespace cv;
 #define MAX_NUMBER_EXAMPLES (MAX_QUOTA + 200)*20 //max number of examples in buffer, (500neg + 200pos)*20images
 #define STOP_CRITERIA 0.05 
 #define MAX_IMAGE_SIZE 300.0
+#define SCALES_PER_OCTAVE 10
 
 
 @interface Classifier ()
@@ -234,7 +235,7 @@ using namespace cv;
     
 //    double initialScale = MAX_IMAGE_SIZE/image.size.height;
     double initialScale = self.scaleFactor.doubleValue/sqrt(image.size.width*image.size.width);
-    double scale = pow(2, 1.0/numberPyramids);
+    double scale = pow(2, 1.0/SCALES_PER_OCTAVE);
 
     //Pyramid limits
     if(self.finPyramid == 0) self.finPyramid = numberPyramids;

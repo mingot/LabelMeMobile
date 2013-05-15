@@ -15,6 +15,8 @@
 #import "NSObject+Folders.h"
 #import "NSString+checkValidity.h"
 
+#import "LMUINavigationController.h"
+
 
 
 
@@ -421,7 +423,6 @@
     NSString *path = [[NSString alloc] initWithString:[[documentsDirectory stringByAppendingPathComponent:self.usernameField.text] stringByAppendingPathComponent:@"profilepicture.jpg" ]];
     if ([filemng createFileAtPath:path contents:UIImageJPEGRepresentation([ppicture thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil]) {
         [self.settingsViewController.tableView reloadData];
-        [self.galleryViewController.profilePicture setImage:ppicture];
     }
 }
 

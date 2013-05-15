@@ -31,15 +31,12 @@
 @property (nonatomic,strong) NSArray *userPaths;
 
 //view
-@property (nonatomic, strong) IBOutlet UIView *view1; //view in the place of the profile picture
-@property (nonatomic,strong) IBOutlet UILabel *usernameLabel;
 @property (nonatomic, strong) UILabel *noImages;
 @property (nonatomic, strong) SendingView *sendingView;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *editButton;
 @property (nonatomic,strong) IBOutlet UIToolbar *bottomToolbar;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *deleteButton;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *sendButton;
-@property (nonatomic,strong) IBOutlet UIImageView *profilePicture;
 @property (nonatomic,strong) IBOutlet UIButton *listButton;
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
 @property (nonatomic,strong) IBOutlet UITableView *tableViewGrid;

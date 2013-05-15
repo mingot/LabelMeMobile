@@ -12,6 +12,7 @@
 
 #import "UIImage+Resize.h"
 #import "UIImage+HOG.h"
+#import "UIButton+CustomViews.h"
 
 
 
@@ -123,43 +124,39 @@
     
     //set labels
     self.nameTextField.text = self.svmClassifier.name;
-    self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
+    self.detectorView.contentMode = UIViewContentModeScaleAspectFill;
+    self.detectorHogView.contentMode = UIViewContentModeScaleAspectFill;
     
     //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
     
-//    UIImage *chatImage = [UIImage imageNamed:@"execute.png"];
-//    UIButton *chatButton = [UIButton buttonWithType:UIButtonTypeCustom];
-//    [chatButton setBackgroundImage:chatImage forState:UIControlStateNormal];
-//    [chatButton setTitle:@"execute" forState:UIControlStateNormal];
-//    chatButton.titleLabel.font = [UIFont systemFontOfSize:10];
-//    chatButton.frame = CGRectMake(0, 0, 70, 50);
-//    [chatButton setTitleEdgeInsets:UIEdgeInsetsMake(30,0,0,0)];
-//    [chatButton setImageEdgeInsets:UIEdgeInsetsMake(30,20,20,20)];
-//    UIBarButtonItem *barButton= [[UIBarButtonItem alloc] initWithCustomView:chatButton];
+    //top toolbar icons
+    self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(edit:)]];
+    self.navigationItem.rightBarButtonItem = self.editButton;
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Back" target:self.navigationController action:@selector(popViewControllerAnimated:)]];
+    self.navigationItem.leftBarButtonItem = backButton;
     
     //bottombar
     UIButton *executeButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
-    [executeButtonView setImage:[UIImage imageNamed:@"execute.png"] forState:UIControlStateNormal];
+    [executeButtonView setImage:[UIImage imageNamed:@"executeIcon.png"] forState:UIControlStateNormal];
     [executeButtonView addTarget:self action:@selector(executeAction:) forControlEvents:UIControlEventTouchUpInside];
     self.executeButtonBar = [[UIBarButtonItem alloc] initWithCustomView:executeButtonView];
     UIButton *trainButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
-    [trainButtonView setImage:[UIImage imageNamed:@"train.png"] forState:UIControlStateNormal];
+    [trainButtonView setImage:[UIImage imageNamed:@"trainIcon.png"] forState:UIControlStateNormal];
     [trainButtonView addTarget:self action:@selector(trainAction:) forControlEvents:UIControlEventTouchUpInside];
     self.trainButtonBar = [[UIBarButtonItem alloc] initWithCustomView:trainButtonView];
     UIButton *infoButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
-    [infoButtonView setImage:[UIImage imageNamed:@"labelsList.png"] forState:UIControlStateNormal];
+    [infoButtonView setImage:[UIImage imageNamed:@"infoIcon.png"] forState:UIControlStateNormal];
     [infoButtonView addTarget:self action:@selector(infoAction:) forControlEvents:UIControlEventTouchUpInside];
     self.infoButtonBar = [[UIBarButtonItem alloc] initWithCustomView:infoButtonView];
     UIButton *undoButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
-    [undoButtonView setImage:[UIImage imageNamed:@"undo.png"] forState:UIControlStateNormal];
+    [undoButtonView setImage:[UIImage imageNamed:@"restoreIcon.png"] forState:UIControlStateNormal];
     [undoButtonView addTarget:self action:@selector(undoAction:) forControlEvents:UIControlEventTouchUpInside];
     self.undoButtonBar = [[UIBarButtonItem alloc] initWithCustomView:undoButtonView];
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     [self.bottomToolbar setItems:[NSArray arrayWithObjects:self.executeButtonBar,flexibleSpace,self.trainButtonBar, flexibleSpace, self.infoButtonBar,flexibleSpace,self.undoButtonBar,nil]];
     
     self.undoButtonBar.enabled = NO;
-
 
     //Check if the classifier exists.
     if(self.svmClassifier.weights == nil){
@@ -183,7 +180,6 @@
     }
     
     //EDIT: set buttons
-    self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.nameTextField.enabled = NO;
     self.nameTextField.hidden = YES;
     self.nameTextField.text = self.svmClassifier.name;
@@ -483,7 +479,6 @@
         UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
         [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationLow]];
     }
-    self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
     self.averageImage = [self imageAveraging:listOfImages];
     self.detectorView.image = self.averageImage;
     

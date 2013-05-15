@@ -32,10 +32,13 @@
 @property (strong, nonatomic) ModalTVC *modalTVC;
 @property (strong, nonatomic) SendingView *sendingView;
 
+//views
 @property (weak, nonatomic) IBOutlet UIImageView *detectorView;
 @property (weak, nonatomic) IBOutlet UIImageView *detectorHogView;
 @property (weak, nonatomic) IBOutlet UILabel *descriptionLabel;
 @property (weak, nonatomic) IBOutlet UITextField *nameTextField;
+@property (strong, nonatomic) UIBarButtonItem *editButton;
+
 
 //bottom toolbar
 @property (weak, nonatomic) IBOutlet UIToolbar *bottomToolbar;

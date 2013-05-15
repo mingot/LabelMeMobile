@@ -97,10 +97,11 @@
     
     self.prevLayer = nil;
     
-    numMax = 1;    
+       
     
     //Initialization of model properties
-    self.numPyramids = 10;
+    numMax = 1; 
+    self.numPyramids = 15;
     self.maxDetectionScore = -0.9;
 
     

@@ -15,6 +15,9 @@
 #import "CreditsViewController.h"
 #import "NSObject+Folders.h"
 #import "UIImage+Resize.h"
+#import "UIButton+CustomViews.h"
+#import "LMUINavigationController.h"
+
 
 
 
@@ -34,8 +37,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:nil tag:3];
-        [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"settings.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"settingsActive.png"]];
-        self.username = [[NSString alloc] init];
+        [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"settingsActive.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"settingsDisabled.png"]];
         
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
             if ([UIScreen mainScreen].bounds.size.height == 568)
@@ -53,14 +55,13 @@
 {
     [super viewDidLoad];
     
+    [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
+    
     self.tableView = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStyleGrouped];
-    UIBarButtonItem * logoutButton = [[UIBarButtonItem alloc]initWithTitle:@"Log out" style:UIBarButtonItemStyleBordered target:self action:@selector(logOutAction:)];
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbarBg"]resizableImageWithCapInsets:UIEdgeInsetsZero  ] forBarMetrics:UIBarMetricsDefault];
-
-    [logoutButton setStyle:UIBarButtonItemStyleBordered];
-    [self.navigationItem setRightBarButtonItem:logoutButton];
-    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
-    [self.navigationController.navigationBar setTintColor:[UIColor colorWithRed:150/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
+    
+    UIBarButtonItem *logoutButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Log out" target:self action:@selector(logOutAction:)]];
+    self.navigationItem.rightBarButtonItem = logoutButton;
+    
     [self.view addSubview:self.tableView];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;

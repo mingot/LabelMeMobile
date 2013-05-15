@@ -24,19 +24,24 @@
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if ([UIScreen mainScreen].bounds.size.height == 568)
             rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPhone5" bundle:nil];
-
         else if ([UIScreen mainScreen].bounds.size.height == 480)
             rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPhone" bundle:nil];
-        
-    }else
-        rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPad" bundle:nil];
+    }else rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPad" bundle:nil];
 
     
-    self.window.rootViewController = rootViewController;
+    //navigation bar definition for all the application
+//    [[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:256/256.0 green:0/256.0 blue:0/256.0 alpha:1.0]];
+//    [[UINavigationBar appearanceWhenContainedIn:[UIViewController class], nil] setTintColor:[UIColor redColor]];
     
+    self.window.rootViewController = rootViewController;
     [self.window makeKeyAndVisible];
+    
     return YES;
 }
 
 
 @end
+
+
+
+
