@@ -35,7 +35,7 @@
 @property (weak, nonatomic) IBOutlet AYUIButton *switchButton;
 @property (weak, nonatomic) IBOutlet AYUIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UIImageView *thumbnailCaptureImageView;
-@property (weak, nonatomic) IBOutlet UIView *cameraView;
+//@property (weak, nonatomic) IBOutlet UIView *cameraView;
 
 - (IBAction)captureAction:(id)sender;
 - (IBAction)toggleFrontAction:(id)sender;

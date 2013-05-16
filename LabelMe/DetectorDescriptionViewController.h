@@ -22,22 +22,26 @@
 
 
 
-@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate,ModalTVCDelegate, UIAlertViewDelegate>
+@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate,ModalTVCDelegate, UIAlertViewDelegate, UITableViewDelegate,UITableViewDataSource, UITextFieldDelegate>
 
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
-@property (weak, nonatomic) IBOutlet UICollectionView *ramon;
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
 @property (strong, nonatomic) ModalTVC *modalTVC;
 @property (strong, nonatomic) SendingView *sendingView;
 
+//array with the properties to show in the description
+@property (strong, nonatomic) NSMutableArray *classifierProperties;
+@property (strong, nonatomic) Classifier *svmClassifier;
+@property (strong, nonatomic) Classifier *previousSvmClassifier; //to undo
+
 //views
 @property (weak, nonatomic) IBOutlet UIImageView *detectorView;
 @property (weak, nonatomic) IBOutlet UIImageView *detectorHogView;
-@property (weak, nonatomic) IBOutlet UILabel *descriptionLabel;
-@property (weak, nonatomic) IBOutlet UITextField *nameTextField;
 @property (strong, nonatomic) UIBarButtonItem *editButton;
-
+@property (weak, nonatomic) IBOutlet UITableView *descriptionTableView;
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (weak, nonatomic) IBOutlet UIView *showView;
 
 //bottom toolbar
 @property (weak, nonatomic) IBOutlet UIToolbar *bottomToolbar;
@@ -45,9 +49,6 @@
 @property (strong, nonatomic) UIBarButtonItem *trainButtonBar;
 @property (strong, nonatomic) UIBarButtonItem *infoButtonBar;
 @property (strong, nonatomic) UIBarButtonItem *undoButtonBar;
-
-@property (strong, nonatomic) Classifier *svmClassifier;
-@property (strong, nonatomic) Classifier *previousSvmClassifier; //to undo
 
 //useful information
 @property (strong, nonatomic) NSString *userPath;
@@ -63,6 +64,7 @@
 - (IBAction)saveAction:(id)sender;
 - (IBAction)infoAction:(id)sender;
 - (IBAction)undoAction:(id)sender;
+- (IBAction)editAction:(id)sender;
 
 
 @end

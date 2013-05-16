@@ -21,11 +21,11 @@
     SendingView *sendingView;
     ServerConnection *sConnection;
     CLLocationManager *locationMng;
-    BOOL keyboardVisible;
     BOOL previousSession;
 }
 
 
+//views
 @property (strong,nonatomic) IBOutlet UIScrollView *scrollView;
 @property (strong,nonatomic) IBOutlet UITextField *usernameField;
 @property (strong,nonatomic) IBOutlet UITextField *passwordField;
@@ -35,13 +35,17 @@
 @property (strong,nonatomic) UIToolbar *keyboardToolbar;
 @property (strong,nonatomic) UITabBarController *tabBarController;
 @property (strong,nonatomic) UIPopoverController *popover;
+
+//controllers
 @property (strong,nonatomic) GalleryViewController *galleryViewController;
 @property (strong,nonatomic) SettingsViewController *settingsViewController;
 @property (strong,nonatomic) DetectorGalleryViewController *detectorGalleryController;
 
-
+//keyboard
 -(void)keyboardDidShow:(NSNotification *)notif;
 -(void)keyboardDidHide:(NSNotification *)notif;
+
+//actions
 -(IBAction)valueChanged:(id)sender;
 -(IBAction)signInAction:(id)sender;
 -(IBAction)nextFieldAction:(id)sender;

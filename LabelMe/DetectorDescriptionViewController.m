@@ -14,6 +14,8 @@
 #import "UIImage+HOG.h"
 #import "UIButton+CustomViews.h"
 
+#import "EditableTableViewCell.h"
+#import "UITableView+TextFieldAdditions.h"
 
 
 #define IMAGES 0
@@ -58,26 +60,10 @@
 @implementation DetectorDescriptionViewController
 
 
-@synthesize delegate = _delegate;
 
 
-@synthesize executeController = _executeController;
-@synthesize modalTVC = _modalTVC;
-@synthesize sendingView = _sendingView;
-@synthesize svmClassifier = _svmClassifier;
-@synthesize userPath = _userPath;
-@synthesize bottomToolbar = _bottomToolbar;
-
-@synthesize availableObjectClasses = _availableObjectClasses;
-@synthesize availablePositiveImagesNames = _availablePositiveImagesNames;
-@synthesize selectedPositiveImageIndexes = _selectedPositiveImageIndexes;
-@synthesize selectedPostiveImageNames = _selectedPostiveImageNames;
-
-@synthesize averageImage = _averageImage;
-
-
-#pragma mark
-#pragma mark - Setters and Getters
+#pragma mark -
+#pragma mark Setters and Getters
 
 -(NSArray *) availablePositiveImagesNames
 {
@@ -99,10 +85,30 @@
     
     return _availablePositiveImagesNames;
 }
-    
 
-#pragma mark
-#pragma mark - Life cycle
+
+- (NSMutableArray *) classifierProperties
+{
+    if(!_classifierProperties){
+        
+        //nsdate treatment
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateFormat:@"mm/dd/yyyy - hh:mm"];
+        [formatter setTimeZone:[NSTimeZone localTimeZone]]; //time zone
+        
+        _classifierProperties = [[NSMutableArray alloc] init];
+        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:self.svmClassifier.name forKey:@"Name"]];
+        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:self.svmClassifier.targetClass forKey:@"Class"]];
+        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[formatter stringFromDate:self.svmClassifier.updateDate] forKey:@"Last Train"]];
+        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.imagesUsedTraining.count] forKey:@"Images"]];
+    }
+    return _classifierProperties;
+}
+
+
+
+#pragma mark -
+#pragma mark Life cycle
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -116,12 +122,12 @@
                            [self.userPath stringByAppendingPathComponent:@"annotations"],
                            [self.userPath stringByAppendingPathComponent:@"Detectors"],
                            self.userPath, nil];
+    self.scrollView.contentSize = self.showView.frame.size;
     
-    //load views
+    //controllers
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
     
     //set labels
-    self.nameTextField.text = self.svmClassifier.name;
     self.detectorView.contentMode = UIViewContentModeScaleAspectFill;
     self.detectorHogView.contentMode = UIViewContentModeScaleAspectFill;
     
@@ -129,10 +135,14 @@
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
     
     //top toolbar icons
-    self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(edit:)]];
-    self.navigationItem.rightBarButtonItem = self.editButton;
+    //self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(editAction:)]];
+    //self.navigationItem.rightBarButtonItem = self.editButton;
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Back" target:self.navigationController action:@selector(popViewControllerAnimated:)]];
     self.navigationItem.leftBarButtonItem = backButton;
+    
+    //description table view
+    self.descriptionTableView.layer.cornerRadius = 10;
+    self.descriptionTableView.backgroundColor = [UIColor clearColor];//
     
     //bottombar
     UIButton *executeButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
@@ -177,10 +187,6 @@
         self.previousSvmClassifier = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.svmClassifier]];
     }
     
-    //EDIT: set buttons
-    self.nameTextField.enabled = NO;
-    self.nameTextField.hidden = YES;
-    self.nameTextField.text = self.svmClassifier.name;
     
     //sending view, responsible for the waiting view
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
@@ -196,6 +202,10 @@
     [super viewWillAppear:animated];
     [self loadDetectorInfo];
     
+    // Register keyboard events
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
+    
 }
 
 - (void) viewDidAppear:(BOOL)animated
@@ -207,8 +217,17 @@
 }
 
 
-#pragma mark
-#pragma mark - Actions
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    // Unregister keyboard events
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+
+#pragma mark -
+#pragma mark Actions
 
 - (IBAction)executeAction:(id)sender
 {
@@ -291,8 +310,14 @@
     [alert show];
 }
 
-#pragma mark
-#pragma mark - UIAlertViewDelegate
+- (IBAction)editAction:(id)sender
+{
+//    BOOL isEditing = self.descriptionTableView.isEditing;
+//    [self.descriptionTableView setEditing:!isEditing animated:YES];
+}
+
+#pragma mark -
+#pragma mark UIAlertViewDelegate
 
 -(void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
@@ -305,35 +330,11 @@
     }
 }
 
-#pragma mark
-#pragma mark - Editing mode
-
-- (void)setEditing:(BOOL)flag animated:(BOOL)animated
-{
-    [super setEditing:flag animated:animated];
-    if (flag == YES){
-        // Change views to edit mode.
-        self.nameTextField.enabled = YES;
-        self.nameTextField.hidden = NO;
-        self.descriptionLabel.text = @"Name:";
-
-    }else {
-        self.nameTextField.enabled = NO;
-        self.nameTextField.hidden = YES,
-        
-        self.svmClassifier.name = self.nameTextField.text;
-        self.title = self.nameTextField.text;
-        self.nameTextField.enabled = YES;
-        [self.delegate updateDetector:self.svmClassifier]; //update name in the detector tableview
-        [self.view endEditing:YES];
-        
-        [self loadDetectorInfo];
-    }
-}
 
 
-#pragma mark
-#pragma mark - SendingViewDelegate
+
+#pragma mark -
+#pragma mark SendingViewDelegate
 
 - (void) cancel
 {
@@ -341,8 +342,8 @@
     self.navigationController.navigationBarHidden = NO;
 }
 
-#pragma mark
-#pragma mark - ClassifierDelegate
+#pragma mark -
+#pragma mark ClassifierDelegate
 
 
 -(void) sendMessage:(NSString *)message
@@ -358,8 +359,8 @@
 }
 
 
-#pragma mark
-#pragma mark - ModalTVCDelegate
+#pragma mark -
+#pragma mark ModalTVCDelegate
 
 - (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
 {
@@ -367,7 +368,6 @@
         NSNumber *sel = [selectedItems objectAtIndex:0];
         self.svmClassifier.targetClass = [self.availableObjectClasses objectAtIndex:sel.intValue];
         self.svmClassifier.name = [NSString stringWithFormat:@"%@%@",self.svmClassifier.targetClass, [self uuid]];
-        self.nameTextField.text = self.svmClassifier.name;
         
         NSLog(@"selected class:%@", self.svmClassifier.targetClass);
         
@@ -423,8 +423,8 @@
 }
 
 
-#pragma mark
-#pragma mark - Memory Management
+#pragma mark -
+#pragma mark Memory Management
 
 -(void) didReceiveMemoryWarning
 {
@@ -433,8 +433,126 @@
 }
 
 
-#pragma mark
-#pragma mark - Private methods
+
+#pragma mark -
+#pragma mark Table View
+
+- (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
+{
+    return self.classifierProperties.count;
+}
+
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+
+    NSDictionary *property = [self.classifierProperties objectAtIndex:indexPath.row];
+    NSString *propertyName = [[property allKeys] objectAtIndex:0];
+    if([propertyName isEqualToString:@"Name"]){
+        NSString * const kCellID = @"editableCell";
+        EditableTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: kCellID];
+        if(!cell) cell = [[EditableTableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier: kCellID];
+        
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.textLabel.text = propertyName;
+        cell.textLabel.backgroundColor = [UIColor clearColor];
+        cell.backgroundColor = [UIColor colorWithWhite:.8 alpha:.2];
+        cell.textField.placeholder = [property objectForKey:propertyName];
+        cell.textField.delegate = self;
+        cell.textField.returnKeyType = UIReturnKeyDone;
+        cell.textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+        cell.textField.autocorrectionType = UITextAutocorrectionTypeNo;
+        cell.textField.text = [property objectForKey:propertyName];
+        return cell;
+    
+    }else{
+        static NSString *MyIdentifier = @"DetectorDescriptionTableCell";
+        UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:MyIdentifier];
+        if (cell == nil)cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2  reuseIdentifier:MyIdentifier];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        cell.textLabel.text = propertyName;
+        cell.textLabel.backgroundColor = [UIColor clearColor];
+        cell.detailTextLabel.text = [property objectForKey:propertyName];
+        cell.detailTextLabel.backgroundColor = [UIColor clearColor];
+        cell.backgroundColor = [UIColor colorWithWhite:.8 alpha:.2];
+
+        return cell;
+    }
+    
+}
+
+
+
+-(void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    if([cell.textLabel.text isEqualToString:@"Name"]){
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        [self.descriptionTableView makeFirstResponderForIndexPath:indexPath];
+    }else if([cell.textLabel.text isEqualToString:@"Description"]){
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        [self.descriptionTableView makeFirstResponderForIndexPath:indexPath];
+    }
+}
+
+#pragma mark -
+#pragma mark Keyboard Events
+
+-(void)keyboardDidShow:(NSNotification *)notif
+{
+    self.scrollView.scrollEnabled = YES;
+    
+	// Get the origin of the keyboard when it finishes animating
+	NSDictionary *info = [notif userInfo];
+	NSValue *aValue = [info objectForKey:UIKeyboardFrameEndUserInfoKey];
+	
+	// Get the top of the keyboard in view's coordinate system.
+	// We need to set the bottom of the scrollview to line up with it
+	CGRect keyboardRect = [aValue CGRectValue];
+	CGFloat keyboardTop = keyboardRect.origin.y;
+    
+	// Resize the scroll view to make room for the keyboard
+    CGRect viewFrame = self.scrollView.frame;
+	viewFrame.size.height = keyboardTop - self.view.bounds.origin.y;
+	
+	self.scrollView.frame = viewFrame;
+    [self.scrollView scrollRectToVisible:self.descriptionTableView.frame animated:YES];
+}
+
+
+-(void)keyboardDidHide:(NSNotification *)notif
+{
+    self.scrollView.scrollEnabled = NO;
+    self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, self.scrollView.frame.size.width, self.view.frame.size.height);
+}
+
+#pragma mark - 
+#pragma mark UITextFieldDelegate
+
+-(BOOL) textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+	NSString *text = [[textField text] stringByReplacingCharactersInRange:range withString:string];
+	NSIndexPath *indexPath = [self.descriptionTableView indexPathForFirstResponder];
+	UITableViewCell *cell = [self.descriptionTableView cellForRowAtIndexPath:indexPath];
+    
+	if([cell.textLabel.text isEqualToString:@"Name"]) self.svmClassifier.name = text;
+    
+	return YES;
+}
+
+-(BOOL) textFieldShouldReturn:(UITextField *)textField
+{
+    [self.delegate updateDetector:self.svmClassifier];
+    [textField resignFirstResponder];
+    self.classifierProperties = nil;
+    self.title = self.svmClassifier.name;
+    [self.descriptionTableView reloadData];
+	return YES;
+}
+
+#pragma mark -
+#pragma mark Private methods
 
 
 -(void) trainForImagesNames:(NSArray *)imagesNames
@@ -611,25 +729,14 @@
     //images
     self.detectorHogView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
     self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];
-    
-    //nsdate treatment
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"mm/dd/yyyy - hh:mm"];
-    [formatter setTimeZone:[NSTimeZone localTimeZone]]; //time zone
-    
-    //description
-    NSMutableString *description = [NSMutableString stringWithFormat:@""];
-    [description appendFormat:@"NAME: %@\n", self.svmClassifier.name];
-    [description appendFormat:@"CLASS: %@\n", self.svmClassifier.targetClass];
-    [description appendFormat:@"NUMBER IMAGES: %d\n", self.svmClassifier.imagesUsedTraining.count];
-    [description appendFormat:@"LAST TRAINED: %@", [formatter stringFromDate:self.svmClassifier.updateDate]];
-    self.descriptionLabel.text = [NSString stringWithString:description];
 }
 
 
 - (void)viewDidUnload {
-    [self setNameTextField:nil];
-    [self setRamon:nil];
+    [self setDescriptionTableView:nil];
+    [self setScrollView:nil];
+    [self setShowView:nil];
+    [self setShowView:nil];
     [super viewDidUnload];
 }
 @end

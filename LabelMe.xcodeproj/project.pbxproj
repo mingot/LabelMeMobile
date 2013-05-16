@@ -221,6 +221,9 @@
 		FC9F94E417443BAA0004598C /* dali.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94E117443BAA0004598C /* dali.jpg */; };
 		FC9F94E517443BAA0004598C /* miro.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94E217443BAA0004598C /* miro.jpg */; };
 		FC9F94E617443BAA0004598C /* picaso.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94E317443BAA0004598C /* picaso.jpg */; };
+		FC9F94EE1745232B0004598C /* UIView+HierarchyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F94E91745232B0004598C /* UIView+HierarchyAdditions.m */; };
+		FC9F94EF1745232C0004598C /* EditableTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F94EB1745232B0004598C /* EditableTableViewCell.m */; };
+		FC9F94F01745232C0004598C /* UITableView+TextFieldAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F94ED1745232B0004598C /* UITableView+TextFieldAdditions.m */; };
 		FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */; };
 		FCC9FAF5170CB66A009B7FC6 /* ModalTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */; };
 		FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */; };
@@ -493,6 +496,12 @@
 		FC9F94E117443BAA0004598C /* dali.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = dali.jpg; sourceTree = "<group>"; };
 		FC9F94E217443BAA0004598C /* miro.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = miro.jpg; sourceTree = "<group>"; };
 		FC9F94E317443BAA0004598C /* picaso.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = picaso.jpg; sourceTree = "<group>"; };
+		FC9F94E81745232B0004598C /* UIView+HierarchyAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+HierarchyAdditions.h"; sourceTree = "<group>"; };
+		FC9F94E91745232B0004598C /* UIView+HierarchyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HierarchyAdditions.m"; sourceTree = "<group>"; };
+		FC9F94EA1745232B0004598C /* EditableTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditableTableViewCell.h; sourceTree = "<group>"; };
+		FC9F94EB1745232B0004598C /* EditableTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditableTableViewCell.m; sourceTree = "<group>"; };
+		FC9F94EC1745232B0004598C /* UITableView+TextFieldAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITableView+TextFieldAdditions.h"; sourceTree = "<group>"; };
+		FC9F94ED1745232B0004598C /* UITableView+TextFieldAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITableView+TextFieldAdditions.m"; sourceTree = "<group>"; };
 		FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalTVC.h; sourceTree = "<group>"; };
 		FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalTVC.m; sourceTree = "<group>"; };
 		FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ModalTVC.xib; sourceTree = "<group>"; };
@@ -928,6 +937,7 @@
 		FC9F94A4174290680004598C /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				FC9F94E71745230D0004598C /* UITableViewTextFieldAditions */,
 				FC9F9486173BE9860004598C /* AYUIButton.h */,
 				FC9F9487173BE9870004598C /* AYUIButton.m */,
 				FC9F94A5174290B40004598C /* LMUINavigationController.h */,
@@ -994,6 +1004,19 @@
 				FC9F94E317443BAA0004598C /* picaso.jpg */,
 			);
 			name = Abstract;
+			sourceTree = "<group>";
+		};
+		FC9F94E71745230D0004598C /* UITableViewTextFieldAditions */ = {
+			isa = PBXGroup;
+			children = (
+				FC9F94E81745232B0004598C /* UIView+HierarchyAdditions.h */,
+				FC9F94E91745232B0004598C /* UIView+HierarchyAdditions.m */,
+				FC9F94EA1745232B0004598C /* EditableTableViewCell.h */,
+				FC9F94EB1745232B0004598C /* EditableTableViewCell.m */,
+				FC9F94EC1745232B0004598C /* UITableView+TextFieldAdditions.h */,
+				FC9F94ED1745232B0004598C /* UITableView+TextFieldAdditions.m */,
+			);
+			name = UITableViewTextFieldAditions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1269,6 +1292,9 @@
 				FC9F9488173BE9880004598C /* AYUIButton.m in Sources */,
 				FC9F94A7174290B40004598C /* LMUINavigationController.m in Sources */,
 				FC9F94B01742CB420004598C /* UIButton+CustomViews.m in Sources */,
+				FC9F94EE1745232B0004598C /* UIView+HierarchyAdditions.m in Sources */,
+				FC9F94EF1745232C0004598C /* EditableTableViewCell.m in Sources */,
+				FC9F94F01745232C0004598C /* UITableView+TextFieldAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -50,7 +50,6 @@
         //GPS settings
         locationMng = [[CLLocationManager alloc] init];
         locationMng.desiredAccuracy = kCLLocationAccuracyKilometer;
-
     }
     return self;
 }
@@ -73,10 +72,10 @@
     self.keyboardToolbar.barStyle = UIBarStyleBlackOpaque;
     self.keyboardToolbar.items = [NSArray arrayWithObjects:previousButton,nextButton,flexibleSpace,cancelButton, doneButton,nil];
     
+    //textfields
     self.usernameField.inputAccessoryView = self.keyboardToolbar;
     self.usernameField.delegate = self;
     self.usernameField.keyboardAppearance = UIKeyboardAppearanceAlert;
-    
     self.passwordField.inputAccessoryView = self.keyboardToolbar;
     self.passwordField.delegate = self;
     self.passwordField.secureTextEntry = YES;
@@ -89,6 +88,7 @@
     
     previousSession = [self rememberMe];
     
+    //sending view
     sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     sendingView.delegate = self;
     sendingView.label.numberOfLines = 1;
@@ -96,11 +96,7 @@
     sendingView.hidden = YES;
     sendingView.progressView.hidden = YES;
     sendingView.label.text = @"Signing in...";
-    
     [self.view addSubview:sendingView];
-    
-
-
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -108,15 +104,13 @@
     [super viewWillAppear:animated];
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
 
-    // Register keyboard events
     [self.usernameField setText:@""];
     [self.passwordField setText:@""];
     previousSession = [self rememberMe];   
     
+    // Register keyboard events
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
-    
-    keyboardVisible = NO;    
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -138,8 +132,6 @@
 
     // Unregister keyboard events
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, self.scrollView.frame.size.width, self.view.frame.size.height);
-    keyboardVisible = NO;
 }
 
 
@@ -147,10 +139,7 @@
 #pragma mark Keyboard Events
 
 -(void)keyboardDidShow:(NSNotification *)notif
-{
-    if (keyboardVisible)
-		return;
-	
+{    
 	// The keyboard wasn't visible before
 	
 	// Get the origin of the keyboard when it finishes animating
@@ -168,19 +157,13 @@
 	viewFrame.size.height = keyboardTop - self.view.bounds.origin.y;
 	
 	self.scrollView.frame = viewFrame;
-	keyboardVisible = YES;
     [self.scrollView scrollRectToVisible:self.passwordField.frame animated:YES];
-    
 }
 
 
 -(void)keyboardDidHide:(NSNotification *)notif
-{
-    if (!keyboardVisible) {
-        return;
-    }
+{    
     self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, self.scrollView.frame.size.width, self.view.frame.size.height);
-    keyboardVisible = NO;
 }
 
 
@@ -332,10 +315,8 @@
 
 -(void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    if (textField == self.passwordField)
-        [self nextFieldAction:nil];
-    else if (textField == self.usernameField)
-        [self previousAction:nil];
+    if (textField == self.passwordField) [self nextFieldAction:nil];
+    else if (textField == self.usernameField) [self previousAction:nil];
     
     [self.scrollView scrollRectToVisible:textField.frame animated:YES];
 }
@@ -413,7 +394,6 @@
     
     //transferring paths to galleryVC
     self.galleryViewController.userPaths = [self newArrayWithFolders:self.usernameField.text];
-
 }
 
 -(void)profilePictureReceived:(UIImage *)ppicture
@@ -439,7 +419,6 @@
 
 -(void)signInError
 {
-    //[self.signInButton setEnabled:YES];
     [sendingView setHidden:YES];
 }
 
