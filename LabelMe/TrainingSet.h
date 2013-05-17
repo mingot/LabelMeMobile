@@ -25,8 +25,4 @@
 @property int numberOfTrainingExamples; // bounding boxes + support vectors added
 
 
-//Given a training set of images and ground truth bounding boxes it generates a set of positive and negative bounding boxes for training
-- (void) initialFill;
-
-
 @end

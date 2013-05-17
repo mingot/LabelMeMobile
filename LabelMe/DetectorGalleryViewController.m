@@ -277,7 +277,9 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    
     if (self.editing == NO) {
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
         _selectedRow = indexPath.row;
         self.detectorController.hidesBottomBarWhenPushed = YES;
         self.detectorController.delegate = self;

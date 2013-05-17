@@ -56,9 +56,7 @@
 
 
 
-
 @implementation DetectorDescriptionViewController
-
 
 
 
@@ -89,12 +87,13 @@
 
 - (NSMutableArray *) classifierProperties
 {
-    if(!_classifierProperties){
+    if(!_classifierProperties && self.svmClassifier.weights != nil){
         
         //nsdate treatment
         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
         [formatter setDateFormat:@"mm/dd/yyyy - hh:mm"];
         [formatter setTimeZone:[NSTimeZone localTimeZone]]; //time zone
+        
         
         _classifierProperties = [[NSMutableArray alloc] init];
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:self.svmClassifier.name forKey:@"Name"]];
@@ -262,32 +261,14 @@
 }
 
 
-- (IBAction)saveAction:(id)sender
-{
-    //save average image
-    NSString *pathDetectorsBig = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
-                                  [NSString stringWithFormat:@"%@_big.jpg",self.svmClassifier.name]];
-    self.detectorView.image = self.averageImage;
-    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsBig contents:UIImageJPEGRepresentation(self.averageImage, 1.0) attributes:nil];
-    self.svmClassifier.averageImagePath = pathDetectorsBig;
-    
-    //save average image thumbnail
-    NSString *pathDetectorsThumb = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
-                                    [NSString stringWithFormat:@"%@_thumb.jpg",self.svmClassifier.name]];
-    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsThumb contents:UIImageJPEGRepresentation([self.averageImage thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
-    self.svmClassifier.averageImageThumbPath = pathDetectorsThumb;
-    self.svmClassifier.updateDate = [NSDate date];
-    
-    [self loadDetectorInfo];
-    
-    [self.delegate updateDetector:self.svmClassifier];
-}
+
 
 - (IBAction)infoAction:(id)sender
 {
     self.navigationController.navigationBarHidden = YES;
     self.sendingView.hidden = NO;
     self.sendingView.cancelButton.hidden = NO;
+    self.sendingView.progressView.hidden = YES;
     [self.sendingView.messagesStack removeAllObjects];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Detector %@", self.svmClassifier.name]];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images:%d", self.svmClassifier.imagesUsedTraining.count]];
@@ -369,8 +350,6 @@
         self.svmClassifier.targetClass = [self.availableObjectClasses objectAtIndex:sel.intValue];
         self.svmClassifier.name = [NSString stringWithFormat:@"%@%@",self.svmClassifier.targetClass, [self uuid]];
         
-        NSLog(@"selected class:%@", self.svmClassifier.targetClass);
-        
     }else if([identifier isEqualToString:@"Select Training Images"]){
         
         //not first training any more
@@ -387,6 +366,7 @@
         if(testImagesNames.count == 0) testImagesNames = traingImagesNames;
         
         //SENDING VIEW initialization
+        self.sendingView.progressView.hidden = NO;
         [self.sendingView.progressView setProgress:0 animated:YES];
         self.sendingView.hidden = NO;
         self.navigationController.navigationBarHidden = YES;
@@ -407,7 +387,7 @@
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [self.sendingView.activityIndicator stopAnimating];
                 self.sendingView.cancelButton.hidden = NO;
-                if(self.trainingWentGood) [self saveAction:self];
+                if(self.trainingWentGood) {[self saveAction:self]; [self loadDetectorInfo];}
                 else {
                     self.navigationController.navigationBarHidden = NO;
                     [self.navigationController popViewControllerAnimated:YES];
@@ -610,26 +590,28 @@
     [self updateProgress:0.05];
     [self.sendingView showMessage:@"Training begins!"];
     int successTraining = [self.svmClassifier train:trainingSet];
-    if(!successTraining){
-        self.trainingWentGood = NO;
-        [self.sendingView showMessage:@"Error training"];
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error Training"
-                                                                 message:@"Shape on training set not allowed.\n Make sure all the labels have a similar shape and that are not too big."
-                                                                delegate:nil
-                                                       cancelButtonTitle:@"OK"
-                                                       otherButtonTitles:nil];
-            [errorAlert show];
-        });
-        
-    }else{
-        self.trainingWentGood = YES;
-        [self.sendingView showMessage:@"Finished training"];
-        [self updateProgress:1];
-        
-        //update view of the detector
-        if(self.previousSvmClassifier != nil) self.undoButtonBar.enabled = YES;
-    }
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        if(!successTraining){
+            self.trainingWentGood = NO;
+            [self.sendingView showMessage:@"Error training"];
+            
+                UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error Training"
+                                                                     message:@"Shape on training set not allowed.\n Make sure all the labels have a similar shape and that are not too big."
+                                                                    delegate:nil
+                                                           cancelButtonTitle:@"OK"
+                                                           otherButtonTitles:nil];
+                [errorAlert show];
+            
+            
+        }else{
+            self.trainingWentGood = YES;
+            [self.sendingView showMessage:@"Finished training"];
+            [self updateProgress:1];
+            
+            //update view of the detector
+            if(self.previousSvmClassifier != nil) self.undoButtonBar.enabled = YES;
+        }
+    });
 }
 
 
@@ -729,8 +711,32 @@
     //images
     self.detectorHogView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
     self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];
+    
+    self.classifierProperties = nil;
+    [self.descriptionTableView reloadData];
+    [self.view setNeedsDisplay];
 }
 
+
+- (IBAction)saveAction:(id)sender
+{
+    //save average image
+    NSString *pathDetectorsBig = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
+                                  [NSString stringWithFormat:@"%@_big.jpg",self.svmClassifier.name]];
+    self.detectorView.image = self.averageImage;
+    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsBig contents:UIImageJPEGRepresentation(self.averageImage, 1.0) attributes:nil];
+    self.svmClassifier.averageImagePath = pathDetectorsBig;
+    
+    //save average image thumbnail
+    NSString *pathDetectorsThumb = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
+                                    [NSString stringWithFormat:@"%@_thumb.jpg",self.svmClassifier.name]];
+    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsThumb contents:UIImageJPEGRepresentation([self.averageImage thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
+    self.svmClassifier.averageImageThumbPath = pathDetectorsThumb;
+    self.svmClassifier.updateDate = [NSDate date];
+    
+    [self loadDetectorInfo];
+    [self.delegate updateDetector:self.svmClassifier];
+}
 
 - (void)viewDidUnload {
     [self setDescriptionTableView:nil];

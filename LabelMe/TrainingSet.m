@@ -79,49 +79,6 @@
     return self;
 }
 
-- (void) initialFill
-{
-    self.boundingBoxes = [[NSMutableArray alloc] initWithArray:self.groundTruthBoundingBoxes];
-    
-    for(BoundingBox *groundTruth in self.groundTruthBoundingBoxes){
-        
-        //TODO: suposing just one ground truth per image
-        UIImage *image = [self.images objectAtIndex:groundTruth.imageIndex];
-        
-        //the new box will have the size of the template size (not necessary though)
-        float height = self.templateSize.height/image.size.height;
-        float width = self.templateSize.width/image.size.width;
-        
-        double randomX;
-        double randomY;
-        
-        int num=20;
-        for(int j=0; j<num/2;j++){
-            
-            if(j%4==0){
-                randomX = 0;
-                randomY = j*1.0/num;
-            }else if(j%4==1){
-                randomX = j*1.0/num;
-                randomY = 0;
-            }else if(j%4==2){
-                randomX = 1 - width;
-                randomY = j*1.0/num;
-            }else{
-                randomX = j*1.0/num;
-                randomY = 1-height;
-            }
-            
-            BoundingBox *negativeExample = [[BoundingBox alloc] initWithRect:CGRectMake(randomX, randomY, width, height) label:-1 imageIndex:groundTruth.imageIndex];
-            
-            if([negativeExample fractionOfAreaOverlappingWith:groundTruth]<0.1)
-                [self.boundingBoxes addObject:negativeExample];
-        }
-        
-        
-        self.numberOfTrainingExamples = self.boundingBoxes.count;
-    }
-}
 
 #pragma mark   
 #pragma mark - Private methods

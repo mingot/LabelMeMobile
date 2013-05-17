@@ -574,7 +574,7 @@ using namespace cv;
             }
             
             selectedGT = aux;
-            if(isNegative || (GTFound == NO)){
+            if((isNegative || (GTFound == NO)) && quota>0){
                 quota--;
                 newBB.label = -1;
                 dispatch_sync(dispatch_get_main_queue(), ^{[self addExample:newBB to:trainingSet];});

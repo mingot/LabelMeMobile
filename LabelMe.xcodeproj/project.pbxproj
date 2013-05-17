@@ -859,8 +859,6 @@
 				A5480D731617969A009F630D /* TagView.m */,
 				A5480D7516179D8E009F630D /* Box.h */,
 				A5480D7616179D8E009F630D /* Box.m */,
-				A5949C7D1625E18500627709 /* CustomBadge.h */,
-				A5949C7E1625E18500627709 /* CustomBadge.m */,
 			);
 			name = "Image Gallery";
 			sourceTree = "<group>";
@@ -944,6 +942,8 @@
 				FC9F94A6174290B40004598C /* LMUINavigationController.m */,
 				FC9F94AE1742CB400004598C /* UIButton+CustomViews.h */,
 				FC9F94AF1742CB410004598C /* UIButton+CustomViews.m */,
+				A5949C7D1625E18500627709 /* CustomBadge.h */,
+				A5949C7E1625E18500627709 /* CustomBadge.m */,
 			);
 			name = UI;
 			sourceTree = "<group>";

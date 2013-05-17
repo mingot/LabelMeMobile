@@ -61,10 +61,10 @@
 
 - (IBAction)executeAction:(id)sender;
 - (IBAction)trainAction:(id)sender;
-- (IBAction)saveAction:(id)sender;
 - (IBAction)infoAction:(id)sender;
 - (IBAction)undoAction:(id)sender;
-- (IBAction)editAction:(id)sender;
+
+- (IBAction)saveAction:(id)sender;
 
 
 @end

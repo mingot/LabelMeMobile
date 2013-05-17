@@ -167,6 +167,8 @@
                 UIImage *imageSelected = UIGraphicsGetImageFromCurrentImageContext();
                 UIGraphicsEndImageContext();
                 
+                [imview addSubview:[self correctAccessoryWithBoxes:[NSNumber numberWithInt:7] forImgeSize:CGSizeMake(imview.frame.size.height, imview.frame.size.width)]];
+                
                 if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
                     button.frame = CGRectMake(0.05*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.225*self.view.frame.size.width, 0.225*self.view.frame.size.width);
                 
@@ -178,6 +180,10 @@
                 [button setImage:image forState:UIControlStateNormal];
                 [button setImage:[imageSelected addBorderForViewFrame:self.view.frame] forState:UIControlStateSelected];
                 
+                //custom badge
+                NSDictionary *dict = [[NSDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
+                NSNumber *num = [dict objectForKey:[indexes objectAtIndex:i]];
+                [button addSubview:[self correctAccessoryWithBoxes:num forImgeSize:button.frame.size]];
                 
                 [buttons addObject:button];
             }
@@ -361,29 +367,28 @@
 
 
 
--(UIView *)correctAccessoryAtIndex:(int)i withNum:(NSNumber *)num withSize:(CGSize)size
+- (UIView *)correctAccessoryWithBoxes:(NSNumber *)num forImgeSize:(CGSize)size
 {
     UIView *ret = nil;
     CGSize size2 = size;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
         size2 = CGSizeMake(80, 80);
 
-    if (num.intValue < 0) {
-        NSString *numBadge = [[NSString alloc] initWithFormat:@"%d",abs(num.intValue+1)];
-        CustomBadge *accessory = [CustomBadge customBadgeWithString:numBadge withStringColor:[UIColor whiteColor] withInsetColor:[UIColor redColor] withBadgeFrame:YES withBadgeFrameColor:[UIColor whiteColor] withScale:1.0 withShining:YES];
-        [accessory setFrame:CGRectMake(size.width- 0.30*size2.width, 0, 0.30*size2.width, 0.30*size2.width)];
-        ret = accessory;
         
-    }else if (num.intValue == 0){
+    if (num.intValue == 0){ // All images sent
         UIImageView *accessory =  [[UIImageView alloc] initWithFrame:CGRectMake(size.width- 0.25*size2.width, 0, 0.25*size2.width, 0.25*size2.width)];
         accessory.image = [UIImage imageNamed:@"tick.png"];
         ret = accessory;
         
     }else{
-        CustomBadge *accessory = [CustomBadge customBadgeWithString:num.stringValue withStringColor:[UIColor whiteColor] withInsetColor:[UIColor orangeColor] withBadgeFrame:YES withBadgeFrameColor:[UIColor whiteColor] withScale:1.0 withShining:YES];
-        [accessory setFrame:CGRectMake(size.width- 0.30*size2.width, 0, 0.30*size2.width, 0.30*size2.width)];
+        int number = num.intValue < 0 ? abs(num.intValue+1):num.intValue;
+        UIColor *color = num.intValue < 0 ? [UIColor redColor]:[UIColor orangeColor];
+        NSString *numberString = [NSString stringWithFormat:@"%d", number];
+        CustomBadge *accessory = [CustomBadge customBadgeWithString:numberString withStringColor:[UIColor whiteColor] withInsetColor:color withBadgeFrame:YES withBadgeFrameColor:[UIColor whiteColor] withScale:1.0 withShining:YES];
+        accessory.frame = CGRectMake(size.width- 0.30*size2.width, 0, 0.30*size2.width, 0.30*size2.width);
         ret = accessory;
     }
+    
     
     return  ret;
 }
@@ -585,8 +590,10 @@
 -(IBAction)buttonClicked:(id)sender
 {
     UIButton *button = (UIButton *)sender;
+    UIButton *editButton = [self.editButton valueForKey:@"view"];
     
-    if ([self.editButton.title isEqual: @"Cancel"]) {
+    
+    if ([editButton.titleLabel.text isEqual: @"Cancel"]) {
         if ([self.selectedItems containsObject:[self.items objectAtIndex:button.tag]]) {
             [self.selectedItems removeObject:[self.items objectAtIndex:button.tag]];
             [button setSelected:NO];
@@ -1119,7 +1126,7 @@
         UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         [cell.imageView setImage:image];
-        [cell.imageView addSubview:[self correctAccessoryAtIndex:indexPath.row withNum:num withSize:CGSizeMake(tableView.rowHeight, tableView.rowHeight)]];
+        [cell.imageView addSubview:[self correctAccessoryWithBoxes:num forImgeSize:CGSizeMake(tableView.rowHeight, tableView.rowHeight)]];
         cell.detailTextLabel.numberOfLines = 2;
         NSString *detailText = [[NSString alloc]initWithFormat:@"%d objects\n%d x %d",annotation.count,(int)newimage.size.width,(int)newimage.size.height];
         cell.detailTextLabel.text = detailText;

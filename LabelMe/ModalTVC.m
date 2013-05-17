@@ -42,7 +42,6 @@
     self.tableView.backgroundColor = [UIColor clearColor];
     if(!self.doneButtonTitle) self.doneButtonTitle = @"Done";
     [self.doneButton setTitle:self.doneButtonTitle forState:UIControlStateNormal];
-//    self.doneButton.titleLabel.text = self.doneButtonTitle;
     
     if(self.selectedItems.count == 0){
         self.doneButton.enabled = NO;
@@ -150,10 +149,12 @@
         else cell.accessoryType = UITableViewCellAccessoryNone;
         
         cell.textLabel.text = [self.data objectAtIndex:indexPath.row];
+        NSLog(@"%@",[self.data objectAtIndex:indexPath.row]);
         
         return cell;
     }
-        
+    
+    NSLog(@"%@", self.data);
     
 }
 
@@ -166,8 +167,8 @@
         if([self.selectedItems indexOfObject:row] == NSNotFound){
             if(!self.multipleChoice) [self.selectedItems removeAllObjects];
             [self.selectedItems addObject:row];
-        }
-        else [self.selectedItems removeObject:row];
+            
+        }else [self.selectedItems removeObject:row];
         
         //Enable done button when at list on item selected
         [self toggleDoneButton];
