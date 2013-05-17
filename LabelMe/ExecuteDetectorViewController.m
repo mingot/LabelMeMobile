@@ -71,7 +71,7 @@
     isUsingFrontFacingCamera = NO;
     fpsToShow = 0.0;
     num = 0;
-    self.title = self.svmClassifier.targetClass;
+    self.title = [self.svmClassifier.targetClasses componentsJoinedByString:@"+"];
     
     self.settingsTableView.hidden = YES;
     self.settingsTableView.layer.cornerRadius = 10;

@@ -35,7 +35,7 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
 {
     if(self = [self init])
     {
-        self.label = label;
+//        self.label = label;
         self.imageIndex = imageIndex;
         self.xmin = initialRect.origin.x;
         self.xmax = initialRect.origin.x + initialRect.size.width;
@@ -45,6 +45,24 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     return self;
 }
 
+-(id) initWithBoundingBox:(BoundingBox *)box
+{
+    if(self = [self init]){
+        self.score = box.score;
+        self.xmin = box.xmin;
+        self.xmax = box.xmax;
+        self.ymin = box.ymin;
+        self.ymax = box.ymax;
+        self.label = box.label;
+        self.imageIndex = box.imageIndex;
+        self.pyramidLevel = box.pyramidLevel;
+        self.rectangle = box.rectangle;
+        self.locationOnImageHog = box.locationOnImageHog;
+        self.targetClass = box.targetClass;
+        self.imageIndex = box.imageHogIndex;
+    }
+    return self;
+}
 
 - (CGRect) rectangle
 {
@@ -76,6 +94,18 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
 //        intersectionArea = unionArea;
     
     return intersectionArea/unionArea>0 ? intersectionArea/unionArea : 0;
+}
+
+
+- (BoundingBox *)increaseSizeByFactor:(float)factor
+{
+    
+    BoundingBox *newBox = [[BoundingBox alloc] initWithBoundingBox:self];
+    newBox.xmax = min(self.xmax*(1+factor), 1);
+    newBox.ymax = min(self.ymax*(1+factor), 1);
+    newBox.xmin = max(self.xmin*(1-factor), 0);
+    newBox.ymin = min(self.ymin*(1-factor), 0);
+    return newBox;
 }
 
 @end

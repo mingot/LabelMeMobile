@@ -177,7 +177,7 @@
         
     Classifier *newDetector = [[Classifier alloc] init];
     newDetector.name = @"New Detector";
-    newDetector.targetClass = @"Not Set";
+    newDetector.targetClasses = [NSArray arrayWithObject:@"Not Set"];
     self.detectorController.availableObjectClasses = self.availableObjectClasses;
     self.detectorController.hidesBottomBarWhenPushed = YES;
     self.detectorController.delegate = self;
@@ -217,7 +217,7 @@
     Classifier *detector = [self.detectors objectAtIndex:indexPath.row];
     cell.textLabel.text = detector.name;
     cell.detailTextLabel.numberOfLines = 2;
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"Class:%@ \nTraining Images: %d", detector.targetClass, detector.imagesUsedTraining.count];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"Class:%@ \nTraining Images: %d", [detector.targetClasses componentsJoinedByString:@"+"], detector.imagesUsedTraining.count];
     cell.imageView.image = [UIImage imageWithContentsOfFile:detector.averageImageThumbPath];
     return cell;
 }
@@ -253,7 +253,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     }else if (editingStyle == UITableViewCellEditingStyleInsert) {
         Classifier *newDetector = [[Classifier alloc] init];
         newDetector.name = @"New Detector";
-        newDetector.targetClass = @"Not Set";
+        newDetector.targetClasses = [NSArray arrayWithObject:@"Not Set"];
         [self.detectors insertObject:newDetector atIndex:[self.detectors count]];
         [self.tableView reloadData];
     }

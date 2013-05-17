@@ -78,7 +78,7 @@ using namespace cv;
 @synthesize weights = _weights;
 @synthesize sizes = _sizes;
 @synthesize name = _name;
-@synthesize targetClass = _targetClass;
+@synthesize targetClasses = _targetClasses;
 @synthesize numberSV = _numberSV;
 @synthesize numberOfPositives = _numberOfPositives;
 @synthesize precisionRecall = _precisionRecall;
@@ -86,8 +86,8 @@ using namespace cv;
 
 
 
-#pragma mark
-#pragma mark - Public Methods
+#pragma mark -
+#pragma mark Public Methods
 
 
 - (id) initWithTemplateWeights:(double *)templateWeights
@@ -369,8 +369,8 @@ using namespace cv;
 }
 
 
-#pragma mark
-#pragma mark - Encoding
+#pragma mark -
+#pragma mark Encoding
 
 -(id) initWithCoder:(NSCoder *)aDecoder
 {
@@ -378,7 +378,7 @@ using namespace cv;
         self.weights = [aDecoder decodeObjectForKey:@"weights"];
         self.sizes = [aDecoder decodeObjectForKey:@"sizes"];
         self.name = [aDecoder decodeObjectForKey:@"name"];
-        self.targetClass = [aDecoder decodeObjectForKey:@"targetClass"];
+        self.targetClasses = [aDecoder decodeObjectForKey:@"targetClasses"];
         self.numberSV = [aDecoder decodeObjectForKey:@"numberSV"];
         self.numberOfPositives = [aDecoder decodeObjectForKey:@"numberOfPositives"];
         self.precisionRecall = [aDecoder decodeObjectForKey:@"precisionRecall"];
@@ -421,7 +421,7 @@ using namespace cv;
     [aCoder encodeObject:self.weights forKey:@"weights"];
     [aCoder encodeObject:self.sizes forKey:@"sizes"];
     [aCoder encodeObject:self.name forKey:@"name"];
-    [aCoder encodeObject:self.targetClass forKey:@"targetClass"];
+    [aCoder encodeObject:self.targetClasses forKey:@"targetClasses"];
     [aCoder encodeObject:self.numberSV forKey:@"numberSV"];
     [aCoder encodeObject:self.numberOfPositives forKey:@"numberOfPositives"];
     [aCoder encodeObject:self.precisionRecall forKey:@"precisionRecall"];
@@ -435,8 +435,8 @@ using namespace cv;
 }
 
 
-#pragma mark
-#pragma mark - Private methods
+#pragma mark -
+#pragma mark Private methods
 
 - (void) showOrientationHistogram
 {
@@ -494,6 +494,7 @@ using namespace cv;
                 p.ymin = (double)(y + 1)/((double)blocks[0] + 2);
                 p.ymax = (double)(y + 1)/((double)blocks[0] + 2) + ((double)self.sizesP[0]/((double)blocks[0] + 2));
                 p.pyramidLevel = pyramidLevel;
+                p.targetClass = [self.targetClasses componentsJoinedByString:@"+"];
                 
                 //save the location and image hog for the later feature extraction during the learning
                 if(self.isLearning){

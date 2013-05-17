@@ -45,6 +45,7 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
                 CGContextSetLineWidth(context, 4);
                 CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
                 CGContextStrokeRect(context, box);
+                [p.targetClass drawAtPoint:CGPointMake(p.xmax, y) withFont:[UIFont systemFontOfSize:25.0f]];
                 
                 // for the rest of boxes
                 CGContextSetLineWidth(context, 1);
@@ -58,7 +59,7 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
 
 - (BoundingBox *) convertBoundingBoxForDetectView:(BoundingBox *) cp
 {
-    BoundingBox *newCP = [[BoundingBox alloc] init];
+    BoundingBox *newCP = [[BoundingBox alloc] initWithBoundingBox:cp];
     
     CGPoint upperLeft = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(cp.ymin, 1 - cp.xmin)];
     CGPoint lowerRight = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(cp.ymax, 1 - cp.xmax)];

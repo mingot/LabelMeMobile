@@ -32,7 +32,7 @@
 
 //Encoding properties
 @property (strong, nonatomic) NSString *name;
-@property (strong, nonatomic) NSString *targetClass;
+@property (strong, nonatomic) NSArray *targetClasses;
 @property (strong, nonatomic) NSMutableArray *weights;
 @property (strong, nonatomic) NSArray *sizes;
 @property (strong, nonatomic) NSNumber *numberSV;
@@ -44,6 +44,7 @@
 @property (strong, nonatomic) NSString *averageImageThumbPath;
 @property (strong, nonatomic) NSDate *updateDate;
 @property (strong, nonatomic) NSNumber *scaleFactor; //average ratio height/width of the positive bb of the training set
+
 
 
 //Initialization of the classifier given the weight vectors of it

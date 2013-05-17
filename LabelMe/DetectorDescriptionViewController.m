@@ -75,8 +75,9 @@
             NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
             NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
             for(Box *box in objects)
-                if([box.label isEqualToString:self.svmClassifier.targetClass] && [list indexOfObject:imageName]==NSNotFound)
-                        [list addObject:imageName];
+                for(NSString *targetClass in self.svmClassifier.targetClasses)
+                    if([box.label isEqualToString:targetClass] && [list indexOfObject:imageName]==NSNotFound)
+                            [list addObject:imageName];
         }
         _availablePositiveImagesNames = [NSArray arrayWithArray:list];
     }
@@ -97,7 +98,7 @@
         
         _classifierProperties = [[NSMutableArray alloc] init];
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:self.svmClassifier.name forKey:@"Name"]];
-        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:self.svmClassifier.targetClass forKey:@"Class"]];
+        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[self.svmClassifier.targetClasses componentsJoinedByString:@"+"] forKey:@"Class"]];
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[formatter stringFromDate:self.svmClassifier.updateDate] forKey:@"Last Train"]];
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.imagesUsedTraining.count] forKey:@"Images"]];
     }
@@ -173,7 +174,7 @@
         self.modalTVC.showCancelButton = YES;
         self.modalTVC.delegate = self;
         self.modalTVC.modalTitle = @"Select Class";
-        self.modalTVC.multipleChoice = NO;
+        self.modalTVC.multipleChoice = YES;
         self.modalTVC.data = self.availableObjectClasses;
         self.modalTVC.doneButtonTitle = @"Create";
         [self presentModalViewController:self.modalTVC animated:YES];
@@ -346,9 +347,11 @@
 - (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
 {
     if([identifier isEqualToString:@"Select Class"]){
-        NSNumber *sel = [selectedItems objectAtIndex:0];
-        self.svmClassifier.targetClass = [self.availableObjectClasses objectAtIndex:sel.intValue];
-        self.svmClassifier.name = [NSString stringWithFormat:@"%@%@",self.svmClassifier.targetClass, [self uuid]];
+        NSMutableArray *classes = [[NSMutableArray alloc] init];
+        for(NSNumber *sel in selectedItems)
+            [classes addObject:[self.availableObjectClasses objectAtIndex:sel.intValue]];
+        self.svmClassifier.targetClasses = [NSArray arrayWithArray:classes];
+        self.svmClassifier.name = [NSString stringWithFormat:@"%@%@",[self.svmClassifier.targetClasses componentsJoinedByString:@"+"], [[self uuid] substringToIndex:3]];
         
     }else if([identifier isEqualToString:@"Select Training Images"]){
         
@@ -547,17 +550,18 @@
         NSString *objectsPath = [(NSString *)[self.resourcesPaths objectAtIndex:OBJECTS]  stringByAppendingPathComponent:imageName];
         NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:objectsPath]];
         for(Box *box in objects){
-            if([box.label isEqualToString:self.svmClassifier.targetClass]){ //add bounding box
-                containedClass = YES;
-                BoundingBox *cp = [[BoundingBox alloc] init];
-                cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
-                cp.ymin = box.upperLeft.y/box->LOWERBOUND;
-                cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
-                cp.ymax = box.lowerRight.y/box->LOWERBOUND;
-                cp.imageIndex = trainingSet.images.count;
-                cp.label = 1;
-                [trainingSet.groundTruthBoundingBoxes addObject:cp];
-            }
+            for(NSString *class in self.svmClassifier.targetClasses)
+                if([box.label isEqualToString:class]){ //add bounding box
+                    containedClass = YES;
+                    BoundingBox *cp = [[BoundingBox alloc] init];
+                    cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
+                    cp.ymin = box.upperLeft.y/box->LOWERBOUND;
+                    cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
+                    cp.ymax = box.lowerRight.y/box->LOWERBOUND;
+                    cp.imageIndex = trainingSet.images.count;
+                    cp.label = 1;
+                    [trainingSet.groundTruthBoundingBoxes addObject:cp];
+                }
         }
         if(containedClass){ //add image
             NSString *imagePath = [(NSString *)[self.resourcesPaths objectAtIndex:IMAGES]  stringByAppendingPathComponent:imageName];
@@ -579,7 +583,7 @@
     NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
     for(BoundingBox *cp in trainingSet.groundTruthBoundingBoxes){
         UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
-        UIImage *croppedImage = [wholeImage croppedImage:[cp rectangleForImage:wholeImage]];
+        UIImage *croppedImage = [wholeImage croppedImage:[[cp increaseSizeByFactor:0.2] rectangleForImage:wholeImage]];
         [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationLow]];
     }
     self.averageImage = [self imageAveraging:listOfImages];
@@ -626,17 +630,18 @@
         NSString *objectsPath = [(NSString *)[self.resourcesPaths objectAtIndex:OBJECTS]  stringByAppendingPathComponent:imageName];
         NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:objectsPath]];
         for(Box *box in objects){
-            if([box.label isEqualToString:self.svmClassifier.targetClass]){ //add bounding box
-                containedClass = YES;
-                BoundingBox *cp = [[BoundingBox alloc] init];
-                cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
-                cp.ymin = box.upperLeft.y/box->LOWERBOUND;
-                cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
-                cp.ymax = box.lowerRight.y/box->LOWERBOUND;
-                cp.imageIndex = testSet.images.count;
-                cp.label = 1;
-                [testSet.groundTruthBoundingBoxes addObject:cp];
-            }
+            for(NSString *class in self.svmClassifier.targetClasses)
+                if([box.label isEqualToString:class]){ //add bounding box
+                    containedClass = YES;
+                    BoundingBox *cp = [[BoundingBox alloc] init];
+                    cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
+                    cp.ymin = box.upperLeft.y/box->LOWERBOUND;
+                    cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
+                    cp.ymax = box.lowerRight.y/box->LOWERBOUND;
+                    cp.imageIndex = testSet.images.count;
+                    cp.label = 1;
+                    [testSet.groundTruthBoundingBoxes addObject:cp];
+                }
         }
         if(containedClass){ //add image
             NSString *imagePath = [(NSString *)[self.resourcesPaths objectAtIndex:IMAGES]  stringByAppendingPathComponent:imageName];
