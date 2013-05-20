@@ -33,7 +33,11 @@
 
 - (NSMutableSet *) levelsToCalculate
 {
-    if(!_levelsToCalculate) _levelsToCalculate = [[NSMutableSet alloc] init];
+    if(!_levelsToCalculate){
+        _levelsToCalculate = [[NSMutableSet alloc] init];
+        for(int i=0;i<self.numPyramids;i++)
+            [_levelsToCalculate addObject:[NSNumber numberWithInt:i]];
+    }
     return _levelsToCalculate;
 }
 
@@ -71,7 +75,6 @@
     double initialScale = self.scaleFactor.doubleValue/sqrt(image.size.width*image.size.width);
     double scale = pow(2, 1.0/SCALES_PER_OCTAVE);
     
-    NSLog(@"Levels: %@", self.levelsToCalculate);
     UIImage *scaledImage = [image scaleImageTo:initialScale/pow(scale,0)]; //optimize to start to the first true index
     for(int i=0; i<self.numPyramids; i++)
         if([self.levelsToCalculate containsObject:[NSNumber numberWithInt:i]]){
@@ -82,7 +85,7 @@
     
 
     //reset indexes to look into
-    self.levelsToCalculate = nil;
+    [self.levelsToCalculate removeAllObjects];
     
 }
 

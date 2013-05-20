@@ -15,14 +15,28 @@ static inline double min(double x, double y) { return (x <= y ? x : y); }
 static inline double max(double x, double y) { return (x <= y ? y : x); }
 
 
+@interface DetectView()
+
+@property (nonatomic, strong) NSArray *colors;
+
+@end
+
+
 @implementation DetectView
 
 
+- (NSArray *) colors
+{
+    if(!_colors)
+        _colors = [NSArray arrayWithObjects:[UIColor redColor], [UIColor blueColor], [UIColor greenColor], [UIColor orangeColor], nil];
+    return _colors;
+}
 
 - (void)drawRect:(CGRect)rect
 {
     
     //for each group of corners generated (by nmsarray)
+    int j=0;
     for(NSArray *corners in self.cornersArray){
         
         if (corners.count==0) continue; //skip if no bb for this class
@@ -47,11 +61,11 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
             CGRect box = CGRectMake(x, y, w, h);
             if(i==0){
                 CGContextSetLineWidth(context, 4);
-                CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
+                
+                CGContextSetStrokeColorWithColor(context, [(UIColor *)[self.colors objectAtIndex:j%self.colors.count] CGColor]);
+                j++;
                 CGContextStrokeRect(context, box);
                 [p.targetClass drawAtPoint:CGPointMake(p.xmax, y) withFont:[UIFont systemFontOfSize:25.0f]];
-                NSLog(@"Targetclass: %@", p.targetClass);
-                NSLog(@"rect data: (x,y)=(%f,%f) (w,h)=(%f,%f)",x,y,w,h);
                 
                 // for the rest of boxes
                 CGContextSetLineWidth(context, 1);

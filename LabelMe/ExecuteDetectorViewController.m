@@ -90,7 +90,6 @@
     numMax = 1;
     self.numPyramids = 15;
     self.maxDetectionScore = -0.9;
-    self.hogPyramid = [[Pyramid alloc] initWithClassifiers:self.svmClassifiers forNumPyramids:self.numPyramids];
     
     // ********  CAMERA CAPUTRE  ********
     //Capture input specifications
@@ -150,6 +149,9 @@
 {
     //set the frame here after all the navigation tabs have been uploaded and we have the definite frame size
     self.prevLayer.frame = self.detectView.frame;
+    
+    //reset the pyramid with the new detectors
+    self.hogPyramid = [[Pyramid alloc] initWithClassifiers:self.svmClassifiers forNumPyramids:self.numPyramids];
     
     //Start the capture
     [self.captureSession startRunning];
@@ -222,12 +224,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                                               usingNms:YES
                                      deviceOrientation:[[UIDevice currentDevice] orientation]
                                     learningImageIndex:0]];
-        }else{            
+        
+        }else{//Multiclass detection
             [self.hogPyramid constructPyramidForImage:image withOrientation:[[UIDevice currentDevice] orientation]];
-            for(Classifier *svmClassifier in self.svmClassifiers){
+            for(Classifier *svmClassifier in self.svmClassifiers)
                 [nmsArray addObject:[svmClassifier detect:self.hogPyramid minimumThreshold:detectionThreshold usingNms:YES orientation:[[UIDevice currentDevice] orientation]]];
-                NSLog(@"For class: %d, Detected: %d", nmsArray.count, [[nmsArray objectAtIndex:nmsArray.count-1] count]);
-            }
         }
         //**** END DETECTION ****
         

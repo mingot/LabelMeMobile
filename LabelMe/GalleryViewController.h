@@ -35,7 +35,6 @@
 @property (nonatomic, strong) UILabel *noImages;
 @property (nonatomic, strong) SendingView *sendingView;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *editButton;
-@property (nonatomic,strong) IBOutlet UIToolbar *bottomToolbar;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *deleteButton;
 @property (nonatomic,strong) IBOutlet UIBarButtonItem *sendButton;
 @property (nonatomic,strong) IBOutlet UIButton *listButton;

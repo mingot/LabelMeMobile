@@ -18,6 +18,15 @@
 #define OBJECTS 2
 #define DETECTORS 3
 
+@interface DetectorGalleryViewController()
+
+//reload delete and execute buttons whenever needed
+- (void) reloadToolbarButtons;
+
+@end
+
+
+
 @implementation DetectorGalleryViewController
 
 
@@ -105,13 +114,13 @@
         self.detectors = [[NSMutableArray alloc] init];
     }
     
-    //execute all the detectors
-    self.executeDetectorsButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    self.executeDetectorsButton.frame = CGRectMake(20, 40, 95, 37);
-    [self.executeDetectorsButton setTitle:@"Execute" forState:UIControlStateNormal];
-    [self.executeDetectorsButton addTarget:self action:@selector(executeDetectorsAction:) forControlEvents:UIControlEventTouchUpInside];
+//    //execute all the detectors
+//    self.executeDetectorsButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+//    self.executeDetectorsButton.frame = CGRectMake(20, 40, 95, 37);
+//    [self.executeDetectorsButton setTitle:@"Execute" forState:UIControlStateNormal];
+//    [self.executeDetectorsButton addTarget:self action:@selector(executeDetectorsAction:) forControlEvents:UIControlEventTouchUpInside];
+//    [customView addSubview:self.executeDetectorsButton];
     UIView *customView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 100)];
-    [customView addSubview:self.executeDetectorsButton];
     self.tableView.tableFooterView = customView;
     
     
@@ -127,6 +136,19 @@
     self.plusButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton plusBarButtonWithTarget:self action:@selector(addDetector:)]];
     self.navigationItem.leftBarButtonItem = self.plusButton;
     self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
+    
+    //toolbar edit buttons
+    self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStyleBordered target:self action:@selector(deleteAction:)];
+    [self.deleteButton setTintColor:[UIColor redColor]];
+    [self.deleteButton setWidth:self.view.frame.size.width/2 - 11];
+    [self.deleteButton setEnabled:NO];
+    self.executeButton = [[UIBarButtonItem alloc] initWithTitle:@"Execute" style:UIBarButtonItemStyleBordered target:self action:@selector(executeDetectorsAction:)];
+    [self.executeButton setWidth:self.view.frame.size.width/2 - 11];
+    [self.executeButton setEnabled:NO];
+    [self.navigationController.toolbar setBarStyle:UIBarStyleBlackTranslucent];
+    self.selectedItems = [[NSMutableArray alloc] init];
+    
+    
     
     [super viewDidLoad];
 }
@@ -151,14 +173,45 @@
         [button setTitle:@"Edit" forState:UIControlStateNormal];
         self.navigationItem.leftBarButtonItem = self.plusButton;
         
+        [self.navigationController setToolbarHidden:YES];
+
+        
     }else{
         [super setEditing:YES animated:YES];
-        [self.tableView setEditing:YES animated:YES];
         [button setTitle:@"Done" forState:UIControlStateNormal];
         self.navigationItem.leftBarButtonItem = nil;
+        
+        [self.navigationController setToolbarHidden:NO];
+        NSArray *toolbarItems = [[NSArray alloc] initWithObjects:self.executeButton,self.deleteButton, nil];
+        [self.navigationController.toolbar setItems:toolbarItems];
+        
+
     }
     [self.tableView reloadData];
 }
+
+- (IBAction)deleteAction:(id)sender
+{
+    
+    //delete from the model
+    NSMutableArray *aux = [[NSMutableArray alloc] init];
+    for(NSNumber *index in self.selectedItems) [aux addObject:[self.detectors objectAtIndex:index.intValue]];
+    for(Classifier *detector in aux) [self.detectors removeObject:detector];
+    
+    [self.selectedItems removeAllObjects];
+    [self.tableView reloadData];
+    
+    [self.deleteButton setTitle:@"Delete"];
+    self.deleteButton.enabled = NO;
+    [self.executeButton setTitle:@"Execute"];
+    self.executeButton.enabled = NO;
+    
+    //remove from disk
+    if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"]])
+        NSLog(@"Unable to save the classifiers");
+}
+
+
 
 - (IBAction)addDetector:(id)sender
 {
@@ -202,48 +255,65 @@
 }
 
 
+//- (IBAction)executeDetectorsAction:(id)sender
+//{
+//    //show modal to select training positives for the selected class
+//    self.modalTVC = [[ModalTVC alloc] init];
+//    self.modalTVC.delegate = self;
+//    self.modalTVC.modalTitle = @"Select Detectors to Execute";
+//    self.modalTVC.doneButtonTitle = @"Execute";
+//    self.modalTVC.multipleChoice = NO;
+//    NSMutableArray *imagesList = [[NSMutableArray alloc] init];
+//    for(Classifier *detector in self.detectors)
+//        [imagesList addObject:[UIImage imageWithContentsOfFile:detector.averageImageThumbPath]];
+//    
+//    self.modalTVC.showCancelButton = YES;
+//    self.modalTVC.data = imagesList;
+//    [self.modalTVC.view setNeedsDisplay];
+//    [self presentModalViewController:self.modalTVC animated:YES];
+//    
+//    
+//    //let's wait for the modalTVCDelegate answer to begin the training
+//}
+
 - (IBAction)executeDetectorsAction:(id)sender
 {
-    //show modal to select training positives for the selected class
-    self.modalTVC = [[ModalTVC alloc] init];
-    self.modalTVC.delegate = self;
-    self.modalTVC.modalTitle = @"Select Detectors to Execute";
-    self.modalTVC.doneButtonTitle = @"Execute";
-    self.modalTVC.multipleChoice = NO;
-    NSMutableArray *imagesList = [[NSMutableArray alloc] init];
-    for(Classifier *detector in self.detectors)
-        [imagesList addObject:[UIImage imageWithContentsOfFile:detector.averageImageThumbPath]];
     
-    self.modalTVC.showCancelButton = YES;
-    self.modalTVC.data = imagesList;
-    [self.modalTVC.view setNeedsDisplay];
-    [self presentModalViewController:self.modalTVC animated:YES];
-    
-    
-    //let's wait for the modalTVCDelegate answer to begin the training
-}
-
-
-#pragma mark -
-#pragma mark ModalTVC Delegate
-
-- (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
-{
-    NSLog(@"Selected Detectors: %@",selectedItems);
     NSMutableArray *selectedDetectors = [[NSMutableArray alloc] init];
-    for(NSNumber *index in selectedItems)
+    for(NSNumber *index in self.selectedItems)
         [selectedDetectors addObject:[self.detectors objectAtIndex:index.intValue]];
     
     self.executeDetectorVC = [[ExecuteDetectorViewController alloc] init];
     self.executeDetectorVC.svmClassifiers = [NSArray arrayWithArray:selectedDetectors];
     [self.navigationController pushViewController:self.executeDetectorVC animated:YES];
-
-}
-
-- (void) selectionCancelled
-{
     
+    //reload views
+    [self edit:self];
+    [self.selectedItems removeAllObjects];
+    [self reloadToolbarButtons];
 }
+
+
+//#pragma mark -
+//#pragma mark ModalTVC Delegate
+//
+//- (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
+//{
+//    NSLog(@"Selected Detectors: %@",selectedItems);
+//    NSMutableArray *selectedDetectors = [[NSMutableArray alloc] init];
+//    for(NSNumber *index in selectedItems)
+//        [selectedDetectors addObject:[self.detectors objectAtIndex:index.intValue]];
+//    
+//    self.executeDetectorVC = [[ExecuteDetectorViewController alloc] init];
+//    self.executeDetectorVC.svmClassifiers = [NSArray arrayWithArray:selectedDetectors];
+//    [self.navigationController pushViewController:self.executeDetectorVC animated:YES];
+//
+//}
+//
+//- (void) selectionCancelled
+//{
+//    
+//}
 
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
@@ -257,24 +327,27 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"detectorCell";
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
-    int count = 0;
-    if(self.editing && indexPath.row != 0)
-        count = 1;
-    if(indexPath.row == ([self.detectors count]) && self.editing){
-        cell.textLabel.text = @"Add Detector";
-        return cell;
-    }
+    
+    if(self.editing) cell.accessoryType = UITableViewCellAccessoryNone;
+    else cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+
     Classifier *detector = [self.detectors objectAtIndex:indexPath.row];
     cell.textLabel.text = detector.name;
     cell.detailTextLabel.numberOfLines = 2;
     cell.detailTextLabel.text = [NSString stringWithFormat:@"Class:%@ \nTraining Images: %d", [detector.targetClasses componentsJoinedByString:@", "], detector.imagesUsedTraining.count];
     cell.imageView.image = [UIImage imageWithContentsOfFile:detector.averageImageThumbPath];
+    
+    //cell highlighted when selected
+    if([self.selectedItems containsObject:[NSNumber numberWithInt:indexPath.row]] && self.editing){
+        NSLog(@"Found cell %d!!", indexPath.row);
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    }
+    
     return cell;
 }
 
@@ -283,53 +356,6 @@
 {
     return 80;
 }
-
-
-- (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView  editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (self.editing == NO || !indexPath) return UITableViewCellEditingStyleNone;
-    
-    if (self.editing && indexPath.row == ([self.detectors count]))
-        return UITableViewCellEditingStyleInsert;
-    else return UITableViewCellEditingStyleDelete;
-    
-    return UITableViewCellEditingStyleNone;
-}
-
-
-- (void)tableView:(UITableView *)aTableView  commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
-forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [self.detectors removeObjectAtIndex:indexPath.row];
-        [self.tableView reloadData];
-        if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"]])
-            NSLog(@"Unable to save the classifiers");
-        
-    }else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        Classifier *newDetector = [[Classifier alloc] init];
-        newDetector.name = @"New Detector";
-        newDetector.targetClasses = [NSArray arrayWithObject:@"Not Set"];
-        [self.detectors insertObject:newDetector atIndex:[self.detectors count]];
-        [self.tableView reloadData];
-    }
-}
-
-
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    return YES;
-}
-
-
-- (void)tableView:(UITableView *)tableView  moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
-      toIndexPath:(NSIndexPath *)toIndexPath
-{
-    NSString *item = [self.detectors objectAtIndex:fromIndexPath.row];
-    [self.detectors removeObject:item];
-    [self.detectors insertObject:item atIndex:toIndexPath.row];
-}
-
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -343,7 +369,17 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
         self.detectorController.view = nil; //to reexecute viewDidLoad
         self.detectorController.userPath = self.userPath;
         [self.navigationController pushViewController:self.detectorController animated:YES];
-        
+    
+    }else{
+        NSNumber *index = [NSNumber numberWithInt:indexPath.row];
+        if(![self.selectedItems containsObject:index]){
+            [self.selectedItems addObject:index];
+        }else{
+            [self.selectedItems removeObject:index];
+        }
+
+        [self reloadToolbarButtons];
+        [tableView reloadData];
     }
 }
 
@@ -365,5 +401,23 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     [self.tableView reloadData];
 }
 
+
+#pragma mark -
+#pragma mark Private methods
+
+- (void) reloadToolbarButtons
+{
+    
+    if(self.selectedItems.count == 0){
+        [self.deleteButton setTitle:@"Delete"];
+        [self.executeButton setTitle:@"Execute"];
+    }else{
+        [self.deleteButton setTitle:[NSString stringWithFormat:@"Delete (%d)", self.selectedItems.count]];
+        [self.executeButton setTitle:[NSString stringWithFormat:@"Execute (%d)", self.selectedItems.count]];
+    }
+    self.deleteButton.enabled = self.selectedItems.count > 0 ? YES:NO;
+    self.executeButton.enabled = self.selectedItems.count > 0 ? YES:NO;
+
+}
 
 @end

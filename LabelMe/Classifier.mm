@@ -319,8 +319,12 @@ using namespace cv;
     //get detections
     NSMutableArray *candidateBoundingBoxes = [[NSMutableArray alloc] init];
     for(int i=self.iniPyramid; i<self.finPyramid; i++){
-        HogFeature *imageHog = [pyramid.hogFeatures objectAtIndex:i];
-        [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:0]];
+        if([[pyramid.hogFeatures objectAtIndex:i] isKindOfClass:[NSNumber class]]){
+            NSLog(@"Error trying to retrieve pyramid %d",i);
+        }else{
+            HogFeature *imageHog = [pyramid.hogFeatures objectAtIndex:i];
+            [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:0]];
+        }
     }
     
     
