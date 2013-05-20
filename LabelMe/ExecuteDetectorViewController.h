@@ -19,6 +19,7 @@
 #import "SettingsViewController.h"
 #import "Classifier.h"
 #import "AYUIButton.h"
+#import "Pyramid.h"
 
 
 @interface ExecuteDetectorViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate>
@@ -30,9 +31,11 @@
 
 
 //model properties
-@property (nonatomic,strong) Classifier *svmClassifier;
+@property (nonatomic,strong) NSArray *svmClassifiers;
+@property (nonatomic,strong) NSMutableArray *detectionThresholds; //for each classifier
 @property int numPyramids;
 @property double maxDetectionScore;
+@property (nonatomic, strong) Pyramid *hogPyramid;
 
 //AVCapture
 @property (nonatomic, strong) AVCaptureSession *captureSession;

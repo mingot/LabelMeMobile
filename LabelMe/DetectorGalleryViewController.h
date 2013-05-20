@@ -8,18 +8,30 @@
 
 #import <UIKit/UIKit.h>
 #import "DetectorDescriptionViewController.h"
+#import "ModalTVC.h"
+#import "ExecuteDetectorViewController.h"
 #import "Classifier.h"
 
-@interface DetectorGalleryViewController : UIViewController <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource,DetectorDescriptionViewControllerDelegate>
+
+@interface DetectorGalleryViewController : UIViewController <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource,DetectorDescriptionViewControllerDelegate, ModalTVCDelegate>
 {
     NSInteger _selectedRow;
 }
 
-@property (nonatomic, strong) NSMutableArray *detectors; //Classifier
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) DetectorDescriptionViewController *detectorController;
-@property (nonatomic, strong) UIBarButtonItem *editButton;
+@property (nonatomic, strong) ModalTVC *modalTVC;
+@property (nonatomic, strong) ExecuteDetectorViewController *executeDetectorVC;
 
+//detecotrs
+@property (nonatomic, strong) NSMutableArray *detectors;
+
+//view
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (nonatomic, strong) UIBarButtonItem *editButton;
+@property (nonatomic, strong) UIButton *executeDetectorsButton;
+@property (strong, nonatomic) UIBarButtonItem *plusButton;
+
+//resources
 @property (nonatomic, strong) NSString *username;
 @property (nonatomic, strong) NSString *userPath;
 @property (strong, nonatomic) NSArray *resourcesPaths;
@@ -28,6 +40,7 @@
 //top toolbar actions
 - (IBAction) edit:(id)sender;
 - (IBAction) addDetector:(id)sender;
+- (IBAction) executeDetectorsAction:(id)sender;
 
 @end
 

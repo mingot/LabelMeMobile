@@ -34,11 +34,9 @@ using namespace cv;
 
 @property BOOL isLearning;
 
-
 //pyramid limits for detection in execution
 @property int iniPyramid;
 @property int finPyramid;
-
 
 //detector buffer (when training)
 @property (strong, nonatomic) NSMutableArray *receivedImageIndex;
@@ -92,13 +90,9 @@ using namespace cv;
 
 - (id) initWithTemplateWeights:(double *)templateWeights
 {
-    for(int i=0; i<10;i++)
-        levelsPyramid[i] =0;
-    
+    for(int i=0; i<10;i++) levelsPyramid[i] = 0;
 
-        
-    if(self = [super init])
-    {
+    if(self = [super init]){
         self.sizesP = (int *) malloc(3*sizeof(int));
         self.sizesP[0] = (int) templateWeights[0];
         self.sizesP[1] = (int) templateWeights[1];
@@ -109,19 +103,19 @@ using namespace cv;
         for(int i=0; i<numberOfSvmWeights; i++) 
             self.weightsP[i] = templateWeights[3 + i];
     }
-    
     return self;
 }
 
 - (id) init
 {
     if (self = [super init]) {
+        
+        //dummy initialization to be replaced during the training
         self.sizesP = (int *) malloc(3*sizeof(int));
         self.sizesP[0] = 1;
         self.sizesP[1] = 1;
         self.sizesP[2] = 1;
         
-        //dummy initialization to be replaced during the training
         self.weightsP = (double *) malloc(sizeof(double));
         self.weightsP[0] = 0;
     }
@@ -156,18 +150,16 @@ using namespace cv;
         [self.imagesHogPyramid addObject:[NSNull null]];
     
     self.receivedImageIndex = [[NSMutableArray alloc] init];
-
-
     
     // Get the template size and get hog feautures dimension
     float ratio = trainingSet.templateSize.width/trainingSet.templateSize.height;
+    //scalefactor for detection. Used to ajust hog size with images resolution
     self.scaleFactor = [NSNumber numberWithDouble:self.maxHog*6*sqrt(ratio/trainingSet.areaRatio)];
-//    self.sizesP[0] = round(40*trainingSet.areaRatio + 4); //Determined empirically to ajust the size of the template according to the size in the training set
     self.sizesP[0] = self.maxHog; //set in user preferences
-    NSLog(@"MAX HOG:%d", self.maxHog);
     self.sizesP[1] = round(self.sizesP[0]*ratio);
     self.sizesP[2] = 31;
     numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];
+    
     [self.delegate sendMessage:[NSString stringWithFormat:@"Hog features: %d %d %d for ratio:%f", self.sizesP[0],self.sizesP[1],self.sizesP[2], ratio]];
     [self.delegate sendMessage:[NSString stringWithFormat:@"area ratio: %f", trainingSet.areaRatio]];
     
@@ -182,6 +174,7 @@ using namespace cv;
     diff = 1;
     int iter = 0;
     numSupportVectors=0;
+    BOOL firstTimeError = YES;
     
     while(diff > STOP_CRITERIA && iter<10){
 
@@ -190,8 +183,14 @@ using namespace cv;
         //Get Bounding Boxes from detection
         [self getBoundingBoxesForTrainingWith:trainingSet];
         
-        //check for positive bb found, other wise, break
-        if(self.numberOfPositives.intValue < 2 || self.numberOfPositives.intValue == trainingSet.numberOfTrainingExamples) return 0;
+        //The first time that not enough positive or negative bb have been generated, try to unify all the sizes of the bounding boxes. This solve the problem in most of the cases. However if still not solved, through an error saying not possible training done due to the ground truth bouning boxes shape.
+        if(self.numberOfPositives.intValue < 2 || self.numberOfPositives.intValue == trainingSet.numberOfTrainingExamples){
+            if(firstTimeError){
+                [trainingSet unifyGroundTruthBoundingBoxes];
+                firstTimeError = NO;
+                continue;
+            }else return 0;
+        }
         
         //Train the SVM, update weights and store support vectors and labels
         [self trainSVMAndGetWeights:trainingSet];
@@ -231,15 +230,12 @@ using namespace cv;
     if(!self.isLearning && UIDeviceOrientationIsLandscape(orientation))
         image = [UIImage imageWithCGImage:image.CGImage scale:1.0 orientation: UIImageOrientationUp];
 
-    
-    
-//    double initialScale = MAX_IMAGE_SIZE/image.size.height;
+    //scaling factor for the image
     double initialScale = self.scaleFactor.doubleValue/sqrt(image.size.width*image.size.width);
     double scale = pow(2, 1.0/SCALES_PER_OCTAVE);
 
     //Pyramid limits
     if(self.finPyramid == 0) self.finPyramid = numberPyramids;
-    
     
     //locate pyramids already calculated in the buffer
     BOOL found=NO;
@@ -277,27 +273,6 @@ using namespace cv;
         });
     });
     dispatch_release(pyramidQueue);
-
-    
-//    //DETECTION WITHOUT PARALLELIZATION
-//    UIImage *im = [image scaleImageTo:initialScale/pow(scale,self.iniPyramid)];
-//    for (int i=self.iniPyramid; i<self.finPyramid; i++){
-//        HogFeature *imageHog;
-//        int imageHogIndex = 0;
-//        if(!found){
-//            im = [im scaleImageTo:1/scale];
-//            imageHog = [im obtainHogFeatures];
-//            if(self.isLearning){
-//                imageHogIndex = imageIndex*numberPyramids + i;
-//                [self.imagesHogPyramid replaceObjectAtIndex:imageHogIndex withObject:imageHog];
-//            }
-//        }else{
-//            imageHogIndex = (imageIndex*numberPyramids + i);
-//            imageHog = (HogFeature *)[self.imagesHogPyramid objectAtIndex:imageHogIndex];
-//        }
-//        [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:imageHogIndex]];
-//    }
-    
     
     //sort array of bounding boxes by score
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"score" ascending:NO];
@@ -331,9 +306,61 @@ using namespace cv;
             boundingBox.ymax = auxXmax;
         }
     }
-    
-    
     return nmsArray;
+}
+
+
+
+- (NSArray *) detect:(Pyramid *) pyramid
+    minimumThreshold:(double) detectionThreshold
+            usingNms:(BOOL)useNms
+         orientation:(int)orientation
+{
+    //get detections
+    NSMutableArray *candidateBoundingBoxes = [[NSMutableArray alloc] init];
+    for(int i=self.iniPyramid; i<self.finPyramid; i++){
+        HogFeature *imageHog = [pyramid.hogFeatures objectAtIndex:i];
+        [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:0]];
+    }
+    
+    
+    //sort array of bounding boxes by score
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"score" ascending:NO];
+    NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
+    NSArray *candidateBoundingBoxesSorted = [candidateBoundingBoxes sortedArrayUsingDescriptors:sortDescriptors];
+    
+    //non maximum supression
+    NSArray *nmsArray = candidateBoundingBoxesSorted;
+    if(useNms) nmsArray = [ConvolutionHelper nms:candidateBoundingBoxesSorted maxOverlapArea:0.25 minScoreThreshold:detectionThreshold];
+    
+    //update the pyramid object with the desired pyramids for the next time
+    if(nmsArray.count > 0){
+        //get the level of the maximum score bb
+        int level = [(BoundingBox*)[nmsArray objectAtIndex:0] pyramidLevel];
+        self.iniPyramid = level-1 > -1 ? level - 1 : 0;
+        self.finPyramid = level+2 < pyramid.numPyramids ? level+2 : pyramid.numPyramids;
+    }else{
+        self.iniPyramid = 0;
+        self.finPyramid = pyramid.numPyramids;
+    }
+    for(int i=self.iniPyramid;i<self.finPyramid;i++)
+        [pyramid.levelsToCalculate addObject:[NSNumber numberWithInt:i]];
+    
+    // Change the resulting orientation of the bounding boxes if the phone orientation requires it
+    if(!self.isLearning && UIInterfaceOrientationIsLandscape(orientation)){
+        for(int i=0; i<nmsArray.count; i++){
+            BoundingBox *boundingBox = [nmsArray objectAtIndex:i];
+            double auxXmin, auxXmax;
+            auxXmin = boundingBox.xmin;
+            auxXmax = boundingBox.xmax;
+            boundingBox.xmin = (1 - boundingBox.ymin);
+            boundingBox.xmax = (1 - boundingBox.ymax);
+            boundingBox.ymin = auxXmin;
+            boundingBox.ymax = auxXmax;
+        }
+    }
+    return nmsArray;
+    
 }
 
 
@@ -388,6 +415,7 @@ using namespace cv;
         self.averageImageThumbPath = [aDecoder decodeObjectForKey:@"averageImageThumbPath"];
         self.updateDate = [aDecoder decodeObjectForKey:@"updateDate"];
         self.scaleFactor = [aDecoder decodeObjectForKey:@"scaleFactor"];
+        self.detectionThreshold = [aDecoder decodeObjectForKey:@"detectionThreshold"];
         
         self.sizesP = (int *) malloc(3*sizeof(int));
         self.sizesP[0] = [(NSNumber *) [self.sizes objectAtIndex:0] intValue];
@@ -431,6 +459,7 @@ using namespace cv;
     [aCoder encodeObject:self.averageImageThumbPath forKey:@"averageImageThumbPath"];
     [aCoder encodeObject:self.updateDate forKey:@"updateDate"];
     [aCoder encodeObject:self.scaleFactor forKey:@"scaleFactor"];
+    [aCoder encodeObject:self.detectionThreshold forKey:@"detectionThreshold"];
     
 }
 

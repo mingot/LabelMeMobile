@@ -8,28 +8,22 @@
 
 #import "CreditsViewController.h"
 
-@interface CreditsViewController ()
 
-@end
 
 @implementation CreditsViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    //title view
     UIImage *titleImage = [UIImage imageNamed:@"labelmelogo-shadow.png"];
     UIImageView *labelmeView = [[UIImageView alloc] initWithImage:titleImage];
     [labelmeView setFrame:CGRectMake((self.view.frame.size.width-labelmeView.frame.size.width)/2, 10, labelmeView.frame.size.width, labelmeView.frame.size.height)];
     [self.scrollView addSubview:labelmeView];
+    
+    //label
     UILabel *information = [[UILabel alloc] initWithFrame:CGRectMake(0.0625*self.view.frame.size.width, 0.0625*self.view.frame.size.width+labelmeView.frame.size.height, self.view.frame.size.width-0.125*self.view.frame.size.width, self.scrollView.frame.size.height - labelmeView.frame.size.height-0.125*self.view.frame.size.width)];
     [information setTextAlignment:NSTextAlignmentCenter];
     [information setNumberOfLines:0];
@@ -40,8 +34,8 @@
     CGSize expectedLabelSize = [informationString sizeWithFont:information.font constrainedToSize:CGSizeMake(information.frame.size.width, 2000) lineBreakMode:UILineBreakModeWordWrap];
     [information setFrame:CGRectMake(information.frame.origin.x, information.frame.origin.y,expectedLabelSize.width, expectedLabelSize.height)];
     [information setTextColor:[UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];
-   /* information.shadowColor = [UIColor grayColor];
-    information.shadowOffset = CGSizeMake(0.0, 1.0);*/
+    
+    //scroll view
     [self.scrollView addSubview:information];
     [self.scrollView setCanCancelContentTouches:NO];
 	self.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
@@ -49,21 +43,17 @@
     self.scrollView.clipsToBounds = YES;
 	self.scrollView.scrollEnabled = YES;
 	self.scrollView.pagingEnabled = NO;
-    [self.scrollView setContentSize:CGSizeMake(self.view.frame.size.width, labelmeView.frame.size.height+information.frame.size.height+0.125*self.view.frame.size.width
-                                               )];
+    [self.scrollView setContentSize:CGSizeMake(self.view.frame.size.width, labelmeView.frame.size.height+information.frame.size.height+0.125*self.view.frame.size.width)];
+    
+    //footer
     UIImage *logoImage = [UIImage imageNamed:@"MITLogo.gif"];
     UIImageView *logoView = [[UIImageView alloc] initWithImage:logoImage];
     [logoView setFrame:CGRectMake((self.view.frame.size.width-logoView.frame.size.width)/2,  labelmeView.frame.size.height+information.frame.size.height+0.125*self.view.frame.size.width, logoView.frame.size.width, logoView.frame.size.height)];
     [self.scrollView addSubview:logoView];
     [self.scrollView setContentSize:CGSizeMake(self.view.frame.size.width, labelmeView.frame.size.height+information.frame.size.height+0.125*self.view.frame.size.width+logoView.frame.size.height
                                                )];
-    // Do any additional setup after loading the view from its nib.
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+
 
 @end

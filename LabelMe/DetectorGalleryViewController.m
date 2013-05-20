@@ -105,6 +105,16 @@
         self.detectors = [[NSMutableArray alloc] init];
     }
     
+    //execute all the detectors
+    self.executeDetectorsButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    self.executeDetectorsButton.frame = CGRectMake(20, 40, 95, 37);
+    [self.executeDetectorsButton setTitle:@"Execute" forState:UIControlStateNormal];
+    [self.executeDetectorsButton addTarget:self action:@selector(executeDetectorsAction:) forControlEvents:UIControlEventTouchUpInside];
+    UIView *customView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 100)];
+    [customView addSubview:self.executeDetectorsButton];
+    self.tableView.tableFooterView = customView;
+    
+    
     //view controller specifications and top toolbar setting
     UIImage *titleImage = [UIImage imageNamed:@"detectorsTitle.png"];
     UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
@@ -114,8 +124,8 @@
     
     self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(edit:)]];
     self.navigationItem.rightBarButtonItem = self.editButton;
-    UIBarButtonItem *plusButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton plusBarButtonWithTarget:self action:@selector(addDetector:)]];
-    self.navigationItem.leftBarButtonItem = plusButton;
+    self.plusButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton plusBarButtonWithTarget:self action:@selector(addDetector:)]];
+    self.navigationItem.leftBarButtonItem = self.plusButton;
     self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
     
     [super viewDidLoad];
@@ -139,11 +149,13 @@
         [super setEditing:NO animated:NO];
         [self.tableView setEditing:NO animated:NO];
         [button setTitle:@"Edit" forState:UIControlStateNormal];
+        self.navigationItem.leftBarButtonItem = self.plusButton;
         
     }else{
         [super setEditing:YES animated:YES];
         [self.tableView setEditing:YES animated:YES];
         [button setTitle:@"Done" forState:UIControlStateNormal];
+        self.navigationItem.leftBarButtonItem = nil;
     }
     [self.tableView reloadData];
 }
@@ -189,6 +201,50 @@
     
 }
 
+
+- (IBAction)executeDetectorsAction:(id)sender
+{
+    //show modal to select training positives for the selected class
+    self.modalTVC = [[ModalTVC alloc] init];
+    self.modalTVC.delegate = self;
+    self.modalTVC.modalTitle = @"Select Detectors to Execute";
+    self.modalTVC.doneButtonTitle = @"Execute";
+    self.modalTVC.multipleChoice = NO;
+    NSMutableArray *imagesList = [[NSMutableArray alloc] init];
+    for(Classifier *detector in self.detectors)
+        [imagesList addObject:[UIImage imageWithContentsOfFile:detector.averageImageThumbPath]];
+    
+    self.modalTVC.showCancelButton = YES;
+    self.modalTVC.data = imagesList;
+    [self.modalTVC.view setNeedsDisplay];
+    [self presentModalViewController:self.modalTVC animated:YES];
+    
+    
+    //let's wait for the modalTVCDelegate answer to begin the training
+}
+
+
+#pragma mark -
+#pragma mark ModalTVC Delegate
+
+- (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
+{
+    NSLog(@"Selected Detectors: %@",selectedItems);
+    NSMutableArray *selectedDetectors = [[NSMutableArray alloc] init];
+    for(NSNumber *index in selectedItems)
+        [selectedDetectors addObject:[self.detectors objectAtIndex:index.intValue]];
+    
+    self.executeDetectorVC = [[ExecuteDetectorViewController alloc] init];
+    self.executeDetectorVC.svmClassifiers = [NSArray arrayWithArray:selectedDetectors];
+    [self.navigationController pushViewController:self.executeDetectorVC animated:YES];
+
+}
+
+- (void) selectionCancelled
+{
+    
+}
+
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
 
@@ -217,7 +273,7 @@
     Classifier *detector = [self.detectors objectAtIndex:indexPath.row];
     cell.textLabel.text = detector.name;
     cell.detailTextLabel.numberOfLines = 2;
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"Class:%@ \nTraining Images: %d", [detector.targetClasses componentsJoinedByString:@"+"], detector.imagesUsedTraining.count];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"Class:%@ \nTraining Images: %d", [detector.targetClasses componentsJoinedByString:@", "], detector.imagesUsedTraining.count];
     cell.imageView.image = [UIImage imageWithContentsOfFile:detector.averageImageThumbPath];
     return cell;
 }

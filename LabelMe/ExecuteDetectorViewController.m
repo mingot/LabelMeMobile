@@ -13,6 +13,7 @@
 
 
 
+
 @interface ExecuteDetectorViewController()
 {
     float fpsToShow;
@@ -34,7 +35,7 @@
 @implementation ExecuteDetectorViewController
 
 
-@synthesize svmClassifier = _svmClassifier;
+@synthesize svmClassifiers = _svmClassifiers;
 @synthesize numPyramids = _numPyramids;
 @synthesize maxDetectionScore = _maxDetectionScore;
 @synthesize captureSession = _captureSession;
@@ -71,7 +72,8 @@
     isUsingFrontFacingCamera = NO;
     fpsToShow = 0.0;
     num = 0;
-    self.title = [self.svmClassifier.targetClasses componentsJoinedByString:@"+"];
+    self.title = @"Detector";
+    [self.detectionThresholdSliderButton addTarget:self action:@selector(sliderChangeAction:) forControlEvents:UIControlEventValueChanged];
     
     self.settingsTableView.hidden = YES;
     self.settingsTableView.layer.cornerRadius = 10;
@@ -83,13 +85,12 @@
     
     self.prevLayer = nil;
     
-       
     
     //Initialization of model properties
-    numMax = 1; 
+    numMax = 1;
     self.numPyramids = 15;
     self.maxDetectionScore = -0.9;
-
+    self.hogPyramid = [[Pyramid alloc] initWithClassifiers:self.svmClassifiers forNumPyramids:self.numPyramids];
     
     // ********  CAMERA CAPUTRE  ********
     //Capture input specifications
@@ -204,30 +205,47 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         CGContextRelease(newContext);
         CGColorSpaceRelease(colorSpace);
         
-        double detectionThreshold = -1 + (self.maxDetectionScore + 1)*self.detectionThresholdSliderButton.value;
-        NSArray *nmsArray = [self.svmClassifier detect:
-                             [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight]
+        //adaptative detection threshold to the max score of the moment
+        //double detectionThreshold = -1 + (self.maxDetectionScore + 1)*self.detectionThresholdSliderButton.value;
+        
+        //nonadaptative detection threshold, [-1,1];
+        double detectionThreshold = -1 + 2*self.detectionThresholdSliderButton.value;
+        
+        //**** DETECTION ****
+        NSMutableArray *nmsArray = [[NSMutableArray alloc] init];
+        UIImage *image = [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight];
+        if(self.svmClassifiers.count == 1){
+            Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:0];
+            [nmsArray addObject:[svmClassifier detect:image
                                       minimumThreshold:detectionThreshold
                                               pyramids:self.numPyramids
                                               usingNms:YES
                                      deviceOrientation:[[UIDevice currentDevice] orientation]
-                                    learningImageIndex:0];
+                                    learningImageIndex:0]];
+        }else{            
+            [self.hogPyramid constructPyramidForImage:image withOrientation:[[UIDevice currentDevice] orientation]];
+            for(Classifier *svmClassifier in self.svmClassifiers){
+                [nmsArray addObject:[svmClassifier detect:self.hogPyramid minimumThreshold:detectionThreshold usingNms:YES orientation:[[UIDevice currentDevice] orientation]]];
+                NSLog(@"For class: %d, Detected: %d", nmsArray.count, [[nmsArray objectAtIndex:nmsArray.count-1] count]);
+            }
+        }
+        //**** END DETECTION ****
         
         
         // set boundaries of the detection and redraw
-        [self.detectView setCorners:nmsArray];
+        self.detectView.cornersArray = nmsArray;
         [self.detectView performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
         
         // Update the navigation controller title with some information about the detection
         int level=-1;
         float scoreFloat = -1;
-        if (nmsArray.count > 0){
-            BoundingBox *score = (BoundingBox *)[nmsArray objectAtIndex:0];
-            scoreFloat = score.score;
-            if(score.score > self.maxDetectionScore) self.maxDetectionScore = score.score;
-            level = score.pyramidLevel;
-            
-        } 
+//        if (nmsArray.count > 0){
+//            BoundingBox *score = (BoundingBox *)[nmsArray objectAtIndex:0];
+//            scoreFloat = score.score;
+//            if(score.score > self.maxDetectionScore) self.maxDetectionScore = score.score;
+//            level = score.pyramidLevel;
+//            
+//        } 
         
         
         //Put the HOG picture on screen
@@ -248,8 +266,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         if(self.fps) [screenLabelText appendString: [NSString stringWithFormat:@"FPS: %.1f\n",-1.0/[start timeIntervalSinceNow]]];
         if(self.scale) [screenLabelText appendString: [NSString stringWithFormat:@"scale: %d\n",level]];
         [self.infoLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithString:screenLabelText] waitUntilDone:YES];
-        
-        
     }
 }
 
@@ -298,7 +314,24 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     self.settingsTableView.hidden = self.settingsTableView.hidden? NO:YES;
 }
 
-
+- (IBAction)sliderChangeAction:(id)sender
+{
+    UISlider *slider = (UISlider *)sender;
+    NSLog(@"slider changed: %f", slider.value);
+    if(self.svmClassifiers.count == 1){
+        
+        //update classifier
+        Classifier *detector = [self.svmClassifiers objectAtIndex:0];
+        detector.detectionThreshold = [NSNumber numberWithFloat:slider.value];
+        
+        //update threshold
+        [self.detectionThresholds replaceObjectAtIndex:0 withObject:[NSNumber numberWithFloat:slider.value]];
+        
+    }else{
+//        for(NSNumber *threshold in self.detectionThresholds)
+        
+    }
+}
 
 
 - (IBAction)cancelAction:(id)sender

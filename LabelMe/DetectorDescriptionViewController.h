@@ -40,7 +40,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *detectorHogView;
 @property (strong, nonatomic) UIBarButtonItem *editButton;
 @property (weak, nonatomic) IBOutlet UITableView *descriptionTableView;
-@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView; //for hide/show keyboard
 @property (weak, nonatomic) IBOutlet UIView *showView;
 
 //bottom toolbar

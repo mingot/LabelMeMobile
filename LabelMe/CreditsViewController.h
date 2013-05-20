@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CreditsViewController : UIViewController{
-    UIScrollView *_scrollView;
-}
+@interface CreditsViewController : UIViewController
+
 @property (nonatomic,strong) IBOutlet UIScrollView *scrollView;
+
 @end

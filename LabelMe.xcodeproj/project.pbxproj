@@ -179,6 +179,7 @@
 		FC5C93B516FCFEAB00637B69 /* ExecuteDetectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */; };
 		FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */; };
 		FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC610AF3170A36D800851AC2 /* CoreImage.framework */; };
+		FC74F8D3174A54FE004701CC /* Pyramid.m in Sources */ = {isa = PBXBuildFile; fileRef = FC74F8D2174A54FE004701CC /* Pyramid.m */; };
 		FC8E89B1173930340018876D /* UIImage+Border.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B0173930340018876D /* UIImage+Border.m */; };
 		FC8E89B3173983640018876D /* download.png in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B2173983640018876D /* download.png */; };
 		FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B51739876D0018876D /* ModalSectionsTVC.m */; };
@@ -449,6 +450,8 @@
 		FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExecuteDetectorViewController.m; sourceTree = "<group>"; };
 		FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ExecuteDetectorViewController.xib; sourceTree = "<group>"; };
 		FC610AF3170A36D800851AC2 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
+		FC74F8D1174A54FE004701CC /* Pyramid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pyramid.h; sourceTree = "<group>"; };
+		FC74F8D2174A54FE004701CC /* Pyramid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pyramid.m; sourceTree = "<group>"; };
 		FC8E89AF173930340018876D /* UIImage+Border.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Border.h"; sourceTree = "<group>"; };
 		FC8E89B0173930340018876D /* UIImage+Border.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Border.m"; sourceTree = "<group>"; };
 		FC8E89B2173983640018876D /* download.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = download.png; sourceTree = "<group>"; };
@@ -815,6 +818,8 @@
 				FCED896217034CD70027CBE1 /* ConvolutionHelper.m */,
 				FCED895E17034CCA0027CBE1 /* Classifier.h */,
 				FCED895F17034CCA0027CBE1 /* Classifier.mm */,
+				FC74F8D1174A54FE004701CC /* Pyramid.h */,
+				FC74F8D2174A54FE004701CC /* Pyramid.m */,
 				FCC9FAFA170F6CF4009B7FC6 /* TrainingSet.h */,
 				FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */,
 			);
@@ -1295,6 +1300,7 @@
 				FC9F94EE1745232B0004598C /* UIView+HierarchyAdditions.m in Sources */,
 				FC9F94EF1745232C0004598C /* EditableTableViewCell.m in Sources */,
 				FC9F94F01745232C0004598C /* UITableView+TextFieldAdditions.m in Sources */,
+				FC74F8D3174A54FE004701CC /* Pyramid.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

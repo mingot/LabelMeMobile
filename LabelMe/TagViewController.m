@@ -141,7 +141,7 @@
     //sending view
     self.sendingView = [[SendingView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height)];
     [self.sendingView setHidden:YES];
-    self.sendingView.label.text = @"Uploading to the server...";
+    self.sendingView.textView.text = @"Uploading to the server...";
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     self.sendingView.delegate = self;
     

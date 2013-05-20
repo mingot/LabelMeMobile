@@ -30,9 +30,8 @@
 @property (strong, nonatomic)  UIProgressView *progressView;
 @property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
 @property (strong, nonatomic) UIButton *cancelButton;
-@property (strong, nonatomic) UILabel *label;
+@property (strong, nonatomic) UITextView *textView;
 
-@property (nonatomic, strong) UITextView *textView;
 @property (nonatomic, strong) NSString *filename;
 
 //stack of messages to ouput in the sending view

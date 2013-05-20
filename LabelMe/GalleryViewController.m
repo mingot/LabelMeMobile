@@ -301,7 +301,7 @@
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [self.sendingView setHidden:YES];
     self.sendingView.delegate = self;
-    self.sendingView.label.text = @"Uploading image to server";
+    self.sendingView.textView.text = @"Uploading image to server";
 
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.tableViewGrid];

@@ -91,11 +91,11 @@
     //sending view
     sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     sendingView.delegate = self;
-    sendingView.label.numberOfLines = 1;
+//    sendingView.label.numberOfLines = 1;
     [sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     sendingView.hidden = YES;
     sendingView.progressView.hidden = YES;
-    sendingView.label.text = @"Signing in...";
+    sendingView.textView.text = @"Signing in...";
     [self.view addSubview:sendingView];
 }
 

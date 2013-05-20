@@ -98,7 +98,7 @@
         
         _classifierProperties = [[NSMutableArray alloc] init];
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:self.svmClassifier.name forKey:@"Name"]];
-        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[self.svmClassifier.targetClasses componentsJoinedByString:@"+"] forKey:@"Class"]];
+        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[self.svmClassifier.targetClasses componentsJoinedByString:@", "] forKey:@"Class"]];
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[formatter stringFromDate:self.svmClassifier.updateDate] forKey:@"Last Train"]];
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.imagesUsedTraining.count] forKey:@"Images"]];
     }
@@ -128,8 +128,10 @@
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
     
     //set labels
-    self.detectorView.contentMode = UIViewContentModeScaleAspectFill;
-    self.detectorHogView.contentMode = UIViewContentModeScaleAspectFill;
+    self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
+    self.detectorView.clipsToBounds = YES;
+    self.detectorHogView.contentMode = UIViewContentModeScaleAspectFit;
+    self.detectorHogView.clipsToBounds = YES;
     
     //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
@@ -142,7 +144,7 @@
     
     //description table view
     self.descriptionTableView.layer.cornerRadius = 10;
-    self.descriptionTableView.backgroundColor = [UIColor clearColor];//
+    self.descriptionTableView.backgroundColor = [UIColor clearColor];
     
     //bottombar
     UIButton *executeButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
@@ -231,7 +233,7 @@
 
 - (IBAction)executeAction:(id)sender
 {
-    self.executeController.svmClassifier = self.svmClassifier;
+    self.executeController.svmClassifiers = [NSArray arrayWithObject:self.svmClassifier];
     self.executeController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.executeController animated:YES];
 }
@@ -351,7 +353,7 @@
         for(NSNumber *sel in selectedItems)
             [classes addObject:[self.availableObjectClasses objectAtIndex:sel.intValue]];
         self.svmClassifier.targetClasses = [NSArray arrayWithArray:classes];
-        self.svmClassifier.name = [NSString stringWithFormat:@"%@%@",[self.svmClassifier.targetClasses componentsJoinedByString:@"+"], [[self uuid] substringToIndex:3]];
+        self.svmClassifier.name = [NSString stringWithFormat:@"%@-Detector",[self.svmClassifier.targetClasses componentsJoinedByString:@"+"]];
         
     }else if([identifier isEqualToString:@"Select Training Images"]){
         

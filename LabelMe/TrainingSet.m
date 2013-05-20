@@ -105,6 +105,29 @@
     
 }
 
+- (void) unifyGroundTruthBoundingBoxes
+{
+//    NSMutableArray *newGroundTruthBB = [[NSMutableArray alloc] init];
+    
+    //get max width and max height of the gt bb
+    float maxWidth=0, maxHeight=0;
+    for(BoundingBox *groundTruthBB in self.groundTruthBoundingBoxes){
+        float width = groundTruthBB.xmax - groundTruthBB.xmin;
+        float height = groundTruthBB.ymax - groundTruthBB.ymin;
+        maxWidth = maxWidth > width ? maxWidth : width;
+        maxHeight = maxHeight > height ? maxHeight : height;
+    }
+    
+    //modify the actual bb
+    for(BoundingBox *groundTruthBB in self.groundTruthBoundingBoxes){
+        float xMidPoint = (groundTruthBB.xmax + groundTruthBB.xmin)/2;
+        float yMidPoint = (groundTruthBB.ymax + groundTruthBB.ymin)/2;
+        groundTruthBB.xmin = xMidPoint - maxWidth/2;
+        groundTruthBB.xmax = xMidPoint + maxWidth/2;
+        groundTruthBB.ymin = yMidPoint - maxHeight/2;
+        groundTruthBB.ymax = yMidPoint + maxHeight/2;
+    }
+}
 
 
 @end

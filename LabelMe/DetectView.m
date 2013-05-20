@@ -17,21 +17,25 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
 
 @implementation DetectView
 
-@synthesize corners = _corners;
 
 
 - (void)drawRect:(CGRect)rect
 {
-
-    if (self.corners.count!=0){
+    
+    //for each group of corners generated (by nmsarray)
+    for(NSArray *corners in self.cornersArray){
+        
+        if (corners.count==0) continue; //skip if no bb for this class
+        
         CGContextRef context = UIGraphicsGetCurrentContext();
         BoundingBox *p;
         CGFloat x,y,w,h;
-        
-        for (int i=0; i<self.corners.count; i++){
+    
+    
+        for (int i=0; i<corners.count; i++){
         
             //convert the point from the device system of reference to the prevLayer system of reference
-            p = [self convertBoundingBoxForDetectView:[self.corners objectAtIndex:i]];
+            p = [self convertBoundingBoxForDetectView:[corners objectAtIndex:i]];
             
             //set the rectangle within the current boundaries 
             x = max(0,p.xmin);
@@ -46,6 +50,8 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
                 CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
                 CGContextStrokeRect(context, box);
                 [p.targetClass drawAtPoint:CGPointMake(p.xmax, y) withFont:[UIFont systemFontOfSize:25.0f]];
+                NSLog(@"Targetclass: %@", p.targetClass);
+                NSLog(@"rect data: (x,y)=(%f,%f) (w,h)=(%f,%f)",x,y,w,h);
                 
                 // for the rest of boxes
                 CGContextSetLineWidth(context, 1);
@@ -53,6 +59,7 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
                 
             }else CGContextStrokeRect(context, box);
         }
+        
     }
 }
 
@@ -75,7 +82,7 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
 
 - (void)reset
 {
-    self.corners = nil;
+    self.cornersArray = nil;
 }
 
 @end

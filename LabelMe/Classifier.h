@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "TrainingSet.h"
+#import "Pyramid.h"
 
 
 
@@ -44,16 +45,17 @@
 @property (strong, nonatomic) NSString *averageImageThumbPath;
 @property (strong, nonatomic) NSDate *updateDate;
 @property (strong, nonatomic) NSNumber *scaleFactor; //average ratio height/width of the positive bb of the training set
-
+@property (strong, nonatomic) NSNumber *detectionThreshold;
 
 
 //Initialization of the classifier given the weight vectors of it
 - (id) initWithTemplateWeights:(double *)templateWeights;
 
+
 - (id) initWithCoder:(NSCoder *)aDecoder;
 
 //Train the classifier given an initial set formed by Images and ground truth bounding boxes containing positive examples. Returns 1 == success, 0 == fail
-- (int) train:(TrainingSet *) trainingSet;
+- (int) train:(TrainingSet *)trainingSet;
 
 //Detect object in the image and return array of convolution points for the indicated number of pyramids and detection threshold
 - (NSArray *) detect:(UIImage *) image
@@ -62,6 +64,12 @@
             usingNms:(BOOL)useNms
    deviceOrientation:(int) orientation
   learningImageIndex:(int) imageIndex;
+
+//for multiple detection using a shared pyramid
+- (NSArray *) detect:(Pyramid *) hogFeaturePyramid
+    minimumThreshold:(double) detectionThreshold
+            usingNms:(BOOL)useNms
+         orientation:(int)orientation;
 
 //Given a set with ground truth bounding boxes, returns the metric spesified.
 - (void) testOnSet:(TrainingSet *)set atThresHold:(float)detectionThreshold;

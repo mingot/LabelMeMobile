@@ -11,8 +11,9 @@
 
 @interface DetectView : UIView
 
-// BoundingBox Array of the detected boxes
-@property (nonatomic,strong) NSArray *corners;
+// Array of arrays. Subarrays contanin bb for each different class.
+@property (nonatomic,strong) NSArray *cornersArray;
+
 // To transform a point from the device reference to prevLayer reference
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *prevLayer;
 
