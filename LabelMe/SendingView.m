@@ -57,7 +57,6 @@
         
         num = 1;
         total = 0;
-        self.messagesStack = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -99,20 +98,11 @@
     });
 }
 
-//-(void)showMessage:(NSString *)message
-//{
-//    NSLog(@"LOG: %@",message);
-//    
-//    //messages stack
-//    if(self.messagesStack.count > 15) [self.messagesStack removeObjectAtIndex:0];
-//    [self.messagesStack addObject:message];
-//    
-//    NSString *output = @"";
-//    for(NSString *message in self.messagesStack)
-//        output = [output stringByAppendingString:[NSString stringWithFormat:@"%@\n",message]];
-//    
-//    [self.label performSelectorOnMainThread:@selector(setText:) withObject:output waitUntilDone:YES];
-//}
+- (void) clearScreen
+{
+    [self.textView performSelectorOnMainThread:@selector(setText:) withObject:@"" waitUntilDone:YES];
+
+}
 
 - (IBAction)cancelAction:(id)sender
 {

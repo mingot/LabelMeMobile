@@ -273,7 +273,7 @@
     self.sendingView.hidden = NO;
     self.sendingView.cancelButton.hidden = NO;
     self.sendingView.progressView.hidden = YES;
-    [self.sendingView.messagesStack removeAllObjects];
+    [self.sendingView clearScreen];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Detector %@", self.svmClassifier.name]];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images:%d", self.svmClassifier.imagesUsedTraining.count]];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of Support Vectors:%@", self.svmClassifier.numberSV]];

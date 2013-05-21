@@ -65,8 +65,6 @@
         _initialDetectionThresholds = [[NSMutableArray alloc] initWithCapacity:self.svmClassifiers.count];
         for(Classifier *svmClassifier in self.svmClassifiers)
             [_initialDetectionThresholds addObject:svmClassifier.detectionThreshold];
-        
-        NSLog(@"initial thresholds:%@", _initialDetectionThresholds);
     }
     return _initialDetectionThresholds;
 }
@@ -348,10 +346,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                 newThreshold = newThreshold >= 0 ? newThreshold : 0;
                 newThreshold = newThreshold <= 1 ? newThreshold : 1;
                 svmClassifier.detectionThreshold = [NSNumber numberWithFloat:newThreshold];
-                NSLog(@"Classifier %d threshold %f", i, newThreshold);
-                NSLog(@"slider value: %f", slider.value);
+//                NSLog(@"Classifier %d threshold %f", i, newThreshold);
+//                NSLog(@"slider value: %f", slider.value);
             }
-            NSLog(@"****");
+//            NSLog(@"****");
         }
         
     }

@@ -73,8 +73,6 @@
 
 - (void) constructPyramidForImage:(UIImage *)image withOrientation:(int)orientation
 {
-    self.hogFeatures = [[NSMutableArray alloc] init];
-    
     //rotate image depending on the orientation
     //TODO: take out the orientation of the pyramid!!
     if(UIDeviceOrientationIsLandscape(orientation))

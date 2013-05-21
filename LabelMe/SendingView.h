@@ -34,14 +34,15 @@
 
 @property (nonatomic, strong) NSString *filename;
 
-//stack of messages to ouput in the sending view
-@property (nonatomic, strong) NSMutableArray *messagesStack;
+
+
 
 
 -(void)setTotal:(int) i;
 -(void)incrementNum;
 -(void)reset;
 -(void)showMessage:(NSString *)message;
+-(void)clearScreen;
 
 - (IBAction)cancelAction:(id)sender;
 

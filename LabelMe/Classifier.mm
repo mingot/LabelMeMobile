@@ -330,11 +330,12 @@ using namespace cv;
     __block NSArray *candidatesForLevel;
     dispatch_queue_t pyramidQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_apply(self.finPyramid - self.iniPyramid, pyramidQueue, ^(size_t i) {
-        if([[pyramid.hogFeatures objectAtIndex:i+self.iniPyramid] isKindOfClass:[NSNumber class]]){
-            NSLog(@"Error trying to retrieve pyramid %zd",i+self.iniPyramid);
-        }else{
+        if([[pyramid.hogFeatures objectAtIndex:i+self.iniPyramid] isKindOfClass:[HogFeature class]]){
             HogFeature *imageHog = [pyramid.hogFeatures objectAtIndex:i+self.iniPyramid];
             candidatesForLevel = [self getBoundingBoxesIn:imageHog forPyramid:i+self.iniPyramid forIndex:0];
+        }else{
+            NSLog(@"Error trying to retrieve pyramid %zd, not the correct class",i+self.iniPyramid);
+            NSLog(@"%@", pyramid.hogFeatures);
         }
         dispatch_sync(dispatch_get_main_queue(), ^{
             [candidateBoundingBoxes addObjectsFromArray:candidatesForLevel];
