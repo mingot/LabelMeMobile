@@ -387,7 +387,7 @@
 #pragma mark
 #pragma mark - Detector Description Delegate
 
-- (void) updateDetector:(Classifier *)updatedDetector
+- (void) updateClassifier:(Classifier *)updatedDetector
 {
     //add or update detector
     if(_selectedRow < self.detectors.count) [self.detectors replaceObjectAtIndex:_selectedRow withObject:updatedDetector];

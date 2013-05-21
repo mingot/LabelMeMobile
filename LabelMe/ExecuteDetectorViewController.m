@@ -73,7 +73,13 @@
     fpsToShow = 0.0;
     num = 0;
     self.title = @"Detector";
+    
+    //slider
     [self.detectionThresholdSliderButton addTarget:self action:@selector(sliderChangeAction:) forControlEvents:UIControlEventValueChanged];
+    if(self.svmClassifiers.count == 1){
+        Classifier *classifier = [self.svmClassifiers objectAtIndex:0];        
+        self.detectionThresholdSliderButton.value = classifier.detectionThreshold ? classifier.detectionThreshold.floatValue : 0.5;
+    }
     
     self.settingsTableView.hidden = YES;
     self.settingsTableView.layer.cornerRadius = 10;
@@ -226,9 +232,20 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                                     learningImageIndex:0]];
         
         }else{//Multiclass detection
+            
             [self.hogPyramid constructPyramidForImage:image withOrientation:[[UIDevice currentDevice] orientation]];
-            for(Classifier *svmClassifier in self.svmClassifiers)
-                [nmsArray addObject:[svmClassifier detect:self.hogPyramid minimumThreshold:detectionThreshold usingNms:YES orientation:[[UIDevice currentDevice] orientation]]];
+            
+            //each classifier run in parallel
+            __block NSArray *candidatesForClassifier;
+            dispatch_queue_t classifierQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+            dispatch_apply(self.svmClassifiers.count, classifierQueue, ^(size_t i) {
+                Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:i];
+                candidatesForClassifier = [svmClassifier detect:self.hogPyramid minimumThreshold:detectionThreshold usingNms:YES orientation:[[UIDevice currentDevice] orientation]];
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    [nmsArray addObject:candidatesForClassifier];
+                });
+            });
+            dispatch_release(classifierQueue);
         }
         //**** END DETECTION ****
         
@@ -322,8 +339,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     if(self.svmClassifiers.count == 1){
         
         //update classifier
-        Classifier *detector = [self.svmClassifiers objectAtIndex:0];
-        detector.detectionThreshold = [NSNumber numberWithFloat:slider.value];
+        Classifier *classifier = [self.svmClassifiers objectAtIndex:0];
+        classifier.detectionThreshold = [NSNumber numberWithFloat:slider.value];
+        [self.delegate updateClassifier:classifier];
         
         //update threshold
         [self.detectionThresholds replaceObjectAtIndex:0 withObject:[NSNumber numberWithFloat:slider.value]];

@@ -409,6 +409,14 @@
 
 
 #pragma mark -
+#pragma makr ExecuteDetectorViewCotrollerDelegate
+
+- (void) updateClassifier:(Classifier *)classifier
+{
+    [self.delegate updateClassifier:classifier];
+}
+
+#pragma mark -
 #pragma mark Memory Management
 
 -(void) didReceiveMemoryWarning
@@ -528,7 +536,7 @@
 
 -(BOOL) textFieldShouldReturn:(UITextField *)textField
 {
-    [self.delegate updateDetector:self.svmClassifier];
+    [self.delegate updateClassifier:self.svmClassifier];
     [textField resignFirstResponder];
     self.classifierProperties = nil;
     self.title = self.svmClassifier.name;
@@ -742,7 +750,7 @@
     self.svmClassifier.updateDate = [NSDate date];
     
     [self loadDetectorInfo];
-    [self.delegate updateDetector:self.svmClassifier];
+    [self.delegate updateClassifier:self.svmClassifier];
 }
 
 - (void)viewDidUnload {

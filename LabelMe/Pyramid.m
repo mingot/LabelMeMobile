@@ -30,6 +30,15 @@
 #pragma mark -
 #pragma mark Initialization
 
+- (NSMutableArray *) hogFeatures
+{
+    if(!_hogFeatures){
+        _hogFeatures = [[NSMutableArray alloc] initWithCapacity:self.numPyramids];
+        for(int i=0;i<self.numPyramids;i++) [_hogFeatures addObject:[NSNumber numberWithInt:0]]; //null initialization;
+    }
+    return _hogFeatures;
+}
+
 
 - (NSMutableSet *) levelsToCalculate
 {
@@ -76,12 +85,35 @@
     double scale = pow(2, 1.0/SCALES_PER_OCTAVE);
     
     UIImage *scaledImage = [image scaleImageTo:initialScale/pow(scale,0)]; //optimize to start to the first true index
-    for(int i=0; i<self.numPyramids; i++)
+    
+    //reset all pyramids levels
+    self.hogFeatures = nil;
+    
+    __block HogFeature *imageHog;
+    dispatch_queue_t pyramidConstructionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_apply(self.numPyramids, pyramidConstructionQueue, ^(size_t i) {
         if([self.levelsToCalculate containsObject:[NSNumber numberWithInt:i]]){
             float scaleLevel = pow(1.0/scale, i);
-            HogFeature *imageHog = [[scaledImage scaleImageTo:scaleLevel] obtainHogFeatures];
-            [self.hogFeatures addObject:imageHog];
-        }else [self.hogFeatures addObject:[NSNumber numberWithInt:0]]; //insert null
+            imageHog = [[scaledImage scaleImageTo:scaleLevel] obtainHogFeatures];
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [self.hogFeatures setObject:imageHog atIndexedSubscript:i];
+            });
+        }
+    });
+    dispatch_release(pyramidConstructionQueue);
+    
+//    NSLog(@"Levels: %@", self.levelsToCalculate);
+//    NSLog(@"hog features: %@", self.hogFeatures);
+    
+    
+    
+//    for(int i=0; i<self.numPyramids; i++)
+//        if([self.levelsToCalculate containsObject:[NSNumber numberWithInt:i]]){
+//            float scaleLevel = pow(1.0/scale, i);
+//            HogFeature *imageHog = [[scaledImage scaleImageTo:scaleLevel] obtainHogFeatures];
+//            [self.hogFeatures setObject:imageHog atIndexedSubscript:i];
+//        }
+    
     
 
     //reset indexes to look into

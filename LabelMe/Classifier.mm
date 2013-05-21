@@ -316,16 +316,22 @@ using namespace cv;
             usingNms:(BOOL)useNms
          orientation:(int)orientation
 {
-    //get detections
-    NSMutableArray *candidateBoundingBoxes = [[NSMutableArray alloc] init];
-    for(int i=self.iniPyramid; i<self.finPyramid; i++){
-        if([[pyramid.hogFeatures objectAtIndex:i] isKindOfClass:[NSNumber class]]){
-            NSLog(@"Error trying to retrieve pyramid %d",i);
+    //get detections for each pyramid level (parallel processing)
+    NSMutableArray *candidateBoundingBoxes = [[NSMutableArray alloc] init];    
+    __block NSArray *candidatesForLevel;
+    dispatch_queue_t pyramidQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_apply(self.finPyramid - self.iniPyramid, pyramidQueue, ^(size_t i) {
+        if([[pyramid.hogFeatures objectAtIndex:i+self.iniPyramid] isKindOfClass:[NSNumber class]]){
+            NSLog(@"Error trying to retrieve pyramid %zd",i+self.iniPyramid);
         }else{
-            HogFeature *imageHog = [pyramid.hogFeatures objectAtIndex:i];
-            [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i forIndex:0]];
+            HogFeature *imageHog = [pyramid.hogFeatures objectAtIndex:i+self.iniPyramid];
+            candidatesForLevel = [self getBoundingBoxesIn:imageHog forPyramid:i+self.iniPyramid forIndex:0];
         }
-    }
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [candidateBoundingBoxes addObjectsFromArray:candidatesForLevel];
+        });
+    });
+    dispatch_release(pyramidQueue);
     
     
     //sort array of bounding boxes by score

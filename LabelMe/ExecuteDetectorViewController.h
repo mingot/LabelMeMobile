@@ -22,6 +22,14 @@
 #import "Pyramid.h"
 
 
+@protocol ExecuteDetectorViewControllerDelegate <NSObject>
+
+@optional //just for updating when a single classifier is called
+- (void) updateClassifier:(Classifier *) classifier;
+
+@end
+
+
 @interface ExecuteDetectorViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate>
 {
     //settings
@@ -29,6 +37,7 @@
     BOOL isUsingFrontFacingCamera;
 }
 
+@property (nonatomic, strong) id<ExecuteDetectorViewControllerDelegate> delegate;
 
 //model properties
 @property (nonatomic,strong) NSArray *svmClassifiers;
