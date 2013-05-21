@@ -27,6 +27,7 @@
 @property BOOL hog;
 
 @property (strong, nonatomic) NSArray *settingsStrings;
+@property (strong, nonatomic) NSMutableArray *initialDetectionThresholds; //initial threshold for mutliclass threshold sweeping
 
 @end
 
@@ -58,11 +59,26 @@
     }return _settingsStrings;
 }
 
+- (NSMutableArray *) initialDetectionThresholds
+{
+    if(!_initialDetectionThresholds){
+        _initialDetectionThresholds = [[NSMutableArray alloc] initWithCapacity:self.svmClassifiers.count];
+        for(Classifier *svmClassifier in self.svmClassifiers)
+            [_initialDetectionThresholds addObject:svmClassifier.detectionThreshold];
+        
+        NSLog(@"initial thresholds:%@", _initialDetectionThresholds);
+    }
+    return _initialDetectionThresholds;
+}
+
+#pragma mark -
+#pragma mark View Lifcycle
+
+
 - (BOOL) shouldAutorotate
 {
     return NO;
 }
-
 
 
 - (void)viewDidLoad
@@ -78,7 +94,7 @@
     [self.detectionThresholdSliderButton addTarget:self action:@selector(sliderChangeAction:) forControlEvents:UIControlEventValueChanged];
     if(self.svmClassifiers.count == 1){
         Classifier *classifier = [self.svmClassifiers objectAtIndex:0];        
-        self.detectionThresholdSliderButton.value = classifier.detectionThreshold ? classifier.detectionThreshold.floatValue : 0.5;
+        self.detectionThresholdSliderButton.value = classifier.detectionThreshold.floatValue;
     }
     
     self.settingsTableView.hidden = YES;
@@ -163,23 +179,19 @@
     [self.captureSession startRunning];
 }
 
-- (BoundingBox *) convertBoundingBoxesForDetectView:(BoundingBox *) cp
+-(void) viewWillDisappear:(BOOL)animated
 {
-    BoundingBox *newCP = [[BoundingBox alloc] init];
-    double xmin = cp.ymin;
-    double ymin = 1 - cp.xmin;
-    double xmax = cp.ymax;
-    double ymax = 1 - cp.xmax;
+    [super viewWillDisappear:animated];
     
-    CGPoint upperLeft = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(xmin, ymin)];
-    CGPoint lowerRight = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(xmax, ymax)];
-    
-    newCP.xmin = upperLeft.x;
-    newCP.ymin = upperLeft.y;
-    newCP.xmax = lowerRight.x;
-    newCP.ymax = lowerRight.y;
-    
-    return newCP;
+    //update detection threshold it it is the only one
+    if(self.svmClassifiers.count == 1)
+        [self.delegate updateClassifier:(Classifier *)[self.svmClassifiers objectAtIndex:0]];
+}
+
+
+-(void)viewDidDisappear:(BOOL)animated{
+    [self.captureSession stopRunning];
+    [self.detectView reset];
 }
 
 #pragma mark -
@@ -212,18 +224,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         //We release some components
         CGContextRelease(newContext);
         CGColorSpaceRelease(colorSpace);
-        
-        //adaptative detection threshold to the max score of the moment
-        //double detectionThreshold = -1 + (self.maxDetectionScore + 1)*self.detectionThresholdSliderButton.value;
-        
-        //nonadaptative detection threshold, [-1,1];
-        double detectionThreshold = -1 + 2*self.detectionThresholdSliderButton.value;
-        
+
         //**** DETECTION ****
         NSMutableArray *nmsArray = [[NSMutableArray alloc] init];
         UIImage *image = [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight];
         if(self.svmClassifiers.count == 1){
             Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:0];
+            float detectionThreshold = -1 + 2*svmClassifier.detectionThreshold.floatValue;
             [nmsArray addObject:[svmClassifier detect:image
                                       minimumThreshold:detectionThreshold
                                               pyramids:self.numPyramids
@@ -240,6 +247,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             dispatch_queue_t classifierQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
             dispatch_apply(self.svmClassifiers.count, classifierQueue, ^(size_t i) {
                 Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:i];
+                float detectionThreshold = -1 + 2*svmClassifier.detectionThreshold.floatValue;
                 candidatesForClassifier = [svmClassifier detect:self.hogPyramid minimumThreshold:detectionThreshold usingNms:YES orientation:[[UIDevice currentDevice] orientation]];
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     [nmsArray addObject:candidatesForClassifier];
@@ -311,18 +319,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 }
 
 
-#pragma mark -
-#pragma mark Memory management
-
-
--(void)viewDidDisappear:(BOOL)animated{
-    [self.captureSession stopRunning];
-    [self.detectView reset];
-}
-
-
-
-
 
 #pragma mark -
 #pragma mark IBActions
@@ -335,19 +331,28 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 - (IBAction)sliderChangeAction:(id)sender
 {
     UISlider *slider = (UISlider *)sender;
-    NSLog(@"slider changed: %f", slider.value);
+    
+    //if only one classifier executing, update the detection threshold property
     if(self.svmClassifiers.count == 1){
         
-        //update classifier
         Classifier *classifier = [self.svmClassifiers objectAtIndex:0];
         classifier.detectionThreshold = [NSNumber numberWithFloat:slider.value];
-        [self.delegate updateClassifier:classifier];
         
-        //update threshold
-        [self.detectionThresholds replaceObjectAtIndex:0 withObject:[NSNumber numberWithFloat:slider.value]];
-        
+    //if more than one, joinly increase/decrease detection threshold
     }else{
-//        for(NSNumber *threshold in self.detectionThresholds)
+        if(((int)slider.value*100)%4==0){
+            for(int i=0; i<self.svmClassifiers.count; i++){
+                Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:i];
+                NSNumber *initialThreshold = [self.initialDetectionThresholds objectAtIndex:i];
+                float newThreshold = initialThreshold.floatValue + (slider.value - 0.5);
+                newThreshold = newThreshold >= 0 ? newThreshold : 0;
+                newThreshold = newThreshold <= 1 ? newThreshold : 1;
+                svmClassifier.detectionThreshold = [NSNumber numberWithFloat:newThreshold];
+                NSLog(@"Classifier %d threshold %f", i, newThreshold);
+                NSLog(@"slider value: %f", slider.value);
+            }
+            NSLog(@"****");
+        }
         
     }
 }

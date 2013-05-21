@@ -126,6 +126,7 @@
     
     //controllers
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
+    self.executeController.delegate = self;
     
     //set labels
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
@@ -409,10 +410,11 @@
 
 
 #pragma mark -
-#pragma makr ExecuteDetectorViewCotrollerDelegate
+#pragma mark ExecuteDetectorViewCotrollerDelegate
 
 - (void) updateClassifier:(Classifier *)classifier
 {
+    //received when updating classifier threshold from execute controller
     [self.delegate updateClassifier:classifier];
 }
 

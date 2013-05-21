@@ -24,7 +24,7 @@
 
 @protocol ExecuteDetectorViewControllerDelegate <NSObject>
 
-@optional //just for updating when a single classifier is called
+@optional //just for updating detectionthreshold when a single classifier is called
 - (void) updateClassifier:(Classifier *) classifier;
 
 @end
@@ -41,7 +41,6 @@
 
 //model properties
 @property (nonatomic,strong) NSArray *svmClassifiers;
-@property (nonatomic,strong) NSMutableArray *detectionThresholds; //for each classifier
 @property int numPyramids;
 @property double maxDetectionScore;
 @property (nonatomic, strong) Pyramid *hogPyramid;

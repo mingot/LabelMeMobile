@@ -83,6 +83,15 @@ using namespace cv;
 
 
 
+#pragma mark -
+#pragma mark Getters and Setters
+
+- (NSNumber *) detectionThreshold
+{
+    if(!_detectionThreshold) _detectionThreshold = [NSNumber numberWithFloat:0.5];
+    return _detectionThreshold;
+}
+
 
 #pragma mark -
 #pragma mark Public Methods
