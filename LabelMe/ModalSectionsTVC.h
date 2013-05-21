@@ -40,6 +40,7 @@
 - (IBAction)doneAction:(id)sender;
 - (IBAction)cancelAction:(id)sender;
 - (IBAction)imageSelectedAction:(UIButton *)button;
+
 //click the section name to select all the images of the section
 - (IBAction)selectAllAction:(id)sender;
 

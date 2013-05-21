@@ -104,8 +104,8 @@
         self.doneButton.alpha = 0.6f;
     }
     
-    //round corners in the view
-    [self.tableView.layer setCornerRadius:6.0];
+
+
     
     //buttons highlight
     [self.doneButton highlightButton];
@@ -131,9 +131,9 @@
     
     // create the parent view that will hold header Label
     UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10,0,tableView.frame.size.width,30)];
-    customView.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.3];
+    customView.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:.9];
     customView.layer.borderWidth = 1.0;
-    customView.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;;
+    customView.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;
     
     // create the label objects
     UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -145,10 +145,11 @@
     
     
     //button to select them all
-    UIButton *selectAll = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width - 120,0,120,30)];
-    selectAll.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.6];
-    selectAll.titleLabel.font = [UIFont systemFontOfSize:12];
-    [selectAll setTitle:@"All" forState:UIControlStateNormal];
+    UIButton *selectAll = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width - 80, 0,80,30)];
+    selectAll.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    selectAll.contentEdgeInsets = UIEdgeInsetsMake(7, 12, 7, 12);
+    [selectAll setImage:[UIImage imageNamed:@"selectAllDisabled.png"] forState:UIControlStateNormal];
+    [selectAll setImage:[UIImage imageNamed:@"selectAllEnabled.png"] forState:UIControlStateSelected];
     selectAll.tag = section;
     [selectAll addTarget:self action:@selector(selectAllAction:) forControlEvents:UIControlEventTouchUpInside];
     [customView addSubview:selectAll];
@@ -242,12 +243,16 @@
 -(IBAction)selectAllAction:(id)sender
 {
     UIButton *senderButton = (UIButton *)sender;
+    senderButton.selected = senderButton.selected ? NO:YES;
     NSString *label = [self.labelsOrdered objectAtIndex:senderButton.tag];
     NSArray *buttons = [self.buttonsDictionary objectForKey:label];
     
     for(UIButton *button in buttons)
-        [self imageSelectedAction:button];
+        if(button.selected != senderButton.selected)
+            [self imageSelectedAction:button];
+    
 }
+
 
 #pragma mark
 #pragma mark - Private methods

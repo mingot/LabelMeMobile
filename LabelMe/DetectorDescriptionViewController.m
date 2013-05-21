@@ -236,7 +236,7 @@
 {
     self.executeController.svmClassifiers = [NSArray arrayWithObject:self.svmClassifier];
     self.executeController.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:self.executeController animated:YES];
+    [self.navigationController pushViewController:self.executeController animated:NO];
 }
 
 - (IBAction)trainAction:(id)sender

@@ -180,6 +180,12 @@
 		FC5C93B616FCFEAB00637B69 /* ExecuteDetectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */; };
 		FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC610AF3170A36D800851AC2 /* CoreImage.framework */; };
 		FC74F8D3174A54FE004701CC /* Pyramid.m in Sources */ = {isa = PBXBuildFile; fileRef = FC74F8D2174A54FE004701CC /* Pyramid.m */; };
+		FC74F8DA174C0D3B004701CC /* LabelMeServerTitle.png in Resources */ = {isa = PBXBuildFile; fileRef = FC74F8D6174C0D3B004701CC /* LabelMeServerTitle.png */; };
+		FC74F8DB174C0D3B004701CC /* LabelMeServerTitleWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = FC74F8D7174C0D3B004701CC /* LabelMeServerTitleWhite.png */; };
+		FC74F8DC174C0D3B004701CC /* LabelMeServerTitle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC74F8D8174C0D3B004701CC /* LabelMeServerTitle@2x.png */; };
+		FC74F8DD174C0D3B004701CC /* LabelMeServerTitleWhite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC74F8D9174C0D3B004701CC /* LabelMeServerTitleWhite@2x.png */; };
+		FC74F8E0174C0FCF004701CC /* selectAllEnabled.png in Resources */ = {isa = PBXBuildFile; fileRef = FC74F8DF174C0FCF004701CC /* selectAllEnabled.png */; };
+		FC74F8E2174C0FD4004701CC /* selectAllDisabled.png in Resources */ = {isa = PBXBuildFile; fileRef = FC74F8E1174C0FD4004701CC /* selectAllDisabled.png */; };
 		FC8E89B1173930340018876D /* UIImage+Border.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B0173930340018876D /* UIImage+Border.m */; };
 		FC8E89B3173983640018876D /* download.png in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B2173983640018876D /* download.png */; };
 		FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B51739876D0018876D /* ModalSectionsTVC.m */; };
@@ -452,6 +458,12 @@
 		FC610AF3170A36D800851AC2 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		FC74F8D1174A54FE004701CC /* Pyramid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pyramid.h; sourceTree = "<group>"; };
 		FC74F8D2174A54FE004701CC /* Pyramid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pyramid.m; sourceTree = "<group>"; };
+		FC74F8D6174C0D3B004701CC /* LabelMeServerTitle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LabelMeServerTitle.png; sourceTree = "<group>"; };
+		FC74F8D7174C0D3B004701CC /* LabelMeServerTitleWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LabelMeServerTitleWhite.png; sourceTree = "<group>"; };
+		FC74F8D8174C0D3B004701CC /* LabelMeServerTitle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LabelMeServerTitle@2x.png"; sourceTree = "<group>"; };
+		FC74F8D9174C0D3B004701CC /* LabelMeServerTitleWhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LabelMeServerTitleWhite@2x.png"; sourceTree = "<group>"; };
+		FC74F8DF174C0FCF004701CC /* selectAllEnabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = selectAllEnabled.png; sourceTree = "<group>"; };
+		FC74F8E1174C0FD4004701CC /* selectAllDisabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = selectAllDisabled.png; sourceTree = "<group>"; };
 		FC8E89AF173930340018876D /* UIImage+Border.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Border.h"; sourceTree = "<group>"; };
 		FC8E89B0173930340018876D /* UIImage+Border.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Border.m"; sourceTree = "<group>"; };
 		FC8E89B2173983640018876D /* download.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = download.png; sourceTree = "<group>"; };
@@ -672,9 +684,10 @@
 			isa = PBXGroup;
 			children = (
 				FC9F94D91743DBBE0004598C /* Backgrounds */,
+				FC74F8DE174C0F6E004701CC /* Buttons */,
 				FC9F94C217433D210004598C /* Camera */,
-				FC9F94BD17433B3F0004598C /* Settings */,
 				FC9F94B417433A830004598C /* Detectors */,
+				FC9F94BD17433B3F0004598C /* Settings */,
 				FC9F9498174275DD0004598C /* Gallery */,
 				FC9F948B1742757B0004598C /* Titles */,
 				FC4B0A2D172F352D00A099A0 /* news */,
@@ -826,6 +839,15 @@
 			name = Detector;
 			sourceTree = "<group>";
 		};
+		FC74F8DE174C0F6E004701CC /* Buttons */ = {
+			isa = PBXGroup;
+			children = (
+				FC74F8E1174C0FD4004701CC /* selectAllDisabled.png */,
+				FC74F8DF174C0FCF004701CC /* selectAllEnabled.png */,
+			);
+			name = Buttons;
+			sourceTree = "<group>";
+		};
 		FC9F947E173AE34B0004598C /* Sign in */ = {
 			isa = PBXGroup;
 			children = (
@@ -916,6 +938,10 @@
 		FC9F948B1742757B0004598C /* Titles */ = {
 			isa = PBXGroup;
 			children = (
+				FC74F8D6174C0D3B004701CC /* LabelMeServerTitle.png */,
+				FC74F8D7174C0D3B004701CC /* LabelMeServerTitleWhite.png */,
+				FC74F8D8174C0D3B004701CC /* LabelMeServerTitle@2x.png */,
+				FC74F8D9174C0D3B004701CC /* LabelMeServerTitleWhite@2x.png */,
 				FC9F948C174275890004598C /* detectorsTitle.png */,
 				FC9F948D174275890004598C /* detectorsTitle@2x.png */,
 				FC9F948E174275890004598C /* galleryTitle.png */,
@@ -1249,6 +1275,12 @@
 				FC9F94E417443BAA0004598C /* dali.jpg in Resources */,
 				FC9F94E517443BAA0004598C /* miro.jpg in Resources */,
 				FC9F94E617443BAA0004598C /* picaso.jpg in Resources */,
+				FC74F8DA174C0D3B004701CC /* LabelMeServerTitle.png in Resources */,
+				FC74F8DB174C0D3B004701CC /* LabelMeServerTitleWhite.png in Resources */,
+				FC74F8DC174C0D3B004701CC /* LabelMeServerTitle@2x.png in Resources */,
+				FC74F8DD174C0D3B004701CC /* LabelMeServerTitleWhite@2x.png in Resources */,
+				FC74F8E0174C0FCF004701CC /* selectAllEnabled.png in Resources */,
+				FC74F8E2174C0FD4004701CC /* selectAllDisabled.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

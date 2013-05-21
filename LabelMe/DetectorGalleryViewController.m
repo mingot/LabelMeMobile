@@ -285,7 +285,7 @@
     
     self.executeDetectorVC = [[ExecuteDetectorViewController alloc] init];
     self.executeDetectorVC.svmClassifiers = [NSArray arrayWithArray:selectedDetectors];
-    [self.navigationController pushViewController:self.executeDetectorVC animated:YES];
+    [self.navigationController pushViewController:self.executeDetectorVC animated:NO];
     
     //reload views
     [self edit:self];

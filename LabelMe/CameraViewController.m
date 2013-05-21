@@ -42,9 +42,13 @@
     self.numberImages = 0;
     
     [self.switchButton transformButtonForCamera];
+    self.switchButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.switchButton.contentEdgeInsets = UIEdgeInsetsMake(5, 10, 5, 10);
     [self.switchButton setImage:[UIImage imageNamed:@"switchCamera"] forState:UIControlStateNormal];
     [self.cancelButton transformButtonForCamera];
     [self.captureButton transformButtonForCamera];
+    CGRect captButton = self.captureButton.frame;
+    self.captureButton.frame = CGRectMake(captButton.origin.x, captButton.origin.y, captButton.size.width, captButton.size.height*1.2);
     [self.captureButton setTitle:@"" forState:UIControlStateNormal];
     [self.captureButton setImage:[UIImage imageNamed:@"camera.png"] forState:UIControlStateNormal];
     self.captureButton.backgroundColor = [UIColor blackColor];
@@ -154,7 +158,7 @@
 - (IBAction)cancelAction:(id)sender
 {
     self.navigationController.navigationBarHidden = NO;
-    [self.navigationController popViewControllerAnimated:YES];
+    [self.navigationController popViewControllerAnimated:NO];
 }
 
 @end

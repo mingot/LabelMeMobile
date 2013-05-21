@@ -262,12 +262,8 @@
     self.sendButton = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleBordered target:self action:@selector(sendAction:)];
     [self.sendButton setWidth:self.view.frame.size.width/2 - 11];
     [self.sendButton setEnabled:NO];
-    self.downloadButton.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;
-    self.downloadButton.layer.borderWidth = 2.0f;
     [self.downloadButton highlightButton];
     self.activityIndicator.hidden = YES;
-    self.cameraButton.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;
-    self.cameraButton.layer.borderWidth = 2.0f;
     [self.cameraButton highlightButton];
     [self.listButton setImage:[UIImage imageNamed:@"listC.png"] forState:UIControlStateNormal];
     [self.listButton setImage:[UIImage imageNamed:@"gridC.png"] forState:UIControlStateSelected];
@@ -449,7 +445,7 @@
 -(IBAction)addImage:(id)sender
 {
     self.cameraVC.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:self.cameraVC animated:YES];
+    [self.navigationController pushViewController:self.cameraVC animated:NO];
 
 }
 
@@ -976,9 +972,9 @@
     
     // create the parent view that will hold header Label
     UIView* customView = [[UIView alloc] initWithFrame:CGRectMake(10,0,tableView.frame.size.width,30)];
-    customView.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.3];
+    customView.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:.9];
     customView.layer.borderWidth = 1.0;
-    customView.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;;
+    customView.layer.borderColor = [UIColor colorWithRed:220/256.0 green:0 blue:0 alpha:1.0].CGColor;
     
     // create the label objects
     UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];

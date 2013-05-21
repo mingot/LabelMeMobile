@@ -20,8 +20,8 @@
     [button setBackgroundColor:[UIColor colorWithWhite:0.4 alpha:0.6] forState:UIControlStateNormal];
     [button setBackgroundColor:[UIColor colorWithWhite:0.4 alpha:0.3] forState:UIControlStateHighlighted];
     [button setTitle:title forState:UIControlStateNormal];
-    button.titleLabel.font = [UIFont systemFontOfSize:10.0];
-    [button setFrame:CGRectMake(0, 0, 51,28)];
+    button.titleLabel.font = [UIFont boldSystemFontOfSize:12.0];
+    [button setFrame:CGRectMake(0, 0, 61,28)];
     
     return button;
 }
@@ -47,6 +47,11 @@
     CGFloat red, blue, green, alpha;
     [self.backgroundColor getRed:&red green:&green blue:&blue alpha:&alpha];
     [button setBackgroundColor:[UIColor colorWithRed:red green:green blue:blue alpha:alpha/2.0] forState:UIControlStateHighlighted];
+    
+    button.layer.shadowColor = [UIColor colorWithRed:.3 green:.3 blue:.3 alpha:1].CGColor;
+    button.layer.shadowOpacity = 1;
+    button.layer.shadowRadius = 2;
+    button.layer.shadowOffset = CGSizeMake(0,1);
 }
 
 @end

@@ -27,9 +27,11 @@
 
 - (void) transformButtonForCamera
 {
-    self.layer.cornerRadius = 20;
+    self.layer.cornerRadius = 18;
     self.layer.borderColor = [[UIColor blackColor] CGColor];
     self.layer.borderWidth = 1;
+    CGRect frame = self.frame;
+    self.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height*0.8);
     [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4]];
     [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.8] forState:UIControlStateHighlighted];
     [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4] forState:UIControlStateNormal];

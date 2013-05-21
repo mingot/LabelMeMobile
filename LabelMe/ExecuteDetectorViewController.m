@@ -102,8 +102,10 @@
     //buttons
     [self.cancelButton transformButtonForCamera];
     [self.settingsButton transformButtonForCamera];
-    
-    self.prevLayer = nil;
+    [self.switchButton transformButtonForCamera];
+    self.switchButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.switchButton.contentEdgeInsets = UIEdgeInsetsMake(5, 10, 5, 10);
+    [self.switchButton setImage:[UIImage imageNamed:@"switchCamera"] forState:UIControlStateNormal];
     
     
     //Initialization of model properties
@@ -150,11 +152,6 @@
     [self.view addSubview:self.HOGimageView];
     [self.view addSubview:self.detectView];
     
-    //Navigation controller navigation bar
-    UIBarButtonItem *settingsButton = [[UIBarButtonItem alloc] initWithTitle:@"settings" style:UIBarButtonItemStyleBordered target:self action:@selector(showSettingsAction:)];
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbarBg"]resizableImageWithCapInsets:UIEdgeInsetsZero ] forBarMetrics:UIBarMetricsDefault];
-    [settingsButton setStyle:UIBarButtonItemStyleBordered];
-    [self.navigationItem setRightBarButtonItem:settingsButton];
     
     //variable number of lines
     self.infoLabel.numberOfLines = 0;
@@ -359,7 +356,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 - (IBAction)cancelAction:(id)sender
 {
     self.navigationController.navigationBarHidden = NO;
-    [self.navigationController popViewControllerAnimated:YES];
+    [self.navigationController popViewControllerAnimated:NO];
 }
 
 
@@ -431,5 +428,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 
 
+- (void)viewDidUnload {
+    [self setSwitchButton:nil];
+    [super viewDidUnload];
+}
 @end
 
