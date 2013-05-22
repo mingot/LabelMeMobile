@@ -57,6 +57,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
    
     //buttons settings
     UIBarButtonItem *nextButton = [[UIBarButtonItem alloc]initWithTitle:@"Next" style:UIBarButtonItemStyleBordered target:self action:@selector(nextFieldAction:)];

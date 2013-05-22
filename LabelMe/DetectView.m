@@ -15,22 +15,11 @@ static inline double min(double x, double y) { return (x <= y ? x : y); }
 static inline double max(double x, double y) { return (x <= y ? y : x); }
 
 
-@interface DetectView()
-
-@property (nonatomic, strong) NSArray *colors;
-
-@end
 
 
 @implementation DetectView
 
 
-- (NSArray *) colors
-{
-    if(!_colors)
-        _colors = [NSArray arrayWithObjects:[UIColor redColor], [UIColor blueColor], [UIColor greenColor], [UIColor orangeColor], nil];
-    return _colors;
-}
 
 - (void)drawRect:(CGRect)rect
 {
@@ -39,11 +28,12 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
     int j=0;
     for(NSArray *corners in self.cornersArray){
         
+        
         if (corners.count==0) continue; //skip if no bb for this class
         
         CGContextRef context = UIGraphicsGetCurrentContext();
         BoundingBox *p;
-        CGFloat x,y,w,h;
+        CGFloat x,y,w,h; //xbox: x for the box position
     
     
         for (int i=0; i<corners.count; i++){
@@ -56,16 +46,27 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
             y = max(0,p.ymin);
             w = min(self.frame.size.width,p.xmax) - x;
             h = min(self.frame.size.height,p.ymax) - y;
-            
-            
+        
             CGRect box = CGRectMake(x, y, w, h);
             if(i==0){
                 CGContextSetLineWidth(context, 4);
-                
-                CGContextSetStrokeColorWithColor(context, [(UIColor *)[self.colors objectAtIndex:j%self.colors.count] CGColor]);
+                UIColor *color = [self.colorsDictionary objectForKey:p.targetClass];
+                CGContextSetStrokeColorWithColor(context, color.CGColor);
                 j++;
                 CGContextStrokeRect(context, box);
-                [p.targetClass drawAtPoint:CGPointMake(p.xmax, y) withFont:[UIFont systemFontOfSize:25.0f]];
+                
+                //text drawing
+                CGContextSetFillColorWithColor(context,color.CGColor);
+                if(self.frontCamera){
+                    x = x + w;
+                    w = abs(w);
+                }
+                
+                CGRect textBox = CGRectMake(x - 2, y - 20 - 2, w/2.0, 20);
+                CGContextFillRect(context, textBox);
+                CGContextSetFillColorWithColor(context,[UIColor blackColor].CGColor);
+//                [p.targetClass drawAtPoint:CGPointMake(xbox, y) withFont:[UIFont systemFontOfSize:20.0f]];
+                [p.targetClass drawInRect:textBox withFont:[UIFont systemFontOfSize:15]];
                 
                 // for the rest of boxes
                 CGContextSetLineWidth(context, 1);

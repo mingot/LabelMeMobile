@@ -65,10 +65,6 @@
 
     [super viewDidLoad];
     self.title = @"Annotation Tool";
-    
-    //back button
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Back" target:self.navigationController action:@selector(popViewControllerAnimated:)]];
-    self.navigationItem.leftBarButtonItem = backButton;
 
     //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
@@ -589,7 +585,6 @@
     UIGraphicsEndImageContext();
     CGImageRef imageRef = CGImageCreateWithImageInRect(viewImage.CGImage, self.imageView.frame);
     UIImage *thumbnailImage = nil;
-    NSLog(@"[THUMBNAIL] imagesize: %zux%zu",CGImageGetWidth(imageRef),CGImageGetHeight(imageRef));
     
     int thumbnailSize = 300;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
@@ -620,11 +615,9 @@
         
         NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:self.filename];
         [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
-        NSLog(@"[IMAGE] Saved at path %@", pathImages);
         
         NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:self.filename];
         [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
-        NSLog(@"[THUMB] Saved at path %@", pathThumb);
         
         [self saveDictionary];
     }

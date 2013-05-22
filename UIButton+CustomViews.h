@@ -18,6 +18,8 @@
 //custom plus button for bar 
 + (AYUIButton *) plusBarButtonWithTarget:(id)target action:(SEL) selector;
 
+
+
 //it returns the same button with the alpha reduced in highlighted mode
 - (void) highlightButton;
 

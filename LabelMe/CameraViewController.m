@@ -8,7 +8,6 @@
 
 #import <ImageIO/ImageIO.h>
 #import "CameraViewController.h"
-#import "DDExpandableButton.h"
 
 
 @interface CameraViewController ()
@@ -16,21 +15,19 @@
 @property int numberImages;
 @property BOOL isUsingFrontFacingCamera;
 
-
-
 @end
 
 
 
 @implementation CameraViewController
 
-@synthesize delegate = _delegate;
-@synthesize captureSession = _captureSession;
-@synthesize prevLayer = _prevLayer;
-
-//private
-@synthesize isUsingFrontFacingCamera = _isUsingFrontFacingCamera;
-@synthesize numberImages = _numberImages;
+//@synthesize delegate = _delegate;
+//@synthesize captureSession = _captureSession;
+//@synthesize prevLayer = _prevLayer;
+//
+////private
+//@synthesize isUsingFrontFacingCamera = _isUsingFrontFacingCamera;
+//@synthesize numberImages = _numberImages;
 
 
 

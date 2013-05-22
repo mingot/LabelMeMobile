@@ -226,6 +226,7 @@
 
     
     self.serverConnection.delegate = self;
+    self.title = @"Gallery"; //for back button
     photosWithErrors = 0;
     
     //Controllers
@@ -265,6 +266,8 @@
     [self.downloadButton highlightButton];
     self.activityIndicator.hidden = YES;
     [self.cameraButton highlightButton];
+    self.cameraButton.imageView.contentMode = UIViewContentModeScaleAspectFill;
+    [self.cameraButton setImage:[UIImage imageNamed:@"cameraIcon.png"] forState:UIControlStateNormal];
     [self.listButton setImage:[UIImage imageNamed:@"listC.png"] forState:UIControlStateNormal];
     [self.listButton setImage:[UIImage imageNamed:@"gridC.png"] forState:UIControlStateSelected];
     

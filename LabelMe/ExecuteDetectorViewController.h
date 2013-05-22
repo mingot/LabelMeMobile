@@ -56,7 +56,6 @@
 @property (weak, nonatomic) IBOutlet AYUIButton *settingsButton;
 @property (weak, nonatomic) IBOutlet AYUIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet AYUIButton *switchButton;
-
 @property (weak, nonatomic) IBOutlet UITableView *settingsTableView;
 
 

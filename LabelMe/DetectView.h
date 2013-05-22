@@ -17,6 +17,12 @@
 // To transform a point from the device reference to prevLayer reference
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *prevLayer;
 
+//targetclass -> UIColor
+@property (nonatomic, strong) NSDictionary *colorsDictionary;
+
+//Camera specifics to help place the boxes
+@property int cameraOrientation;
+@property BOOL frontCamera;
 
 - (void)reset;
 

@@ -34,6 +34,7 @@
 //Encoding properties
 @property (strong, nonatomic) NSString *name;
 @property (strong, nonatomic) NSArray *targetClasses;
+@property (strong, nonatomic) NSString *classifierID;
 @property (strong, nonatomic) NSMutableArray *weights;
 @property (strong, nonatomic) NSArray *sizes;
 @property (strong, nonatomic) NSNumber *numberSV;

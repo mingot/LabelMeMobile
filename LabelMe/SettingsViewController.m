@@ -295,8 +295,6 @@
     label.frame = CGRectMake(20, 6, 300, 30);
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
-    label.shadowColor = [UIColor grayColor];
-    label.shadowOffset = CGSizeMake(0.0, 1.0);
     label.text = sectionTitle;
     
     // Create header view and add label as a subview

@@ -13,7 +13,7 @@
 #import "Classifier.h"
 
 
-@interface DetectorGalleryViewController : UIViewController <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource,DetectorDescriptionViewControllerDelegate, ModalTVCDelegate>
+@interface DetectorGalleryViewController : UIViewController <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource,DetectorDescriptionViewControllerDelegate>
 {
     NSInteger _selectedRow;
 }

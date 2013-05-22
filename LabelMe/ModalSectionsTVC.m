@@ -180,7 +180,6 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
     NSArray *items = [self.dataDictionary objectForKey:[self.labelsOrdered objectAtIndex:indexPath.section]];
     return (0.225*self.view.frame.size.width*ceil((float)items.count/4) + 0.0375*self.view.frame.size.width);
 }
@@ -188,7 +187,6 @@
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
 {
-    
     if (self.labelsOrdered.count>0) return 1;
     else return 0;
 }

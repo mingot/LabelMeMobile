@@ -106,6 +106,8 @@
 
 - (void)viewDidLoad
 {
+    self.title = @"Detectors"; //for back button
+    
     //load detectors and create directory if it does not exist
     NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"];
     self.detectors = [NSKeyedUnarchiver unarchiveObjectWithFile:detectorsPath];
@@ -114,12 +116,6 @@
         self.detectors = [[NSMutableArray alloc] init];
     }
     
-//    //execute all the detectors
-//    self.executeDetectorsButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-//    self.executeDetectorsButton.frame = CGRectMake(20, 40, 95, 37);
-//    [self.executeDetectorsButton setTitle:@"Execute" forState:UIControlStateNormal];
-//    [self.executeDetectorsButton addTarget:self action:@selector(executeDetectorsAction:) forControlEvents:UIControlEventTouchUpInside];
-//    [customView addSubview:self.executeDetectorsButton];
     UIView *customView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 100)];
     self.tableView.tableFooterView = customView;
     
@@ -196,7 +192,7 @@
     //delete from the model
     NSMutableArray *aux = [[NSMutableArray alloc] init];
     for(NSNumber *index in self.selectedItems) [aux addObject:[self.detectors objectAtIndex:index.intValue]];
-    for(Classifier *detector in aux) [self.detectors removeObject:detector];
+    for(Classifier *classifier in aux) [self.detectors removeObject:classifier];
     
     [self.selectedItems removeAllObjects];
     [self.tableView reloadData];
@@ -206,16 +202,25 @@
     [self.executeButton setTitle:@"Execute"];
     self.executeButton.enabled = NO;
     
-    //remove from disk
+    //update classifier list in disk
     if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"]])
         NSLog(@"Unable to save the classifiers");
+    
+    //delete images
+    for(Classifier *classifier in aux){
+        NSString *bigImagePath = [self.userPath stringByAppendingPathComponent:[NSString stringWithFormat:@"Detectors/%@_big.jpg", classifier.classifierID]];
+        NSString *thumbnailImagePath = [self.userPath stringByAppendingPathComponent:[NSString stringWithFormat:@"Detectors/%@_thumb.jpg", classifier.classifierID]];
+        [[NSFileManager defaultManager] removeItemAtPath:bigImagePath error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:thumbnailImagePath error:nil];
+    }
+    
 }
 
 
 
 - (IBAction)addDetector:(id)sender
 {
-    _selectedRow = self.detectors;
+    _selectedRow = self.detectors.count;
     
     //check if there for no images or no labels to show error
     self.availableObjectClasses = nil; //reload
@@ -254,28 +259,6 @@
     
 }
 
-
-//- (IBAction)executeDetectorsAction:(id)sender
-//{
-//    //show modal to select training positives for the selected class
-//    self.modalTVC = [[ModalTVC alloc] init];
-//    self.modalTVC.delegate = self;
-//    self.modalTVC.modalTitle = @"Select Detectors to Execute";
-//    self.modalTVC.doneButtonTitle = @"Execute";
-//    self.modalTVC.multipleChoice = NO;
-//    NSMutableArray *imagesList = [[NSMutableArray alloc] init];
-//    for(Classifier *detector in self.detectors)
-//        [imagesList addObject:[UIImage imageWithContentsOfFile:detector.averageImageThumbPath]];
-//    
-//    self.modalTVC.showCancelButton = YES;
-//    self.modalTVC.data = imagesList;
-//    [self.modalTVC.view setNeedsDisplay];
-//    [self presentModalViewController:self.modalTVC animated:YES];
-//    
-//    
-//    //let's wait for the modalTVCDelegate answer to begin the training
-//}
-
 - (IBAction)executeDetectorsAction:(id)sender
 {
     
@@ -285,6 +268,7 @@
     
     self.executeDetectorVC = [[ExecuteDetectorViewController alloc] init];
     self.executeDetectorVC.svmClassifiers = [NSArray arrayWithArray:selectedDetectors];
+    self.executeDetectorVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.executeDetectorVC animated:NO];
     
     //reload views
@@ -294,39 +278,20 @@
 }
 
 
-//#pragma mark -
-//#pragma mark ModalTVC Delegate
-//
-//- (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
-//{
-//    NSLog(@"Selected Detectors: %@",selectedItems);
-//    NSMutableArray *selectedDetectors = [[NSMutableArray alloc] init];
-//    for(NSNumber *index in selectedItems)
-//        [selectedDetectors addObject:[self.detectors objectAtIndex:index.intValue]];
-//    
-//    self.executeDetectorVC = [[ExecuteDetectorViewController alloc] init];
-//    self.executeDetectorVC.svmClassifiers = [NSArray arrayWithArray:selectedDetectors];
-//    [self.navigationController pushViewController:self.executeDetectorVC animated:YES];
-//
-//}
-//
-//- (void) selectionCancelled
-//{
-//    
-//}
 
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
 {
-//    return self.editing ? self.detectors.count + 1 : self.detectors.count;
     return self.detectors.count;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+
+    
     static NSString *CellIdentifier = @"detectorCell";
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
@@ -335,18 +300,17 @@
     
     if(self.editing) cell.accessoryType = UITableViewCellAccessoryNone;
     else cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-
-    Classifier *detector = [self.detectors objectAtIndex:indexPath.row];
+    
+    NSArray* reversedDetectors = [[self.detectors reverseObjectEnumerator] allObjects]; //reverse order to show newer first
+    Classifier *detector = [reversedDetectors objectAtIndex:indexPath.row];
     cell.textLabel.text = detector.name;
     cell.detailTextLabel.numberOfLines = 2;
     cell.detailTextLabel.text = [NSString stringWithFormat:@"Class:%@ \nTraining Images: %d", [detector.targetClasses componentsJoinedByString:@", "], detector.imagesUsedTraining.count];
     cell.imageView.image = [UIImage imageWithContentsOfFile:detector.averageImageThumbPath];
     
-    //cell highlighted when selected
-    if([self.selectedItems containsObject:[NSNumber numberWithInt:indexPath.row]] && self.editing){
-        NSLog(@"Found cell %d!!", indexPath.row);
+    //cell checkmarked when selected
+    if([self.selectedItems containsObject:[NSNumber numberWithInt:self.detectors.count - indexPath.row - 1]] && self.editing)
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
-    }
     
     return cell;
 }
@@ -361,23 +325,21 @@
 {
     
     if (self.editing == NO) {
+        NSArray* reversedDetectors = [[self.detectors reverseObjectEnumerator] allObjects];
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
-        _selectedRow = indexPath.row;
+        _selectedRow = self.detectors.count - indexPath.row - 1;
         self.detectorController.hidesBottomBarWhenPushed = YES;
         self.detectorController.delegate = self;
-        self.detectorController.svmClassifier = [self.detectors objectAtIndex:indexPath.row];
+        self.detectorController.svmClassifier = [reversedDetectors objectAtIndex:indexPath.row];
         self.detectorController.view = nil; //to reexecute viewDidLoad
         self.detectorController.userPath = self.userPath;
         [self.navigationController pushViewController:self.detectorController animated:YES];
     
     }else{
-        NSNumber *index = [NSNumber numberWithInt:indexPath.row];
-        if(![self.selectedItems containsObject:index]){
-            [self.selectedItems addObject:index];
-        }else{
-            [self.selectedItems removeObject:index];
-        }
-
+        NSNumber *index = [NSNumber numberWithInt:self.detectors.count - indexPath.row - 1]; //index according to reversed order
+        if(![self.selectedItems containsObject:index]) [self.selectedItems addObject:index];
+        else [self.selectedItems removeObject:index];
+        
         [self reloadToolbarButtons];
         [tableView reloadData];
     }

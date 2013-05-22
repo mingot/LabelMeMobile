@@ -26,6 +26,8 @@
 @implementation Pyramid
 
 
+@synthesize hogFeatures = _hogFeatures;
+@synthesize levelsToCalculate = _levelsToCalculate;
 
 #pragma mark -
 #pragma mark Initialization
@@ -39,6 +41,11 @@
     return _hogFeatures;
 }
 
+//- (void) setHogFeatures:(NSMutableArray *)hogFeatures
+//{
+//    _hogFeatures = hogFeatures;
+//}
+
 
 - (NSMutableSet *) levelsToCalculate
 {
@@ -49,6 +56,11 @@
     }
     return _levelsToCalculate;
 }
+
+//- (void) setLevelsToCalculate:(NSMutableSet *)levelsToCalculate
+//{
+//    _levelsToCalculate = levelsToCalculate;
+//}
 
 - (id) initWithClassifiers:(NSArray *)svmClassifiers forNumPyramids:(int)numPyramids
 {
@@ -84,11 +96,8 @@
     
     UIImage *scaledImage = [image scaleImageTo:initialScale/pow(scale,0)]; //optimize to start to the first true index
     
-    //reset all pyramids levels
-    self.hogFeatures = nil;
-    
     __block HogFeature *imageHog;
-    dispatch_queue_t pyramidConstructionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_queue_t pyramidConstructionQueue = dispatch_queue_create("pyramidConstructionQueue", DISPATCH_QUEUE_CONCURRENT);
     dispatch_apply(self.numPyramids, pyramidConstructionQueue, ^(size_t i) {
         if([self.levelsToCalculate containsObject:[NSNumber numberWithInt:i]]){
             float scaleLevel = pow(1.0/scale, i);
@@ -102,7 +111,6 @@
     
 //    NSLog(@"Levels: %@", self.levelsToCalculate);
 //    NSLog(@"hog features: %@", self.hogFeatures);
-    
     
     
 //    for(int i=0; i<self.numPyramids; i++)

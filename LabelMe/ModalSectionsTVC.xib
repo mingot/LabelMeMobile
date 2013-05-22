@@ -47,8 +47,8 @@
 						<reference key="NSNextKeyView" ref="861783790"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
-							<int key="NSColorSpace">1</int>
-							<bytes key="NSRGB">MC45MDE5NjA3OTAyIDAuOTAxOTYwNzkwMiAwLjkwMTk2MDc5MDIAA</bytes>
+							<int key="NSColorSpace">2</int>
+							<bytes key="NSRGB">MC45MDE5NjA4NDk4IDAuOTAxOTYwODQ5OCAwLjkwMTk2MDg0OTgAA</bytes>
 						</object>
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -171,10 +171,10 @@
 						</object>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
-					<object class="IBUIImageView" id="539370214">
+					<object class="IBUIImageView" id="607860429">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrameSize">{320, 51}</string>
+						<string key="NSFrame">{{0, 6}, {320, 45}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="119546454"/>
@@ -184,14 +184,14 @@
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<object class="NSCustomResource" key="IBUIImage">
 							<string key="NSClassName">NSImage</string>
-							<string key="NSResourceName">LabelMeServerTitleWhite.png</string>
+							<string key="NSResourceName">LabelMeServerTitle.png</string>
 						</object>
 					</object>
 				</array>
 				<string key="NSFrame">{{0, 20}, {320, 460}}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
-				<reference key="NSNextKeyView" ref="539370214"/>
+				<reference key="NSNextKeyView" ref="607860429"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">2</int>
 					<bytes key="NSRGB">MC45MDE5NjA4NDk4IDAuOTAxOTYwODQ5OCAwLjkwMTk2MDg0OTgAA</bytes>
@@ -308,7 +308,7 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="119546454"/>
 							<reference ref="861783790"/>
-							<reference ref="539370214"/>
+							<reference ref="607860429"/>
 						</array>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -358,7 +358,7 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">200</int>
-						<reference key="object" ref="539370214"/>
+						<reference key="object" ref="607860429"/>
 						<reference key="parent" ref="191373211"/>
 					</object>
 				</array>
@@ -402,7 +402,6 @@
 						<string key="doneAction:">id</string>
 						<string key="imageSelectedAction:">UIButton</string>
 						<string key="selectAllAction:">id</string>
-						<string key="selectAllSwitchAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="cancelAction:">
@@ -419,10 +418,6 @@
 						</object>
 						<object class="IBActionInfo" key="selectAllAction:">
 							<string key="name">selectAllAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="selectAllSwitchAction:">
-							<string key="name">selectAllSwitchAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</dictionary>
@@ -462,7 +457,7 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="NS.key.0">LabelMeServerTitleWhite.png</string>
+			<string key="NS.key.0">LabelMeServerTitle.png</string>
 			<string key="NS.object.0">{223, 40}</string>
 		</object>
 		<string key="IBCocoaTouchPluginVersion">2083</string>

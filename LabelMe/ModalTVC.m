@@ -33,7 +33,6 @@
     [super viewDidLoad];
     
     //UI
-    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bgPattern2.png"]];
     [self.doneButton highlightButton];
     [self.cancelButton highlightButton];
     self.tableView.layer.cornerRadius = 10;
@@ -149,12 +148,10 @@
         else cell.accessoryType = UITableViewCellAccessoryNone;
         
         cell.textLabel.text = [self.data objectAtIndex:indexPath.row];
-        NSLog(@"%@",[self.data objectAtIndex:indexPath.row]);
         
         return cell;
     }
     
-    NSLog(@"%@", self.data);
     
 }
 

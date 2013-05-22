@@ -29,9 +29,9 @@
 {
 	[super layoutSubviews];
 	
-	CGRect contentRect = [[self contentView] bounds];
+	CGRect contentRect = self.contentView.bounds;
 	CGSize textSize = [@"W" sizeWithFont: [[self textField] font]];
-	self.textField.frame = CGRectIntegral( CGRectMake(contentRect.size.width / 2.0, (contentRect.size.height - textSize.height) / 2.0, (contentRect.size.width / 2.0) - (2.0 * kLeading), textSize.height) );
+	self.textField.frame = CGRectIntegral( CGRectMake(contentRect.size.width/3.0 + 5, (contentRect.size.height - textSize.height) / 2.0, (contentRect.size.width / 2.0) - (2.0 * kLeading), textSize.height) );
 }
 
 @end

@@ -36,7 +36,7 @@
 @property BOOL trainingWentGood;
 @property (strong, nonatomic) UIImage *averageImage;
 @property int firstTraingState; //0: not first training, 1: first training initiated, 2: first training interrupted
-
+@property BOOL isFirstTraining;
 
 // wrapper to call the detector for training and testing
 -(void) trainForImagesNames:(NSArray *)imagesNames;
@@ -92,9 +92,8 @@
         
         //nsdate treatment
         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-        [formatter setDateFormat:@"mm/dd/yyyy - hh:mm"];
+        [formatter setDateFormat:@"MM/dd/yyyy - HH:mm"];
         [formatter setTimeZone:[NSTimeZone localTimeZone]]; //time zone
-        
         
         _classifierProperties = [[NSMutableArray alloc] init];
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:self.svmClassifier.name forKey:@"Name"]];
@@ -128,20 +127,24 @@
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
     self.executeController.delegate = self;
     
-    //set labels
+    //image views
     self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
     self.detectorView.clipsToBounds = YES;
+    self.detectorView.layer.shadowColor = [UIColor colorWithRed:.3 green:.3 blue:.3 alpha:1].CGColor;
+    self.detectorView.layer.shadowOpacity = 1;
+    self.detectorView.layer.shadowRadius = 5;
+    self.detectorView.layer.shadowOffset = CGSizeMake(-1,-1);
     self.detectorHogView.contentMode = UIViewContentModeScaleAspectFit;
     self.detectorHogView.clipsToBounds = YES;
+    self.detectorHogView.layer.shadowColor = [UIColor colorWithRed:.3 green:.3 blue:.3 alpha:1].CGColor;
+    self.detectorHogView.layer.shadowOpacity = 1;
+    self.detectorHogView.layer.shadowRadius = 5;
+    self.detectorHogView.layer.shadowOffset = CGSizeMake(-1,-1);
+    
     
     //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
     
-    //top toolbar icons
-    //self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(editAction:)]];
-    //self.navigationItem.rightBarButtonItem = self.editButton;
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Back" target:self.navigationController action:@selector(popViewControllerAnimated:)]];
-    self.navigationItem.leftBarButtonItem = backButton;
     
     //description table view
     self.descriptionTableView.layer.cornerRadius = 10;
@@ -172,6 +175,7 @@
     //Check if the classifier exists.
     if(self.svmClassifier.weights == nil){
         NSLog(@"New classifier");
+        self.isFirstTraining = YES;
         //show modal to select the target class
         self.modalTVC = [[ModalTVC alloc] init];
         self.modalTVC.showCancelButton = YES;
@@ -184,7 +188,8 @@
         self.firstTraingState = INITIATED;
         
     }else{
-        NSLog(@"Loading old classifier");
+        NSLog(@"Loading classifier: %@", self.svmClassifier.name);
+        self.isFirstTraining = NO;
         //storing the previous classifier using the nscoding for object copy
         self.previousSvmClassifier = [[Classifier alloc] init];
         self.previousSvmClassifier = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.svmClassifier]];
@@ -295,10 +300,26 @@
     [alert show];
 }
 
-- (IBAction)editAction:(id)sender
+
+
+- (IBAction)saveAction:(id)sender
 {
-//    BOOL isEditing = self.descriptionTableView.isEditing;
-//    [self.descriptionTableView setEditing:!isEditing animated:YES];
+    //save average image
+    NSString *pathDetectorsBig = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
+                                  [NSString stringWithFormat:@"%@_big.jpg",self.svmClassifier.classifierID]];
+    self.detectorView.image = self.averageImage;
+    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsBig contents:UIImageJPEGRepresentation(self.averageImage, 1.0) attributes:nil];
+    self.svmClassifier.averageImagePath = pathDetectorsBig;
+    
+    //save average image thumbnail
+    NSString *pathDetectorsThumb = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
+                                    [NSString stringWithFormat:@"%@_thumb.jpg",self.svmClassifier.classifierID]];
+    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsThumb contents:UIImageJPEGRepresentation([self.averageImage thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
+    self.svmClassifier.averageImageThumbPath = pathDetectorsThumb;
+    self.svmClassifier.updateDate = [NSDate date];
+    
+    [self loadDetectorInfo];
+    [self.delegate updateClassifier:self.svmClassifier];
 }
 
 #pragma mark -
@@ -354,7 +375,9 @@
         for(NSNumber *sel in selectedItems)
             [classes addObject:[self.availableObjectClasses objectAtIndex:sel.intValue]];
         self.svmClassifier.targetClasses = [NSArray arrayWithArray:classes];
-        self.svmClassifier.name = [NSString stringWithFormat:@"%@-Detector",[self.svmClassifier.targetClasses componentsJoinedByString:@"+"]];
+        NSString *className = [self.svmClassifier.targetClasses componentsJoinedByString:@"+"];
+        self.svmClassifier.name = [NSString stringWithFormat:@"%@-Detector",className];
+        self.svmClassifier.classifierID = [NSString stringWithFormat:@"%@%@",className,[self uuid]];
         
     }else if([identifier isEqualToString:@"Select Training Images"]){
         
@@ -450,14 +473,15 @@
         
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.textLabel.text = propertyName;
+        cell.textLabel.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
         cell.textLabel.backgroundColor = [UIColor clearColor];
-        cell.backgroundColor = [UIColor colorWithWhite:.8 alpha:.2];
+        cell.backgroundColor = [UIColor colorWithWhite:247/256.0 alpha:1];
         cell.textField.placeholder = [property objectForKey:propertyName];
         cell.textField.delegate = self;
         cell.textField.returnKeyType = UIReturnKeyDone;
         cell.textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
         cell.textField.autocorrectionType = UITextAutocorrectionTypeNo;
-        cell.textField.text = [property objectForKey:propertyName];
+        if (!self.isFirstTraining) cell.textField.text = [property objectForKey:propertyName];
         return cell;
     
     }else{
@@ -467,10 +491,11 @@
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
         cell.textLabel.text = propertyName;
+        cell.textLabel.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
         cell.textLabel.backgroundColor = [UIColor clearColor];
         cell.detailTextLabel.text = [property objectForKey:propertyName];
         cell.detailTextLabel.backgroundColor = [UIColor clearColor];
-        cell.backgroundColor = [UIColor colorWithWhite:.8 alpha:.2];
+        cell.backgroundColor = [UIColor colorWithWhite:247/256.0 alpha:1];
 
         return cell;
     }
@@ -539,6 +564,7 @@
 -(BOOL) textFieldShouldReturn:(UITextField *)textField
 {
     [self.delegate updateClassifier:self.svmClassifier];
+    self.isFirstTraining = NO;
     [textField resignFirstResponder];
     self.classifierProperties = nil;
     self.title = self.svmClassifier.name;
@@ -732,27 +758,6 @@
     self.classifierProperties = nil;
     [self.descriptionTableView reloadData];
     [self.view setNeedsDisplay];
-}
-
-
-- (IBAction)saveAction:(id)sender
-{
-    //save average image
-    NSString *pathDetectorsBig = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
-                                  [NSString stringWithFormat:@"%@_big.jpg",self.svmClassifier.name]];
-    self.detectorView.image = self.averageImage;
-    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsBig contents:UIImageJPEGRepresentation(self.averageImage, 1.0) attributes:nil];
-    self.svmClassifier.averageImagePath = pathDetectorsBig;
-    
-    //save average image thumbnail
-    NSString *pathDetectorsThumb = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
-                                    [NSString stringWithFormat:@"%@_thumb.jpg",self.svmClassifier.name]];
-    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsThumb contents:UIImageJPEGRepresentation([self.averageImage thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
-    self.svmClassifier.averageImageThumbPath = pathDetectorsThumb;
-    self.svmClassifier.updateDate = [NSDate date];
-    
-    [self loadDetectorInfo];
-    [self.delegate updateClassifier:self.svmClassifier];
 }
 
 - (void)viewDidUnload {

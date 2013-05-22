@@ -41,15 +41,20 @@
 						<int key="NSvFlags">274</int>
 						<string key="NSFrameSize">{320, 460}</string>
 						<reference key="NSSuperview" ref="191373211"/>
+						<reference key="NSWindow"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
-							<int key="NSColorSpace">3</int>
-							<bytes key="NSWhite">MQA</bytes>
+							<int key="NSColorSpace">2</int>
+							<bytes key="NSRGB">MC45MDE5NjA4NDk4IDAuOTAxOTYwODQ5OCAwLjkwMTk2MDg0OTgAA</bytes>
 						</object>
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<bool key="IBUIAlwaysBounceVertical">YES</bool>
 						<int key="IBUISeparatorStyle">1</int>
+						<object class="NSColor" key="IBUISeparatorColor">
+							<int key="NSColorSpace">3</int>
+							<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
+						</object>
 						<int key="IBUISectionIndexMinimumDisplayRowCount">0</int>
 						<bool key="IBUIShowsSelectionImmediatelyOnTouchBegin">YES</bool>
 						<float key="IBUIRowHeight">44</float>
@@ -59,6 +64,7 @@
 				</array>
 				<string key="NSFrame">{{0, 20}, {320, 460}}</string>
 				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="195947196"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">3</int>
@@ -266,7 +272,61 @@
 			<nil key="sourceID"/>
 			<int key="maxID">17</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes"/>
+		<object class="IBClassDescriber" key="IBDocument.Classes">
+			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
+				<object class="IBPartialClassDescription">
+					<string key="className">DetectorGalleryViewController</string>
+					<string key="superclassName">UIViewController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="addDetector:">id</string>
+						<string key="deleteAction:">id</string>
+						<string key="edit:">id</string>
+						<string key="executeDetectorsAction:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="addDetector:">
+							<string key="name">addDetector:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="deleteAction:">
+							<string key="name">deleteAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="edit:">
+							<string key="name">edit:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="executeDetectorsAction:">
+							<string key="name">executeDetectorsAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">tableView</string>
+						<string key="NS.object.0">UITableView</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">tableView</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">tableView</string>
+							<string key="candidateClassName">UITableView</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/DetectorGalleryViewController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSLayoutConstraint</string>
+					<string key="superclassName">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/NSLayoutConstraint.h</string>
+					</object>
+				</object>
+			</array>
+		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaTouchFramework</string>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>

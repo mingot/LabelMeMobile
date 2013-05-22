@@ -28,6 +28,8 @@
 
 @property (strong, nonatomic) NSArray *settingsStrings;
 @property (strong, nonatomic) NSMutableArray *initialDetectionThresholds; //initial threshold for mutliclass threshold sweeping
+@property (strong, nonatomic) NSArray *colors; //static array of colors to assign to multiple detectors
+
 
 @end
 
@@ -55,7 +57,7 @@
 -(NSArray *) settingsStrings
 {
     if(!_settingsStrings){
-        _settingsStrings = [[NSArray alloc] initWithObjects:@"Scale",@"FPS",@"Score",@"HOG",@"Front", nil];
+        _settingsStrings = [[NSArray alloc] initWithObjects:@"Scale",@"FPS",@"Score",@"HOG", nil];
     }return _settingsStrings;
 }
 
@@ -67,6 +69,17 @@
             [_initialDetectionThresholds addObject:svmClassifier.detectionThreshold];
     }
     return _initialDetectionThresholds;
+}
+
+- (NSArray *) colors
+{
+    if(!_colors) _colors = [NSArray arrayWithObjects:
+                            [UIColor colorWithRed:217/255.0 green:58/255.0 blue:62/255.0 alpha:.6],
+                            [UIColor colorWithRed:75/255.0 green:53/255.0 blue:151/255.0 alpha:.6],
+                            [UIColor colorWithRed:219/255.0 green:190/255.0 blue:59/255.0 alpha:.6],
+                            [UIColor colorWithRed:54/255.0 green:177/255.0 blue:48/255.0 alpha:.6],
+                            nil];
+    return _colors;
 }
 
 #pragma mark -
@@ -83,6 +96,8 @@
 {
     [super viewDidLoad];
     
+    self.infoLabel.adjustsFontSizeToFitWidth = NO;
+    
     isUsingFrontFacingCamera = NO;
     fpsToShow = 0.0;
     num = 0;
@@ -95,12 +110,21 @@
         self.detectionThresholdSliderButton.value = classifier.detectionThreshold.floatValue;
     }
     
+    //assign colors to each detector
+    NSMutableDictionary *colorsDictionary = [[NSMutableDictionary alloc] initWithCapacity:self.svmClassifiers.count];
+    int i=0;
+    for(Classifier *classifier in self.svmClassifiers){
+        [colorsDictionary setObject:[self.colors objectAtIndex:i%self.colors.count] forKey:[classifier.targetClasses componentsJoinedByString:@"+"]];
+        i++;
+    }
+    self.detectView.colorsDictionary = [NSDictionary dictionaryWithDictionary:colorsDictionary];
+    
     self.settingsTableView.hidden = YES;
     self.settingsTableView.layer.cornerRadius = 10;
-    self.settingsTableView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.4];
+    self.settingsTableView.backgroundColor = [UIColor clearColor];
     
     //buttons
-    [self.cancelButton transformButtonForCamera];
+    [self.cancelButton transformButtonForCamera];    
     [self.settingsButton transformButtonForCamera];
     [self.switchButton transformButtonForCamera];
     self.switchButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -152,9 +176,6 @@
     [self.view addSubview:self.HOGimageView];
     [self.view addSubview:self.detectView];
     
-    
-    //variable number of lines
-    self.infoLabel.numberOfLines = 0;
 }
 
 - (void) viewWillAppear:(BOOL)animated
@@ -184,9 +205,16 @@
 }
 
 
--(void)viewDidDisappear:(BOOL)animated{
+-(void)viewDidDisappear:(BOOL)animated
+{
     [self.captureSession stopRunning];
     [self.detectView reset];
+}
+
+- (void)viewDidUnload
+{
+    [self setSwitchButton:nil];
+    [super viewDidUnload];
 }
 
 #pragma mark -
@@ -239,7 +267,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             
             //each classifier run in parallel
             __block NSArray *candidatesForClassifier;
-            dispatch_queue_t classifierQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+            dispatch_queue_t classifierQueue = dispatch_queue_create("classifierQueue", DISPATCH_QUEUE_CONCURRENT);
             dispatch_apply(self.svmClassifiers.count, classifierQueue, ^(size_t i) {
                 Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:i];
                 float detectionThreshold = -1 + 2*svmClassifier.detectionThreshold.floatValue;
@@ -254,6 +282,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         
         // set boundaries of the detection and redraw
+        self.detectView.cameraOrientation = [[UIDevice currentDevice] orientation];
         self.detectView.cornersArray = nmsArray;
         [self.detectView performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
         
@@ -287,6 +316,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         if(self.fps) [screenLabelText appendString: [NSString stringWithFormat:@"FPS: %.1f\n",-1.0/[start timeIntervalSinceNow]]];
         if(self.scale) [screenLabelText appendString: [NSString stringWithFormat:@"scale: %d\n",level]];
         [self.infoLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithString:screenLabelText] waitUntilDone:YES];
+
     }
 }
 
@@ -343,10 +373,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                 newThreshold = newThreshold >= 0 ? newThreshold : 0;
                 newThreshold = newThreshold <= 1 ? newThreshold : 1;
                 svmClassifier.detectionThreshold = [NSNumber numberWithFloat:newThreshold];
-//                NSLog(@"Classifier %d threshold %f", i, newThreshold);
-//                NSLog(@"slider value: %f", slider.value);
             }
-//            NSLog(@"****");
         }
         
     }
@@ -364,7 +391,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 {
     AVCaptureDevicePosition desiredPosition = isUsingFrontFacingCamera ? AVCaptureDevicePositionBack : AVCaptureDevicePositionFront;
-
     
     for (AVCaptureDevice *d in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
         if ([d position] == desiredPosition) {
@@ -379,6 +405,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         }
     }
     isUsingFrontFacingCamera = !isUsingFrontFacingCamera;
+    self.detectView.frontCamera = isUsingFrontFacingCamera;
 }
 
 - (IBAction)switchValueDidChange:(UISwitch *)sw
@@ -388,13 +415,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     if([label isEqualToString:@"HOG"]){
         self.hog = sw.on;
         if(!self.hog) {self.HOGimageView.image = nil; self.HOGimageView.hidden = YES;}
-        else self.HOGimageView.hidden = NO;
-    }else if([label isEqualToString:@"FPS"]){ self.fps = sw.on;
-    }else if([label isEqualToString:@"Scale"]){ self.scale = sw.on;
-    }else if([label isEqualToString:@"Score"]){ self.score = sw.on;
-    }else if([label isEqualToString:@"Front"]){
-        [self switchCameras:self];
-    }
+        else self.HOGimageView.hidden = NO;}
+    else if([label isEqualToString:@"FPS"]){ self.fps = sw.on;}
+    else if([label isEqualToString:@"Scale"]){ self.scale = sw.on;}
+    else if([label isEqualToString:@"Score"]){ self.score = sw.on;}
 }
 
 
@@ -403,7 +427,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
 {
-
     return self.settingsStrings.count;
 }
 
@@ -412,12 +435,17 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 {
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectZero];
-    [sw setOnTintColor:[UIColor colorWithRed:(180.0/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0]];
+
+    cell.backgroundColor = [UIColor colorWithWhite:1 alpha:0.4];
+    cell.textLabel.backgroundColor = [UIColor clearColor];
+    cell.opaque = NO;
     
     NSString *label = [self.settingsStrings objectAtIndex:indexPath.row];
     cell.textLabel.text = label;
-    cell.textLabel.backgroundColor = [UIColor clearColor];
+
+    //switch
+    UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectZero];
+    [sw setOnTintColor:[UIColor colorWithRed:(180.0/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0]];
     [sw setOn:NO  animated:NO];
     sw.tag = indexPath.row;
     [sw addTarget:self action:@selector(switchValueDidChange:) forControlEvents:UIControlEventValueChanged];
@@ -426,11 +454,5 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     return cell;
 }
 
-
-
-- (void)viewDidUnload {
-    [self setSwitchButton:nil];
-    [super viewDidUnload];
-}
 @end
 

@@ -328,14 +328,16 @@ using namespace cv;
     //get detections for each pyramid level (parallel processing)
     NSMutableArray *candidateBoundingBoxes = [[NSMutableArray alloc] init];    
     __block NSArray *candidatesForLevel;
-    dispatch_queue_t pyramidQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_queue_t pyramidQueue = dispatch_queue_create("pyramidQueue", DISPATCH_QUEUE_CONCURRENT);
     dispatch_apply(self.finPyramid - self.iniPyramid, pyramidQueue, ^(size_t i) {
         if([[pyramid.hogFeatures objectAtIndex:i+self.iniPyramid] isKindOfClass:[HogFeature class]]){
-            HogFeature *imageHog = [pyramid.hogFeatures objectAtIndex:i+self.iniPyramid];
+            __block HogFeature *imageHog;
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                imageHog = [pyramid.hogFeatures objectAtIndex:i+self.iniPyramid];
+            });
             candidatesForLevel = [self getBoundingBoxesIn:imageHog forPyramid:i+self.iniPyramid forIndex:0];
         }else{
             NSLog(@"Error trying to retrieve pyramid %zd, not the correct class",i+self.iniPyramid);
-            NSLog(@"%@", pyramid.hogFeatures);
         }
         dispatch_sync(dispatch_get_main_queue(), ^{
             [candidateBoundingBoxes addObjectsFromArray:candidatesForLevel];
@@ -363,8 +365,12 @@ using namespace cv;
         self.iniPyramid = 0;
         self.finPyramid = pyramid.numPyramids;
     }
-    for(int i=self.iniPyramid;i<self.finPyramid;i++)
-        [pyramid.levelsToCalculate addObject:[NSNumber numberWithInt:i]];
+    
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        for(int i=self.iniPyramid;i<self.finPyramid;i++)
+            [pyramid.levelsToCalculate addObject:[NSNumber numberWithInt:i]];
+    });
+
     
     // Change the resulting orientation of the bounding boxes if the phone orientation requires it
     if(!self.isLearning && UIInterfaceOrientationIsLandscape(orientation)){
@@ -425,6 +431,7 @@ using namespace cv;
         self.weights = [aDecoder decodeObjectForKey:@"weights"];
         self.sizes = [aDecoder decodeObjectForKey:@"sizes"];
         self.name = [aDecoder decodeObjectForKey:@"name"];
+        self.classifierID = [aDecoder decodeObjectForKey:@"classifierID"];
         self.targetClasses = [aDecoder decodeObjectForKey:@"targetClasses"];
         self.numberSV = [aDecoder decodeObjectForKey:@"numberSV"];
         self.numberOfPositives = [aDecoder decodeObjectForKey:@"numberOfPositives"];
@@ -469,6 +476,7 @@ using namespace cv;
     [aCoder encodeObject:self.weights forKey:@"weights"];
     [aCoder encodeObject:self.sizes forKey:@"sizes"];
     [aCoder encodeObject:self.name forKey:@"name"];
+    [aCoder encodeObject:self.classifierID forKey:@"classifierID"];
     [aCoder encodeObject:self.targetClasses forKey:@"targetClasses"];
     [aCoder encodeObject:self.numberSV forKey:@"numberSV"];
     [aCoder encodeObject:self.numberOfPositives forKey:@"numberOfPositives"];
