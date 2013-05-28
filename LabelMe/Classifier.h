@@ -49,6 +49,8 @@
 @property (strong, nonatomic) NSNumber *detectionThreshold;
 
 
+@property BOOL trainCancelled;
+
 //Initialization of the classifier given the weight vectors of it
 - (id) initWithTemplateWeights:(double *)templateWeights;
 

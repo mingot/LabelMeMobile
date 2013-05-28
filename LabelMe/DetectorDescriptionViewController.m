@@ -180,7 +180,9 @@
         self.modalTVC = [[ModalTVC alloc] init];
         self.modalTVC.showCancelButton = YES;
         self.modalTVC.delegate = self;
-        self.modalTVC.modalTitle = @"Select Class";
+        self.modalTVC.modalTitle = @"New Detector";
+        self.modalTVC.modalSubtitle = @"1 of 2 select class(es)";
+        self.modalTVC.modalID = @"classes";
         self.modalTVC.multipleChoice = YES;
         self.modalTVC.data = self.availableObjectClasses;
         self.modalTVC.doneButtonTitle = @"Create";
@@ -250,8 +252,15 @@
     //show modal to select training positives for the selected class
     self.modalTVC = [[ModalTVC alloc] init];
     self.modalTVC.delegate = self;
-    self.modalTVC.modalTitle = @"Select Training Images";
+    if(self.firstTraingState == INITIATED){
+        self.modalTVC.modalTitle = @"New Detector";
+        self.modalTVC.modalSubtitle = @"2 of 2 select training image(es)";
+    }else{
+        self.modalTVC.modalTitle = @"Train Detector";
+        self.modalTVC.modalSubtitle = @"1 of 1 select training images";
+    }
     self.modalTVC.doneButtonTitle = @"Train";
+    self.modalTVC.modalID = @"images";
     self.modalTVC.multipleChoice = NO;
     self.availablePositiveImagesNames = nil; //to reset
     NSMutableArray *imagesList = [[NSMutableArray alloc] init];
@@ -275,6 +284,7 @@
 - (IBAction)infoAction:(id)sender
 {
     self.navigationController.navigationBarHidden = YES;
+    self.sendingView.sendingViewID = @"info";
     self.sendingView.hidden = NO;
     self.sendingView.cancelButton.hidden = NO;
     self.sendingView.progressView.hidden = YES;
@@ -344,8 +354,12 @@
 
 - (void) cancel
 {
-    self.sendingView.hidden = YES;
-    self.navigationController.navigationBarHidden = NO;
+    if([self.sendingView.sendingViewID isEqualToString:@"info"]){
+        self.sendingView.hidden = YES;
+        self.navigationController.navigationBarHidden = NO;
+    }else if([self.sendingView.sendingViewID isEqualToString:@"train"]){
+        self.svmClassifier.trainCancelled = YES;
+    }
 }
 
 #pragma mark -
@@ -370,7 +384,7 @@
 
 - (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
 {
-    if([identifier isEqualToString:@"Select Class"]){
+    if([identifier isEqualToString:@"classes"]){
         NSMutableArray *classes = [[NSMutableArray alloc] init];
         for(NSNumber *sel in selectedItems)
             [classes addObject:[self.availableObjectClasses objectAtIndex:sel.intValue]];
@@ -379,7 +393,7 @@
         self.svmClassifier.name = [NSString stringWithFormat:@"%@-Detector",className];
         self.svmClassifier.classifierID = [NSString stringWithFormat:@"%@%@",className,[self uuid]];
         
-    }else if([identifier isEqualToString:@"Select Training Images"]){
+    }else if([identifier isEqualToString:@"images"]){
         
         //not first training any more
         self.firstTraingState = NOT_FIRST;
@@ -400,12 +414,13 @@
         self.sendingView.hidden = NO;
         self.navigationController.navigationBarHidden = YES;
         [self.sendingView.activityIndicator startAnimating];
-        self.sendingView.cancelButton.hidden = YES;
-
+        self.sendingView.cancelButton.hidden = NO;
+        self.sendingView.sendingViewID = @"train";
+        
         //set hog dimension based on user preferences
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[self.resourcesPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
         int hog = [(NSNumber *)[dict objectForKey:@"hogdimension"] intValue];
-        if(hog==0) hog = 4; //minimum hog
+        if(hog==0) hog = 8; //if not set, defautl is template size of 8 cells height
         self.svmClassifier.maxHog = hog;
         
         //train in a different thread

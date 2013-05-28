@@ -152,6 +152,7 @@ using namespace cv;
 {
     NSDate *start = [NSDate date];
     free(self.weightsP);
+    self.trainCancelled = NO;
     self.isLearning = YES;
     self.imageListAux = [[NSMutableArray alloc] init];
     self.imagesHogPyramid = [[NSMutableArray alloc] init];
@@ -185,7 +186,7 @@ using namespace cv;
     numSupportVectors=0;
     BOOL firstTimeError = YES;
     
-    while(diff > STOP_CRITERIA && iter<10){
+    while(diff > STOP_CRITERIA && iter<10 && !self.trainCancelled){
 
         [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter++]];
         
@@ -207,6 +208,8 @@ using namespace cv;
         diff = [self computeDifferenceOfWeights];
         if(iter!=1) [self.delegate updateProgress:STOP_CRITERIA/diff];
     }
+    
+    if(self.trainCancelled) [self.delegate sendMessage:@"\n TRAINING INTERRUPTED \n"];
     
     //update information about the classifier
     self.numberSV = [NSNumber numberWithInt:numSupportVectors];

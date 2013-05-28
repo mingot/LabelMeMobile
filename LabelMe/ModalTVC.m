@@ -37,6 +37,7 @@
     [self.cancelButton highlightButton];
     self.tableView.layer.cornerRadius = 10;
     self.titleLabel.text = self.modalTitle;
+    self.subtitleLabel.text = self.modalSubtitle;
     self.tableView.backgroundView = nil;
     self.tableView.backgroundColor = [UIColor clearColor];
     if(!self.doneButtonTitle) self.doneButtonTitle = @"Done";
@@ -180,7 +181,7 @@
 - (IBAction)doneAction:(id)sender
 {    
     //send index of selected rows
-    [self.delegate userSlection:[[NSArray alloc] initWithArray:self.selectedItems] for:self.modalTitle];
+    [self.delegate userSlection:[[NSArray alloc] initWithArray:self.selectedItems] for:self.modalID];
     [self dismissModalViewControllerAnimated:YES];
 }
 
@@ -219,6 +220,7 @@
 - (void)viewDidUnload {
     [self setCancelButton:nil];
     [self setTitleLabel:nil];
+    [self setSubtitleLabel:nil];
     [super viewDidUnload];
 }
 @end

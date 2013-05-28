@@ -15,7 +15,7 @@
 @property (nonatomic, strong) NSMutableSet *levelsToCalculate;
 
 //hog feature for each level
-@property (nonatomic, strong) NSMutableArray *hogFeatures;
+@property (atomic, strong) NSMutableArray *hogFeatures;
 
 @property int numPyramids;
 

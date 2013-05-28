@@ -57,15 +57,24 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
                 
                 //text drawing
                 CGContextSetFillColorWithColor(context,color.CGColor);
+                CGFloat textBoxHeight = 20;
+                
+//                NSLog(@"(x,y)=(%f,%f), (w,h)=(%f,%f)",x,y,w,h);
+                //handle distinct orientations
                 if(self.frontCamera){
                     x = x + w;
                     w = abs(w);
+                }else if(!self.frontCamera && self.cameraOrientation == 3){
+                    CGFloat xaux=x;
+                    x=x+w;
+                    w=abs(w);
+                    textBoxHeight = w/2.0;
+                    w = 20*2.0;
                 }
                 
-                CGRect textBox = CGRectMake(x - 2, y - 20 - 2, w/2.0, 20);
+                CGRect textBox = CGRectMake(x - 2, y - 20 - 2, w/2.0, textBoxHeight);
                 CGContextFillRect(context, textBox);
                 CGContextSetFillColorWithColor(context,[UIColor blackColor].CGColor);
-//                [p.targetClass drawAtPoint:CGPointMake(xbox, y) withFont:[UIFont systemFontOfSize:20.0f]];
                 [p.targetClass drawInRect:textBox withFont:[UIFont systemFontOfSize:15]];
                 
                 // for the rest of boxes

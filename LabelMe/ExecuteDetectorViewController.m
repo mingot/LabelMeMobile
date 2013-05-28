@@ -96,7 +96,9 @@
 {
     [super viewDidLoad];
     
-    self.infoLabel.adjustsFontSizeToFitWidth = NO;
+    self.infoLabel.lineBreakMode = UILineBreakModeWordWrap;
+    self.infoLabel.numberOfLines = 0;
+    
     
     isUsingFrontFacingCamera = NO;
     fpsToShow = 0.0;
@@ -316,6 +318,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         if(self.fps) [screenLabelText appendString: [NSString stringWithFormat:@"FPS: %.1f\n",-1.0/[start timeIntervalSinceNow]]];
         if(self.scale) [screenLabelText appendString: [NSString stringWithFormat:@"scale: %d\n",level]];
         [self.infoLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithString:screenLabelText] waitUntilDone:YES];
+//        dispatch_sync(dispatch_get_main_queue(), ^{
+//            self.infoLabel.text = screenLabelText;
+//        });
 
     }
 }

@@ -38,6 +38,13 @@
 @property (nonatomic, strong) NSArray *labelsOrdered; //ordered labels names
 @property (nonatomic, strong) NSMutableDictionary *buttonsDictionary; //buttons stored to select all images when section name tapped
 
+@property BOOL cancelDownloading;
+
+
+//show/hide tabBarcontroller for the sending view
+- (void)hideTabBar:(UITabBarController *) tabbarcontroller;
+- (void)showTabBar:(UITabBarController *) tabbarcontroller;
+
 @end
 
 
@@ -111,17 +118,17 @@
 
             for(Box *box in boxes){
                 NSString *label;
-                if([box.label isEqualToString:@""]) label = @"None"; else label = box.label;
+                if([box.label isEqualToString:@""]) label = @"00None"; else label = box.label;
                 NSMutableArray *currentFilenames = (NSMutableArray *)[_labelsDictionary objectForKey:label];
                 if(!currentFilenames) currentFilenames = [[NSMutableArray alloc] init];
                 [currentFilenames addObject:filename];
                 [_labelsDictionary setObject:currentFilenames forKey:label];
             }
             if(boxes.count==0){ //no labels
-                NSMutableArray *currentFilenames = (NSMutableArray *)[_labelsDictionary objectForKey:@"None"];
+                NSMutableArray *currentFilenames = (NSMutableArray *)[_labelsDictionary objectForKey:@"00None"];
                 if(!currentFilenames) currentFilenames = [[NSMutableArray alloc] init];
                 [currentFilenames addObject:filename];
-                [_labelsDictionary setObject:currentFilenames forKey:@"None"];
+                [_labelsDictionary setObject:currentFilenames forKey:@"00None"];
             }
         }
     }
@@ -215,6 +222,7 @@
         self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Gallery" image:nil tag:0];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"home.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"homeActive.png"]];
 
+
     }
     return self;
 }
@@ -296,7 +304,8 @@
     [self.noImages setUserInteractionEnabled:YES];
     
     //sendingView 
-    self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
+    self.sendingView = [[SendingView alloc] initWithFrame:self.tabBarController.view.frame];
+//    NSLog(@"view height: %f, tabBarContorller height: %f", self.view.frame.size.height, self.tabBarController.view.frame.size.height);
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [self.sendingView setHidden:YES];
     self.sendingView.delegate = self;
@@ -620,7 +629,6 @@
 
 -(void)imageDidSelectedWithIndex:(int)selectedImage
 {
-    
     NSString *filename = (NSString *)[self.items objectAtIndex:selectedImage];
     
     //boxes
@@ -634,6 +642,7 @@
     //load tagVC
     [self.tagViewController setImage:image];
     [self.tagViewController setUsername:self.username];
+    self.tagViewController.items = self.items;
     [self.tagViewController.annotationView reset];
     [self.tagViewController.annotationView.objects setArray:boxes];
     [self.tagViewController setFilename:filename];
@@ -661,9 +670,8 @@
 
 -(IBAction)deleteAction:(id)sender
 {
-    NSString *str = nil;
-    if (self.selectedItems.count == 1)
-        str = @"Delete Selected Photo";
+    NSString *str;
+    if (self.selectedItems.count == 1) str = @"Delete Selected Photo";
     else str = [[NSString alloc] initWithFormat:@"Delete %d Selected Photos",self.selectedItems.count];
     
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:str otherButtonTitles:nil, nil];
@@ -675,19 +683,18 @@
 -(IBAction)sendAction:(id)sender
 {
     [self.selectedItemsSend addObjectsFromArray:self.selectedItems];
-    
     [self.sendingView.activityIndicator startAnimating];
     [self.sendingView setHidden:NO];
-    
-    [self.tabBarController.tabBar setUserInteractionEnabled:NO];
+    [self.sendingView setTotal:self.selectedItemsSend.count];
+    [self.sendingView.progressView setProgress:0];
+    self.sendingView.sendingViewID = @"upload";
+    [self hideTabBar:self.tabBarController];
 
     [self.editButton setEnabled:NO];
-    [self.sendingView setTotal:self.selectedItemsSend.count];
     photosWithErrors = 0;
     [self sendPhoto];
     [self.selectedItems removeAllObjects];
-    [self editAction:self.editButton];
-    
+    [self editAction: self.editButton];
 }
 
 
@@ -885,7 +892,7 @@
         }
         [self.sendingView reset];
         [self.sendingView setHidden:YES];
-        [self.tabBarController.tabBar setUserInteractionEnabled:YES];
+        [self showTabBar:self.tabBarController];
 
         [self.editButton setEnabled:YES];
         [self.sendingView.activityIndicator stopAnimating];
@@ -930,11 +937,10 @@
 {
     NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
     if (objects != nil) {
-        for (int i=0; i<objects.count; i++) {
+        for (int i=0; i<objects.count; i++)
             [[objects objectAtIndex:i] setSent:NO];
-        }
-        [NSKeyedArchiver archiveRootObject:objects toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
         
+        [NSKeyedArchiver archiveRootObject:objects toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
     }
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     NSNumber *newdictnum = [[NSNumber alloc]initWithInt:(-objects.count-1)];
@@ -969,6 +975,7 @@
     NSString *title;
     if(tableView.tag==0){
         NSString *label = [self.labelsOrdered objectAtIndex:section];
+        if([label isEqualToString:@"00None"]) label = @"None";
         NSArray *items = [self.labelsDictionary objectForKey:label];
         title = [NSString stringWithFormat:@"%@ (%d)", label, items.count];
     }else title = @"";
@@ -987,16 +994,14 @@
     headerLabel.text =  title;
     headerLabel.textColor = [UIColor whiteColor];
     
-    
     [customView addSubview:headerLabel];
 
-    
     return customView;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    return 30; //
+    return 30; 
 }
 
 
@@ -1006,14 +1011,6 @@
     else return 1;
 }
 
-//-(NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-//{
-//    if(tableView.tag==0){
-//        NSString *label = [self.labelsOrdered objectAtIndex:section];
-//        NSArray *items = [self.labelsDictionary objectForKey:label];
-//        return [NSString stringWithFormat:@"%@ (%d)", label, items.count];
-//    }else return @"";
-//}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -1041,7 +1038,6 @@
             [self.selectedItemsDelete addObject:[self.items objectAtIndex:indexPath.row]];
             if (self.selectedItemsDelete.count == 1)
                 [self deletePhotoAndAnnotation];
-
         }
 }
 
@@ -1141,15 +1137,12 @@
 {
     if (tableView.tag == 0) return NO;
     
-    else{
-        UIButton *button =  (UIButton *)[[tableView cellForRowAtIndexPath:indexPath].contentView viewWithTag:indexPath.row+10];
-        if (([button.titleLabel.text length]>0) && (![tableView isEditing]))
-            button.hidden = NO;
+    UIButton *button =  (UIButton *)[[tableView cellForRowAtIndexPath:indexPath].contentView viewWithTag:indexPath.row+10];
+    
+    if (([button.titleLabel.text length]>0) && (![tableView isEditing])) button.hidden = NO;
+    else button.hidden = YES;
 
-        else button.hidden = YES;
-
-        return YES;
-    }
+    return YES;
 }
 
 
@@ -1165,16 +1158,24 @@
 #pragma mark SendingView
 -(void)cancel
 {
-    [self.serverConnection cancelRequestFor:0];
-    [self.selectedItemsSend removeAllObjects];
-    [self.sendingView reset];
-    [self.sendingView.progressView setProgress:0];
-    [self.sendingView setHidden:YES];
-    [self.tabBarController.tabBar setUserInteractionEnabled:YES];
-
-    [self.editButton setEnabled:YES];
-    [self.sendingView.activityIndicator stopAnimating];
+    if([self.sendingView.sendingViewID isEqualToString:@"upload"]){
+        [self.serverConnection cancelRequestFor:0];
+        [self.selectedItemsSend removeAllObjects];
+        [self.editButton setEnabled:YES];
+        
+        [self.sendingView reset];
+        [self showTabBar:self.tabBarController];
+        [self.sendingView setHidden:YES];
+        [self.sendingView.activityIndicator stopAnimating];
+        [self reloadGallery];
     
+    }else if([self.sendingView.sendingViewID isEqualToString:@"download"]){
+        NSLog(@"Cancel download!!");
+        self.cancelDownloading = YES;
+    }
+    
+
+
 }
 
 
@@ -1185,41 +1186,22 @@
 
 - (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier
 {
-    dispatch_queue_t queue = dispatch_queue_create("DownloadQueue", NULL);
-
     //sending view preparation
-//    self.navigationController.navigationBarHidden = YES;
-    self.sendingView.total = selectedItems.count;
+    [self hideTabBar:self.tabBarController];
     [self.sendingView setHidden:NO];
+    self.sendingView.cancelButton.hidden = NO;
     [self.sendingView.activityIndicator startAnimating];
     [self.sendingView.progressView setProgress:0];
+    self.sendingView.textView.text = @"Download initiated";
+    self.sendingView.sendingViewID = @"download";
     
-    
-    //get the images when the label is choosen
-    NSMutableArray *newIndexes = [[NSMutableArray alloc] init];
-    if([identifier isEqualToString:@"Choose Labels"]){
-        NSArray *labels = [self.downloadedLabelsMap allKeys];
-        for(NSNumber *select in selectedItems){
-            NSString *label = [labels objectAtIndex:select.intValue];
-            NSArray *indexes = [self.downloadedLabelsMap objectForKey:label];
-            [newIndexes addObjectsFromArray:indexes];
-        }
-        newIndexes = [[[NSSet setWithArray:newIndexes] allObjects] mutableCopy];
-        
-        selectedItems = newIndexes;
-        self.sendingView.total = selectedItems.count;
-    }
-    
-
-    
-//    dispatch_apply(count, queue, ^(size_t i) {
-//        printf("%u\n",i);
-//    });
-    
+    self.cancelDownloading = NO;
+    dispatch_queue_t queue = dispatch_queue_create("DownloadQueue", NULL);
     dispatch_async(queue, ^(void){
-        __block int i=0;
-        for(NSNumber *selectedIndex in selectedItems){ //for each image selected
         
+        for(int i=0;i<selectedItems.count && !self.cancelDownloading; i++){ //for each image selected
+            
+            NSNumber *selectedIndex = [selectedItems objectAtIndex:i];
             NSString *imageName = [self.downloadedImageNames objectAtIndex:selectedIndex.intValue];
             
             //Save thumbnail
@@ -1230,42 +1212,49 @@
             NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
             [NSKeyedArchiver archiveRootObject:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue] toFile:pathObject];
 
-            
             //download and save images 
             UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[self.downloadedImageUrls objectAtIndex:selectedIndex.intValue]]]];
 
             NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
             [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
             
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [self.tagViewController setImage:image];
-                [self.tagViewController setUsername:self.username];
-                [self.tagViewController.annotationView reset];
-                [self.tagViewController.annotationView.objects setArray:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue]];
-                [self.tagViewController setFilename:imageName];
-                self.tagViewController.forThumbnailUpdating = YES;
-                [self.navigationController pushViewController:self.tagViewController animated:NO];
-                
-                [self.sendingView incrementNum];
-                [self.sendingView.progressView setProgress:i*1.0/selectedItems.count];
-                i++;
-            });
+            if(!self.cancelDownloading){
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    [self.tagViewController setImage:image];
+                    [self.tagViewController setUsername:self.username];
+                    [self.tagViewController.annotationView reset];
+                    [self.tagViewController.annotationView.objects setArray:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue]];
+                    [self.tagViewController setFilename:imageName];
+                    self.tagViewController.forThumbnailUpdating = YES;
+                    [self.navigationController pushViewController:self.tagViewController animated:NO];
+                    
+                    self.sendingView.textView.text = [NSString stringWithFormat:@"Downloading from LabelMe Server... %d/%d",i+1,selectedItems.count];
+                    [self.sendingView.progressView setProgress:(i+1)*1.0/selectedItems.count];
+                });
+            }
+            
         }
-        
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [self reloadGallery];
-            self.sendingView.hidden = YES;
-            self.navigationController.navigationBarHidden = NO;
-            self.tableViewGrid.hidden = NO;
-            [self.sendingView.activityIndicator stopAnimating];
-            [self.sendingView reset];
+            if(self.cancelDownloading){
+                self.sendingView.textView.text = @"Download cancelled.";
+                [self performSelector:@selector(hideSendingiew) withObject:nil afterDelay:1];
+            }else [self hideSendingiew];
         });
-        
+
     });
     
     dispatch_release(queue);
-
 }
+
+- (void) hideSendingiew
+{
+    [self reloadGallery];
+    self.sendingView.hidden = YES;
+    [self showTabBar:self.tabBarController];
+    self.tableViewGrid.hidden = NO;
+    [self.sendingView.activityIndicator stopAnimating];
+}
+
 
 -(void) selectionCancelled{}
 
@@ -1279,6 +1268,40 @@
     [self setCameraButton:nil];
     [self setActivityIndicator:nil];
     [super viewDidUnload];
+}
+
+// Method implementations
+- (void)hideTabBar:(UITabBarController *) tabbarcontroller
+{
+    self.navigationController.navigationBarHidden = YES;
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:0.5];
+    
+    for(UIView *view in tabbarcontroller.view.subviews){
+        if([view isKindOfClass:[UITabBar class]])
+            [view setFrame:CGRectMake(view.frame.origin.x, 480, view.frame.size.width, view.frame.size.height)];
+        
+        else [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, 480)];
+    }
+    
+    [UIView commitAnimations];
+}
+
+- (void)showTabBar:(UITabBarController *) tabbarcontroller
+{
+    self.navigationController.navigationBarHidden = NO;
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:0.5];
+    for(UIView *view in tabbarcontroller.view.subviews)
+    {
+        if([view isKindOfClass:[UITabBar class]])
+            [view setFrame:CGRectMake(view.frame.origin.x, 431, view.frame.size.width, view.frame.size.height)];
+        
+        else [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, 431)];
+        
+    }
+    
+    [UIView commitAnimations];
 }
 
 @end

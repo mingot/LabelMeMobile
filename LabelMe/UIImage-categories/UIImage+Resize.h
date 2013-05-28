@@ -31,7 +31,6 @@
                                   bounds:(CGSize)bounds
                     interpolationQuality:(CGInterpolationQuality)quality;
 
-- (UIImage *)fixOrientation;
 
 - (UIImage *)scaleImageTo:(double) scale;
 

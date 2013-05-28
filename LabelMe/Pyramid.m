@@ -25,9 +25,7 @@
 
 @implementation Pyramid
 
-
 @synthesize hogFeatures = _hogFeatures;
-@synthesize levelsToCalculate = _levelsToCalculate;
 
 #pragma mark -
 #pragma mark Initialization
@@ -41,10 +39,10 @@
     return _hogFeatures;
 }
 
-//- (void) setHogFeatures:(NSMutableArray *)hogFeatures
-//{
-//    _hogFeatures = hogFeatures;
-//}
+- (void) setHogFeatures:(NSMutableArray *)hogFeatures
+{
+    _hogFeatures = hogFeatures;
+}
 
 
 - (NSMutableSet *) levelsToCalculate
@@ -57,10 +55,6 @@
     return _levelsToCalculate;
 }
 
-//- (void) setLevelsToCalculate:(NSMutableSet *)levelsToCalculate
-//{
-//    _levelsToCalculate = levelsToCalculate;
-//}
 
 - (id) initWithClassifiers:(NSArray *)svmClassifiers forNumPyramids:(int)numPyramids
 {

@@ -164,6 +164,7 @@
 		FC4B0A31172F358600A099A0 /* train.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2E172F358600A099A0 /* train.png */; };
 		FC4B0A32172F358600A099A0 /* save.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2F172F358600A099A0 /* save.png */; };
 		FC4B0A33172F358600A099A0 /* execute.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A30172F358600A099A0 /* execute.png */; };
+		FC4C5E1D174D63D100D26331 /* UIImage+Rotation.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */; };
 		FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC4D68801716164E002A73AD /* CoreMotion.framework */; };
 		FC4EE0F617231A1700536B4A /* CameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4EE0F417231A1700536B4A /* CameraViewController.m */; };
 		FC4EE0F717231A1700536B4A /* CameraViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC4EE0F517231A1700536B4A /* CameraViewController.xib */; };
@@ -439,6 +440,8 @@
 		FC4B0A2E172F358600A099A0 /* train.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = train.png; sourceTree = "<group>"; };
 		FC4B0A2F172F358600A099A0 /* save.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = save.png; sourceTree = "<group>"; };
 		FC4B0A30172F358600A099A0 /* execute.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = execute.png; sourceTree = "<group>"; };
+		FC4C5E1B174D63D100D26331 /* UIImage+Rotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Rotation.h"; sourceTree = "<group>"; };
+		FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Rotation.m"; sourceTree = "<group>"; };
 		FC4D68801716164E002A73AD /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		FC4D6890171A37E4002A73AD /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		FC4EE0F317231A1700536B4A /* CameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraViewController.h; sourceTree = "<group>"; };
@@ -578,6 +581,8 @@
 				A5480D7A1617A364009F630D /* UIImage+Alpha.m */,
 				A5480D7B1617A364009F630D /* UIImage+Resize.h */,
 				A5480D7C1617A364009F630D /* UIImage+Resize.m */,
+				FC4C5E1B174D63D100D26331 /* UIImage+Rotation.h */,
+				FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */,
 				FC8E89AF173930340018876D /* UIImage+Border.h */,
 				FC8E89B0173930340018876D /* UIImage+Border.m */,
 				A5480D7D1617A364009F630D /* UIImage+RoundedCorner.h */,
@@ -1345,6 +1350,7 @@
 				FC9F94EF1745232C0004598C /* EditableTableViewCell.m in Sources */,
 				FC9F94F01745232C0004598C /* UITableView+TextFieldAdditions.m in Sources */,
 				FC74F8D3174A54FE004701CC /* Pyramid.m in Sources */,
+				FC4C5E1D174D63D100D26331 /* UIImage+Rotation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

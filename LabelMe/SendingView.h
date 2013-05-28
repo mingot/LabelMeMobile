@@ -27,14 +27,15 @@
 
 @property (nonatomic, weak) id <SendingViewDelegate> delegate;
 
-@property (strong, nonatomic)  UIProgressView *progressView;
+//view
+@property (strong, nonatomic) UIProgressView *progressView;
 @property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
-@property (strong, nonatomic) UIButton *cancelButton;
 @property (strong, nonatomic) UITextView *textView;
+@property (strong, nonatomic) UIButton *cancelButton;
 
-@property (nonatomic, strong) NSString *filename;
 
-
+@property (strong, nonatomic) NSString *filename;
+@property (strong, nonatomic) NSString *sendingViewID; //to identify
 
 
 

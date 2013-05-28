@@ -8,34 +8,22 @@
 
 #import <UIKit/UIKit.h>
 #import "ServerConnection.h"
-@protocol CreateAccountDelegate <NSObject>
 
+
+@protocol CreateAccountDelegate <NSObject>
 @optional
 -(void)signIn;
-
-
 @end
 
-@interface CreateAccountViewController : UIViewController <UITextFieldDelegate, ServerConnectionDelegate>{
-    
-    
-     UITextField    *_usernameField;
-     UITextField    *_passwordField;
-     UITextField    *_biologicalNameField;
-     UITextField    *_emailField;
-     UITextField    *_institutionField;
-     UIToolbar      *_topToolBar;
-     UIScrollView   *_scrollView;
-    UIToolbar               *_keyboardToolbar;
-    
-    BOOL                      keyboardVisible;
-    UITextField             * currentTextField;
-    UITabBarController      *_tabBarController;
-    
-    
-    
-    
+
+
+@interface CreateAccountViewController : UIViewController <UITextFieldDelegate, ServerConnectionDelegate>
+{
+    BOOL keyboardVisible;
+    UITextField* currentTextField;
 }
+
+
 @property (nonatomic,strong) id <CreateAccountDelegate> delegate;
 @property (nonatomic,strong) IBOutlet UITextField *usernameField;
 @property (nonatomic,strong) IBOutlet UITextField *passwordField;
@@ -49,9 +37,6 @@
 
 @property (nonatomic,strong) UITabBarController   *tabBarController;
 
-
-#pragma mark -
-#pragma mark Methods
 
 -(void)keyboardDidShow:(NSNotification *)notif;
 -(void)keyboardDidHide:(NSNotification *)notif;

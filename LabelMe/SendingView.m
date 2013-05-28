@@ -26,19 +26,13 @@
 
         self.activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(self.progressView.frame.origin.x, self.progressView.frame.origin.y + self.progressView.frame.size.height+10, 20, 20)];
         self.backgroundColor = [UIColor colorWithRed:10/255.0f green:10/255.0f blue:10/255.0f alpha:0.8];
-    
-        
-        //label
-//        self.label = [[UILabel alloc] initWithFrame:CGRectMake(self.activityIndicator.frame.origin.x + self.activityIndicator.frame.size.width + 10, self.activityIndicator.frame.origin.y, (self.progressView.frame.size.width - self.activityIndicator.frame.size.width - 20), 100)];
-
         
         //text view
-        self.textView = [[UITextView alloc] initWithFrame:CGRectMake(0,self.progressView.frame.origin.y + 50,320,300)];
+        self.textView = [[UITextView alloc] initWithFrame:CGRectMake(0,self.progressView.frame.origin.y + 50,320,290)];
         self.textView.backgroundColor = [UIColor clearColor];
         self.textView.textColor = [UIColor whiteColor];
         self.textView.textAlignment = NSTextAlignmentCenter;
         self.textView.text = @"";
-        
         
         //cancel button
         self.cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -62,7 +56,7 @@
 }
 
 
--(void)setTotal:(int) i
+-(void)setTotal:(int)i
 {
     total=i;
     if (total>0) [self.textView setText:[NSString stringWithFormat:@"Uploading to LabelMe server... %d/%d",num,total]];

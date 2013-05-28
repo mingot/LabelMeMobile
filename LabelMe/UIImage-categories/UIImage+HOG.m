@@ -8,6 +8,7 @@
 
 #import "UIImage+HOG.h"
 #import "UIImage+Resize.h"
+#import "UIImage+Rotation.h"
 
 #define PI 3.14159265
 #define eps 0.00001

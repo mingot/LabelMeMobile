@@ -11,30 +11,14 @@
 #import "NSObject+ShowAlert.h"
 #import "NSObject+Folders.h"
 
-@interface CreateAccountViewController ()
 
-@end
 
 @implementation CreateAccountViewController
-@synthesize usernameField = _usernameField;
-@synthesize passwordField = _passwordField;
-@synthesize biologicalNameField = _biologicalNameField;
-@synthesize emailField = _emailField;
-@synthesize institutionField = _institutionField;
-@synthesize keyboardToolbar = _keyboardToolbar;
-@synthesize topToolbar = _topToolBar;
-@synthesize scrollView = _scrollView;
-@synthesize tabBarController = _tabBarController;
+
+
 #pragma mark -
 #pragma mark Initialitation
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
+
 
 - (void)viewDidLoad
 {
@@ -87,7 +71,6 @@
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
     
     keyboardVisible = NO;
-    
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
@@ -100,10 +83,10 @@
 }
 #pragma mark -
 #pragma mark Keyboard Events
--(void)keyboardDidShow:(NSNotification *)notif{
-    if (keyboardVisible) {
-		return;
-	}
+-(void)keyboardDidShow:(NSNotification *)notif
+{
+    
+    if (keyboardVisible) return;
 	
 	// The keyboard wasn't visible before
 	
@@ -123,43 +106,44 @@
 	
 	self.scrollView.frame = viewFrame;
 	keyboardVisible = YES;
-    
-    
-    
-    
 }
--(void)keyboardDidHide:(NSNotification *)notif{
+
+
+-(void)keyboardDidHide:(NSNotification *)notif
+{
+    if (!keyboardVisible) return;
     
-    if (!keyboardVisible) {
-        return;
-    }
     CGRect viewFrame = self.view.frame;
     viewFrame.origin.y = self.scrollView.frame.origin.y;
     viewFrame.size.height = viewFrame.size.height - self.topToolbar.frame.size.height;
     self.scrollView.frame = viewFrame;
     keyboardVisible = NO;
 }
+
+
 #pragma mark -
 #pragma mark IBActions
 
--(IBAction)createAccountAction:(id)sender{
+-(IBAction)createAccountAction:(id)sender
+{
     if ([self checkValidity]) {
         ServerConnection *serverConnection = [[ServerConnection alloc]init];
         serverConnection.delegate = self;
         NSArray *fields = [[NSArray alloc] initWithObjects:self.biologicalNameField.text,self.institutionField.text,self.usernameField.text,self.passwordField.text,self.emailField.text, nil];
         [serverConnection createAccountWithFields:fields];
-       // [self dismissViewControllerAnimated:YES completion:NULL];
         
-    }
-    else{
-        [self errorWithTitle:@"" andDescription:@"Please, check the fields. Only letters and numbers allowed."];
+    }else [self errorWithTitle:@"" andDescription:@"Please, check the fields. Only letters and numbers allowed."];
 
-    }
+    
 }
--(IBAction)cancelButtonAction:(id)sender{
+
+-(IBAction)cancelButtonAction:(id)sender
+{
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
--(IBAction)nextFieldAction:(id)sender{
+
+-(IBAction)nextFieldAction:(id)sender
+{
     UIBarButtonItem * nextButton = [[self.keyboardToolbar items] objectAtIndex:1];
     UIBarButtonItem * previousButton = [[self.keyboardToolbar items] objectAtIndex:0];
     switch (currentTextField.tag) {
@@ -189,7 +173,9 @@
             break;
     }
 }
--(IBAction)previousAction:(id)sender{
+
+-(IBAction)previousAction:(id)sender
+{
     UIBarButtonItem * nextButton = [[self.keyboardToolbar items] objectAtIndex:1];
     UIBarButtonItem * previousButton = [[self.keyboardToolbar items] objectAtIndex:0];
     switch (currentTextField.tag) {
@@ -222,26 +208,25 @@
 
     
 }
--(IBAction)cancelAction:(id)sender{
-    
-    [currentTextField resignFirstResponder];
 
-    
+-(IBAction)cancelAction:(id)sender
+{
+    [currentTextField resignFirstResponder];
 }
--(IBAction)valueChanged:(id)sender{
+
+-(IBAction)valueChanged:(id)sender
+{
     UIBarButtonItem * doneButton = [[self.keyboardToolbar items] objectAtIndex:4];
     
     if ((self.passwordField.text.length*self.usernameField.text.length*self.biologicalNameField.text.length*self.emailField.text.length*self.institutionField.text.length)==0) {
         [doneButton setEnabled:NO];
     }
-    else{
-        [doneButton setEnabled:YES];
-    }
-    
+    else [doneButton setEnabled:YES];
 }
+
+
 #pragma mark -
 #pragma mark Previous Session Methods
-
 
 -(BOOL)saveSessionWithUsername:(NSString *) username andPassword:(NSString *) password{
     NSError *error;
@@ -253,6 +238,8 @@
     }
     return NO;
 }
+
+
 #pragma mark -
 #pragma mark Check Fields Validity
 
@@ -273,6 +260,7 @@
 
 #pragma mark -
 #pragma mark Text Field Delegate Methods
+
 -(void)textFieldDidBeginEditing:(UITextField *)textField{
     currentTextField = textField;
     UIBarButtonItem * nextButton = [[self.keyboardToolbar items] objectAtIndex:1];
@@ -280,18 +268,18 @@
     if (currentTextField.tag == 4) {
         nextButton.enabled = NO;
         previousButton.enabled = YES;
-    }
-    else if(currentTextField.tag == 0){
+        
+    }else if(currentTextField.tag == 0){
         nextButton.enabled = YES;
         previousButton.enabled = NO;
         
-    }
-    else{
+    }else{
         nextButton.enabled = YES;
         previousButton.enabled = YES;
     }
 
 }
+
 #pragma mark -
 #pragma mark ServerConnectionDelegate Methods
 -(void)createAccountComplete{
@@ -301,15 +289,11 @@
         [self.delegate signIn];
 
     }
-    else{
-        [self errorWithTitle:@"Unknown error" andDescription:@""];
-    }
-        
-    
-
-
+    else [self errorWithTitle:@"Unknown error" andDescription:@""];
 }
--(void)createAccountError{
+
+-(void)createAccountError
+{
 }
 
 

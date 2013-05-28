@@ -15,29 +15,10 @@
 
 @interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, UIScrollViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate,UITextFieldDelegate>
 {
-    
-     UIScrollView *         _scrollView;
-     UITextField *          _label;
-     UIBarButtonItem *      _addButton;
-     UIBarButtonItem *      _deleteButton;
-     UIBarButtonItem *      _sendButton;
-    UIBarButtonItem *       _flexibleSpace;
-    UIImageView *                   _imageView;
-    //NSArray *                       _colorArray;
-    NSString *                      _filename;
-    NSArray *                       _paths;
-    TagView *                       _annotationView;
+    UIBarButtonItem *_flexibleSpace;
     int numImages;
-    BOOL                             keyboardVisible;
-    //BOOL                             gallery;
-    NSString * _username;
-    
-    UIView              *_composeView;
-    UIBarButtonItem  *_labelsButton;
-    CGSize              labelSize;
-    UIToolbar           *_bottomToolbar;
-    UITableView *_labelsView;
-    SendingView *_sendingView;
+    BOOL keyboardVisible;
+    CGSize labelSize;
     ServerConnection *sConnection;
     UIButton *labelsButtonView;
     UIButton *tip;
@@ -60,6 +41,8 @@
 @property (strong,nonatomic) NSString *username;
 @property (strong,nonatomic) UIView *composeView;
 @property (strong,nonatomic) SendingView *sendingView;
+
+@property (strong, nonatomic) NSArray *items;
 
 @property BOOL forThumbnailUpdating;
 

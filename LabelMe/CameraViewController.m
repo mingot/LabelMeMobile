@@ -8,6 +8,8 @@
 
 #import <ImageIO/ImageIO.h>
 #import "CameraViewController.h"
+#import "UIImage+Resize.h"
+#import "UIImage+Rotation.h"
 
 
 @interface CameraViewController ()
@@ -20,16 +22,6 @@
 
 
 @implementation CameraViewController
-
-//@synthesize delegate = _delegate;
-//@synthesize captureSession = _captureSession;
-//@synthesize prevLayer = _prevLayer;
-//
-////private
-//@synthesize isUsingFrontFacingCamera = _isUsingFrontFacingCamera;
-//@synthesize numberImages = _numberImages;
-
-
 
 - (void)viewDidLoad
 {
@@ -110,20 +102,23 @@
 {
     
 	AVCaptureConnection *videoConnection = nil;
+    
 	for (AVCaptureConnection *connection in self.stillImageOutput.connections){
 		for (AVCaptureInputPort *port in [connection inputPorts])
 			if ([[port mediaType] isEqual:AVMediaTypeVideo] ){
 				videoConnection = connection;
+                [videoConnection setVideoOrientation:[UIDevice currentDevice].orientation];
 				break;
 			}
 		if (videoConnection) break; 
 	}
 	
+    
 	[self.stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler: ^(CMSampleBufferRef imageSampleBuffer, NSError *error){
         
         
-         NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
-         UIImage *image = [[UIImage alloc] initWithData:imageData];
+        NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
+        UIImage *image = [[UIImage alloc] initWithData:imageData];
         
         self.thumbnailCaptureImageView.image = image;
         self.numberImages++;

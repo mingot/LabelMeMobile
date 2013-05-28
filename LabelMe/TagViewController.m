@@ -20,6 +20,9 @@
 #import "UIButton+CustomViews.h"
 
 
+
+
+
 @implementation TagViewController
 
 @synthesize  scrollView = _scrollView;
@@ -65,7 +68,7 @@
 
     [super viewDidLoad];
     self.title = @"Annotation Tool";
-
+    
     //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
     UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"] ;
@@ -120,6 +123,14 @@
     [self.composeView addSubview:self.annotationView];
     [self.scrollView addSubview:self.label];
 
+    //Swipe gesture recognizer: for both directions the same target
+     UISwipeGestureRecognizer *swipeLeftRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeAction:)];
+    [swipeLeftRecognizer setDirection:UISwipeGestureRecognizerDirectionLeft];
+    [self.scrollView addGestureRecognizer:swipeLeftRecognizer];
+    UISwipeGestureRecognizer *swipeRightRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeAction:)];
+    [swipeRightRecognizer setDirection:UISwipeGestureRecognizerDirectionRight];
+    [self.scrollView addGestureRecognizer:swipeRightRecognizer];
+    
     [self.deleteButton setStyle:UIBarButtonItemStyleBordered];
 
     [self.labelsView setBackgroundColor:[UIColor clearColor]];
@@ -178,19 +189,25 @@
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
     
-    [self selectedAnObject:NO];
-
-    if (self.annotationView.objects.count >0)
-        [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-        
-
+    //check if enabled connection
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     NSNumber *dictnum  = [dict objectForKey:self.filename];
     if (dictnum.intValue == 0)
         [self.sendButton setEnabled:NO];
     
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidHide:) name:UIKeyboardDidHideNotification object:nil];
+    
+    [self onTimeLoad]; //for use later
+    
+    if(self.forThumbnailUpdating) {self.forThumbnailUpdating=NO; [self.navigationController popViewControllerAnimated:NO];}
+}
+
+- (void) onTimeLoad
+{
+    [self selectedAnObject:NO];
+    if (self.annotationView.objects.count >0)
+        [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
     
     //check for all the boxes have the correct size (correction for the downloaded boxes)
     for(Box* box in self.annotationView.objects){
@@ -203,11 +220,8 @@
         box->LOWERBOUND = frameHeight;
     }
     
-    
     [self.annotationView setNeedsDisplay];
 	keyboardVisible = NO;
-    
-    if(self.forThumbnailUpdating) {self.forThumbnailUpdating=NO; [self.navigationController popViewControllerAnimated:NO];}
 }
 
 - (void) viewWillDisappear:(BOOL)animated
@@ -277,6 +291,7 @@
     [self.scrollView scrollRectToVisible:self.label.frame animated:YES];
 	keyboardVisible = YES;
 }
+
 - (void) keyboardDidHide:(NSNotification *)notif
 {
     [self.scrollView setScrollEnabled:NO];
@@ -396,8 +411,6 @@
             
             box.label= self.label.text;
             [box.label replaceByUnderscore];
-
-            // [str release];
         
            if (![self.label.text isEqualToString:@""]) { 
             for (int i=0; i<self.annotationView.objects.count; i++) {
@@ -415,14 +428,10 @@
            }
             [self objectModified];
         }
-   // }
-    
-    //[box release];
-    
     [self.annotationView setNeedsDisplay];
-
-    
 }
+
+
 -(IBAction)doneAction:(id)sender{
     //Aqui falta guardar la foto y los rectángulos.
     [self.scrollView setZoomScale:1.0 animated:NO];
@@ -442,7 +451,6 @@
     [self.sendingView setHidden:NO];
     [self.sendingView.progressView setProgress:0];
     [self.sendingView.activityIndicator startAnimating];
-    //[self performSelectorInBackground:@selector(sendPhoto) withObject:nil];
     [self.scrollView setZoomScale:1.0 animated:NO];
     [self.annotationView setLINEWIDTH:1.0];
     [self sendPhoto];
@@ -451,7 +459,6 @@
 }
 -(IBAction)labelAction:(id)sender{
     
-
     //self.navigationItem.rightBarButtonItems = nil;
     
     /*UIBarButtonItem *labelBar = [[UIBarButtonItem alloc] initWithCustomView:self.label];
@@ -471,7 +478,6 @@
 }
 -(IBAction)listAction:(id)sender
 {
-    
     [self.labelsView reloadData];
     if (self.labelsView.hidden) {
     
@@ -495,6 +501,38 @@
     [self.labelsView setHidden:!self.labelsView.hidden];
     
 }
+
+- (IBAction)swipeAction:(id)sender
+{
+    UISwipeGestureRecognizer *swipe = (UISwipeGestureRecognizer *) sender;
+    
+    int increase = 2*swipe.direction-3;
+    NSUInteger currentIndex = [self.items indexOfObject:self.filename];
+    NSString *filename = (NSString *)[self.items objectAtIndex:(currentIndex+increase)%self.items.count];
+    
+    //boxes
+    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
+    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
+    
+    //image
+    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
+    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
+    
+    //load tagVC
+    [self setImage:image];
+    [self.annotationView reset];
+    [self.annotationView.objects setArray:boxes];
+    [self setFilename:filename];
+    
+    [self onTimeLoad];
+    
+    //save boxes
+    [self saveThumbnail];
+    [self saveDictionary];
+}
+
+
+
 
 #pragma mark -
 #pragma mark ActionSheetDelegate Methods
