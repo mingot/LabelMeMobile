@@ -42,4 +42,7 @@
 + (void) setLINEWIDTH:(float)value;
 - (void) generateDateString;
 
+//returns the CGRect of the Box
+- (CGRect) getRectangleForBox;
+
 @end

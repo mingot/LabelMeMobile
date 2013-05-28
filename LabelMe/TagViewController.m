@@ -353,8 +353,9 @@
 
 #pragma mark -
 #pragma mark IBAction Method
--(IBAction)addAction:(id)sender{
 
+-(IBAction)addAction:(id)sender
+{
    // int num = [self.annotationView numLabels];
     int num = self.annotationView.objects.count;
     //NSLog(@"addaction: numlabels,%d",self.annotationView.numLabels);
@@ -368,8 +369,6 @@
     box.color=[[self.annotationView colorArray] objectAtIndex:(num%8)];
     [[self.annotationView objects] addObject:box];
     [self.annotationView setSelectedBox:num];
-
-    
 
     num++;
     //[self.annotationView setNumLabels:num];
@@ -434,18 +433,15 @@
 }
 
 
--(IBAction)doneAction:(id)sender{
-    //Aqui falta guardar la foto y los rectángulos.
+-(IBAction)doneAction:(id)sender
+{
     [self.scrollView setZoomScale:1.0 animated:NO];
     [self saveThumbnail];
     [self saveDictionary];
     [self.imageView setImage:nil];
     [self dismissViewControllerAnimated:NO completion:NULL];
-    
-    //[self.annotationView setObjects:nil];
-    
-    
 }
+
 -(IBAction)sendAction:(id)sender{
     
     [self saveAnnotation];
@@ -459,6 +455,7 @@
     
     
 }
+
 -(IBAction)labelAction:(id)sender{
     
     //self.navigationItem.rightBarButtonItems = nil;
@@ -467,6 +464,7 @@
     self.navigationItem.rightBarButtonItem =labelBar;*/
 
 }
+
 -(IBAction)deleteAction:(id)sender{
     if(([self.annotationView SelectedBox]!=-1)&&(!keyboardVisible)){
         UIActionSheet *actionSheet = [[UIActionSheet alloc]  initWithTitle:@"" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Object" otherButtonTitles:nil, nil];
@@ -474,10 +472,8 @@
         //[actionSheet showFromToolbar:self.bottomToolbar];
         [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
     }
-   
-    
-    
 }
+
 -(IBAction)listAction:(id)sender
 {
     [self.labelsView reloadData];
@@ -654,7 +650,6 @@
     if([[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil]) return YES;
     else return NO;
 }
-
 
 -(void)saveImage:(UIImage *)image
 {

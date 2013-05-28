@@ -45,6 +45,9 @@
 - (void)hideTabBar:(UITabBarController *) tabbarcontroller;
 - (void)showTabBar:(UITabBarController *) tabbarcontroller;
 
+//generate thumbnail image with the boxes from an image given
+- (UIImage *) thumbnailImageFromImage:(UIImage *)image withBoxes:(NSArray *)boxes;
+
 @end
 
 
@@ -1169,13 +1172,8 @@
         [self.sendingView.activityIndicator stopAnimating];
         [self reloadGallery];
     
-    }else if([self.sendingView.sendingViewID isEqualToString:@"download"]){
-        NSLog(@"Cancel download!!");
+    }else if([self.sendingView.sendingViewID isEqualToString:@"download"])
         self.cancelDownloading = YES;
-    }
-    
-
-
 }
 
 
@@ -1203,35 +1201,26 @@
             
             NSNumber *selectedIndex = [selectedItems objectAtIndex:i];
             NSString *imageName = [self.downloadedImageNames objectAtIndex:selectedIndex.intValue];
-            
-            //Save thumbnail
-            NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:imageName];
-            [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation([self.downloadedThumbnails objectAtIndex:selectedIndex.intValue], 1.0) attributes:nil];
-            
+                        
             //Save annotation
             NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
             [NSKeyedArchiver archiveRootObject:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue] toFile:pathObject];
 
-            //download and save images 
+            //download and save image 
             UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[self.downloadedImageUrls objectAtIndex:selectedIndex.intValue]]]];
-
             NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
             [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
             
-            if(!self.cancelDownloading){
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    [self.tagViewController setImage:image];
-                    [self.tagViewController setUsername:self.username];
-                    [self.tagViewController.annotationView reset];
-                    [self.tagViewController.annotationView.objects setArray:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue]];
-                    [self.tagViewController setFilename:imageName];
-                    self.tagViewController.forThumbnailUpdating = YES;
-                    [self.navigationController pushViewController:self.tagViewController animated:NO];
-                    
-                    self.sendingView.textView.text = [NSString stringWithFormat:@"Downloading from LabelMe Server... %d/%d",i+1,selectedItems.count];
-                    [self.sendingView.progressView setProgress:(i+1)*1.0/selectedItems.count];
-                });
-            }
+            //Save thumbnail
+            UIImage *thumbnailImage = [self thumbnailImageFromImage:image withBoxes:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue]];
+            NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:imageName];
+            [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation(thumbnailImage, 1.0) attributes:nil];
+            
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                self.sendingView.textView.text = [NSString stringWithFormat:@"Downloading from LabelMe Server... %d/%d",i+1,selectedItems.count];
+                [self.sendingView.progressView setProgress:(i+1)*1.0/selectedItems.count];
+            });
+
             
         }
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -1245,6 +1234,7 @@
     
     dispatch_release(queue);
 }
+
 
 - (void) hideSendingiew
 {
@@ -1302,6 +1292,36 @@
     }
     
     [UIView commitAnimations];
+}
+
+
+- (UIImage *) thumbnailImageFromImage:(UIImage *)image withBoxes:(NSArray *)boxes
+{
+    UIGraphicsBeginImageContext(image.size);
+    [image drawAtPoint:CGPointZero];
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    [[UIColor blueColor] setStroke];
+    
+    
+    CGContextSetLineWidth(ctx, 60);
+    CGContextSetStrokeColorWithColor(ctx, [UIColor blueColor].CGColor);
+    
+    
+    for(Box *box in boxes){
+        CGRect rectangle = [box getRectangleForBox];
+        CGContextStrokeRect(ctx, rectangle);
+    }
+    
+    UIImage *resultingImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    //generate thumbnail
+    int thumbnailSize = 300;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
+    UIImage *thumbnailImage = [[UIImage imageWithCGImage:resultingImage.CGImage] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
+    
+    
+    return thumbnailImage;
 }
 
 @end

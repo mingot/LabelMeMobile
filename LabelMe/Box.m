@@ -283,5 +283,11 @@ static float LINEWIDTH = 6;
     LINEWIDTH = value;
 }
 
+- (CGRect) getRectangleForBox
+{
+    CGRect rectangle = CGRectMake(upperLeft.x, upperLeft.y, lowerRigth.x - upperLeft.x, lowerRigth.y - upperLeft.y);
+    return rectangle;
+}
+
 
 @end
