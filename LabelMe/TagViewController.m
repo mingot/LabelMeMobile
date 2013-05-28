@@ -124,12 +124,14 @@
     [self.scrollView addSubview:self.label];
 
     //Swipe gesture recognizer: for both directions the same target
-     UISwipeGestureRecognizer *swipeLeftRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeAction:)];
-    [swipeLeftRecognizer setDirection:UISwipeGestureRecognizerDirectionLeft];
-    [self.scrollView addGestureRecognizer:swipeLeftRecognizer];
+    UISwipeGestureRecognizer *swipeLeftRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeAction:)];
     UISwipeGestureRecognizer *swipeRightRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeAction:)];
+    [swipeLeftRecognizer setDirection:UISwipeGestureRecognizerDirectionLeft];
     [swipeRightRecognizer setDirection:UISwipeGestureRecognizerDirectionRight];
+    [self.scrollView addGestureRecognizer:swipeLeftRecognizer];
     [self.scrollView addGestureRecognizer:swipeRightRecognizer];
+    swipeLeftRecognizer.delegate = self;
+    swipeRightRecognizer.delegate = self;
     
     [self.deleteButton setStyle:UIBarButtonItemStyleBordered];
 
@@ -502,8 +504,22 @@
     
 }
 
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    
+    // Disallow recognition of tap gestures in the segmented control.
+    if ([self.annotationView SelectedBox] != -1){
+        NSLog(@"swipe blocked");
+        return NO;
+        
+    }else return YES;
+}
+
 - (IBAction)swipeAction:(id)sender
 {
+    NSLog(@"selected box:%d",[self.annotationView SelectedBox]);
+    
+    //if none box currently selected
+
     UISwipeGestureRecognizer *swipe = (UISwipeGestureRecognizer *) sender;
     
     int increase = 2*swipe.direction-3;
@@ -529,6 +545,7 @@
     //save boxes
     [self saveThumbnail];
     [self saveDictionary];
+
 }
 
 
@@ -571,7 +588,6 @@
                 
                 [dict removeObjectForKey:self.filename];
                 [dict setObject:newdictnum forKey:self.filename];
-                
             }
 
         }

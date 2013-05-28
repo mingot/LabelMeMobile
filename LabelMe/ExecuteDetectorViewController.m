@@ -253,6 +253,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         //**** DETECTION ****
         NSMutableArray *nmsArray = [[NSMutableArray alloc] init];
         UIImage *image = [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight];
+        //single class detection
         if(self.svmClassifiers.count == 1){
             Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:0];
             float detectionThreshold = -1 + 2*svmClassifier.detectionThreshold.floatValue;
@@ -263,7 +264,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                                      deviceOrientation:[[UIDevice currentDevice] orientation]
                                     learningImageIndex:0]];
         
-        }else{//Multiclass detection
+        //Multiclass detection
+        }else{
             
             [self.hogPyramid constructPyramidForImage:image withOrientation:[[UIDevice currentDevice] orientation]];
             
@@ -290,15 +292,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         // Update the navigation controller title with some information about the detection
         int level=-1;
-        float scoreFloat = -1;
-//        if (nmsArray.count > 0){
-//            BoundingBox *score = (BoundingBox *)[nmsArray objectAtIndex:0];
-//            scoreFloat = score.score;
-//            if(score.score > self.maxDetectionScore) self.maxDetectionScore = score.score;
-//            level = score.pyramidLevel;
-//            
-//        } 
-        
+        float scoreFloat = -1;        
         
         //Put the HOG picture on screen
         if (self.hog){

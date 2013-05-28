@@ -355,7 +355,6 @@
     if(_selectedRow < self.detectors.count) [self.detectors replaceObjectAtIndex:_selectedRow withObject:updatedDetector];
     else [self.detectors addObject:updatedDetector];
 
-    NSLog(@"updating detector at position: %d", _selectedRow);
     if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"]]){
         NSLog(@"Unable to save the classifiers");
     }

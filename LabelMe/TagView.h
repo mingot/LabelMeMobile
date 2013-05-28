@@ -20,26 +20,24 @@
 -(void)correctOrientation:(CGPoint)upperLeft : (CGPoint)lowerRight SuperviewFrame:(CGRect)viewSize;
 
 @end
+
+
 @interface TagView : UIView
 {
-    NSMutableArray *   _objects;
-    //UITextField *           _label;
-    CGPoint                  firstLocation;
-    NSArray *               _colorArray;
+    CGPoint firstLocation;
     
-    int                      selectedBox;
-    //int                      numLabels;
-    int                      corner;
-    BOOL                     move;
-    BOOL                     size;
+    int selectedBox;
+    int corner;
+    BOOL move;
+    BOOL size;
     
-    float                   UPPERBOUND;
-    float                   LOWERBOUND;
-    float                   LEFTBOUND;
-    float                   RIGHTBOUND;
-    float                   lineOriginal;
-    float                   LINEWIDTH;
-    CGRect                  visibleFrame;
+    float UPPERBOUND;
+    float LOWERBOUND;
+    float LEFTBOUND;
+    float RIGHTBOUND;
+    float lineOriginal;
+    float LINEWIDTH;
+    CGRect visibleFrame;
 
 }
 @property (nonatomic, weak) id <TagViewDelegate> delegate;
@@ -48,16 +46,16 @@
 
 
 
--(void) setSelectedBox:(int) i;
--(int) SelectedBox;
--(void) drawBox:(CGContextRef )context :(Box *)box1 :(CGFloat)alpha;
--(void) drawSelectedBox:(CGContextRef )context :(Box *) box;
--(void) reset;
--(void)setLINEWIDTH:(float)factor;
--(int)whereIs:(CGPoint) point;
--(int)boxInterior:(int)i :(CGPoint)point;
--(void)setVisibleFrame:(CGRect)rect;
--(CGRect)visibleFrame;
-
+- (void) setSelectedBox:(int) i;
+- (int) SelectedBox;
+- (void) drawBox:(CGContextRef )context :(Box *)box1 :(CGFloat)alpha;
+- (void) drawSelectedBox:(CGContextRef )context :(Box *) box;
+- (void) reset;
+- (void)setLINEWIDTH:(float)factor;
+- (int)whereIs:(CGPoint) point;
+- (int)boxInterior:(int)i :(CGPoint)point;
+- (void)setVisibleFrame:(CGRect)rect;
+- (CGRect)visibleFrame;
+- (BOOL) anyBoxSelected;
 
 @end

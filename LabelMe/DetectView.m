@@ -61,15 +61,9 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
                 
 //                NSLog(@"(x,y)=(%f,%f), (w,h)=(%f,%f)",x,y,w,h);
                 //handle distinct orientations
-                if(self.frontCamera){
+                if(self.frontCamera || self.cameraOrientation == 3){
                     x = x + w;
                     w = abs(w);
-                }else if(!self.frontCamera && self.cameraOrientation == 3){
-                    CGFloat xaux=x;
-                    x=x+w;
-                    w=abs(w);
-                    textBoxHeight = w/2.0;
-                    w = 20*2.0;
                 }
                 
                 CGRect textBox = CGRectMake(x - 2, y - 20 - 2, w/2.0, textBoxHeight);
@@ -77,6 +71,11 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
                 CGContextSetFillColorWithColor(context,[UIColor blackColor].CGColor);
                 [p.targetClass drawInRect:textBox withFont:[UIFont systemFontOfSize:15]];
                 
+                //rotate
+//                if(self.cameraOrientation==3){
+//                    CGAffineTransform rotation = CGAffineTransformMakeRotation(-90.0 * M_PI/180.0);
+//                    CGContextConcatCTM(context, rotation);
+//                }
                 // for the rest of boxes
                 CGContextSetLineWidth(context, 1);
                 CGContextSetStrokeColorWithColor(context, [UIColor purpleColor].CGColor);

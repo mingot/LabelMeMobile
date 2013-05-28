@@ -285,6 +285,7 @@
 {
     self.navigationController.navigationBarHidden = YES;
     self.sendingView.sendingViewID = @"info";
+    [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
     self.sendingView.hidden = NO;
     self.sendingView.cancelButton.hidden = NO;
     self.sendingView.progressView.hidden = YES;
@@ -359,6 +360,8 @@
         self.navigationController.navigationBarHidden = NO;
     }else if([self.sendingView.sendingViewID isEqualToString:@"train"]){
         self.svmClassifier.trainCancelled = YES;
+        self.sendingView.cancelButton.enabled = NO;
+        self.sendingView.sendingViewID = @"info";
     }
 }
 
@@ -416,6 +419,8 @@
         [self.sendingView.activityIndicator startAnimating];
         self.sendingView.cancelButton.hidden = NO;
         self.sendingView.sendingViewID = @"train";
+        [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+        [self.sendingView.cancelButton setTitle:@"Cancelling..." forState:UIControlStateDisabled];
         
         //set hog dimension based on user preferences
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[self.resourcesPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
@@ -430,6 +435,9 @@
             if(self.trainingWentGood)[self testForImagesNames:testImagesNames];
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [self.sendingView.activityIndicator stopAnimating];
+                [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
+                self.sendingView.sendingViewID = @"info";
+                self.sendingView.cancelButton.enabled = YES;
                 self.sendingView.cancelButton.hidden = NO;
                 if(self.trainingWentGood) {[self saveAction:self]; [self loadDetectorInfo];}
                 else {

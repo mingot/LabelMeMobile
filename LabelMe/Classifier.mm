@@ -240,7 +240,7 @@ using namespace cv;
     
     //rotate image depending on the orientation
     if(!self.isLearning && UIDeviceOrientationIsLandscape(orientation))
-        image = [UIImage imageWithCGImage:image.CGImage scale:1.0 orientation: UIImageOrientationUp];
+        image = [UIImage imageWithCGImage:image.CGImage scale:1.0 orientation:UIImageOrientationUp];
 
     //scaling factor for the image
     double initialScale = self.scaleFactor.doubleValue/sqrt(image.size.width*image.size.width);
