@@ -152,7 +152,6 @@ using namespace cv;
 {
     NSDate *start = [NSDate date];
     free(self.weightsP);
-    self.trainCancelled = NO;
     self.isLearning = YES;
     self.imageListAux = [[NSMutableArray alloc] init];
     self.imagesHogPyramid = [[NSMutableArray alloc] init];
@@ -209,7 +208,9 @@ using namespace cv;
         if(iter!=1) [self.delegate updateProgress:STOP_CRITERIA/diff];
     }
     
+    self.cancelledBeforBeginning = NO;
     if(self.trainCancelled) [self.delegate sendMessage:@"\n TRAINING INTERRUPTED \n"];
+    if(iter == 0) self.cancelledBeforBeginning = YES;
     
     //update information about the classifier
     self.numberSV = [NSNumber numberWithInt:numSupportVectors];
@@ -602,82 +603,50 @@ using namespace cv;
     //concurrent adding examples for the different images
     dispatch_queue_t trainingQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_apply(trainingSet.images.count, trainingQueue, ^(size_t i) {
-        UIImage *image = [trainingSet.images objectAtIndex:i];
-        
-        //run the detector on the current image
-        NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp learningImageIndex:i];
-        
-        dispatch_sync(dispatch_get_main_queue(),^{[self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %zd: %d", i, newBoundingBoxes.count]];});
-        
-        //max negative bounding boxes detected per image
-        int quota = MAX_QUOTA;
-        NSArray *selectedGT = trainingSet.groundTruthBoundingBoxes;
-        NSMutableArray *aux = [selectedGT mutableCopy];
-        
-        for(BoundingBox *newBB in newBoundingBoxes){
-            BOOL isNegative = NO;
-            BOOL GTFound = NO;
-            for(BoundingBox *groundTruthBB in selectedGT){
-                if(groundTruthBB.imageIndex == i){
-                    GTFound = YES;
-                    double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];
-                    if (overlapArea > 0.8 && overlapArea<1){
-                        newBB.label = 1;
-                        isNegative = NO;
-                        if(trainingSet.numberOfTrainingExamples+1 < MAX_NUMBER_EXAMPLES){
-                            dispatch_sync(dispatch_get_main_queue(), ^{
-                                [self addExample:newBB to:trainingSet];
-                                positives++;
-                            });
-                        }else NSLog(@"Training Buffer FULL!!");
-                    }else if(overlapArea < 0.25 && quota>0) isNegative = YES;
-                }else [aux removeObject:groundTruthBB];
-            }
+        if(!self.trainCancelled){
+            UIImage *image = [trainingSet.images objectAtIndex:i];
             
-            selectedGT = aux;
-            if((isNegative || (GTFound == NO)) && quota>0){
-                quota--;
-                newBB.label = -1;
-                dispatch_sync(dispatch_get_main_queue(), ^{[self addExample:newBB to:trainingSet];});
+            //run the detector on the current image
+            NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp learningImageIndex:i];
+            
+            dispatch_sync(dispatch_get_main_queue(),^{[self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %zd: %d", i, newBoundingBoxes.count]];});
+            
+            //max negative bounding boxes detected per image
+            int quota = MAX_QUOTA;
+            NSArray *selectedGT = trainingSet.groundTruthBoundingBoxes;
+            NSMutableArray *aux = [selectedGT mutableCopy];
+            
+            for(BoundingBox *newBB in newBoundingBoxes){
+                BOOL isNegative = NO;
+                BOOL GTFound = NO;
+                for(BoundingBox *groundTruthBB in selectedGT){
+                    if(groundTruthBB.imageIndex == i){
+                        GTFound = YES;
+                        double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];
+                        if (overlapArea > 0.8 && overlapArea<1){
+                            newBB.label = 1;
+                            isNegative = NO;
+                            if(trainingSet.numberOfTrainingExamples+1 < MAX_NUMBER_EXAMPLES){
+                                dispatch_sync(dispatch_get_main_queue(), ^{
+                                    [self addExample:newBB to:trainingSet];
+                                    positives++;
+                                });
+                            }else NSLog(@"Training Buffer FULL!!");
+                        }else if(overlapArea < 0.25 && quota>0) isNegative = YES;
+                    }else [aux removeObject:groundTruthBB];
+                }
+                
+                selectedGT = aux;
+                if((isNegative || (GTFound == NO)) && quota>0){
+                    quota--;
+                    newBB.label = -1;
+                    dispatch_sync(dispatch_get_main_queue(), ^{[self addExample:newBB to:trainingSet];});
+                }
             }
         }
     });
     dispatch_release(trainingQueue);
-    
-// TRAINING WITHOUT PARALLELIZATION
-//    for(int i=0; i<trainingSet.images.count; i++){
-//        UIImage *image = [trainingSet.images objectAtIndex:i];
-//        NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp learningImageIndex:i];
-//        [self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %d: %d", i, newBoundingBoxes.count]];
-//        int quota = MAX_QUOTA;
-//        NSArray *selectedGT = trainingSet.groundTruthBoundingBoxes;
-//        NSMutableArray *aux = [selectedGT mutableCopy];
-//        
-//        for(BoundingBox *newBB in newBoundingBoxes){
-//            BOOL isNegative = NO;
-//            for(BoundingBox *groundTruthBB in selectedGT){
-//                if(groundTruthBB.imageIndex == i){
-//                    double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];
-//                    if (overlapArea > 0.8 && overlapArea<1){
-//                        newBB.label = 1;
-//                        isNegative = NO;
-//                        if(trainingSet.numberOfTrainingExamples+1 < MAX_NUMBER_EXAMPLES){
-//                            [self addExample:newBB to:trainingSet];
-//                            positives ++;
-//                        }else NSLog(@"Training Buffer FULL!!");
-//                    }else if(overlapArea < 0.25 && quota>0) isNegative = YES;
-//                }else [aux removeObject:groundTruthBB];
-//                
-//            }
-//            selectedGT = aux;
-//            if(isNegative){
-//                newBB.label = -1;
-//                quota--;
-//                [self addExample:newBB to:trainingSet];
-//            }
-//        }
-//    }
-    
+        
     [self.delegate sendMessage:[NSString stringWithFormat:@"added:%d positives", positives]];
     self.numberOfPositives = [NSNumber numberWithInt:positives];
 }

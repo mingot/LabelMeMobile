@@ -181,7 +181,7 @@
         self.modalTVC.showCancelButton = YES;
         self.modalTVC.delegate = self;
         self.modalTVC.modalTitle = @"New Detector";
-        self.modalTVC.modalSubtitle = @"1 of 2 select class(es)";
+        self.modalTVC.modalSubtitle = @"1 of 2: select class(es)";
         self.modalTVC.modalID = @"classes";
         self.modalTVC.multipleChoice = YES;
         self.modalTVC.data = self.availableObjectClasses;
@@ -192,9 +192,6 @@
     }else{
         NSLog(@"Loading classifier: %@", self.svmClassifier.name);
         self.isFirstTraining = NO;
-        //storing the previous classifier using the nscoding for object copy
-        self.previousSvmClassifier = [[Classifier alloc] init];
-        self.previousSvmClassifier = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.svmClassifier]];
     }
     
     
@@ -252,12 +249,15 @@
     //show modal to select training positives for the selected class
     self.modalTVC = [[ModalTVC alloc] init];
     self.modalTVC.delegate = self;
-    if(self.firstTraingState == INITIATED){
+    if(self.firstTraingState == INITIATED){ //training for the first time
         self.modalTVC.modalTitle = @"New Detector";
-        self.modalTVC.modalSubtitle = @"2 of 2 select training image(es)";
+        self.modalTVC.modalSubtitle = @"2 of 2: select training image(es)";
     }else{
         self.modalTVC.modalTitle = @"Train Detector";
-        self.modalTVC.modalSubtitle = @"1 of 1 select training images";
+        self.modalTVC.modalSubtitle = @"1 of 1: select training images";
+        //storing the previous classifier using the nscoding for object copy
+        self.previousSvmClassifier = [[Classifier alloc] init];
+        self.previousSvmClassifier = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.svmClassifier]];
     }
     self.modalTVC.doneButtonTitle = @"Train";
     self.modalTVC.modalID = @"images";
@@ -421,6 +421,8 @@
         self.sendingView.sendingViewID = @"train";
         [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
         [self.sendingView.cancelButton setTitle:@"Cancelling..." forState:UIControlStateDisabled];
+        [self.sendingView clearScreen];
+        self.svmClassifier.trainCancelled = NO;
         
         //set hog dimension based on user preferences
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[self.resourcesPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
@@ -428,11 +430,17 @@
         if(hog==0) hog = 8; //if not set, defautl is template size of 8 cells height
         self.svmClassifier.maxHog = hog;
         
-        //train in a different thread
+        //train in a different queue
         dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
         dispatch_async(myQueue, ^{
             [self trainForImagesNames:traingImagesNames];
-            if(self.trainingWentGood)[self testForImagesNames:testImagesNames];
+            if(self.trainingWentGood && !self.svmClassifier.cancelledBeforBeginning)[self testForImagesNames:testImagesNames];
+            if(self.svmClassifier.cancelledBeforBeginning == YES){
+                //if classifier not even trained with one iteration(cancelled before) then rescue previous classifer (undo)
+                self.svmClassifier = self.previousSvmClassifier;
+                self.undoButtonBar.enabled = NO;
+            }
+            
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [self.sendingView.activityIndicator stopAnimating];
                 [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
@@ -670,7 +678,7 @@
             
         }else{
             self.trainingWentGood = YES;
-            [self.sendingView showMessage:@"Finished training"];
+            if(self.svmClassifier.cancelledBeforBeginning==NO)[self.sendingView showMessage:@"Finished training"];
             [self updateProgress:1];
             
             //update view of the detector

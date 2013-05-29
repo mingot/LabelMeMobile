@@ -82,13 +82,13 @@
     //rotate image depending on the orientation
     //TODO: take out the orientation of the pyramid!!
     if(UIDeviceOrientationIsLandscape(orientation))
-        image = [UIImage imageWithCGImage:image.CGImage scale:1.0 orientation: UIImageOrientationUp];
+        image = [UIImage imageWithCGImage:image.CGImage scale:1.0 orientation:UIImageOrientationUp];
     
     //scaling factor for the image
     double initialScale = self.scaleFactor.doubleValue/sqrt(image.size.width*image.size.width);
     double scale = pow(2, 1.0/SCALES_PER_OCTAVE);
+    UIImage *scaledImage = [image scaleImageTo:initialScale/pow(scale,0)]; //TODO: optimize to start to the first true index
     
-    UIImage *scaledImage = [image scaleImageTo:initialScale/pow(scale,0)]; //optimize to start to the first true index
     
     __block HogFeature *imageHog;
     dispatch_queue_t pyramidConstructionQueue = dispatch_queue_create("pyramidConstructionQueue", DISPATCH_QUEUE_CONCURRENT);
@@ -102,19 +102,6 @@
         }
     });
     dispatch_release(pyramidConstructionQueue);
-    
-//    NSLog(@"Levels: %@", self.levelsToCalculate);
-//    NSLog(@"hog features: %@", self.hogFeatures);
-    
-    
-//    for(int i=0; i<self.numPyramids; i++)
-//        if([self.levelsToCalculate containsObject:[NSNumber numberWithInt:i]]){
-//            float scaleLevel = pow(1.0/scale, i);
-//            HogFeature *imageHog = [[scaledImage scaleImageTo:scaleLevel] obtainHogFeatures];
-//            [self.hogFeatures setObject:imageHog atIndexedSubscript:i];
-//        }
-    
-    
 
     //reset indexes to look into
     [self.levelsToCalculate removeAllObjects];

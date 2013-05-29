@@ -15,36 +15,37 @@
 
 @interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, UIScrollViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate,UITextFieldDelegate, UIGestureRecognizerDelegate>
 {
-    UIBarButtonItem *_flexibleSpace;
     int numImages;
     BOOL keyboardVisible;
     CGSize labelSize;
     ServerConnection *sConnection;
     UIButton *labelsButtonView;
     UIButton *tip;
-  
 }
 
+//views
+@property (strong,nonatomic) SendingView *sendingView;
+@property (strong, nonatomic) TagView *annotationView;
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (strong, nonatomic) IBOutlet UITextField *label;
+@property (nonatomic, strong) UIImageView *imageView;
+@property (strong, nonatomic) UITableView *labelsView;
+@property (strong,nonatomic) UIView *composeView;
+
+//toolbar
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *addButton;
-@property (strong, nonatomic)  UIBarButtonItem *deleteButton;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *deleteButton;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *sendButton;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *labelsButton;
 @property (strong, nonatomic) IBOutlet UIToolbar *bottomToolbar;
-@property (nonatomic, strong) UIImageView *imageView;
-@property (strong, nonatomic)  UITableView *labelsView;
 
+//model
 @property (nonatomic, strong) NSString *filename;
 @property (nonatomic, strong) NSArray *paths;
-@property (strong, nonatomic)  TagView *annotationView;
 @property (strong,nonatomic) NSString *username;
-@property (strong,nonatomic) UIView *composeView;
-@property (strong,nonatomic) SendingView *sendingView;
-
 @property (strong, nonatomic) NSArray *items;
 
-@property BOOL forThumbnailUpdating;
+
 
 - (void) keyboardDidShow:(NSNotification *)notif;
 - (void) keyboardDidHide:(NSNotification *)notif;
@@ -56,6 +57,7 @@
 -(IBAction)sendAction:(id)sender;
 -(IBAction)doneAction:(id)sender;
 -(IBAction)listAction:(id)sender;
+-(IBAction)hideTip:(id)sender;
 
 -(void)setImage:(UIImage *)image;
 -(BOOL)saveThumbnail;

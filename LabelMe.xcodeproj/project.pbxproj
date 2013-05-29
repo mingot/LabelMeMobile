@@ -597,7 +597,6 @@
 				A558D61F16134E0C001DED8C /* LabelMe */,
 				A558D61816134E0C001DED8C /* Frameworks */,
 				A558D61616134E0C001DED8C /* Products */,
-				A5DCC5A81628F5CB00AC9067 /* LabelMe-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -653,6 +652,7 @@
 		A558D62016134E0C001DED8C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A5DCC5A81628F5CB00AC9067 /* LabelMe-Info.plist */,
 				FC9F94E017443B9A0004598C /* Abstract */,
 				FC5C93A116FCB8C800637B69 /* app-login-A@2x-568h@2x.png */,
 				FC5C939F16FCB8BF00637B69 /* app-login-A@2x-Portrait.png */,
