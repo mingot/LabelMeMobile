@@ -247,6 +247,8 @@
 		FCED8972170350F80027CBE1 /* bottle.txt in Resources */ = {isa = PBXBuildFile; fileRef = FCED8971170350F80027CBE1 /* bottle.txt */; };
 		FCED8974170353FB0027CBE1 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCED8973170353FB0027CBE1 /* CoreMedia.framework */; };
 		FCED8976170354010027CBE1 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCED8975170354010027CBE1 /* CoreVideo.framework */; };
+		FCF1C0B11757ED52003DC895 /* TagViewController_withUIScroll in Resources */ = {isa = PBXBuildFile; fileRef = FCF1C0B01757ED52003DC895 /* TagViewController_withUIScroll */; };
+		FCF1C0B31757F99D003DC895 /* next_button.png in Resources */ = {isa = PBXBuildFile; fileRef = FCF1C0B21757F99D003DC895 /* next_button.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -544,6 +546,8 @@
 		FCED8971170350F80027CBE1 /* bottle.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bottle.txt; sourceTree = "<group>"; };
 		FCED8973170353FB0027CBE1 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		FCED8975170354010027CBE1 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		FCF1C0B01757ED52003DC895 /* TagViewController_withUIScroll */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TagViewController_withUIScroll; sourceTree = "<group>"; };
+		FCF1C0B21757F99D003DC895 /* next_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = next_button.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -812,6 +816,7 @@
 		FC4B0A2D172F352D00A099A0 /* news */ = {
 			isa = PBXGroup;
 			children = (
+				FCF1C0B21757F99D003DC895 /* next_button.png */,
 				FC8E89B2173983640018876D /* download.png */,
 				FC92DD9017343A32004F8189 /* camera2.png */,
 				FC92DD8017316C2D004F8189 /* undo.png */,
@@ -893,6 +898,7 @@
 				A5DEA1061640D48B00DD58D6 /* GalleryViewController_iPhone5.xib */,
 				A52C36761617C99400FEF74D /* TagViewController.h */,
 				A52C36771617C99400FEF74D /* TagViewController.m */,
+				FCF1C0B01757ED52003DC895 /* TagViewController_withUIScroll */,
 				A5480D6F16179557009F630D /* TagViewController_iPhone.xib */,
 				A5D91D0C1641D29A00EA0442 /* TagViewController_iPhone5.xib */,
 				A549B845165162F6000B41CB /* TagViewController_iPad.xib */,
@@ -1298,6 +1304,8 @@
 				FC74F8E9174C1B49004701CC /* selectAllDisabled-1.png in Resources */,
 				FC74F8EA174C1B49004701CC /* selectAllEnabled-1.png in Resources */,
 				FC74F8F2174C2BF6004701CC /* backButton.png in Resources */,
+				FCF1C0B11757ED52003DC895 /* TagViewController_withUIScroll in Resources */,
+				FCF1C0B31757F99D003DC895 /* next_button.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

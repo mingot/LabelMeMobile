@@ -22,7 +22,9 @@
 
 @interface TagViewController()
 
-@property int currentIndex;
+//
+@property int currentScrollIndex;
+@property (nonatomic, strong) NSMutableArray *composeViewsArray; //array of compose views to set in each part of the scroll view.
 
 //load ajustments for the loaded boxes
 - (void) onTimeLoad;
@@ -34,17 +36,33 @@
 
 
 #pragma mark -
+#pragma mark Getters and Setters
+
+- (NSMutableArray *) composeViewsArray
+{
+    if(!_composeViewsArray){
+        _composeViewsArray = [[NSMutableArray alloc] initWithCapacity:self.items.count];
+        for(int i=0;i<self.items.count;i++)
+            [_composeViewsArray addObject:[NSNull null]];
+    }
+    return _composeViewsArray;
+}
+
+
+#pragma mark -
 #pragma mark View lifecycle
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
         self.username = [[NSString alloc] init];
         self.filename = [[NSString alloc] init];
-        self.annotationView = [[TagView alloc] initWithFrame:CGRectZero];
+        
         self.composeView = [[UIView alloc] initWithFrame:CGRectZero];
+        self.annotationView = [[TagView alloc] initWithFrame:CGRectZero];
+        self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        
         self.labelsView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
 
         sConnection = [[ServerConnection alloc] init];
@@ -99,11 +117,11 @@
 	self.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
 	self.scrollView.clipsToBounds = YES;		
 	self.scrollView.scrollEnabled = YES;
-	self.scrollView.pagingEnabled = NO;
+	self.scrollView.pagingEnabled = YES;
     self.scrollView.minimumZoomScale = 1.0;
     self.scrollView.maximumZoomScale = 10.0;
     self.scrollView.delegate = self;
-//    CGSize contentSize = CGSizeMake(self.scrollView.frame.size.width*6, self.scrollView.frame.size.height);
+//    CGSize contentSize = CGSizeMake(self.scrollView.frame.size.width*self.items.count, self.scrollView.frame.size.height);
 //    [self.scrollView setContentSize:contentSize];
     [self.scrollView setContentSize:self.scrollView.frame.size];
     [self.scrollView addSubview:self.composeView];
@@ -112,13 +130,7 @@
     [self.scrollView addSubview:self.sendingView];
     [self.scrollView addSubview:self.tip];
     
-    //compose view
-    self.composeView.frame = CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height);
-    [self.composeView addSubview:self.imageView];
-    [self.composeView addSubview:self.annotationView];
-
-    self.annotationView.delegate = self;
-
+    
     [self.label setBorderStyle:UITextBorderStyleNone];
     [self.label setKeyboardAppearance:UIKeyboardAppearanceAlert];
     [self.labelsView setBackgroundColor:[UIColor clearColor]];
@@ -133,7 +145,7 @@
 
     //tip
     self.tip = [[UIButton alloc] initWithFrame:CGRectMake(25, 2*self.scrollView.frame.size.height/3, self.scrollView.frame.size.width/2, self.scrollView.frame.size.height/3)];
-    [self.tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )  ] forState:UIControlStateNormal];
+    [self.tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )] forState:UIControlStateNormal];
     UILabel *tiplabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 12, self.tip.frame.size.width-24, self.tip.frame.size.height-24)];
     tiplabel.numberOfLines = 4;
     tiplabel.text = @"Tip:\nPress this button \nto add a bounding box!";
@@ -144,6 +156,8 @@
     if ((self.items.count>1) || (self.annotationView.objects.count != 0))
         self.tip.hidden = YES;
 
+
+    
     //sending view
     self.sendingView = [[SendingView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height)];
     [self.sendingView setHidden:YES];
@@ -153,9 +167,35 @@
 
     //model
     self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
+    
     self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-    [self.imageView setFrame:self.scrollView.frame];
+    self.imageView.frame = self.scrollView.frame;
 
+    //compose view
+    self.composeView.frame = self.scrollView.frame;
+    [self.composeView addSubview:self.imageView];
+    [self.composeView addSubview:self.annotationView];
+    
+    //annotation view
+    self.annotationView.delegate = self;
+
+    //Next and previous buttons
+    
+    UIButton *nextButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    nextButton.frame = CGRectMake(0, self.scrollView.frame.size.height/2, 50, 50);
+    [nextButton setImage:[UIImage imageNamed:@"next_button.png"] forState:UIControlStateNormal];
+    [nextButton addTarget:self action:@selector(changeImageAction:) forControlEvents:UIControlEventTouchUpInside];
+    nextButton.tag = 2;
+    UIImageView *rotateImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"next_button.png"]];
+    rotateImageView.transform = CGAffineTransformMakeRotation(M_PI);
+    
+    UIButton *previousButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    previousButton.frame  = CGRectMake(self.scrollView.frame.size.width - 50, self.scrollView.frame.size.height/2, 50, 50);
+    [previousButton setImage:rotateImageView.image forState:UIControlStateNormal];
+    [previousButton addTarget:self action:@selector(changeImageAction:) forControlEvents:UIControlEventTouchUpInside];
+    previousButton.tag = 1;
+    [self.composeView addSubview:nextButton];
+    [self.composeView addSubview:previousButton];
     
 
 //    //Swipe gesture recognizer: for both directions the same target
@@ -167,60 +207,8 @@
 //    [self.scrollView addGestureRecognizer:swipeRightRecognizer];
 //    swipeLeftRecognizer.delegate = self;
 //    swipeRightRecognizer.delegate = self;
-//    self.currentIndex = [self.items indexOfObject:self.filename];
-//    NSLog(@"current index: %d", self.currentIndex);
-//    [self loadScrollViewWithImageIndex:self.currentIndex];
-//    [self loadScrollViewWithImageIndex:self.currentIndex + 1];
-//    [self loadScrollViewWithImageIndex:self.currentIndex + 2];
-//    [self loadScrollViewWithImageIndex:self.currentIndex + 3];
-//    [self loadScrollViewWithImageIndex:self.currentIndex + 4];
-//    [self loadScrollViewWithImageIndex:self.currentIndex + 5];
-    
 }
 
-
-
-
-//- (void)loadScrollViewWithImageIndex:(NSUInteger)index
-//{
-//    if (index >= self.items.count)
-//        return;
-//    
-//    NSString *filename = (NSString *)[self.items objectAtIndex:index];
-//    
-//    //boxes
-//    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
-//    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-//    
-//    //image
-//    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
-//    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-//    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-//    
-//    // add image to uiscrollview
-//    CGRect frame = self.scrollView.frame;
-//    frame.origin.x = (frame.size.width * (index%6));
-//    NSLog(@"x:%f for image index %d", frame.origin.x, index);
-//    frame.origin.y = 0;
-//    imageView.frame = frame;
-//    
-//    [self.scrollView addSubview:imageView];
-//    //TODO: save the other things on the tagview controller.
-//}
-
-
-//// at the end of scroll animation, reset the boolean used when scrolls originate from the UIPageControl
-//- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-//{
-//    // switch the indicator when more than 50% of the previous/next page is visible
-//    CGFloat pageWidth = CGRectGetWidth(self.scrollView.frame);
-//    NSUInteger index = floor((self.scrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
-//    
-//    // load the visible page and the page on either side of it (to avoid flashes when the user starts scrolling)
-//    [self loadScrollViewWithImageIndex:self.currentIndex - 1];
-//    [self loadScrollViewWithImageIndex:self.currentIndex];
-//    [self loadScrollViewWithImageIndex:self.currentIndex + 1];
-//}
 
 - (void) viewWillAppear:(BOOL)animated
 {
@@ -229,7 +217,13 @@
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
     
-    //check if enabled connection
+    //make some ajustments on the loaded boxes
+    [self onTimeLoad];
+}
+
+- (void) onTimeLoad
+{
+    //check if boxes not saved on the server
     NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
     if (dictnum.intValue == 0) [self.sendButton setEnabled:NO];
     
@@ -238,13 +232,12 @@
     UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
     self.imageView.image = image;
     self.annotationView.frame = [self getImageFrameFromImageView:self.imageView];
-
-    //make some ajustments on the loaded boxes
-    [self onTimeLoad];
-}
-
-- (void) onTimeLoad
-{
+    
+    //load boxes
+    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
+    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
+    [self.annotationView.objects setArray:boxes];
+    
     [self selectedAnObject:NO];
     if (self.annotationView.objects.count > 0)
         [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
@@ -288,6 +281,136 @@
     
     [self.delegate reloadTableOnImageGallery];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+#pragma mark -
+#pragma mark UIScrollView delegate: Scrolling Images
+
+//- (void)loadScrollViewWithImageIndex:(int) index
+//{
+//    
+//    if(index >= self.items.count) return;
+//    
+//    NSString *filename = [self.items objectAtIndex:index];
+//
+//    //look for the view in the array. If it is not there, save it
+//    UIView *composeViewSelected = [self.composeViewsArray objectAtIndex:index];
+//    if ((NSNull *)composeViewSelected == [NSNull null]){
+//        
+//        //boxes
+//        NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
+//        NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
+//        
+//        //image
+//        NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
+//        UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
+//        
+//        //init views
+//        composeViewSelected = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height)];
+//        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height)];
+//        imageView.tag = 200;
+//        imageView.contentMode = UIViewContentModeScaleAspectFit;
+//        imageView.image = image;
+//        
+//        TagView *annotationView = [[TagView alloc] initWithFrame:[self getImageFrameFromImageView:imageView]];
+//        annotationView.tag = 100;
+//        [annotationView.objects setArray:boxes];
+//        annotationView.delegate = self;
+//        annotationView.filename = filename;
+//        for(Box* box in boxes){
+//            CGFloat frameWidth = annotationView.frame.size.width;
+//            CGFloat frameHeight = annotationView.frame.size.height;
+//            
+//            box.upperLeft = CGPointMake(box.upperLeft.x*frameWidth/box->RIGHTBOUND, box.upperLeft.y*frameHeight/box->LOWERBOUND);
+//            box.lowerRight = CGPointMake(box.lowerRight.x*frameWidth/box->RIGHTBOUND, box.lowerRight.y*frameHeight/box->LOWERBOUND);
+//            box->RIGHTBOUND = frameWidth;
+//            box->LOWERBOUND = frameHeight;
+//        }
+//        [composeViewSelected addSubview:imageView];
+//        [composeViewSelected addSubview:annotationView];
+//        [self.composeViewsArray setObject:composeViewSelected atIndexedSubscript:index];
+//    }
+//    
+//    //Add it to the scroll view (if it was not setted)
+//    if(composeViewSelected.superview == nil){
+//        // compose view to uiscrollview
+//        CGRect frame = self.scrollView.frame;
+//        frame.origin.x = (frame.size.width * index);
+//        frame.origin.y = 0;
+//        composeViewSelected.frame = frame;
+//        
+//        [self.scrollView addSubview:composeViewSelected];
+//    }
+//}
+
+//// at the end of scroll animation, reset the boolean used when scrolls originate from the UIPageControl
+//- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+//{
+//    
+//    // switch the indicator when more than 50% of the previous/next page is visible
+//    CGFloat pageWidth = CGRectGetWidth(self.scrollView.frame);
+//    self.currentScrollIndex = floor((self.scrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
+//    self.filename = [self.items objectAtIndex:self.currentScrollIndex];
+////    UIView *selectedComposeView = [self.composeViewsArray objectAtIndex:self.currentScrollIndex];
+////    TagView *annotationView = (TagView *)[selectedComposeView viewWithTag:100];
+////    UIImageView *imageView = (UIImageView *)[selectedComposeView viewWithTag:200];
+////    self.composeView = selectedComposeView;
+////    self.imageView = imageView;
+////    self.annotationView = annotationView;
+//    NSLog(@"decelerating on page %d with filename %@", self.currentScrollIndex, self.filename);
+//    
+//    
+//    // load the visible page and the page on either side of it (to avoid flashes when the user starts scrolling)
+//    [self loadScrollViewWithImageIndex:self.currentScrollIndex - 1];
+//    [self loadScrollViewWithImageIndex:self.currentScrollIndex];
+//    [self loadScrollViewWithImageIndex:self.currentScrollIndex + 1];
+//}
+
+#pragma mark -
+#pragma mark UIScrollView delegate: Zoom
+
+- (UIView*)viewForZoomingInScrollView:(UIScrollView *)aScrollView
+{
+    return self.composeView;
+}
+
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    //calculate the visible frame for when adding a new box being adapted to the box
+    if (scrollView.zoomScale > 1.0) {
+        CGPoint point = self.annotationView.frame.origin; // origin
+        CGPoint point2 = CGPointMake(0, 0); // size
+        
+        if (scrollView.contentOffset.y < self.annotationView.frame.origin.y*scrollView.zoomScale) {
+            
+            point.y = scrollView.contentOffset.y/scrollView.zoomScale;
+            point2.y += self.annotationView.frame.origin.y*scrollView.zoomScale - scrollView.contentOffset.y;
+        }
+        if ((scrollView.contentOffset.y + scrollView.frame.size.height-self.annotationView.frame.origin.y*scrollView.zoomScale)>(self.annotationView.frame.size.height)*scrollView.zoomScale) {
+            
+            point2.y += scrollView.contentOffset.y + scrollView.frame.size.height -(self.annotationView.frame.size.height + self.annotationView.frame.origin.y)*scrollView.zoomScale;
+            
+        }
+        if (scrollView.contentOffset.x< self.annotationView.frame.origin.x*scrollView.zoomScale) {
+            point.x = scrollView.contentOffset.x/scrollView.zoomScale;
+            point2.x += self.annotationView.frame.origin.x*scrollView.zoomScale - scrollView.contentOffset.x;
+            
+            
+        }
+        if ((scrollView.contentOffset.x + scrollView.frame.size.width -self.annotationView.frame.size.width*scrollView.zoomScale)>(self.annotationView.frame.origin.x)*scrollView.zoomScale) {
+            point2.x += scrollView.contentOffset.x + scrollView.frame.size.width -(self.annotationView.frame.size.width + self.annotationView.frame.origin.x)*scrollView.zoomScale;
+            
+            
+        }
+        CGRect rectvisible = CGRectMake(scrollView.contentOffset.x/scrollView.zoomScale - point.x, scrollView.contentOffset.y/scrollView.zoomScale - point.y, (scrollView.frame.size.width-point2.x)/scrollView.zoomScale, (scrollView.frame.size.height-point2.y)/scrollView.zoomScale);
+        [self.annotationView setVisibleFrame:rectvisible];
+        
+    }else [self.annotationView setVisibleFrame:CGRectMake(0, 0, self.annotationView.frame.size.width, self.annotationView.frame.size.height)];
+}
+
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
+{
+    [self.annotationView setLINEWIDTH:scale];
 }
 
 #pragma mark -
@@ -429,8 +552,8 @@
     [self sendPhoto];
 }
 
--(IBAction)labelAction:(id)sender{
-    
+-(IBAction)labelAction:(id)sender
+{    
     //self.navigationItem.rightBarButtonItems = nil;
     
     /*UIBarButtonItem *labelBar = [[UIBarButtonItem alloc] initWithCustomView:self.label];
@@ -490,11 +613,41 @@
     else return YES;
 }
 
-- (IBAction)swipeAction:(id)sender
+//- (IBAction)swipeAction:(id)sender
+//{
+//    UISwipeGestureRecognizer *swipe = (UISwipeGestureRecognizer *) sender;
+//    
+//    int increase = 2*swipe.direction-3;
+//    NSUInteger currentIndex = [self.items indexOfObject:self.filename];
+//    NSString *filename = (NSString *)[self.items objectAtIndex:(currentIndex+increase)%self.items.count];
+//    
+//    //boxes
+//    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
+//    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
+//    
+//    //image
+//    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
+//    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
+//    
+//    //load tagVC
+//    [self.annotationView reset];
+//    [self.annotationView.objects setArray:boxes];
+//    [self setFilename:filename];
+//    
+//    [self onTimeLoad];
+//    
+//    //save boxes
+//    [self saveThumbnail];
+//    [self saveDictionary];
+//}
+
+- (IBAction)changeImageAction:(id)sender
 {
-    UISwipeGestureRecognizer *swipe = (UISwipeGestureRecognizer *) sender;
+    NSLog(@"Button pressed!");
     
-    int increase = 2*swipe.direction-3;
+    UIButton *button = (UIButton *)sender;
+    
+    int increase = 2*button.tag - 3;
     NSUInteger currentIndex = [self.items indexOfObject:self.filename];
     NSString *filename = (NSString *)[self.items objectAtIndex:(currentIndex+increase)%self.items.count];
     
@@ -516,7 +669,6 @@
     //save boxes
     [self saveThumbnail];
     [self saveDictionary];
-
 }
 
 
@@ -617,15 +769,14 @@
     
     CGImageRelease(imageRef);
 
+    
     NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
     [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil];
-
-
-
 }
 
 -(void)saveDictionary
 {
+
     dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
     dispatch_async(saveQueue, ^{
         NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
@@ -690,53 +841,6 @@
     [self.labelsView reloadData];
 }
 
-
-#pragma mark -
-#pragma mark ScrollViewDelegate Method
-
-- (UIView*)viewForZoomingInScrollView:(UIScrollView *)aScrollView
-{
-    return self.composeView;
-}
-
--(void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
-    //calculate the visible frame for when adding a new box being adapted to the box
-    if (scrollView.zoomScale > 1.0) {
-        CGPoint point = self.annotationView.frame.origin; // origin
-        CGPoint point2 = CGPointMake(0, 0); // size
-        
-        if (scrollView.contentOffset.y < self.annotationView.frame.origin.y*scrollView.zoomScale) {
-           
-            point.y = scrollView.contentOffset.y/scrollView.zoomScale;
-            point2.y += self.annotationView.frame.origin.y*scrollView.zoomScale - scrollView.contentOffset.y;
-        }
-        if ((scrollView.contentOffset.y + scrollView.frame.size.height-self.annotationView.frame.origin.y*scrollView.zoomScale)>(self.annotationView.frame.size.height)*scrollView.zoomScale) {
-           
-            point2.y += scrollView.contentOffset.y + scrollView.frame.size.height -(self.annotationView.frame.size.height + self.annotationView.frame.origin.y)*scrollView.zoomScale;
-            
-        }
-        if (scrollView.contentOffset.x< self.annotationView.frame.origin.x*scrollView.zoomScale) {
-                    point.x = scrollView.contentOffset.x/scrollView.zoomScale;
-            point2.x += self.annotationView.frame.origin.x*scrollView.zoomScale - scrollView.contentOffset.x;
-            
-            
-        }
-        if ((scrollView.contentOffset.x + scrollView.frame.size.width -self.annotationView.frame.size.width*scrollView.zoomScale)>(self.annotationView.frame.origin.x)*scrollView.zoomScale) {
-                       point2.x += scrollView.contentOffset.x + scrollView.frame.size.width -(self.annotationView.frame.size.width + self.annotationView.frame.origin.x)*scrollView.zoomScale;
-            
-            
-        }
-        CGRect rectvisible = CGRectMake(scrollView.contentOffset.x/scrollView.zoomScale - point.x, scrollView.contentOffset.y/scrollView.zoomScale - point.y, (scrollView.frame.size.width-point2.x)/scrollView.zoomScale, (scrollView.frame.size.height-point2.y)/scrollView.zoomScale);
-        [self.annotationView setVisibleFrame:rectvisible];
-    
-    }else [self.annotationView setVisibleFrame:CGRectMake(0, 0, self.annotationView.frame.size.width, self.annotationView.frame.size.height)];
-}
-
-- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
-{
-    [self.annotationView setLINEWIDTH:scale];
-}
 
 #pragma mark -
 #pragma mark TableViewDelegate&Datasource Methods
@@ -939,5 +1043,37 @@
     
     return imageFrame;
 }
+
+- (void)viewDidUnload {
+    [super viewDidUnload];
+}
+
+- (UIImage *) thumbnailImageFromImage:(UIImage *)image withBoxes:(NSArray *)boxes
+{
+    UIGraphicsBeginImageContext(image.size);
+    [image drawAtPoint:CGPointZero];
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    [[UIColor blueColor] setStroke];
+    
+    CGContextSetLineWidth(ctx, 60);
+    CGContextSetStrokeColorWithColor(ctx, [UIColor blueColor].CGColor);
+    
+    for(Box *box in boxes){
+        CGRect rectangle = [box getRectangleForBox];
+        CGContextStrokeRect(ctx, rectangle);
+    }
+    
+    UIImage *resultingImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    //generate thumbnail
+    int thumbnailSize = 300;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
+    UIImage *thumbnailImage = [[UIImage imageWithCGImage:resultingImage.CGImage] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
+    
+    
+    return thumbnailImage;
+}
+
 
 @end

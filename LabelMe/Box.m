@@ -285,5 +285,10 @@ static float LINEWIDTH = 6;
     return rectangle;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"upperLeft = (%.1f,%.1f), lowerRight = (%.1f,%.1f). Upper, lower, left and right bounds = (%.1f,%.1f,%.1f,%.1f)",upperLeft.x, upperLeft.y, lowerRigth.x,lowerRigth.y, UPPERBOUND, LOWERBOUND, LEFTBOUND, RIGHTBOUND];
+}
+
 
 @end

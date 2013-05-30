@@ -40,9 +40,11 @@
     CGRect visibleFrame;
 
 }
+
 @property (nonatomic, weak) id <TagViewDelegate> delegate;
 @property (nonatomic, strong) NSMutableArray *objects;
 @property (nonatomic, strong) NSArray *colorArray;
+@property (nonatomic, strong) NSString *filename; //Image filename
 
 
 

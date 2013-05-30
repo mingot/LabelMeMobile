@@ -37,6 +37,7 @@
 @property (strong, nonatomic) UIButton *tip;
 @property (strong, nonatomic) id<TagViewControllerDelegate> delegate;
 
+
 //toolbar
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *addButton;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *deleteButton;
@@ -63,6 +64,7 @@
 -(IBAction)doneAction:(id)sender;
 -(IBAction)listAction:(id)sender;
 -(IBAction)hideTip:(id)sender;
+-(IBAction)changeImageAction:(id)sender;
 
 -(void)saveThumbnail;
 -(void)saveDictionary;

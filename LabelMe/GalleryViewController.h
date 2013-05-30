@@ -63,7 +63,6 @@
 -(IBAction)listAction:(id)sender;
 -(IBAction)cancelAction:(id)sender;
 -(IBAction)editAction:(id)sender;
-//-(IBAction)imageSelectedAction:(UIButton *)button;
 -(IBAction)addImage:(id)sender;
 -(IBAction)downloadAction:(id)sender;
 

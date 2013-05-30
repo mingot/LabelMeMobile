@@ -169,6 +169,7 @@
                                                0.2*self.view.frame.size.width - 7,
                                                0.2*self.view.frame.size.width - 7);
                 
+                button.titleLabel.text = label;
                 UIImage *thumbnailImage = [UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[indexes objectAtIndex:i]]];
                 
                 [button addTarget:self
@@ -237,6 +238,7 @@
         else if ([UIScreen mainScreen].bounds.size.height == 480)
             self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
     }else self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPad" bundle:nil];
+    self.tagViewController.username = self.username;
     self.tagViewController.delegate = self;
     self.modalSectionsTVC = [[ModalSectionsTVC alloc] initWithNibName:@"ModalSectionsTVC" bundle:nil];
     self.cameraVC = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
@@ -624,30 +626,25 @@
             [self.sendButton setEnabled:NO];
             [self.deleteButton setEnabled:NO];
         }
-    }else [self imageDidSelectedWithIndex:button.tag];
+    }else [self imageDidSelectedWithIndex:button.tag forObjectClass:button.titleLabel.text];
 }
 
 
 
--(void)imageDidSelectedWithIndex:(int)selectedImage
+-(void)imageDidSelectedWithIndex:(int)selectedImage forObjectClass:(NSString *)objectClass
 {
     NSString *filename = (NSString *)[self.items objectAtIndex:selectedImage];
     
-    //boxes
-    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
-    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-    
-//    //image
-//    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
-//    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-    
+//    //only scroll view of the objects of the same class.
+//    NSMutableArray *items = [[NSMutableArray alloc] init];
+//    if([objectClass isEqualToString:@""]){
+//        items = [NSMutableArray arrayWithArray:self.items];
+//    }else items = [NSMutableArray arrayWithArray:[self.labelsDictionary objectForKey:objectClass]];
+
     //load tagVC
-    self.tagViewController.username = self.username;
     self.tagViewController.items = self.items;
     self.tagViewController.filename = filename;
     self.tagViewController.userDictionary = self.userDictionary;
-    [self.tagViewController.annotationView reset];
-    [self.tagViewController.annotationView.objects setArray:boxes];
     self.tagViewController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.tagViewController animated:YES];
 }
@@ -843,6 +840,7 @@
         //save location information
         NSString *location = @"";
         location = [[self.locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
+        //TODO: FIX THIS!!
 //        [location writeToFile:[[self.userPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[tagViewController.filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
         
         [self.locationMng stopUpdatingLocation];
@@ -1189,7 +1187,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (tableView.tag == 1)
-        [self imageDidSelectedWithIndex:indexPath.row];
+        [self imageDidSelectedWithIndex:indexPath.row forObjectClass:@""];
 }
 
 
