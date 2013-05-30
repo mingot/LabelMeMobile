@@ -13,14 +13,17 @@
 #import "SendingView.h"
 
 
+@protocol TagViewControllerDelegate <NSObject>
+
+- (void) reloadTableOnImageGallery;
+
+@end
+
+
 @interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, UIScrollViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate,UITextFieldDelegate, UIGestureRecognizerDelegate>
 {
-    int numImages;
     BOOL keyboardVisible;
-    CGSize labelSize;
     ServerConnection *sConnection;
-    UIButton *labelsButtonView;
-    UIButton *tip;
 }
 
 //views
@@ -31,20 +34,22 @@
 @property (nonatomic, strong) UIImageView *imageView;
 @property (strong, nonatomic) UITableView *labelsView;
 @property (strong,nonatomic) UIView *composeView;
+@property (strong, nonatomic) UIButton *tip;
+@property (strong, nonatomic) id<TagViewControllerDelegate> delegate;
 
 //toolbar
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *addButton;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *deleteButton;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *sendButton;
-@property (strong, nonatomic) IBOutlet UIBarButtonItem *labelsButton;
+@property (strong, nonatomic) IBOutlet UIButton *labelsButton;
 @property (strong, nonatomic) IBOutlet UIToolbar *bottomToolbar;
 
 //model
 @property (nonatomic, strong) NSString *filename;
 @property (nonatomic, strong) NSArray *paths;
-@property (strong,nonatomic) NSString *username;
+@property (strong, nonatomic) NSString *username;
 @property (strong, nonatomic) NSArray *items;
-
+@property (strong, nonatomic) NSMutableDictionary *userDictionary;
 
 
 - (void) keyboardDidShow:(NSNotification *)notif;
@@ -59,11 +64,7 @@
 -(IBAction)listAction:(id)sender;
 -(IBAction)hideTip:(id)sender;
 
--(void)setImage:(UIImage *)image;
--(BOOL)saveThumbnail;
--(void)saveImage:(UIImage *)image;
--(BOOL)saveDictionary;
--(void)createFilename;
--(void)saveAnnotation;
+-(void)saveThumbnail;
+-(void)saveDictionary;
 
 @end

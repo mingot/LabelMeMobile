@@ -118,7 +118,6 @@
             NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
             NSArray *boxes = [[NSArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
             
-
             for(Box *box in boxes){
                 NSString *label;
                 if([box.label isEqualToString:@""]) label = @"00None"; else label = box.label;
@@ -155,44 +154,30 @@
             NSArray *indexes = [self.labelsDictionary objectForKey:label];
             NSMutableArray *buttons = [[NSMutableArray alloc] init];
             for(int i=0; i<indexes.count; i++){
+                
                 UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
                 button.tag = [self.items indexOfObject:[indexes objectAtIndex:i]];
-
-                //button views generation
-                UIView *imview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width)];
-                UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0.0375*self.view.frame.size.width,0.4125*self.view.frame.size.width, 0.4125*self.view.frame.size.width)];
-                imageView.image = [UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[indexes objectAtIndex:i]]];
-                [imview addSubview:imageView];
-                
-                //unselected image
-                UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width,0.45*self.view.frame.size.width));
-                [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
-                UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-                UIGraphicsEndImageContext();
-                
-                //selected image
-                UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width));
-                imview.alpha = 0.65;
-                [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
-                UIImage *imageSelected = UIGraphicsGetImageFromCurrentImageContext();
-                UIGraphicsEndImageContext();
-                
-                [imview addSubview:[self correctAccessoryWithBoxes:[NSNumber numberWithInt:7] forImgeSize:CGSizeMake(imview.frame.size.height, imview.frame.size.width)]];
                 
                 if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-                    button.frame = CGRectMake(0.05*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.225*self.view.frame.size.width, 0.225*self.view.frame.size.width);
+                    button.frame = CGRectMake(0.05*self.view.frame.size.width + 0.225*self.view.frame.size.width*(i%4),
+                                              0.01875*self.view.frame.size.width + 0.225*self.view.frame.size.width*(floor((i/4))),
+                                              0.225*self.view.frame.size.width - 5,
+                                              0.225*self.view.frame.size.width - 5);
                 
-                else button.frame = CGRectMake(0.07*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.2*self.view.frame.size.width, 0.2*self.view.frame.size.width);
+                else button.frame = CGRectMake(0.07*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4),
+                                               0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))),
+                                               0.2*self.view.frame.size.width - 7,
+                                               0.2*self.view.frame.size.width - 7);
+                
+                UIImage *thumbnailImage = [UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[indexes objectAtIndex:i]]];
                 
                 [button addTarget:self
                            action:@selector(buttonClicked:)
                  forControlEvents:UIControlEventTouchUpInside];
-                [button setImage:image forState:UIControlStateNormal];
-                [button setImage:[imageSelected addBorderForViewFrame:self.view.frame] forState:UIControlStateSelected];
+                [button setImage:thumbnailImage forState:UIControlStateNormal];
                 
                 //custom badge
-                NSDictionary *dict = [[NSDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
-                NSNumber *num = [dict objectForKey:[indexes objectAtIndex:i]];
+                NSNumber *num = [self.userDictionary objectForKey:[indexes objectAtIndex:i]];
                 [button addSubview:[self correctAccessoryWithBoxes:num forImgeSize:button.frame.size]];
                 
                 [buttons addObject:button];
@@ -204,6 +189,13 @@
 }
 
 
+
+-(NSMutableDictionary *)userDictionary
+{
+    if(!_userDictionary)
+        _userDictionary = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
+    return _userDictionary;
+}
 
 
 
@@ -224,8 +216,6 @@
         //tab bar
         self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Gallery" image:nil tag:0];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"home.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"homeActive.png"]];
-
-
     }
     return self;
 }
@@ -247,6 +237,7 @@
         else if ([UIScreen mainScreen].bounds.size.height == 480)
             self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
     }else self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPad" bundle:nil];
+    self.tagViewController.delegate = self;
     self.modalSectionsTVC = [[ModalSectionsTVC alloc] initWithNibName:@"ModalSectionsTVC" bundle:nil];
     self.cameraVC = [[CameraViewController alloc] initWithNibName:@"CameraViewController" bundle:nil];
     self.cameraVC.delegate = self;
@@ -325,7 +316,6 @@
 - (void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self reloadGallery];
     
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
@@ -360,20 +350,27 @@
 -(void) reloadGallery
 {
     //get sorted files by date of modification of the image
-    self.items = nil; //reload
-    self.labelsDictionary = nil;
-    self.buttonsDictionary = nil;
-    self.labelsOrdered = nil;
-    
-    if(self.items.count == 0) {
-        self.noImages.hidden = NO;
-        self.tableView.hidden = YES;
-        self.tableViewGrid.hidden = YES;
-    }
-    else self.noImages.hidden = YES;
-    
-    [self.tableView reloadData];
-    [self.tableViewGrid reloadData];
+    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
+    dispatch_async(saveQueue, ^{
+        self.items = nil;
+        self.labelsDictionary = nil;
+        self.labelsOrdered = nil;
+        self.buttonsDictionary = nil;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+
+            if(self.items.count == 0) {
+                self.noImages.hidden = NO;
+                self.tableView.hidden = YES;
+                self.tableViewGrid.hidden = YES;
+            }
+            else self.noImages.hidden = YES;
+            
+            [self.tableView reloadData];
+            [self.tableViewGrid reloadData];
+        });
+    });
+    dispatch_release(saveQueue);
 }
 
 
@@ -387,7 +384,7 @@
 
         
     if (num.intValue == 0){ // All images sent
-        UIImageView *accessory =  [[UIImageView alloc] initWithFrame:CGRectMake(size.width- 0.25*size2.width, 0, 0.25*size2.width, 0.25*size2.width)];
+        UIImageView *accessory =  [[UIImageView alloc] initWithFrame:CGRectMake(size.width - 0.25*size2.width, 0, 0.25*size2.width, 0.25*size2.width)];
         accessory.image = [UIImage imageNamed:@"tick.png"];
         ret = accessory;
         
@@ -399,7 +396,6 @@
         accessory.frame = CGRectMake(size.width- 0.30*size2.width, 0, 0.30*size2.width, 0.30*size2.width);
         ret = accessory;
     }
-    
     
     return  ret;
 }
@@ -509,7 +505,6 @@
                 NSString *imageUrl = [element objectForKey:@"image"];
                 [self.downloadedImageUrls addObject:imageUrl];
                 
-                
                 //get and save annotations
                 NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
                 NSDictionary *annotation = (NSDictionary *) [element objectForKey:@"annotation"];
@@ -608,10 +603,14 @@
         if ([self.selectedItems containsObject:[self.items objectAtIndex:button.tag]]) {
             [self.selectedItems removeObject:[self.items objectAtIndex:button.tag]];
             [button setSelected:NO];
+            button.layer.borderWidth = 0;
             
         }else{
             [self.selectedItems addObject:[self.items objectAtIndex:button.tag]];
             [button setSelected:YES];
+            button.layer.borderColor = [UIColor colorWithRed:(160/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0].CGColor;
+            button.layer.borderWidth = 4;
+
         }
         
         if (self.selectedItems.count > 0) {
@@ -638,20 +637,19 @@
     NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
     NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
     
-    //image
-    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
-    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
+//    //image
+//    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
+//    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
     
     //load tagVC
-    [self.tagViewController setImage:image];
-    [self.tagViewController setUsername:self.username];
+    self.tagViewController.username = self.username;
     self.tagViewController.items = self.items;
+    self.tagViewController.filename = filename;
+    self.tagViewController.userDictionary = self.userDictionary;
     [self.tagViewController.annotationView reset];
     [self.tagViewController.annotationView.objects setArray:boxes];
-    [self.tagViewController setFilename:filename];
     self.tagViewController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.tagViewController animated:YES];
-    
 }
 
 
@@ -754,10 +752,9 @@
 {
     int index = 0;
     NSError *error = nil;
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     NSFileManager *filemng = [NSFileManager defaultManager];
     if (![filemng removeItemAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:index]] error:&error]) {
-        [NSKeyedArchiver archiveRootObject:dict toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.selectedItems objectAtIndex:index]]];
+        [NSKeyedArchiver archiveRootObject:self.userDictionary toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.selectedItems objectAtIndex:index]]];
         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"It can not be removed." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
     }
@@ -766,7 +763,7 @@
         
         if (![filemng removeItemAtPath:[[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:index]] error:&error]) {
             NSData *thum = UIImageJPEGRepresentation(thumim, 0.75);
-            [NSKeyedArchiver archiveRootObject:dict toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:index]]];
+            [NSKeyedArchiver archiveRootObject:self.userDictionary toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:index]]];
             [filemng createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:index]] contents:thum attributes:nil];
             UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"It can not be removed." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];
@@ -781,10 +778,10 @@
             else{
                 [filemng removeItemAtPath:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:OBJECTS],[[[self.selectedItemsDelete objectAtIndex:index] stringByDeletingPathExtension] stringByAppendingPathExtension:@"txt"]  ] error:&error];
             }
-            [dict removeObjectForKey:[self.selectedItemsDelete objectAtIndex:index]];
+            [self.userDictionary removeObjectForKey:[self.selectedItemsDelete objectAtIndex:index]];
         }
     }
-    [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:YES];
+    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:YES];
     [self.selectedItemsDelete removeObjectAtIndex:index];
     if(self.selectedItemsDelete.count > 0){
         [self deletePhotoAndAnnotation];
@@ -798,8 +795,7 @@
 
 -(void)sendPhoto
 {
-    NSDictionary *dict = [[NSDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
-    NSNumber *num = [dict objectForKey:[self.selectedItemsSend objectAtIndex:0]];
+    NSNumber *num = [self.userDictionary objectForKey:[self.selectedItemsSend objectAtIndex:0]];
 
     UIImage *image = [[UIImage alloc] initWithContentsOfFile:[[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:[self.selectedItemsSend objectAtIndex:0]]];
     
@@ -833,8 +829,6 @@
         NSDictionary *userDictionary = [[NSDictionary alloc] initWithContentsOfFile:[[self.userPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
         
         [self.locationMng startUpdatingLocation];
-        TagViewController *tagViewController = [[TagViewController alloc] init];
-        tagViewController.username = self.username;
         
         //get the new size of the image according to the defined resolution and save image
         CGSize newSize = image.size;
@@ -849,17 +843,63 @@
         //save location information
         NSString *location = @"";
         location = [[self.locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
-        [location writeToFile:[[self.userPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[tagViewController.filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+//        [location writeToFile:[[self.userPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[tagViewController.filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
         
         [self.locationMng stopUpdatingLocation];
         
-        [tagViewController saveImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
+        [self saveImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
         dispatch_sync(dispatch_get_main_queue(), ^{
             [self reloadGallery];
             self.tableViewGrid.hidden = NO;
         });
     });
     dispatch_release(savingQueue);
+}
+
+#pragma mark -
+#pragma mark Save image and Filename
+
+-(void)saveImage:(UIImage *)image
+{
+    if (self.paths == nil)
+        self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
+    
+    //set self.filename
+    NSString *filename = [self createFilename];
+    [self createPlistEntry:filename];
+    
+    NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:filename];
+    [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
+    
+    NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:filename];
+    [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
+}
+
+
+-(void)createPlistEntry:(NSString *)filename
+{
+    [self.sendButton setTitle:@"Send"];
+    [self.userDictionary setObject:[[NSNumber alloc] initWithInt:-1] forKey:filename];
+    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
+}
+
+
+-(NSString *) createFilename
+{
+    NSString *date = [[NSString alloc]initWithString:[[[NSDate date] description] substringToIndex:19]];
+    date = [date stringByReplacingOccurrencesOfString:@" " withString:@""];
+    date = [date stringByReplacingOccurrencesOfString:@"-" withString:@""];
+    date = [date stringByReplacingOccurrencesOfString:@":" withString:@""];
+    
+    return [date stringByAppendingFormat:@"%@.jpg",self.username];
+}
+
+#pragma mark -
+#pragma mark TagVC Delegate
+
+- (void) reloadTableOnImageGallery
+{
+    [self reloadGallery];
 }
 
 
@@ -877,11 +917,10 @@
         [NSKeyedArchiver archiveRootObject:objects toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
     }
     
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     NSNumber *newdictnum = [[NSNumber alloc]initWithInt:0];
-    [dict removeObjectForKey:filename];
-    [dict setObject:newdictnum forKey:filename];
-    [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
+    [self.userDictionary removeObjectForKey:filename];
+    [self.userDictionary setObject:newdictnum forKey:filename];
+    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
     if (self.selectedItemsSend.count > 0) {
         [self.sendingView.progressView setProgress:0];
         [self.sendingView incrementNum];
@@ -945,11 +984,10 @@
         
         [NSKeyedArchiver archiveRootObject:objects toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
     }
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     NSNumber *newdictnum = [[NSNumber alloc]initWithInt:(-objects.count-1)];
-    [dict removeObjectForKey:filename];
-    [dict setObject:newdictnum forKey:filename];
-    [dict writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
+    [self.userDictionary removeObjectForKey:filename];
+    [self.userDictionary setObject:newdictnum forKey:filename];
+    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
     if (self.selectedItemsSend.count > 0) {
         [self sendPhoto];
     }
@@ -1068,14 +1106,13 @@
 {
   
     UITableViewCell *cell = nil;
-    NSDictionary *dict = [[NSDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     
     //grid
     if (tableView.tag == 0) {
         
-        NSArray *buttons = [self.buttonsDictionary  objectForKey:[self.labelsOrdered objectAtIndex:indexPath.section]];
-        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
         
+        NSArray *buttons = [self.buttonsDictionary  objectForKey:[self.labelsOrdered objectAtIndex:indexPath.section]];
         for(UIButton *button in buttons) [cell addSubview:button];
         
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
@@ -1083,7 +1120,7 @@
     //list
     }else if (tableView.tag == 1) {
        
-        NSNumber *num = [dict objectForKey:[self.items objectAtIndex:indexPath.row]];
+        NSNumber *num = [self.userDictionary objectForKey:[self.items objectAtIndex:indexPath.row]];
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
         
         //button
@@ -1302,10 +1339,8 @@
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     [[UIColor blueColor] setStroke];
     
-    
     CGContextSetLineWidth(ctx, 60);
     CGContextSetStrokeColorWithColor(ctx, [UIColor blueColor].CGColor);
-    
     
     for(Box *box in boxes){
         CGRect rectangle = [box getRectangleForBox];

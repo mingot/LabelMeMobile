@@ -17,7 +17,7 @@
 #import "AYUIButton.h"
 
 
-@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalSectionsTVCDelegate, CameraViewControllerDeledate>
+@interface GalleryViewController : UIViewController <UIActionSheetDelegate,ServerConnectionDelegate, UITableViewDelegate,UITableViewDataSource,UINavigationControllerDelegate,SendingViewDelegate, ModalSectionsTVCDelegate, CameraViewControllerDeledate, TagViewControllerDelegate>
 {
     int selectedTableIndex;
     int photosWithErrors;
@@ -25,11 +25,12 @@
 }
 
 
-@property (nonatomic, strong) ServerConnection *serverConnection;
+@property (nonatomic,strong) ServerConnection *serverConnection;
 @property (nonatomic,strong) CLLocationManager *locationMng;
 @property (nonatomic,strong) NSArray *paths;
 @property (nonatomic,strong) NSString *username;
 @property (nonatomic,strong) NSArray *userPaths;
+@property (nonatomic,strong) NSMutableDictionary *userDictionary;
 
 //view
 @property (nonatomic, strong) UILabel *noImages;

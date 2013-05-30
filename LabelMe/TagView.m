@@ -98,101 +98,84 @@
 
 #pragma mark -
 #pragma mark Touch Events
--(void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
+
+-(void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint location = [touch locationInView:touch.view];
     
-
-
-    if (selectedBox!=-1) {
+    //a box is selected
+    if (selectedBox != -1) {
         Box *currentBox = [self.objects objectAtIndex: selectedBox];
         [currentBox setBounds:self.frame];
 
-        
-        if ((CGRectContainsPoint(CGRectMake([currentBox upperLeft].x-DET*LINEWIDTH, [currentBox upperLeft].y-DET*LINEWIDTH,2*DET*LINEWIDTH,2*DET*LINEWIDTH) , location)))  {
-            size=YES;
+        if ((CGRectContainsPoint(CGRectMake([currentBox upperLeft].x-DET*LINEWIDTH, [currentBox upperLeft].y-DET*LINEWIDTH,2*DET*LINEWIDTH,2*DET*LINEWIDTH), location)))  {
+            size = YES;
             corner = 1;
-        }
-        else if ((CGRectContainsPoint(CGRectMake([currentBox lowerRight].x-DET*LINEWIDTH, [currentBox lowerRight].y-DET*LINEWIDTH,2*DET*LINEWIDTH,2*DET*LINEWIDTH) , location)))  {
-            size=YES;
-            corner=4;
-        }
-        else if ((CGRectContainsPoint(CGRectMake([currentBox lowerRight].x-DET*LINEWIDTH, [currentBox upperLeft].y-DET*LINEWIDTH,2*DET*LINEWIDTH,2*DET*LINEWIDTH) , location)))  {
-            size=YES;
-            corner=2;
-        }
-        else if ((CGRectContainsPoint(CGRectMake([currentBox upperLeft].x-DET*LINEWIDTH, [currentBox lowerRight].y-DET*LINEWIDTH,2*DET*LINEWIDTH,2*DET*LINEWIDTH) , location)))  {
-            size=YES;
-            corner=3;
-        }
-        else if ((CGRectContainsPoint(CGRectMake([currentBox upperLeft].x-LINEWIDTH/2, [currentBox upperLeft].y-LINEWIDTH/2, [currentBox lowerRight].x-[currentBox upperLeft].x+LINEWIDTH, [currentBox lowerRight].y-[currentBox upperLeft].y+LINEWIDTH) , location))) {
+            
+        } else if ((CGRectContainsPoint(CGRectMake([currentBox lowerRight].x-DET*LINEWIDTH, [currentBox lowerRight].y-DET*LINEWIDTH,2*DET*LINEWIDTH,2*DET*LINEWIDTH), location)))  {
+            size = YES;
+            corner = 4;
+            
+        } else if ((CGRectContainsPoint(CGRectMake([currentBox lowerRight].x-DET*LINEWIDTH, [currentBox upperLeft].y-DET*LINEWIDTH,2*DET*LINEWIDTH,2*DET*LINEWIDTH), location)))  {
+            size = YES;
+            corner = 2;
+            
+        } else if ((CGRectContainsPoint(CGRectMake([currentBox upperLeft].x-DET*LINEWIDTH, [currentBox lowerRight].y-DET*LINEWIDTH,2*DET*LINEWIDTH,2*DET*LINEWIDTH), location)))  {
+            size = YES;
+            corner = 3;
+            
+        }else if ((CGRectContainsPoint(CGRectMake([currentBox upperLeft].x-LINEWIDTH/2, [currentBox upperLeft].y-LINEWIDTH/2, [currentBox lowerRight].x-[currentBox upperLeft].x+LINEWIDTH, [currentBox lowerRight].y-[currentBox upperLeft].y+LINEWIDTH) , location))) {
           
-                move=YES;
-                firstLocation=location;
-            
-            
-        }
-        
-        
-        else{
+            move = YES;
+            firstLocation = location;
+        }else{
             [self.delegate selectedAnObject:NO];
             selectedBox=-1;
             [self.delegate hiddenTextField:YES];
-            
         }
-    }
-    
-    else{
         
-
-        selectedBox=[self whereIs:location];
-        if ((selectedBox!=-1) && (![self boxIsVisible:[self.objects objectAtIndex:selectedBox]])) {
-            selectedBox = -1;
-            [self.delegate selectedAnObject:NO];
-
-        }
-        if (selectedBox!=-1) {
+    //no box selected
+    }else{
+        
+        //locate if there is any box at the point touched
+        selectedBox = [self whereIs:location];
+        
+//        if ((selectedBox != -1) && (![self boxIsVisible:[self.objects objectAtIndex:selectedBox]])) {
+//            selectedBox = -1;
+//            [self.delegate selectedAnObject:NO];
+//        }
+        
+        if (selectedBox != -1) {
             [self.delegate hiddenTextField:NO];
             Box *currentBox=[self.objects objectAtIndex: selectedBox];
             [self.delegate selectedAnObject:YES];
             [currentBox setBounds:self.frame];
 
-            //self.label.text=currentBox.label;
             [self.delegate stringLabel:currentBox.label];
             [self.delegate correctOrientation:currentBox.upperLeft :currentBox.lowerRight SuperviewFrame:self.frame];
-            //[self.label setCorrectOrientationWithCorners:currentBox.upperLeft :currentBox.lowerRight SuperviewFrame:self.frame.size];
-            move=NO;
-            size=NO;
-        }
-        
-        else{
-            /*corner=0;
-            size=YES;*/
+            move = NO;
+            size = NO;
+            
+        }else{
             size = NO;
             move = NO;
             [self.delegate selectedAnObject:NO];            
         }
-    }  
-    
+    }
 }
 
 
 
--(void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
+-(void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint location = [touch locationInView:touch.view];
     [self.delegate hiddenTextField:YES];
     Box *currentBox;
     if (move) {
-
         currentBox = [self.objects objectAtIndex:selectedBox];
-   //     [currentBox setBounds:self.frame];
-
-        [currentBox updatePoints:firstLocation :location];
-      //  [self.objects replaceObjectAtIndex:selectedBox withObject:currentBox];
-        //[self.label setCorrectOrientationWithCorners:currentBox.upperLeft :currentBox.lowerRight SuperviewFrame:self.frame.size];
-
-        
+        [currentBox updatePoints:firstLocation :location];        
     }
     
     else if (size){
@@ -242,6 +225,7 @@
 
 #pragma mark -
 #pragma mark Search Box
+
 -(int)boxInterior:(int)i :(CGPoint)point
 {
 
@@ -292,23 +276,17 @@
     return visibleFrame;
 }
 
--(BOOL)boxIsVisible:(Box *)box{
-    int num = 0;
-    if (CGRectContainsPoint(visibleFrame, box.upperLeft)) 
-        num++;
-    
-    if (CGRectContainsPoint(visibleFrame, box.lowerRight)) 
-        num++;
-    
-    if (CGRectContainsPoint(visibleFrame, CGPointMake(box.lowerRight.x, box.upperLeft.y))) 
-        num++;
-    
-    if (CGRectContainsPoint(visibleFrame, CGPointMake(box.upperLeft.x, box.lowerRight.y))) 
-        num++;
-    
-    if(num > 1)return YES;
-    else return NO;
-}
+//-(BOOL)boxIsVisible:(Box *)box
+//{    
+//    int num = 0;
+//    if (CGRectContainsPoint(visibleFrame, box.upperLeft)) num++;
+//    if (CGRectContainsPoint(visibleFrame, box.lowerRight)) num++;
+//    if (CGRectContainsPoint(visibleFrame, CGPointMake(box.lowerRight.x, box.upperLeft.y))) num++;
+//    if (CGRectContainsPoint(visibleFrame, CGPointMake(box.upperLeft.x, box.lowerRight.y))) num++;
+//    
+//    if(num > 1)return YES;
+//    else return NO;
+//}
 
 #pragma mark -
 #pragma mark Selected Box

@@ -39,15 +39,11 @@ static float LINEWIDTH = 6;
 {
     self = [super init];
     if (self) {
-        // Initialization code here.
         upperLeft = upper;
         lowerRigth = lower;
         self.label= [NSString stringWithFormat:@""];
         sent = NO;
-
-
     }
-    
     return self;
 }
 -(void)setBounds:(CGRect)rect{
