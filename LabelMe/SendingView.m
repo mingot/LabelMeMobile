@@ -33,6 +33,7 @@
         self.textView.textColor = [UIColor whiteColor];
         self.textView.textAlignment = NSTextAlignmentCenter;
         self.textView.text = @"";
+        self.textView.editable = NO;
         
         //cancel button
         self.cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];

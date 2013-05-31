@@ -27,15 +27,17 @@
 }
 
 //views
-@property (strong,nonatomic) SendingView *sendingView;
+@property (strong, nonatomic) SendingView *sendingView;
 @property (strong, nonatomic) TagView *annotationView;
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (strong, nonatomic) IBOutlet UITextField *label;
-@property (nonatomic, strong) UIImageView *imageView;
+@property (strong, nonatomic) UIImageView *imageView;
 @property (strong, nonatomic) UITableView *labelsView;
-@property (strong,nonatomic) UIView *composeView;
+@property (strong, nonatomic) UIView *composeView;
 @property (strong, nonatomic) UIButton *tip;
 @property (strong, nonatomic) id<TagViewControllerDelegate> delegate;
+@property (strong, nonatomic) UIButton *nextButton;
+@property (strong, nonatomic) UIButton *previousButton;
 
 
 //toolbar
@@ -46,8 +48,8 @@
 @property (strong, nonatomic) IBOutlet UIToolbar *bottomToolbar;
 
 //model
-@property (nonatomic, strong) NSString *filename;
-@property (nonatomic, strong) NSArray *paths;
+@property (strong, nonatomic) NSString *filename;
+@property (strong, nonatomic) NSArray *paths;
 @property (strong, nonatomic) NSString *username;
 @property (strong, nonatomic) NSArray *items;
 @property (strong, nonatomic) NSMutableDictionary *userDictionary;

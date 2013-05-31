@@ -22,9 +22,9 @@
 
 @interface TagViewController()
 
-//
-@property int currentScrollIndex;
-@property (nonatomic, strong) NSMutableArray *composeViewsArray; //array of compose views to set in each part of the scroll view.
+//UIScroll view
+//@property int currentScrollIndex;
+//@property (nonatomic, strong) NSMutableArray *composeViewsArray; //array of compose views to set in each part of the scroll view.
 
 //load ajustments for the loaded boxes
 - (void) onTimeLoad;
@@ -38,15 +38,15 @@
 #pragma mark -
 #pragma mark Getters and Setters
 
-- (NSMutableArray *) composeViewsArray
-{
-    if(!_composeViewsArray){
-        _composeViewsArray = [[NSMutableArray alloc] initWithCapacity:self.items.count];
-        for(int i=0;i<self.items.count;i++)
-            [_composeViewsArray addObject:[NSNull null]];
-    }
-    return _composeViewsArray;
-}
+//- (NSMutableArray *) composeViewsArray
+//{
+//    if(!_composeViewsArray){
+//        _composeViewsArray = [[NSMutableArray alloc] initWithCapacity:self.items.count];
+//        for(int i=0;i<self.items.count;i++)
+//            [_composeViewsArray addObject:[NSNull null]];
+//    }
+//    return _composeViewsArray;
+//}
 
 
 #pragma mark -
@@ -117,20 +117,14 @@
 	self.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
 	self.scrollView.clipsToBounds = YES;		
 	self.scrollView.scrollEnabled = YES;
-	self.scrollView.pagingEnabled = YES;
+	self.scrollView.pagingEnabled = NO;
     self.scrollView.minimumZoomScale = 1.0;
     self.scrollView.maximumZoomScale = 10.0;
     self.scrollView.delegate = self;
 //    CGSize contentSize = CGSizeMake(self.scrollView.frame.size.width*self.items.count, self.scrollView.frame.size.height);
 //    [self.scrollView setContentSize:contentSize];
-    [self.scrollView setContentSize:self.scrollView.frame.size];
-    [self.scrollView addSubview:self.composeView];
-    [self.scrollView addSubview:self.label];
-    [self.scrollView addSubview:self.labelsView];
-    [self.scrollView addSubview:self.sendingView];
-    [self.scrollView addSubview:self.tip];
     
-    
+    //labels
     [self.label setBorderStyle:UITextBorderStyleNone];
     [self.label setKeyboardAppearance:UIKeyboardAppearanceAlert];
     [self.labelsView setBackgroundColor:[UIColor clearColor]];
@@ -138,6 +132,7 @@
     [self.labelsView setDelegate:self];
     [self.labelsView setDataSource:self];
     [self.labelsView setRowHeight:30];
+    self.labelsView.scrollEnabled = NO;
     UIImage *globo = [[UIImage imageNamed:@"globo4.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )];
     UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.scrollView.frame];
     [backgroundView setImage:globo];
@@ -156,8 +151,6 @@
     if ((self.items.count>1) || (self.annotationView.objects.count != 0))
         self.tip.hidden = YES;
 
-
-    
     //sending view
     self.sendingView = [[SendingView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height)];
     [self.sendingView setHidden:YES];
@@ -181,21 +174,28 @@
 
     //Next and previous buttons
     
-    UIButton *nextButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    nextButton.frame = CGRectMake(0, self.scrollView.frame.size.height/2, 50, 50);
-    [nextButton setImage:[UIImage imageNamed:@"next_button.png"] forState:UIControlStateNormal];
-    [nextButton addTarget:self action:@selector(changeImageAction:) forControlEvents:UIControlEventTouchUpInside];
-    nextButton.tag = 2;
-    UIImageView *rotateImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"next_button.png"]];
-    rotateImageView.transform = CGAffineTransformMakeRotation(M_PI);
+    self.nextButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.nextButton.frame = CGRectMake(self.scrollView.frame.size.width - 50, self.scrollView.frame.size.height/2, 50, 50);
+    [self.nextButton setImage:[UIImage imageNamed:@"next_button.png"] forState:UIControlStateNormal];
+    [self.nextButton addTarget:self action:@selector(changeImageAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.nextButton.tag = 2;
     
-    UIButton *previousButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    previousButton.frame  = CGRectMake(self.scrollView.frame.size.width - 50, self.scrollView.frame.size.height/2, 50, 50);
-    [previousButton setImage:rotateImageView.image forState:UIControlStateNormal];
-    [previousButton addTarget:self action:@selector(changeImageAction:) forControlEvents:UIControlEventTouchUpInside];
-    previousButton.tag = 1;
-    [self.composeView addSubview:nextButton];
-    [self.composeView addSubview:previousButton];
+    self.previousButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.previousButton.frame  = CGRectMake(0, self.scrollView.frame.size.height/2, 50, 50);
+    [self.previousButton setImage:[UIImage imageNamed:@"next_button.png"] forState:UIControlStateNormal];
+    [self.previousButton addTarget:self action:@selector(changeImageAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.previousButton.tag = 1;
+
+    
+    //subview hierarchy
+    [self.scrollView setContentSize:self.scrollView.frame.size];
+    [self.scrollView addSubview:self.composeView];
+    [self.scrollView addSubview:self.label];
+    [self.scrollView addSubview:self.labelsView];
+    [self.scrollView addSubview:self.tip];
+    [self.scrollView addSubview:self.nextButton];
+    [self.scrollView addSubview:self.previousButton];
+    [self.scrollView addSubview:self.sendingView];
     
 
 //    //Swipe gesture recognizer: for both directions the same target
@@ -216,6 +216,10 @@
     
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
+    
+    //show buttons
+    self.previousButton.hidden = NO;
+    self.nextButton.hidden = NO;
     
     //make some ajustments on the loaded boxes
     [self onTimeLoad];
@@ -378,6 +382,11 @@
 {
     //calculate the visible frame for when adding a new box being adapted to the box
     if (scrollView.zoomScale > 1.0) {
+        
+        //disable buttons
+        self.nextButton.hidden = YES;
+        self.previousButton.hidden = YES;
+        
         CGPoint point = self.annotationView.frame.origin; // origin
         CGPoint point2 = CGPointMake(0, 0); // size
         
@@ -405,7 +414,11 @@
         CGRect rectvisible = CGRectMake(scrollView.contentOffset.x/scrollView.zoomScale - point.x, scrollView.contentOffset.y/scrollView.zoomScale - point.y, (scrollView.frame.size.width-point2.x)/scrollView.zoomScale, (scrollView.frame.size.height-point2.y)/scrollView.zoomScale);
         [self.annotationView setVisibleFrame:rectvisible];
         
-    }else [self.annotationView setVisibleFrame:CGRectMake(0, 0, self.annotationView.frame.size.width, self.annotationView.frame.size.height)];
+    }else {
+        [self.annotationView setVisibleFrame:CGRectMake(0, 0, self.annotationView.frame.size.width, self.annotationView.frame.size.height)];
+        self.previousButton.hidden = NO;
+        self.nextButton.hidden = NO;
+    }
 }
 
 - (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
@@ -541,9 +554,13 @@
 
 -(IBAction)sendAction:(id)sender
 {
+    //save state
     [self saveDictionary];
     [self saveThumbnail];
+    
     [self barButtonsEnabled:NO];
+    
+    //sending view
     [self.sendingView setHidden:NO];
     [self.sendingView.progressView setProgress:0];
     [self.sendingView.activityIndicator startAnimating];
@@ -589,7 +606,7 @@
         }else [self.labelsView setFrame:CGRectMake(0.015625*self.view.frame.size.width + self.scrollView.contentOffset.x,
                                                  self.scrollView.frame.size.height - self.annotationView.objects.count*self.labelsView.rowHeight-0.078125*self.view.frame.size.width + self.scrollView.contentOffset.y,
                                                  self.scrollView.frame.size.width - 0.03125*self.view.frame.size.width,
-                                                 self.annotationView.objects.count*self.labelsView.rowHeight+0.0625*self.view.frame.size.width)];
+                                                 self.annotationView.objects.count*self.labelsView.rowHeight+0.0625*self.view.frame.size.width+5)];
         self.labelsView.layer.masksToBounds = YES;
         [self.labelsView.layer setCornerRadius:10];
         
@@ -613,62 +630,25 @@
     else return YES;
 }
 
-//- (IBAction)swipeAction:(id)sender
-//{
-//    UISwipeGestureRecognizer *swipe = (UISwipeGestureRecognizer *) sender;
-//    
-//    int increase = 2*swipe.direction-3;
-//    NSUInteger currentIndex = [self.items indexOfObject:self.filename];
-//    NSString *filename = (NSString *)[self.items objectAtIndex:(currentIndex+increase)%self.items.count];
-//    
-//    //boxes
-//    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
-//    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-//    
-//    //image
-//    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
-//    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-//    
-//    //load tagVC
-//    [self.annotationView reset];
-//    [self.annotationView.objects setArray:boxes];
-//    [self setFilename:filename];
-//    
-//    [self onTimeLoad];
-//    
-//    //save boxes
-//    [self saveThumbnail];
-//    [self saveDictionary];
-//}
-
 - (IBAction)changeImageAction:(id)sender
 {
-    NSLog(@"Button pressed!");
+    //save state
+    [self saveThumbnail];
+    [self saveDictionary];
     
     UIButton *button = (UIButton *)sender;
     
     int increase = 2*button.tag - 3;
-    NSUInteger currentIndex = [self.items indexOfObject:self.filename];
-    NSString *filename = (NSString *)[self.items objectAtIndex:(currentIndex+increase)%self.items.count];
+    int currentIndex = [self.items indexOfObject:self.filename];
+    int total = self.items.count;
+    int a = currentIndex + increase;
+    int nextIndex = (a >= 0) ? (a % total) : ((a % total) + total);
+    NSString *newFilename = (NSString *)[self.items objectAtIndex:nextIndex];
+    //NSLog(@"current index: %d, next index: %d, increase: %d, button.tag: %d",currentIndex, (currentIndex+increase)%self.items.count, increase, button.tag);
     
-    //boxes
-    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
-    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-    
-    //image
-    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
-    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-    
-    //load tagVC
-    [self.annotationView reset];
-    [self.annotationView.objects setArray:boxes];
-    [self setFilename:filename];
-    
+    //load new boxes and new image
+    self.filename = newFilename;
     [self onTimeLoad];
-    
-    //save boxes
-    [self saveThumbnail];
-    [self saveDictionary];
 }
 
 
@@ -769,9 +749,12 @@
     
     CGImageRelease(imageRef);
 
-    
-    NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
-    [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil];
+    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
+    dispatch_async(saveQueue, ^{
+        NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
+        [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil];
+    });
+    dispatch_release(saveQueue);
 }
 
 -(void)saveDictionary
@@ -896,12 +879,11 @@
          cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
 
     [cell setBackgroundColor:[UIColor clearColor]];
-    Box *b = [self.annotationView.objects   objectAtIndex:indexPath.row];
-    if ([b.label length] != 0) {
+    Box *b = [self.annotationView.objects objectAtIndex:indexPath.row];
+    if (b.label.length != 0) {
         if ([cell.textLabel respondsToSelector:@selector(setAttributedText:)]) {
             NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:b.label];
             [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, b.label.length)];
-
             [attrString addAttribute:NSStrokeColorAttributeName value:b.color range:NSMakeRange(0, b.label.length)];
             [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, b.label.length)];
 
@@ -914,7 +896,6 @@
             NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:@"(No Label)"];
 
             [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0,10)];
-            
             [attrString addAttribute:NSStrokeColorAttributeName value:b.color range:NSMakeRange(0, 10)];
             [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, 10)];
             

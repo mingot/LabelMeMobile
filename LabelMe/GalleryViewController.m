@@ -26,6 +26,9 @@
 
 
 @interface GalleryViewController()
+{
+    dispatch_queue_t savingQueue;
+}
 
 //arrays to store information about downloaded images from server
 @property (nonatomic, strong) NSMutableArray *downloadedThumbnails;
@@ -217,6 +220,9 @@
         //tab bar
         self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Gallery" image:nil tag:0];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"home.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"homeActive.png"]];
+        
+        //saving Queue
+        savingQueue = dispatch_queue_create("savingQueue", NULL);
     }
     return self;
 }
@@ -301,7 +307,6 @@
     
     //sendingView 
     self.sendingView = [[SendingView alloc] initWithFrame:self.tabBarController.view.frame];
-//    NSLog(@"view height: %f, tabBarContorller height: %f", self.view.frame.size.height, self.tabBarController.view.frame.size.height);
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [self.sendingView setHidden:YES];
     self.sendingView.delegate = self;
@@ -681,6 +686,8 @@
 -(IBAction)sendAction:(id)sender
 {
     [self.selectedItemsSend addObjectsFromArray:self.selectedItems];
+    
+    //sending view
     [self.sendingView.activityIndicator startAnimating];
     [self.sendingView setHidden:NO];
     [self.sendingView setTotal:self.selectedItemsSend.count];
@@ -820,12 +827,8 @@
 
 -(void) addImageCaptured:(UIImage *)image
 {
-    dispatch_queue_t savingQueue = dispatch_queue_create("saving_image", 0);
     dispatch_async(savingQueue, ^{
-        
         NSDictionary *userDictionary = [[NSDictionary alloc] initWithContentsOfFile:[[self.userPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
-        
-        [self.locationMng startUpdatingLocation];
         
         //get the new size of the image according to the defined resolution and save image
         CGSize newSize = image.size;
@@ -837,21 +840,12 @@
         //save image into library if option enabled in settings
         if ([[userDictionary objectForKey:@"cameraroll"] boolValue]) UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
         
-        //save location information
-        NSString *location = @"";
-        location = [[self.locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
-        //TODO: FIX THIS!!
-//        [location writeToFile:[[self.userPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[tagViewController.filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
-        
-        [self.locationMng stopUpdatingLocation];
-        
         [self saveImage:[image resizedImage:newSize interpolationQuality:kCGInterpolationHigh]];
         dispatch_sync(dispatch_get_main_queue(), ^{
             [self reloadGallery];
             self.tableViewGrid.hidden = NO;
         });
     });
-    dispatch_release(savingQueue);
 }
 
 #pragma mark -
@@ -866,9 +860,18 @@
     NSString *filename = [self createFilename];
     [self createPlistEntry:filename];
     
+    //save location
+    [self.locationMng startUpdatingLocation];
+    NSString *location = @"";
+    location = [[self.locationMng.location.description stringByReplacingOccurrencesOfString:@"<" withString:@""] stringByReplacingOccurrencesOfString:@">" withString:@""];
+    [location writeToFile:[[self.userPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[filename stringByDeletingPathExtension] stringByAppendingString:@".txt"]] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+    [self.locationMng stopUpdatingLocation];
+    
+    //save image
     NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:filename];
     [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
     
+    //save thumb
     NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:filename];
     [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
 }
@@ -888,6 +891,7 @@
     date = [date stringByReplacingOccurrencesOfString:@" " withString:@""];
     date = [date stringByReplacingOccurrencesOfString:@"-" withString:@""];
     date = [date stringByReplacingOccurrencesOfString:@":" withString:@""];
+    date = [date stringByAppendingFormat:@"%02d", arc4random()%100];
     
     return [date stringByAppendingFormat:@"%@.jpg",self.username];
 }
@@ -1232,31 +1236,30 @@
     dispatch_queue_t queue = dispatch_queue_create("DownloadQueue", NULL);
     dispatch_async(queue, ^(void){
         
-        for(int i=0;i<selectedItems.count && !self.cancelDownloading; i++){ //for each image selected
-            
-            NSNumber *selectedIndex = [selectedItems objectAtIndex:i];
-            NSString *imageName = [self.downloadedImageNames objectAtIndex:selectedIndex.intValue];
-                        
-            //Save annotation
-            NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
-            [NSKeyedArchiver archiveRootObject:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue] toFile:pathObject];
+        for(int i=0;i<selectedItems.count && !self.cancelDownloading; i++){ //for each image selected            
+            @autoreleasepool {
+                NSNumber *selectedIndex = [selectedItems objectAtIndex:i];
+                NSString *imageName = [self.downloadedImageNames objectAtIndex:selectedIndex.intValue];
+                
+                //Save annotation
+                NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
+                [NSKeyedArchiver archiveRootObject:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue] toFile:pathObject];
+                
+                //download and save image
+                UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[self.downloadedImageUrls objectAtIndex:selectedIndex.intValue]]]];
+                NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
+                [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
+                
+                //Save thumbnail
+                UIImage *thumbnailImage = [self thumbnailImageFromImage:image withBoxes:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue]];
+                NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:imageName];
+                [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation(thumbnailImage, 1.0) attributes:nil];
+            }
 
-            //download and save image 
-            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[self.downloadedImageUrls objectAtIndex:selectedIndex.intValue]]]];
-            NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
-            [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
-            
-            //Save thumbnail
-            UIImage *thumbnailImage = [self thumbnailImageFromImage:image withBoxes:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue]];
-            NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:imageName];
-            [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation(thumbnailImage, 1.0) attributes:nil];
-            
             dispatch_sync(dispatch_get_main_queue(), ^{
                 self.sendingView.textView.text = [NSString stringWithFormat:@"Downloading from LabelMe Server... %d/%d",i+1,selectedItems.count];
                 [self.sendingView.progressView setProgress:(i+1)*1.0/selectedItems.count];
             });
-
-            
         }
         dispatch_sync(dispatch_get_main_queue(), ^{
             if(self.cancelDownloading){
@@ -1352,8 +1355,7 @@
     int thumbnailSize = 300;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
     UIImage *thumbnailImage = [[UIImage imageWithCGImage:resultingImage.CGImage] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
-    
-    
+
     return thumbnailImage;
 }
 
