@@ -14,7 +14,6 @@
 
 @interface CameraViewController ()
 
-@property int numberImages;
 @property BOOL isUsingFrontFacingCamera;
 
 @end
@@ -28,7 +27,6 @@
     [super viewDidLoad];
     
     self.isUsingFrontFacingCamera = NO;
-    self.numberImages = 0;
     
     [self.switchButton transformButtonForCamera];
     self.switchButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -91,8 +89,16 @@
 
 -(void) viewWillAppear:(BOOL)animated
 {
+
     self.navigationController.navigationBarHidden = YES;
+    self.thumbnailCaptureImageView.image = nil;
 }
+
+//-(void) viewWillDisappear:(BOOL)animated
+//{
+//    [self.captureSession stopRunning];
+//    [super viewWillDisappear:animated];
+//}
 
 #pragma mark -
 #pragma mark IBActions
@@ -121,7 +127,6 @@
         UIImage *image = [[UIImage alloc] initWithData:imageData];
         
         self.thumbnailCaptureImageView.image = image;
-        self.numberImages++;
         [self.delegate addImageCaptured:image];
 	 }];
 }

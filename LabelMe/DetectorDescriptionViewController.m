@@ -30,16 +30,20 @@
 #define INITIATED 1
 #define INTERRUPTED 2
 
+//training results
+#define SUCCESS 1
+#define INTERRUPTED 2 //and not trained
+#define FAIL 0
+
 
 @interface DetectorDescriptionViewController()
 
-@property BOOL trainingWentGood;
 @property (strong, nonatomic) UIImage *averageImage;
 @property int firstTraingState; //0: not first training, 1: first training initiated, 2: first training interrupted
 @property BOOL isFirstTraining;
 
 // wrapper to call the detector for training and testing
--(void) trainForImagesNames:(NSArray *)imagesNames;
+-(int) trainForImagesNames:(NSArray *)imagesNames;
 -(void) testForImagesNames: (NSArray *) imagesNames;
 
 //generate a unique id
@@ -424,34 +428,55 @@
         [self.sendingView clearScreen];
         self.svmClassifier.trainCancelled = NO;
         
-        //set hog dimension based on user preferences
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[self.resourcesPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
-        int hog = [(NSNumber *)[dict objectForKey:@"hogdimension"] intValue];
-        if(hog==0) hog = 8; //if not set, defautl is template size of 8 cells height
-        self.svmClassifier.maxHog = hog;
-        
         //train in a different queue
         dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
         dispatch_async(myQueue, ^{
-            [self trainForImagesNames:traingImagesNames];
-            if(self.trainingWentGood && !self.svmClassifier.cancelledBeforBeginning)[self testForImagesNames:testImagesNames];
-            if(self.svmClassifier.cancelledBeforBeginning == YES){
-                //if classifier not even trained with one iteration(cancelled before) then rescue previous classifer (undo)
-                self.svmClassifier = self.previousSvmClassifier;
-                self.undoButtonBar.enabled = NO;
+            __block int trainingState = [self trainForImagesNames:traingImagesNames];
+            if (trainingState == SUCCESS) {
+                [self.sendingView showMessage:@"Finished training"];
+                [self testForImagesNames:testImagesNames];
             }
-            
+                
             dispatch_sync(dispatch_get_main_queue(), ^{
+                if(trainingState == SUCCESS){
+                    [self updateProgress:1];
+                    
+                    //update view of the detector
+                    if(self.previousSvmClassifier != nil) self.undoButtonBar.enabled = YES;
+                    [self saveAction:self];
+                    [self loadDetectorInfo];
+                    
+                }else if(trainingState == FAIL){
+                    [self.sendingView showMessage:@"Error training"];
+                    
+                    UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error Training"
+                                                                         message:@"Shape on training set not allowed.\n Make sure all the labels have a similar shape and that are not too big."
+                                                                        delegate:nil
+                                                               cancelButtonTitle:@"OK"
+                                                               otherButtonTitles:nil];
+                    [errorAlert show];
+                    
+                    if(self.isFirstTraining){
+                        self.navigationController.navigationBarHidden = NO;
+                        [self.navigationController popViewControllerAnimated:YES];
+                    }
+                    
+                }else if(trainingState == INTERRUPTED){
+                    //if classifier not even trained with one iteration(cancelled before) then rescue previous classifer (undo)
+                    self.svmClassifier = self.previousSvmClassifier;
+                    self.undoButtonBar.enabled = NO;
+                    if(self.isFirstTraining){
+                        self.navigationController.navigationBarHidden = NO;
+                        [self.navigationController popViewControllerAnimated:YES];
+                    }
+                }
+                    
+                //stop sending view
                 [self.sendingView.activityIndicator stopAnimating];
                 [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
                 self.sendingView.sendingViewID = @"info";
                 self.sendingView.cancelButton.enabled = YES;
                 self.sendingView.cancelButton.hidden = NO;
-                if(self.trainingWentGood) {[self saveAction:self]; [self loadDetectorInfo];}
-                else {
-                    self.navigationController.navigationBarHidden = NO;
-                    [self.navigationController popViewControllerAnimated:YES];
-                }
             });
         });
     }
@@ -607,11 +632,16 @@
 #pragma mark Private methods
 
 
--(void) trainForImagesNames:(NSArray *)imagesNames
+-(int) trainForImagesNames:(NSArray *)imagesNames
 {
     //initialization
     TrainingSet *trainingSet = [[TrainingSet alloc] init];
     self.svmClassifier.imagesUsedTraining = [[NSMutableArray alloc] init];
+    
+    //setting hog dimensions based on user preferences
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[self.resourcesPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
+    int hog = [(NSNumber *)[dict objectForKey:@"hogdimension"] intValue];
+    self.svmClassifier.maxHog = hog;
     
     //training set construction
     for(NSString *imageName in imagesNames){
@@ -663,28 +693,8 @@
     [self updateProgress:0.05];
     [self.sendingView showMessage:@"Training begins!"];
     int successTraining = [self.svmClassifier train:trainingSet];
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        if(!successTraining){
-            self.trainingWentGood = NO;
-            [self.sendingView showMessage:@"Error training"];
-            
-                UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error Training"
-                                                                     message:@"Shape on training set not allowed.\n Make sure all the labels have a similar shape and that are not too big."
-                                                                    delegate:nil
-                                                           cancelButtonTitle:@"OK"
-                                                           otherButtonTitles:nil];
-                [errorAlert show];
-            
-            
-        }else{
-            self.trainingWentGood = YES;
-            if(self.svmClassifier.cancelledBeforBeginning==NO)[self.sendingView showMessage:@"Finished training"];
-            [self updateProgress:1];
-            
-            //update view of the detector
-            if(self.previousSvmClassifier != nil) self.undoButtonBar.enabled = YES;
-        }
-    });
+
+    return successTraining;
 }
 
 

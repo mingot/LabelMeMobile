@@ -28,6 +28,8 @@
 @interface GalleryViewController()
 {
     dispatch_queue_t savingQueue;
+    int selectedTableIndex;
+    int photosWithErrors;
 }
 
 //arrays to store information about downloaded images from server
@@ -36,12 +38,27 @@
 @property (nonatomic, strong) NSMutableArray *downloadedImageUrls;
 @property (nonatomic, strong) NSMutableArray *downloadedImageNames;
 @property (nonatomic, strong) NSMutableDictionary *downloadedLabelsMap; //label -> array with indexes
-@property (nonatomic, strong) NSMutableDictionary *labelsDictionary; //dictionary: label -> array of filenames containing label
 
-@property (nonatomic, strong) NSArray *labelsOrdered; //ordered labels names
+//models
+@property (nonatomic, strong) NSMutableArray *items; //filenames ordered by update date
+@property (nonatomic, strong) NSMutableArray *labelsOrdered;
 @property (nonatomic, strong) NSMutableDictionary *buttonsDictionary; //buttons stored to select all images when section name tapped
+@property (nonatomic, strong) NSMutableArray *labelsArray; //each element of the array is a dictionary with the label as key and object the array of filenames
 
+
+
+//table
+@property (nonatomic, strong) NSMutableArray *selectedItems;
+@property (nonatomic, strong) NSMutableArray *selectedItemsSend;
+@property (nonatomic, strong) NSMutableArray *selectedItemsDelete;
+
+//resources
+@property (nonatomic, strong) ServerConnection *serverConnection;
+@property (nonatomic, strong) CLLocationManager *locationMng;
+@property (nonatomic, strong) NSArray *paths;
+@property (nonatomic, strong) NSMutableDictionary *userDictionary;
 @property BOOL cancelDownloading;
+
 
 
 //show/hide tabBarcontroller for the sending view
@@ -51,11 +68,15 @@
 //generate thumbnail image with the boxes from an image given
 - (UIImage *) thumbnailImageFromImage:(UIImage *)image withBoxes:(NSArray *)boxes;
 
+//update the models every time an image is altered. Avoid having to reset the whole models every time
+- (void) updateImageByFilename:(NSString *)filename;
+- (void) deleteImageByFilename:(NSString *)filename;
+- (NSArray *) getLabelsForFilename:(NSString *) filename; //obtain the labels of an image
+
 @end
 
 
 @implementation GalleryViewController
-
 
 #pragma mark
 #pragma mark - Getters 
@@ -73,14 +94,14 @@
 }
 
 
-- (NSArray *) items
+- (NSMutableArray *) items
 {
     if(!_items){
         NSString *path = [self.paths objectAtIndex:IMAGES];
-        NSMutableArray *files = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL] mutableCopy];
-        NSMutableArray *filesAndProperties = [NSMutableArray arrayWithCapacity:[files count]];
+        _items = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL] mutableCopy];
+        NSMutableArray *filesAndProperties = [NSMutableArray arrayWithCapacity:[_items count]];
         
-        for(NSString *file in files) {
+        for(NSString *file in _items) {
             NSString *filePath = [path stringByAppendingPathComponent:file];
             NSDictionary *properties = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil];
             NSDate *modDate = (NSDate *)[properties objectForKey:NSFileModificationDate];
@@ -101,60 +122,69 @@
             return comp == NSOrderedAscending ? NSOrderedDescending : NSOrderedAscending;
         }];
         
-        [files removeAllObjects];
+        [_items removeAllObjects];
         for(NSDictionary *sortFile in sortedFiles)
-            [files addObject:(NSString *)[sortFile objectForKey:@"path"]];
-        
-        _items = [NSArray arrayWithArray:files];
+            [_items addObject:(NSString *)[sortFile objectForKey:@"path"]];
     }
     return _items;
 }
 
--(NSMutableDictionary *) labelsDictionary
+- (NSMutableArray *) labelsArray
 {
-    if(!_labelsDictionary){
-     
-        _labelsDictionary = [[NSMutableDictionary alloc] init];
+    if(!_labelsArray){
+        _labelsArray = [[NSMutableArray alloc] initWithCapacity:self.labelsOrdered.count];
+        
+        //dummy initialization
+        for(int i=0; i<self.labelsOrdered.count; i++)
+            [_labelsArray addObject:[NSNull null]];
+        
         for(NSString *filename in self.items){
             
-            //get the boxes
-            NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
-            NSArray *boxes = [[NSArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-            
-            for(Box *box in boxes){
-                NSString *label;
-                if([box.label isEqualToString:@""]) label = @"00None"; else label = box.label;
-                NSMutableArray *currentFilenames = (NSMutableArray *)[_labelsDictionary objectForKey:label];
-                if(!currentFilenames) currentFilenames = [[NSMutableArray alloc] init];
-                [currentFilenames addObject:filename];
-                [_labelsDictionary setObject:currentFilenames forKey:label];
+            NSArray *labels = [self getLabelsForFilename:filename];
+            for(NSString *boxLabel in labels){
+                int index = [self.labelsOrdered indexOfObject:boxLabel];
+                NSMutableArray *currentFilenames = [_labelsArray objectAtIndex:index];
+                if([currentFilenames isKindOfClass:[NSMutableArray class]]) [currentFilenames addObject:filename];
+                else currentFilenames = [NSMutableArray arrayWithObject:filename];
+                [_labelsArray setObject:currentFilenames atIndexedSubscript:index];
             }
-            if(boxes.count==0){ //no labels
-                NSMutableArray *currentFilenames = (NSMutableArray *)[_labelsDictionary objectForKey:@"00None"];
-                if(!currentFilenames) currentFilenames = [[NSMutableArray alloc] init];
-                [currentFilenames addObject:filename];
-                [_labelsDictionary setObject:currentFilenames forKey:@"00None"];
+            if(labels.count==0){ //box has no labels
+                int index = [self.labelsOrdered indexOfObject:@"00None"];
+                NSMutableArray *currentFilenames = [_labelsArray objectAtIndex:index];
+                if([currentFilenames isKindOfClass:[NSMutableDictionary class]]) [currentFilenames addObject:filename];
+                else currentFilenames = [NSMutableArray arrayWithObject:filename];
+                [_labelsArray setObject:currentFilenames atIndexedSubscript:index];
             }
         }
     }
-    
-    return _labelsDictionary;
+    return _labelsArray;
 }
 
-
-- (NSArray *) labelsOrdered
+- (NSMutableArray *)labelsOrdered
 {
-    if(!_labelsOrdered) _labelsOrdered = [[self.labelsDictionary allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    if(!_labelsOrdered){
+        NSMutableSet *unorderedLabels = [[NSMutableSet alloc] init];
+        for(NSString *filename in self.items){
+            NSArray *labels = [self getLabelsForFilename:filename];
+            if(labels.count == 0) [unorderedLabels addObject:@"00None"];
+            [unorderedLabels addObjectsFromArray:labels];
+        }
+        [unorderedLabels removeObject:@""];
+
+        _labelsOrdered = [NSMutableArray arrayWithArray:[[unorderedLabels allObjects] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
+    }
     return _labelsOrdered;
 }
+
 
 - (NSMutableDictionary *) buttonsDictionary
 {
     if(!_buttonsDictionary){
         
         _buttonsDictionary = [[NSMutableDictionary alloc] init];
-        for (NSString *label in self.labelsOrdered){
-            NSArray *indexes = [self.labelsDictionary objectForKey:label];
+        for (int i=0;i<self.labelsOrdered.count;i++){
+            NSArray *indexes = [self.labelsArray objectAtIndex:i];
+            NSString *label = [self.labelsOrdered objectAtIndex:i];
             NSMutableArray *buttons = [[NSMutableArray alloc] init];
             for(int i=0; i<indexes.count; i++){
                 
@@ -299,9 +329,9 @@
     self.noImages.layer.shadowColor = [UIColor grayColor].CGColor;
     self.noImages.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
     self.noImages.shadowColor = [UIColor grayColor];
-    [self.noImages setNumberOfLines:2];
+    self.noImages.numberOfLines = 3;
     self.noImages.shadowOffset = CGSizeMake(0.0, 1.0);
-    self.noImages.text = @"You do not have images, \nstart taking pics and labeling or download from web!";
+    self.noImages.text = @"You do not have images, \nstart taking pics and labeling\n or download from web!";
     [self.noImages setTextAlignment:NSTextAlignmentCenter];
     [self.noImages setUserInteractionEnabled:YES];
     
@@ -360,8 +390,10 @@
     dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
     dispatch_async(saveQueue, ^{
         self.items = nil;
-        self.labelsDictionary = nil;
+//        self.labelsDictionary = nil;
+//        self.labelsOrdered = nil;
         self.labelsOrdered = nil;
+        self.labelsArray = nil;
         self.buttonsDictionary = nil;
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -647,7 +679,7 @@
 //    }else items = [NSMutableArray arrayWithArray:[self.labelsDictionary objectForKey:objectClass]];
 
     //load tagVC
-    self.tagViewController.items = self.items;
+    self.tagViewController.items = [NSArray arrayWithArray:self.items]; //give a copy to avoid problems writing
     self.tagViewController.filename = filename;
     self.tagViewController.userDictionary = self.userDictionary;
     self.tagViewController.hidesBottomBarWhenPushed = YES;
@@ -716,8 +748,6 @@
         self.tableView.hidden = YES;
         [self.listButton setSelected:NO];
     }
-    
-    [self reloadGallery];
 }
 
 -(IBAction)cancelAction:(id)sender
@@ -735,6 +765,7 @@
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
+    //deleted items
     if (actionSheet.tag == 0){
         if (buttonIndex==0) {
             [self.selectedItemsDelete addObjectsFromArray:self.selectedItems];
@@ -754,43 +785,44 @@
 
 -(void)deletePhotoAndAnnotation
 {
-    int index = 0;
-    NSError *error = nil;
+    NSError *error;
     NSFileManager *filemng = [NSFileManager defaultManager];
-    if (![filemng removeItemAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:index]] error:&error]) {
-        [NSKeyedArchiver archiveRootObject:self.userDictionary toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.selectedItems objectAtIndex:index]]];
+    NSString *path;
+    
+    path = [[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:0]];
+    if (![filemng removeItemAtPath:path error:&error]) {
+        [NSKeyedArchiver archiveRootObject:self.userDictionary toFile:path];
         UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"It can not be removed." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
-    }
-    else {
-        UIImage *thumim =  [UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:index]]];
+    
+    }else {
+        UIImage *thumim =  [UIImage imageWithContentsOfFile:path];
         
-        if (![filemng removeItemAtPath:[[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:index]] error:&error]) {
-            NSData *thum = UIImageJPEGRepresentation(thumim, 0.75);
-            [NSKeyedArchiver archiveRootObject:self.userDictionary toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:index]]];
-            [filemng createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:index]] contents:thum attributes:nil];
+        if (![filemng removeItemAtPath:[[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:0]] error:&error]) {
+            NSData *thumData = UIImageJPEGRepresentation(thumim, 0.75);
+            [NSKeyedArchiver archiveRootObject:self.userDictionary toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:0]]];
+            [filemng createFileAtPath:path contents:thumData attributes:nil];
             UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"It can not be removed." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];
-        }
-        else {
             
-            if (![filemng removeItemAtPath:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:OBJECTS],[self.selectedItemsDelete objectAtIndex:index] ] error:&error]) {
+        }else {
+            path = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.selectedItemsDelete objectAtIndex:0]];
+            if (![filemng removeItemAtPath:path error:&error]) {
 
                 UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"It can not be removed." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+                NSLog(@"3");
                 [alert show];
-            }
-            else{
-                [filemng removeItemAtPath:[NSString stringWithFormat:@"%@/%@",[self.paths objectAtIndex:OBJECTS],[[[self.selectedItemsDelete objectAtIndex:index] stringByDeletingPathExtension] stringByAppendingPathExtension:@"txt"]  ] error:&error];
-            }
-            [self.userDictionary removeObjectForKey:[self.selectedItemsDelete objectAtIndex:index]];
+                
+            }else [filemng removeItemAtPath:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[[self.selectedItemsDelete objectAtIndex:0] stringByDeletingPathExtension] stringByAppendingPathExtension:@"txt"]] error:&error]; //delete location information
+            
+            [self.userDictionary removeObjectForKey:[self.selectedItemsDelete objectAtIndex:0]];
         }
     }
+    
     [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:YES];
-    [self.selectedItemsDelete removeObjectAtIndex:index];
-    if(self.selectedItemsDelete.count > 0){
+    [self.selectedItemsDelete removeObjectAtIndex:0];
+    if(self.selectedItemsDelete.count > 0)
         [self deletePhotoAndAnnotation];
-    }
-    [self reloadGallery];
 }
 
 
@@ -804,7 +836,7 @@
     UIImage *image = [[UIImage alloc] initWithContentsOfFile:[[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:[self.selectedItemsSend objectAtIndex:0]]];
     
     NSMutableArray *annotation = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[self.selectedItemsSend objectAtIndex:0] ] ];
-    Box *box = nil;
+    Box *box;
     CGPoint point;
 
     if (annotation.count >0) {
@@ -871,6 +903,11 @@
     NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:filename];
     [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
     
+    //save empty boxes as annotation
+    NSArray *emptyBoxes = [[NSArray alloc] init];
+    NSString *pathAnnotation = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
+    [NSKeyedArchiver archiveRootObject:emptyBoxes toFile:pathAnnotation];
+    
     //save thumb
     NSString *pathThumb = [[self.paths objectAtIndex:THUMB ] stringByAppendingPathComponent:filename];
     [[NSFileManager defaultManager] createFileAtPath:pathThumb contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
@@ -927,8 +964,8 @@
         [self.sendingView.progressView setProgress:0];
         [self.sendingView incrementNum];
         [self sendPhoto];
-    }
-    else{
+        
+    }else{
         if (photosWithErrors >0) {
             if (photosWithErrors == 1)
                 [self errorWithTitle:@"An image could not be sent" andDescription:@"Please, try again."];
@@ -936,11 +973,10 @@
         }
         [self.sendingView reset];
         [self.sendingView setHidden:YES];
+        [self.sendingView.activityIndicator stopAnimating];
         [self showTabBar:self.tabBarController];
 
         [self.editButton setEnabled:YES];
-        [self.sendingView.activityIndicator stopAnimating];
-
     }
     [self reloadGallery];
 }
@@ -960,19 +996,17 @@
         [self.sendingView.progressView setProgress:0];
         [self.sendingView incrementNum];
         [self sendPhoto];
-    }
-    else if (photosWithErrors > 0 ){
-        if (photosWithErrors == 1) {
+        
+    }else if (photosWithErrors > 0 ){
+        if (photosWithErrors == 1)
             [self errorWithTitle:@"An image could not be sent" andDescription:@"Please, try again."];
-        }
-        else{
-            [self errorWithTitle:[NSString stringWithFormat:@"%d images could not be sent.",photosWithErrors] andDescription:@"Please, try again."];
-        }
+        else [self errorWithTitle:[NSString stringWithFormat:@"%d images could not be sent.",photosWithErrors] andDescription:@"Please, try again."];
+        
         [self.sendingView reset];
         [self.sendingView setHidden:YES];
         [self.sendingView.activityIndicator stopAnimating];
+        [self showTabBar:self.tabBarController];
         
-        [self.tabBarController.tabBar setUserInteractionEnabled:YES];
         [self.editButton setEnabled:YES];
     }
 }
@@ -1019,7 +1053,7 @@
     if(tableView.tag==0){
         NSString *label = [self.labelsOrdered objectAtIndex:section];
         if([label isEqualToString:@"00None"]) label = @"None";
-        NSArray *items = [self.labelsDictionary objectForKey:label];
+        NSArray *items = [self.labelsArray objectAtIndex:section];
         title = [NSString stringWithFormat:@"%@ (%d)", label, items.count];
     }else title = @"";
     
@@ -1058,7 +1092,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if(tableView.tag==0){
-        NSArray *items = [self.labelsDictionary objectForKey:[self.labelsOrdered objectAtIndex:indexPath.section]];
+        NSArray *items = [self.labelsArray objectAtIndex:indexPath.section];
         return (0.225*self.view.frame.size.width*ceil((float)items.count/4) + 0.0375*self.view.frame.size.width);
     }else return tableView.rowHeight;
 }
@@ -1358,5 +1392,46 @@
 
     return thumbnailImage;
 }
+
+
+- (void) updateImageByFilename:(NSString *)filename
+{
+    
+    
+}
+
+//- (void) deleteImageByFilename:(NSString *)filename
+//{
+//    //items
+//    [self.items removeObject:filename];
+//    
+//    //labelsDictionary: for each unique label present in the image
+//    NSArray *labels = [self getLabelsForFilename:filename];
+//    for(NSString *label in labels){
+//        NSMutableArray *objectsForLabel = [self.labelsDictionary objectForKey:label];
+//        [objectsForLabel removeObject:filename];
+//        [self.labelsDictionary setObject:objectsForLabel forKey:label];
+//    }
+//    
+//    //buttonsDictionary
+//    for(NSString *label in labels){
+//        NSMutableArray *buttonsForLabel = [self.buttonsDictionary objectForKey:label];
+//        
+//    }
+//    
+//}
+
+- (NSArray *) getLabelsForFilename:(NSString *) filename
+{
+    NSMutableSet *unorderedLabels = [[NSMutableSet alloc] init];
+    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
+    NSArray *boxes = [[NSArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
+    
+    for(Box *box in boxes)
+        [unorderedLabels addObject:box.label];
+    
+    return [NSArray arrayWithArray:[unorderedLabels allObjects]];
+}
+
 
 @end

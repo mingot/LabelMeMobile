@@ -26,8 +26,9 @@
 //@property int currentScrollIndex;
 //@property (nonatomic, strong) NSMutableArray *composeViewsArray; //array of compose views to set in each part of the scroll view.
 
-//load ajustments for the loaded boxes
-- (void) onTimeLoad;
+// instructions to execute when loading and unloading images
+- (void) loadWhenAppear;
+- (void) loadWhenDisappear;
 
 @end
 
@@ -222,10 +223,10 @@
     self.nextButton.hidden = NO;
     
     //make some ajustments on the loaded boxes
-    [self onTimeLoad];
+    [self loadWhenAppear];
 }
 
-- (void) onTimeLoad
+- (void) loadWhenAppear
 {
     //check if boxes not saved on the server
     NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
@@ -265,26 +266,32 @@
 {
 	[super viewWillDisappear:animated];
     
+    [self loadWhenDisappear];
+    
     if (!self.annotationView.userInteractionEnabled){
         self.annotationView.userInteractionEnabled = YES;
         self.scrollView.frame = CGRectMake(0 , 0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
         [self.label resignFirstResponder];
     }
     
-    [self.labelsView setHidden:YES];
-    [self.labelsButton setSelected:NO];
-    if (![self.sendingView isHidden]) [self.sendingView setHidden:YES];
+    self.labelsView.hidden = YES;
+    self.labelsButton.selected = NO;
+    if (![self.sendingView isHidden]) self.sendingView.hidden = YES;
     [self.scrollView setZoomScale:1.0 animated:NO];
     [self.annotationView setLINEWIDTH:1.0];
-    
-    //save thumbnail and dictionary
-    [self saveThumbnail];
-    [self saveDictionary];
     [self.imageView setImage:nil];
     self.label.hidden = YES;
     
-    [self.delegate reloadTableOnImageGallery];
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void) loadWhenDisappear
+{
+    //save thumbnail and dictionary
+    [self saveThumbnail];
+    [self saveDictionary];
+    [self.delegate reloadTableOnImageGallery];
 }
 
 #pragma mark -
@@ -632,9 +639,8 @@
 
 - (IBAction)changeImageAction:(id)sender
 {
-    //save state
-    [self saveThumbnail];
-    [self saveDictionary];
+    
+    [self loadWhenDisappear];
     
     UIButton *button = (UIButton *)sender;
     
@@ -648,7 +654,7 @@
     
     //load new boxes and new image
     self.filename = newFilename;
-    [self onTimeLoad];
+    [self loadWhenAppear];
 }
 
 
@@ -750,7 +756,7 @@
     CGImageRelease(imageRef);
 
     dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-    dispatch_async(saveQueue, ^{
+    dispatch_sync(saveQueue, ^{
         NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
         [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil];
     });
@@ -761,7 +767,7 @@
 {
 
     dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-    dispatch_async(saveQueue, ^{
+    dispatch_sync(saveQueue, ^{
         NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
         [NSKeyedArchiver archiveRootObject:self.annotationView.objects toFile:pathObject];
     });

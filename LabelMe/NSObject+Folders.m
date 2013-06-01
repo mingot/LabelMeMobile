@@ -65,6 +65,7 @@
         [dict setObject:[NSNumber numberWithFloat:0] forKey:@"resolution"];
         [dict setObject:[NSNumber numberWithBool:NO] forKey:@"wifi"];
         [dict setObject:[NSNumber numberWithBool:YES] forKey:@"signinauto"];
+        [dict setObject:[NSNumber numberWithInt:8] forKey:@"hogdimension"];
         [dict writeToFile:[path stringByAppendingString:@"/settings.plist"] atomically:YES];
         
     }

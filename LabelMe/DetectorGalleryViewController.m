@@ -80,7 +80,7 @@
             NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
             NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
             for(Box *box in objects)
-                if([list indexOfObject:box.label] == NSNotFound)
+                if([list indexOfObject:box.label] == NSNotFound && ![box.label isEqualToString:@""])
                     [list addObject:box.label];
         }
         

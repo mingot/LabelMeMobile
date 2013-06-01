@@ -48,39 +48,27 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
             h = min(self.frame.size.height,p.ymax) - y;
         
             CGRect box = CGRectMake(x, y, w, h);
-            if(i==0){
-                CGContextSetLineWidth(context, 4);
-                UIColor *color = [self.colorsDictionary objectForKey:p.targetClass];
-                CGContextSetStrokeColorWithColor(context, color.CGColor);
-                j++;
-                CGContextStrokeRect(context, box);
-                
-                //text drawing
-                CGContextSetFillColorWithColor(context,color.CGColor);
-                CGFloat textBoxHeight = 20;
-                
-//                NSLog(@"(x,y)=(%f,%f), (w,h)=(%f,%f)",x,y,w,h);
-                //handle distinct orientations
-                if(self.frontCamera || self.cameraOrientation == 3){
-                    x = x + w;
-                    w = abs(w);
-                }
-                
-                CGRect textBox = CGRectMake(x - 2, y - 20 - 2, w/2.0, textBoxHeight);
-                CGContextFillRect(context, textBox);
-                CGContextSetFillColorWithColor(context,[UIColor blackColor].CGColor);
-                [p.targetClass drawInRect:textBox withFont:[UIFont systemFontOfSize:15]];
-                
-                //rotate
-//                if(self.cameraOrientation==3){
-//                    CGAffineTransform rotation = CGAffineTransformMakeRotation(-90.0 * M_PI/180.0);
-//                    CGContextConcatCTM(context, rotation);
-//                }
-                // for the rest of boxes
-                CGContextSetLineWidth(context, 1);
-                CGContextSetStrokeColorWithColor(context, [UIColor purpleColor].CGColor);
-                
-            }else CGContextStrokeRect(context, box);
+            
+            CGContextSetLineWidth(context, 4);
+            UIColor *color = [self.colorsDictionary objectForKey:p.targetClass];
+            CGContextSetStrokeColorWithColor(context, color.CGColor);
+            j++;
+            CGContextStrokeRect(context, box);
+            
+            //text drawing
+            CGContextSetFillColorWithColor(context,color.CGColor);
+            CGFloat textBoxHeight = 20;
+            
+            //handle distinct orientations
+            if(self.frontCamera || self.cameraOrientation == 3){
+                x = x + w;
+                w = abs(w);
+            }
+            
+            CGRect textBox = CGRectMake(x - 2, y - 20 - 2, w/2.0, textBoxHeight);
+            CGContextFillRect(context, textBox);
+            CGContextSetFillColorWithColor(context,[UIColor blackColor].CGColor);
+            [p.targetClass drawInRect:textBox withFont:[UIFont systemFontOfSize:15]];
         }
         
     }

@@ -398,7 +398,7 @@
     //detector settings
     }else if(indexPath.section == 4){
         
-        NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
+        NSDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
         UIStepper *stepper = [[UIStepper alloc] initWithFrame:CGRectZero];
         stepper.value = [(NSNumber *)[dict objectForKey:@"hogdimension"] doubleValue];
         stepper.maximumValue = 14;

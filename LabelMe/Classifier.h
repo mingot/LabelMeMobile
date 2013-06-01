@@ -50,7 +50,6 @@
 
 
 @property BOOL trainCancelled; //received from outside
-@property BOOL cancelledBeforBeginning; //set in Classifier
 
 //Initialization of the classifier given the weight vectors of it
 - (id) initWithTemplateWeights:(double *)templateWeights;

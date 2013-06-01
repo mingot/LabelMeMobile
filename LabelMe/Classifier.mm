@@ -150,14 +150,15 @@ using namespace cv;
 
 - (int) train:(TrainingSet *) trainingSet;
 {
-    NSDate *start = [NSDate date];
+    NSDate *start = [NSDate date]; //to compute the learning time.
     free(self.weightsP);
     self.isLearning = YES;
+    
+    //array initialization
     self.imageListAux = [[NSMutableArray alloc] init];
     self.imagesHogPyramid = [[NSMutableArray alloc] init];
     for (int i = 0; i < trainingSet.images.count*10; ++i)
         [self.imagesHogPyramid addObject:[NSNull null]];
-    
     self.receivedImageIndex = [[NSMutableArray alloc] init];
     
     // Get the template size and get hog feautures dimension
@@ -172,13 +173,14 @@ using namespace cv;
     [self.delegate sendMessage:[NSString stringWithFormat:@"Hog features: %d %d %d for ratio:%f", self.sizesP[0],self.sizesP[1],self.sizesP[2], ratio]];
     [self.delegate sendMessage:[NSString stringWithFormat:@"area ratio: %f", trainingSet.areaRatio]];
     
+    //define buffer sizes
     //TODO: max size for the buffers
     trainingSet.imageFeatures = (float *) malloc(MAX_NUMBER_EXAMPLES*numOfFeatures*sizeof(float));
     trainingSet.labels = (float *) malloc(MAX_NUMBER_EXAMPLES*sizeof(float));
     
     //convergence loop
     self.weightsP = (double *) calloc((numOfFeatures+1),sizeof(double));
-    for(int i=0; i<numOfFeatures+1;i++) self.weightsP[i]=1;
+    for(int i=0; i<numOfFeatures+1;i++) self.weightsP[i] = 1;
     self.weightsPLast = (double *) calloc((numOfFeatures+1),sizeof(double));
     diff = 1;
     int iter = 0;
@@ -187,7 +189,7 @@ using namespace cv;
     
     while(diff > STOP_CRITERIA && iter<10 && !self.trainCancelled){
 
-        [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter++]];
+        [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter]];
         
         //Get Bounding Boxes from detection
         [self getBoundingBoxesForTrainingWith:trainingSet];
@@ -205,12 +207,14 @@ using namespace cv;
         [self trainSVMAndGetWeights:trainingSet];
         
         diff = [self computeDifferenceOfWeights];
+        iter++;
         if(iter!=1) [self.delegate updateProgress:STOP_CRITERIA/diff];
     }
     
-    self.cancelledBeforBeginning = NO;
+    
     if(self.trainCancelled) [self.delegate sendMessage:@"\n TRAINING INTERRUPTED \n"];
-    if(iter == 0) self.cancelledBeforBeginning = YES;
+    if(iter == 0) return 2; //interrupted without training
+
     
     //update information about the classifier
     self.numberSV = [NSNumber numberWithInt:numSupportVectors];
