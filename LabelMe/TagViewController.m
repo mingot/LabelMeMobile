@@ -57,12 +57,8 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.composeView = [[UIView alloc] initWithFrame:CGRectZero];
-        self.annotationView = [[TagView alloc] initWithFrame:CGRectZero];
-        self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
         
         self.labelsView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
-
         sConnection = [[ServerConnection alloc] init];
         sConnection.delegate = self;
     }
@@ -109,8 +105,6 @@
 	[self.scrollView setCanCancelContentTouches:NO];
 	self.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
 	self.scrollView.clipsToBounds = YES;		
-	self.scrollView.scrollEnabled = YES;
-	self.scrollView.pagingEnabled = NO;
     self.scrollView.minimumZoomScale = 1.0;
     self.scrollView.maximumZoomScale = 10.0;
     self.scrollView.delegate = self;
@@ -141,12 +135,11 @@
     tiplabel.backgroundColor = [UIColor clearColor];
     [self.tip addSubview:tiplabel];
     [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
-    if ((self.items.count>1) || (self.annotationView.objects.count != 0))
+    if ((self.items.count>1) || (self.tagView.objects.count != 0))
         self.tip.hidden = YES;
 
     //sending view
-    self.sendingView = [[SendingView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height)];
-    [self.sendingView setHidden:YES];
+    self.sendingView.hidden = YES;
     self.sendingView.textView.text = @"Uploading to the server...";
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     self.sendingView.delegate = self;
@@ -154,16 +147,8 @@
     //model
     self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
     
-    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-    self.imageView.frame = self.scrollView.frame;
-
-    //compose view
-    self.composeView.frame = self.scrollView.frame;
-    [self.composeView addSubview:self.imageView];
-    [self.composeView addSubview:self.annotationView];
-    
     //annotation view
-    self.annotationView.delegate = self;
+    self.tagView.delegate = self;
 
     //Next and previous buttons
     
@@ -230,22 +215,22 @@
         NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:self.filename];
         UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
         self.imageView.image = image;
-        self.annotationView.frame = [self getImageFrameFromImageView:self.imageView];
+        self.tagView.frame = [self getImageFrameFromImageView:self.imageView];
         
         //load boxes
         NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
         NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-        [self.annotationView.objects setArray:boxes];
+        [self.tagView.objects setArray:boxes];
         
         [self selectedAnObject:NO];
-        if (self.annotationView.objects.count > 0)
+        if (self.tagView.objects.count > 0)
             [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
         
         //set the box dimensions for the current context
-        for(Box* box in self.annotationView.objects)
-            [box setBoxDimensionsForImageSize:self.annotationView.frame.size];
+        for(Box* box in self.tagView.objects)
+            [box setBoxDimensionsForImageSize:self.tagView.frame.size];
         
-        [self.annotationView setNeedsDisplay];
+        [self.tagView setNeedsDisplay];
         keyboardVisible = NO;
     });
 }
@@ -256,8 +241,8 @@
     
     [self loadWhenDisappear];
     
-    if (!self.annotationView.userInteractionEnabled){
-        self.annotationView.userInteractionEnabled = YES;
+    if (!self.tagView.userInteractionEnabled){
+        self.tagView.userInteractionEnabled = YES;
         self.scrollView.frame = CGRectMake(0 , 0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
         [self.label resignFirstResponder];
     }
@@ -266,10 +251,10 @@
     self.labelsButton.selected = NO;
     if (![self.sendingView isHidden]) self.sendingView.hidden = YES;
     [self.scrollView setZoomScale:1.0 animated:NO];
-    [self.annotationView setLINEWIDTH:1.0];
+    [self.tagView setLINEWIDTH:1.0];
     [self.imageView setImage:nil];
     self.label.hidden = YES;
-    [self.annotationView.objects removeAllObjects];
+    [self.tagView.objects removeAllObjects];
     
     
     
@@ -386,35 +371,35 @@
         self.nextButton.hidden = YES;
         self.previousButton.hidden = YES;
         
-        CGPoint point = self.annotationView.frame.origin; // origin
+        CGPoint point = self.tagView.frame.origin; // origin
         CGPoint point2 = CGPointMake(0, 0); // size
         
-        if (scrollView.contentOffset.y < self.annotationView.frame.origin.y*scrollView.zoomScale) {
+        if (scrollView.contentOffset.y < self.tagView.frame.origin.y*scrollView.zoomScale) {
             
             point.y = scrollView.contentOffset.y/scrollView.zoomScale;
-            point2.y += self.annotationView.frame.origin.y*scrollView.zoomScale - scrollView.contentOffset.y;
+            point2.y += self.tagView.frame.origin.y*scrollView.zoomScale - scrollView.contentOffset.y;
         }
-        if ((scrollView.contentOffset.y + scrollView.frame.size.height-self.annotationView.frame.origin.y*scrollView.zoomScale)>(self.annotationView.frame.size.height)*scrollView.zoomScale) {
+        if ((scrollView.contentOffset.y + scrollView.frame.size.height-self.tagView.frame.origin.y*scrollView.zoomScale)>(self.tagView.frame.size.height)*scrollView.zoomScale) {
             
-            point2.y += scrollView.contentOffset.y + scrollView.frame.size.height -(self.annotationView.frame.size.height + self.annotationView.frame.origin.y)*scrollView.zoomScale;
+            point2.y += scrollView.contentOffset.y + scrollView.frame.size.height -(self.tagView.frame.size.height + self.tagView.frame.origin.y)*scrollView.zoomScale;
             
         }
-        if (scrollView.contentOffset.x< self.annotationView.frame.origin.x*scrollView.zoomScale) {
+        if (scrollView.contentOffset.x< self.tagView.frame.origin.x*scrollView.zoomScale) {
             point.x = scrollView.contentOffset.x/scrollView.zoomScale;
-            point2.x += self.annotationView.frame.origin.x*scrollView.zoomScale - scrollView.contentOffset.x;
+            point2.x += self.tagView.frame.origin.x*scrollView.zoomScale - scrollView.contentOffset.x;
             
             
         }
-        if ((scrollView.contentOffset.x + scrollView.frame.size.width -self.annotationView.frame.size.width*scrollView.zoomScale)>(self.annotationView.frame.origin.x)*scrollView.zoomScale) {
-            point2.x += scrollView.contentOffset.x + scrollView.frame.size.width -(self.annotationView.frame.size.width + self.annotationView.frame.origin.x)*scrollView.zoomScale;
+        if ((scrollView.contentOffset.x + scrollView.frame.size.width -self.tagView.frame.size.width*scrollView.zoomScale)>(self.tagView.frame.origin.x)*scrollView.zoomScale) {
+            point2.x += scrollView.contentOffset.x + scrollView.frame.size.width -(self.tagView.frame.size.width + self.tagView.frame.origin.x)*scrollView.zoomScale;
             
             
         }
         CGRect rectvisible = CGRectMake(scrollView.contentOffset.x/scrollView.zoomScale - point.x, scrollView.contentOffset.y/scrollView.zoomScale - point.y, (scrollView.frame.size.width-point2.x)/scrollView.zoomScale, (scrollView.frame.size.height-point2.y)/scrollView.zoomScale);
-        [self.annotationView setVisibleFrame:rectvisible];
+        [self.tagView setVisibleFrame:rectvisible];
         
     }else {
-        [self.annotationView setVisibleFrame:CGRectMake(0, 0, self.annotationView.frame.size.width, self.annotationView.frame.size.height)];
+        [self.tagView setVisibleFrame:CGRectMake(0, 0, self.tagView.frame.size.width, self.tagView.frame.size.height)];
         self.previousButton.hidden = NO;
         self.nextButton.hidden = NO;
     }
@@ -422,7 +407,7 @@
 
 - (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
 {
-    [self.annotationView setLINEWIDTH:scale];
+    [self.tagView setLINEWIDTH:scale];
 }
 
 #pragma mark -
@@ -430,7 +415,7 @@
 
 - (void) keyboardDidShow:(NSNotification *)notif
 {
-    self.annotationView.userInteractionEnabled = NO;
+    self.tagView.userInteractionEnabled = NO;
     [self.scrollView setScrollEnabled:YES];
     [self.labelsView setHidden:YES];
     [self.labelsButton setSelected:NO];
@@ -465,7 +450,7 @@
     self.scrollView.frame = CGRectMake(0,0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
 
 	keyboardVisible = NO;
-    self.annotationView.userInteractionEnabled=YES;
+    self.tagView.userInteractionEnabled=YES;
 }
 
 
@@ -477,21 +462,21 @@
  
     if (![self.tip isHidden])[self.tip setHidden:YES];
     
-    Box *box = [[Box alloc]initWithPoints:CGPointMake(self.annotationView.visibleFrame.origin.x+(self.annotationView.frame.size.width  - 100)/(2*self.scrollView.zoomScale),
-                                                      self.annotationView.visibleFrame.origin.y+(self.annotationView.frame.size.height  - 100)/(2*self.scrollView.zoomScale)) :CGPointMake(self.annotationView.visibleFrame.origin.x+(self.annotationView.frame.size.width  + 100)/(2*self.scrollView.zoomScale),self.annotationView.visibleFrame.origin.y+(self.annotationView.frame.size.height  + 100)/(2*self.scrollView.zoomScale))];
+    Box *box = [[Box alloc]initWithPoints:CGPointMake(self.tagView.visibleFrame.origin.x+(self.tagView.frame.size.width  - 100)/(2*self.scrollView.zoomScale),
+                                                      self.tagView.visibleFrame.origin.y+(self.tagView.frame.size.height  - 100)/(2*self.scrollView.zoomScale)) :CGPointMake(self.tagView.visibleFrame.origin.x+(self.tagView.frame.size.width  + 100)/(2*self.scrollView.zoomScale),self.tagView.visibleFrame.origin.y+(self.tagView.frame.size.height  + 100)/(2*self.scrollView.zoomScale))];
     
-    int num = self.annotationView.objects.count;
-    [box setBounds:self.annotationView.frame];
+    int num = self.tagView.objects.count;
+    [box setBounds:self.tagView.frame];
     [box generateDateString];
     box.downloadDate = [NSDate date];
-    box.color=[[self.annotationView colorArray] objectAtIndex:(num%8)];
-    [[self.annotationView objects] addObject:box];
-    [self.annotationView setSelectedBox:num];
+    box.color=[[self.tagView colorArray] objectAtIndex:(num%8)];
+    [[self.tagView objects] addObject:box];
+    [self.tagView setSelectedBox:num];
 
-    [self.label setCorrectOrientationWithCorners:box.upperLeft :box.lowerRight subviewFrame:self.annotationView.frame andViewSize:self.scrollView.frame.size andScale:self.scrollView.zoomScale];
+    [self.label setCorrectOrientationWithCorners:box.upperLeft :box.lowerRight subviewFrame:self.tagView.frame andViewSize:self.scrollView.frame.size andScale:self.scrollView.zoomScale];
     self.label.text = @"";
     self.label.hidden = NO;
-    [self.annotationView setNeedsDisplay];
+    [self.tagView setNeedsDisplay];
 
     if (!self.labelsView.hidden) {
         [self.labelsView setHidden:YES];
@@ -517,19 +502,19 @@
 
 - (IBAction)labelFinish:(id)sender
 {
-    int selected=[self.annotationView SelectedBox];
+    int selected=[self.tagView SelectedBox];
    self.label.text = [self.label.text replaceByUnderscore];
-        Box *box = [[self.annotationView objects] objectAtIndex: selected];
+        Box *box = [[self.tagView objects] objectAtIndex: selected];
         if (![box.label isEqualToString:self.label.text]) {
             
             box.label = self.label.text;
             [box.label replaceByUnderscore];
         
             if (![self.label.text isEqualToString:@""]) {
-                for (int i=0; i<self.annotationView.objects.count; i++) {
+                for (int i=0; i<self.tagView.objects.count; i++) {
                     if (i==selected)
                         continue;
-                    Box *b=[[self.annotationView objects] objectAtIndex: i];
+                    Box *b=[[self.tagView objects] objectAtIndex: i];
                     if ([box.label isEqualToString:b.label]) {
                         box.color = b.color;
                         break;
@@ -538,7 +523,7 @@
             }
             [self objectModified];
         }
-    [self.annotationView setNeedsDisplay];
+    [self.tagView setNeedsDisplay];
 }
 
 
@@ -564,7 +549,7 @@
     [self.sendingView.progressView setProgress:0];
     [self.sendingView.activityIndicator startAnimating];
     [self.scrollView setZoomScale:1.0 animated:NO];
-    [self.annotationView setLINEWIDTH:1.0];
+    [self.tagView setLINEWIDTH:1.0];
     [self sendPhoto];
 }
 
@@ -578,7 +563,7 @@
 
 -(IBAction)deleteAction:(id)sender
 {
-    if(([self.annotationView SelectedBox]!=-1)&&(!keyboardVisible)){
+    if(([self.tagView SelectedBox]!=-1)&&(!keyboardVisible)){
         UIActionSheet *actionSheet = [[UIActionSheet alloc]  initWithTitle:@"" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Object" otherButtonTitles:nil, nil];
         actionSheet.actionSheetStyle = UIBarStyleBlackTranslucent;
         [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
@@ -590,22 +575,22 @@
     [self.labelsView reloadData];
     if (self.labelsView.hidden) {
     
-        if (self.annotationView.objects.count == 0) {
+        if (self.tagView.objects.count == 0) {
             [self.labelsView setFrame:CGRectMake(0.015625*self.view.frame.size.width+self.scrollView.contentOffset.x,
                                                  self.scrollView.frame.size.height-0.19375*self.view.frame.size.width+self.scrollView.contentOffset.y,
                                                  self.scrollView.frame.size.width-0.03125*self.view.frame.size.width,
                                                  0.19375*self.view.frame.size.width)];
             
-        }else if (self.annotationView.objects.count*self.labelsView.rowHeight >= self.scrollView.frame.size.height/3) {
+        }else if (self.tagView.objects.count*self.labelsView.rowHeight >= self.scrollView.frame.size.height/3) {
             [self.labelsView setFrame:CGRectMake(0.015625*self.view.frame.size.width+self.scrollView.contentOffset.x,
                                                  2*self.scrollView.frame.size.height/3-0.078125*self.view.frame.size.width+self.scrollView.contentOffset.y,
                                                  self.scrollView.frame.size.width-0.03125*self.view.frame.size.width,
                                                  self.scrollView.frame.size.height/3+0.0625*self.view.frame.size.width)];
             
         }else [self.labelsView setFrame:CGRectMake(0.015625*self.view.frame.size.width + self.scrollView.contentOffset.x,
-                                                 self.scrollView.frame.size.height - self.annotationView.objects.count*self.labelsView.rowHeight-0.078125*self.view.frame.size.width + self.scrollView.contentOffset.y,
+                                                 self.scrollView.frame.size.height - self.tagView.objects.count*self.labelsView.rowHeight-0.078125*self.view.frame.size.width + self.scrollView.contentOffset.y,
                                                  self.scrollView.frame.size.width - 0.03125*self.view.frame.size.width,
-                                                 self.annotationView.objects.count*self.labelsView.rowHeight+0.0625*self.view.frame.size.width+5)];
+                                                 self.tagView.objects.count*self.labelsView.rowHeight+0.0625*self.view.frame.size.width+5)];
         self.labelsView.layer.masksToBounds = YES;
         [self.labelsView.layer setCornerRadius:10];
         
@@ -624,7 +609,7 @@
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
     // Disallow recognition of tap gestures in the segmented control.
-    if ([self.annotationView SelectedBox] != -1)
+    if ([self.tagView SelectedBox] != -1)
         return NO;
     else return YES;
 }
@@ -658,14 +643,14 @@
 {
 
     if (buttonIndex==0) {
-        int num=[[self.annotationView objects] count];
+        int num=[[self.tagView objects] count];
 
-        if((num<1)||([self.annotationView SelectedBox]==-1))
+        if((num<1)||([self.tagView SelectedBox]==-1))
             return;
 
         NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
         if (dictnum.intValue < 0){
-            if (![[[self.annotationView objects] objectAtIndex:[self.annotationView SelectedBox] ] sent]) {
+            if (![[[self.tagView objects] objectAtIndex:[self.tagView SelectedBox] ] sent]) {
                 NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
                 [self.userDictionary removeObjectForKey:self.filename];
                 [self.userDictionary setObject:newdictnum forKey:self.filename];
@@ -674,7 +659,7 @@
         }
         else if(dictnum.intValue >= 0){
 
-            if (![[[self.annotationView objects] objectAtIndex:[self.annotationView SelectedBox] ] sent]) {
+            if (![[[self.tagView objects] objectAtIndex:[self.tagView SelectedBox] ] sent]) {
                 NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue-1];
 
                 [self.userDictionary removeObjectForKey:self.filename];
@@ -690,12 +675,12 @@
     
         [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
 
-        [self.annotationView.objects removeObjectAtIndex:[self.annotationView SelectedBox]];
-        [self.annotationView setSelectedBox:-1];
+        [self.tagView.objects removeObjectAtIndex:[self.tagView SelectedBox]];
+        [self.tagView setSelectedBox:-1];
         self.label.hidden=YES;
         [self saveThumbnail];
         [self saveDictionary];
-        [self.annotationView setNeedsDisplay];
+        [self.tagView setNeedsDisplay];
         [self selectedAnObject:NO];
     }
 }
@@ -715,10 +700,10 @@
 -(void)sendPhoto
 {
     NSNumber *num = [self.userDictionary objectForKey:self.filename];
-    CGPoint point = CGPointMake(self.imageView.image.size.width/self.annotationView.frame.size.width, self.imageView.image.size.height/self.annotationView.frame.size.height);
+    CGPoint point = CGPointMake(self.imageView.image.size.width/self.tagView.frame.size.width, self.imageView.image.size.height/self.tagView.frame.size.height);
     
-    if (num.intValue<0) [sConnection sendPhoto:self.imageView.image filename:self.filename path:[self.paths objectAtIndex:OBJECTS] withSize:point andAnnotation:self.annotationView.objects];
-    else [sConnection updateAnnotationFrom:self.filename withSize:point :self.annotationView.objects];
+    if (num.intValue<0) [sConnection sendPhoto:self.imageView.image filename:self.filename path:[self.paths objectAtIndex:OBJECTS] withSize:point andAnnotation:self.tagView.objects];
+    else [sConnection updateAnnotationFrom:self.filename withSize:point :self.tagView.objects];
 }
 
 
@@ -727,14 +712,14 @@
 
 -(void) saveThumbnail
 {
-    [self.annotationView setSelectedBox:-1];
-    [self.annotationView setNeedsDisplay];
+    [self.tagView setSelectedBox:-1];
+    [self.tagView setNeedsDisplay];
     
-    UIGraphicsBeginImageContext(self.annotationView.frame.size);
+    UIGraphicsBeginImageContext(self.tagView.frame.size);
     [self.composeView.layer renderInContext:UIGraphicsGetCurrentContext()];
     UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    CGImageRef imageRef = CGImageCreateWithImageInRect(viewImage.CGImage, self.annotationView.frame);
+    CGImageRef imageRef = CGImageCreateWithImageInRect(viewImage.CGImage, self.tagView.frame);
     UIImage *thumbnailImage;
     
     int thumbnailSize = 300;
@@ -762,7 +747,7 @@
     dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
     dispatch_sync(saveQueue, ^{
         NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
-        [NSKeyedArchiver archiveRootObject:self.annotationView.objects toFile:pathObject];
+        [NSKeyedArchiver archiveRootObject:self.tagView.objects toFile:pathObject];
     });
     dispatch_release(saveQueue);
 }
@@ -773,11 +758,11 @@
 
 -(void)objectModified
 {   
-    if ([self.annotationView SelectedBox] == -1)
+    if ([self.tagView SelectedBox] == -1)
         return;
 
-    if ([[self.annotationView.objects objectAtIndex:[self.annotationView SelectedBox]] sent]) {
-        [[self.annotationView.objects objectAtIndex:[self.annotationView SelectedBox]] setSent:NO];
+    if ([[self.tagView.objects objectAtIndex:[self.tagView SelectedBox]] sent]) {
+        [[self.tagView.objects objectAtIndex:[self.tagView SelectedBox]] setSent:NO];
         NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
 
         if (dictnum.intValue < 0){
@@ -834,14 +819,14 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (section == 0) return self.annotationView.objects.count;
+    if (section == 0) return self.tagView.objects.count;
     else return 0;
 }
 
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-    if (section == 0) return [NSString stringWithFormat:@"%d objects",self.annotationView.objects.count];
+    if (section == 0) return [NSString stringWithFormat:@"%d objects",self.tagView.objects.count];
     else return  @"";
 }
 
@@ -878,7 +863,7 @@
          cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
 
     [cell setBackgroundColor:[UIColor clearColor]];
-    Box *b = [self.annotationView.objects objectAtIndex:indexPath.row];
+    Box *b = [self.tagView.objects objectAtIndex:indexPath.row];
     if (b.label.length != 0) {
         if ([cell.textLabel respondsToSelector:@selector(setAttributedText:)]) {
             NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:b.label];
@@ -903,8 +888,8 @@
         }else [cell.textLabel setText:@"(No Label)"];
         
     }
-    [cell.detailTextLabel setText:[NSString stringWithFormat:@"%d x %d",(int)((b.lowerRight.x - b.upperLeft.x)*self.imageView.image.size.width/self.annotationView.frame.size.width),(int)((b.lowerRight.y - b.upperLeft.y)*self.imageView.image.size.height/self.annotationView.frame.size.height)]];
-    if (indexPath.row == [self.annotationView SelectedBox])
+    [cell.detailTextLabel setText:[NSString stringWithFormat:@"%d x %d",(int)((b.lowerRight.x - b.upperLeft.x)*self.imageView.image.size.width/self.tagView.frame.size.width),(int)((b.lowerRight.y - b.upperLeft.y)*self.imageView.image.size.height/self.tagView.frame.size.height)]];
+    if (indexPath.row == [self.tagView SelectedBox])
         [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
     
     else [cell setAccessoryType:UITableViewCellAccessoryNone];
@@ -917,15 +902,15 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self.annotationView setSelectedBox:indexPath.row];
-    [self.annotationView setNeedsDisplay];
+    [self.tagView setSelectedBox:indexPath.row];
+    [self.tagView setNeedsDisplay];
     [self.labelsView reloadData];
     [self listAction:self.labelsButton];
-    Box *box = [self.annotationView.objects objectAtIndex:indexPath.row];
-    [self.scrollView zoomToRect:CGRectMake(box.upperLeft.x+self.annotationView.frame.origin.x-10, box.upperLeft.y+self.annotationView.frame.origin.y-10, box.lowerRight.x - box.upperLeft.x+20, box.lowerRight.y - box.upperLeft.y+20) animated:YES];
-    [self.annotationView setLINEWIDTH:self.scrollView.zoomScale];
+    Box *box = [self.tagView.objects objectAtIndex:indexPath.row];
+    [self.scrollView zoomToRect:CGRectMake(box.upperLeft.x+self.tagView.frame.origin.x-10, box.upperLeft.y+self.tagView.frame.origin.y-10, box.lowerRight.x - box.upperLeft.x+20, box.lowerRight.y - box.upperLeft.y+20) animated:YES];
+    [self.tagView setLINEWIDTH:self.scrollView.zoomScale];
     [self selectedAnObject:YES];
-    [self correctOrientation:box.upperLeft :box.lowerRight SuperviewFrame:self.annotationView.frame];
+    [self correctOrientation:box.upperLeft :box.lowerRight SuperviewFrame:self.tagView.frame];
 }
 
 
@@ -964,8 +949,8 @@
 -(void)photoSentCorrectly:(NSString *)filename
 {
     if ([self.filename isEqualToString:filename]) {
-        for (int i=0; i<[self.annotationView.objects count ]; i++)
-            [[self.annotationView.objects objectAtIndex:i ] setSent:YES];
+        for (int i=0; i<[self.tagView.objects count ]; i++)
+            [[self.tagView.objects objectAtIndex:i ] setSent:YES];
 
         [self saveDictionary];
         

@@ -40,7 +40,7 @@
 @property (nonatomic, strong) IBOutlet UITableView *tableViewGrid;
 @property (nonatomic, weak) IBOutlet AYUIButton *downloadButton;
 @property (nonatomic, weak) IBOutlet AYUIButton *cameraButton;
-@property (nonatomic, weak) IBOutlet UIActivityIndicatorView *activityIndicator;
+
 
 
 //actions

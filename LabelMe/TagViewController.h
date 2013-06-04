@@ -28,17 +28,17 @@
 
 //views
 @property (weak, nonatomic) IBOutlet SendingView *sendingView;
-@property (strong, nonatomic) TagView *annotationView;
-@property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
-@property (strong, nonatomic) IBOutlet UITextField *label;
-@property (strong, nonatomic) UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (weak, nonatomic) IBOutlet UITextField *label;
+@property (weak, nonatomic) IBOutlet UIView *composeView;
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet TagView *tagView;
 @property (strong, nonatomic) UITableView *labelsView;
-@property (strong, nonatomic) UIView *composeView;
 @property (strong, nonatomic) UIButton *tip;
-@property (strong, nonatomic) id<TagViewControllerDelegate> delegate;
 @property (strong, nonatomic) UIButton *nextButton;
 @property (strong, nonatomic) UIButton *previousButton;
 
+@property (strong, nonatomic) id<TagViewControllerDelegate> delegate;
 
 //toolbar
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *addButton;

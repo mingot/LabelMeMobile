@@ -258,18 +258,14 @@
 {
     [super viewDidLoad];
 
-    
     self.serverConnection.delegate = self;
     self.title = @"Gallery"; //for back button
     photosWithErrors = 0;
     
     //Controllers
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        if ([UIScreen mainScreen].bounds.size.height == 568)
-            self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
-        else if ([UIScreen mainScreen].bounds.size.height == 480)
-            self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone5" bundle:nil];
-    }else self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPad" bundle:nil];
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+        self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
+    else self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPad" bundle:nil];
     self.tagViewController.username = self.username;
     self.tagViewController.delegate = self;
     self.modalSectionsTVC = [[ModalSectionsTVC alloc] initWithNibName:@"ModalSectionsTVC" bundle:nil];
@@ -300,7 +296,6 @@
     [self.sendButton setWidth:self.view.frame.size.width/2 - 11];
     [self.sendButton setEnabled:NO];
     [self.downloadButton highlightButton];
-    self.activityIndicator.hidden = YES;
     [self.cameraButton highlightButton];
     self.cameraButton.imageView.contentMode = UIViewContentModeScaleAspectFill;
     [self.cameraButton setImage:[UIImage imageNamed:@"cameraIcon.png"] forState:UIControlStateNormal];
@@ -1338,7 +1333,6 @@
 - (void)viewDidUnload {
     [self setDownloadButton:nil];
     [self setCameraButton:nil];
-    [self setActivityIndicator:nil];
     [super viewDidUnload];
 }
 

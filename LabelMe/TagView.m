@@ -14,29 +14,39 @@
 @implementation TagView
 
 
+#pragma mark -
+#pragma mark Initialization
+
+- (void) initialize
+{
+    [self setBackgroundColor:[UIColor clearColor ]];
+    self.objects = [[NSMutableArray alloc]init] ;
+    
+    move = NO;
+    size = NO;
+    corner = -1;
+    self.colorArray=[[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
+    selectedBox = -1;
+    lineOriginal = 6;
+    LINEWIDTH = 6;
+}
+
+- (id) initWithCoder:(NSCoder *)aDecoder
+{
+    if(self = [super initWithCoder:aDecoder]) [self initialize];
+    return self;
+}
+
 - (id)initWithFrame:(CGRect)frame
 {
-    
-    self = [super initWithFrame:frame];
-    if (self) {
-        [self setBackgroundColor:[UIColor clearColor ]];
-        self.objects = [[NSMutableArray alloc]init] ;
-        
-        move = NO;
-        size = NO;
-        corner = -1;
-        self.colorArray=[[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
-        selectedBox = -1;
-        lineOriginal = 6;
-        LINEWIDTH = 6;
-
-    }
+    if (self= [super initWithFrame:frame]) [self initialize];
     return self;
 }
 
 
 #pragma mark -
 #pragma mark Draw Rect
+
 - (void)drawRect:(CGRect)rect
 {
     int count = self.objects.count;

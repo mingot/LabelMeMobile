@@ -81,7 +81,6 @@
 		A5BE1EC616443E6500FE54B5 /* SendingView.m in Sources */ = {isa = PBXBuildFile; fileRef = A5BE1EC516443E6500FE54B5 /* SendingView.m */; };
 		A5C8BFCF162F4EC4009A39E0 /* ResolutionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5C8BFCD162F4EC4009A39E0 /* ResolutionViewController.m */; };
 		A5C8BFD0162F4EC4009A39E0 /* ResolutionViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5C8BFCE162F4EC4009A39E0 /* ResolutionViewController_iPhone.xib */; };
-		A5D91D0D1641D29A00EA0442 /* TagViewController_iPhone5.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5D91D0C1641D29A00EA0442 /* TagViewController_iPhone5.xib */; };
 		A5D91D171641ECEF00EA0442 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5D91D161641ECEF00EA0442 /* QuartzCore.framework */; };
 		A5DCC5591628F5CB00AC9067 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A558D62516134E0C001DED8C /* main.m */; };
 		A5DCC55A1628F5CB00AC9067 /* LabelMeAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A558D62916134E0C001DED8C /* LabelMeAppDelegate.m */; };
@@ -399,7 +398,6 @@
 		A5CAAF4E16163A870095D703 /* GalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GalleryViewController.h; sourceTree = "<group>"; };
 		A5CAAF4F16163A870095D703 /* GalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GalleryViewController.m; sourceTree = "<group>"; };
 		A5CAAF5016163A870095D703 /* GalleryViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GalleryViewController_iPhone.xib; sourceTree = "<group>"; };
-		A5D91D0C1641D29A00EA0442 /* TagViewController_iPhone5.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagViewController_iPhone5.xib; sourceTree = "<group>"; };
 		A5D91D161641ECEF00EA0442 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A5DCC5A61628F5CB00AC9067 /* LabelMe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LabelMe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5DEA0F61640B08700DD58D6 /* app-login-A.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "app-login-A.png"; sourceTree = "<group>"; };
@@ -853,7 +851,6 @@
 				A52C36771617C99400FEF74D /* TagViewController.m */,
 				FCF1C0B01757ED52003DC895 /* TagViewController_withUIScroll */,
 				A5480D6F16179557009F630D /* TagViewController_iPhone.xib */,
-				A5D91D0C1641D29A00EA0442 /* TagViewController_iPhone5.xib */,
 				A549B845165162F6000B41CB /* TagViewController_iPad.xib */,
 				A5480D721617969A009F630D /* TagView.h */,
 				A5480D731617969A009F630D /* TagView.m */,
@@ -1132,7 +1129,6 @@
 				A5DEA1011640B08700DD58D6 /* app-login-B@2x.png in Resources */,
 				A5DEA1041640B08700DD58D6 /* logo-title.png in Resources */,
 				A5DEA1051640B08700DD58D6 /* logo-title@2x.png in Resources */,
-				A5D91D0D1641D29A00EA0442 /* TagViewController_iPhone5.xib in Resources */,
 				A5FAF9FE1642D830002B56B4 /* navbarBg.png in Resources */,
 				A5FAF9FF1642D830002B56B4 /* navbarBg@2x.png in Resources */,
 				A54E1841164C77A000369509 /* SignInViewController_iPad.xib in Resources */,
