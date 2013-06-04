@@ -57,9 +57,6 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.username = [[NSString alloc] init];
-        self.filename = [[NSString alloc] init];
-        
         self.composeView = [[UIView alloc] initWithFrame:CGRectZero];
         self.annotationView = [[TagView alloc] initWithFrame:CGRectZero];
         self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
@@ -75,13 +72,10 @@
 
 - (void)viewDidLoad
 {
-
     [super viewDidLoad];
     self.title = @"Annotation Tool";
-    UIImage *barImage = [UIImage imageNamed:@"navbarBg.png"];
-    [self.navigationController.navigationBar setBackgroundImage:barImage forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbarBg.png"] forBarMetrics:UIBarMetricsDefault];
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
-    [self.view setBackgroundColor:[UIColor blackColor]];
     
     //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
@@ -89,29 +83,27 @@
     UIButton *addButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [addButtonView setImage:[UIImage imageNamed:@"newLabel.png"] forState:UIControlStateNormal];
     [addButtonView addTarget:self action:@selector(addAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.addButton = [[UIBarButtonItem alloc] initWithCustomView:addButtonView];
+    self.addButton.customView = addButtonView;
     
     UIButton *deleteButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [deleteButtonView setImage:[UIImage imageNamed:@"delete.png"] forState:UIControlStateNormal];
     [deleteButtonView addTarget:self action:@selector(deleteAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.deleteButton = [[UIBarButtonItem alloc] initWithCustomView:deleteButtonView];
+    self.deleteButton.customView = deleteButtonView;
     [self.deleteButton setEnabled:NO];
     [self.deleteButton setStyle:UIBarButtonItemStyleBordered];
     
     UIButton *sendButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,self.bottomToolbar.frame.size.height)];
     [sendButtonView setImage:[UIImage imageNamed:@"send.png"] forState:UIControlStateNormal];
     [sendButtonView addTarget:self action:@selector(sendAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.sendButton = [[UIBarButtonItem alloc] initWithCustomView:sendButtonView];
+    self.sendButton.customView = sendButtonView;
 
     self.labelsButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,self.bottomToolbar.frame.size.height)];
     [self.labelsButton setImage:[UIImage imageNamed:@"labelsList.png"] forState:UIControlStateNormal];
     [self.labelsButton setImage:[UIImage imageNamed:@"labelsList-white.png"] forState:UIControlStateSelected];
     [self.labelsButton addTarget:self action:@selector(listAction:) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *labelsButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.labelsButton];
+    self.labelsButtonItem.customView = self.labelsButton;
     
-    UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    [self.bottomToolbar setItems:[NSArray arrayWithObjects:self.addButton,flexibleSpace,self.deleteButton,flexibleSpace, self.sendButton,flexibleSpace, labelsButtonItem, nil]];
-    
+
     //Scroll view
     [self.scrollView setBackgroundColor:[UIColor blackColor]];
 	[self.scrollView setCanCancelContentTouches:NO];
@@ -1033,6 +1025,7 @@
 }
 
 - (void)viewDidUnload {
+    [self setLabelsButtonItem:nil];
     [super viewDidUnload];
 }
 

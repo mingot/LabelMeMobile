@@ -27,7 +27,7 @@
 }
 
 //views
-@property (strong, nonatomic) SendingView *sendingView;
+@property (weak, nonatomic) IBOutlet SendingView *sendingView;
 @property (strong, nonatomic) TagView *annotationView;
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (strong, nonatomic) IBOutlet UITextField *label;
@@ -41,10 +41,11 @@
 
 
 //toolbar
-@property (strong, nonatomic) IBOutlet UIBarButtonItem *addButton;
-@property (strong, nonatomic) IBOutlet UIBarButtonItem *deleteButton;
-@property (strong, nonatomic) IBOutlet UIBarButtonItem *sendButton;
-@property (strong, nonatomic) IBOutlet UIButton *labelsButton;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *addButton;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *deleteButton;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *sendButton;
+@property (strong, nonatomic) UIButton *labelsButton;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *labelsButtonItem;
 @property (strong, nonatomic) IBOutlet UIToolbar *bottomToolbar;
 
 //model

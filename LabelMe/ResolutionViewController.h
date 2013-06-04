@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ResolutionViewController : UIViewController <UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface ResolutionViewController : UIViewController < UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic,weak) IBOutlet UITableView *tableView;
 @property (nonatomic,strong) NSString *username;

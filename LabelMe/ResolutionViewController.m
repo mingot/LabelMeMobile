@@ -108,6 +108,7 @@
     NSString *path = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,self.username ];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[path stringByAppendingPathComponent:@"settings.plist"]];
     NSNumber *dictnum = [NSNumber numberWithInteger:[tableView cellForRowAtIndexPath:indexPath].tag];
+    
     [dict removeObjectForKey:@"resolution"];
     [dict setObject:dictnum forKey:@"resolution"];
     [dict writeToFile:[path stringByAppendingPathComponent:@"settings.plist"] atomically:YES];

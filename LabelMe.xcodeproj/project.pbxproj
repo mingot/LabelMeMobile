@@ -22,11 +22,10 @@
 		A536FB08165607B900F989D4 /* listC.png in Resources */ = {isa = PBXBuildFile; fileRef = A536FAFB165607B900F989D4 /* listC.png */; };
 		A536FB09165607B900F989D4 /* listC@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A536FAFC165607B900F989D4 /* listC@2x.png */; };
 		A537747B165C3E9900BF0649 /* CreditsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5377479165C3E9900BF0649 /* CreditsViewController.m */; };
-		A537747C165C3E9900BF0649 /* CreditsViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = A537747A165C3E9900BF0649 /* CreditsViewController_iPhone.xib */; };
+		A537747C165C3E9900BF0649 /* CreditsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A537747A165C3E9900BF0649 /* CreditsViewController.xib */; };
 		A5377480165C448D00BF0649 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = A537747E165C448D00BF0649 /* logo.png */; };
 		A5377481165C448D00BF0649 /* logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A537747F165C448D00BF0649 /* logo@2x.png */; };
 		A5377487165C4F8000BF0649 /* MITLogo.gif in Resources */ = {isa = PBXBuildFile; fileRef = A5377486165C4F8000BF0649 /* MITLogo.gif */; };
-		A5377489165C506C00BF0649 /* CreditsViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5377488165C506C00BF0649 /* CreditsViewController_iPad.xib */; };
 		A5438AF6165619BC003B8CF1 /* globo.png in Resources */ = {isa = PBXBuildFile; fileRef = A5438AF5165619BC003B8CF1 /* globo.png */; };
 		A549B838164F1EB3000B41CB /* labelsList-white.png in Resources */ = {isa = PBXBuildFile; fileRef = A549B830164F1EB3000B41CB /* labelsList-white.png */; };
 		A549B839164F1EB3000B41CB /* labelsList-white@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A549B831164F1EB3000B41CB /* labelsList-white@2x.png */; };
@@ -268,11 +267,10 @@
 		A536FAFC165607B900F989D4 /* listC@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "listC@2x.png"; sourceTree = "<group>"; };
 		A5377478165C3E9900BF0649 /* CreditsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CreditsViewController.h; sourceTree = "<group>"; };
 		A5377479165C3E9900BF0649 /* CreditsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CreditsViewController.m; sourceTree = "<group>"; };
-		A537747A165C3E9900BF0649 /* CreditsViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CreditsViewController_iPhone.xib; sourceTree = "<group>"; };
+		A537747A165C3E9900BF0649 /* CreditsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CreditsViewController.xib; sourceTree = "<group>"; };
 		A537747E165C448D00BF0649 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		A537747F165C448D00BF0649 /* logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logo@2x.png"; sourceTree = "<group>"; };
 		A5377486165C4F8000BF0649 /* MITLogo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = MITLogo.gif; sourceTree = "<group>"; };
-		A5377488165C506C00BF0649 /* CreditsViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CreditsViewController_iPad.xib; sourceTree = "<group>"; };
 		A5438AF5165619BC003B8CF1 /* globo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = globo.png; sourceTree = "<group>"; };
 		A5480D5E16173525009F630D /* NSObject+Folders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+Folders.h"; sourceTree = "<group>"; };
 		A5480D5F16173525009F630D /* NSObject+Folders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Folders.m"; sourceTree = "<group>"; };
@@ -900,8 +898,7 @@
 				A5817E04165932720061FE67 /* WebsiteViewController_iPhone.xib */,
 				A5377478165C3E9900BF0649 /* CreditsViewController.h */,
 				A5377479165C3E9900BF0649 /* CreditsViewController.m */,
-				A537747A165C3E9900BF0649 /* CreditsViewController_iPhone.xib */,
-				A5377488165C506C00BF0649 /* CreditsViewController_iPad.xib */,
+				A537747A165C3E9900BF0649 /* CreditsViewController.xib */,
 			);
 			name = "Additional View Controllers";
 			sourceTree = "<group>";
@@ -1190,11 +1187,10 @@
 				A56C96F31656C87E004A80A6 /* globo4@2x.png in Resources */,
 				A5817E06165932720061FE67 /* WebsiteViewController_iPhone.xib in Resources */,
 				A56126F5165961F7001DDD17 /* WebsiteViewController_iPad.xib in Resources */,
-				A537747C165C3E9900BF0649 /* CreditsViewController_iPhone.xib in Resources */,
+				A537747C165C3E9900BF0649 /* CreditsViewController.xib in Resources */,
 				A5377480165C448D00BF0649 /* logo.png in Resources */,
 				A5377481165C448D00BF0649 /* logo@2x.png in Resources */,
 				A5377487165C4F8000BF0649 /* MITLogo.gif in Resources */,
-				A5377489165C506C00BF0649 /* CreditsViewController_iPad.xib in Resources */,
 				A55C7051165E8AF300DDB0E5 /* Icon.png in Resources */,
 				FC5C93A216FCB8C800637B69 /* app-login-A-568h@2x.png in Resources */,
 				FC5C93A016FCB8BF00637B69 /* app-login-A@2x-Portrait.png in Resources */,

@@ -20,7 +20,6 @@
 
 
 
-
 @implementation SettingsViewController
 
 
@@ -422,6 +421,7 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    //website
     if (indexPath.section == 2) {
         [self.website setHidesBottomBarWhenPushed:YES];
         [self.navigationController pushViewController:self.website animated:YES];
@@ -437,16 +437,10 @@
 
         resolutionVC.username = self.username;
         [self.navigationController pushViewController:resolutionVC animated:YES];
-        
+    
+    
     }else if ((indexPath.section == 5) ) {
-        CreditsViewController *creditsVC = nil;
-        
-        //choose controller
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-            creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPhone" bundle:nil];
-        else creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPad" bundle:nil];
-            
-        
+        CreditsViewController *creditsVC = creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController" bundle:nil];
         [creditsVC setHidesBottomBarWhenPushed:YES];
         [self.navigationController pushViewController:creditsVC animated:YES];
     }

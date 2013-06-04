@@ -12,5 +12,6 @@
 
 @property (nonatomic, weak) IBOutlet UIScrollView *scrollView;
 @property (nonatomic, weak) IBOutlet UIImageView *titleView;
-
+@property (nonatomic, weak) IBOutlet UITextView *textView;
+@property (weak, nonatomic) IBOutlet UIImageView *logoView;
 @end
