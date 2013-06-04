@@ -15,7 +15,7 @@
 
 @protocol TagViewControllerDelegate <NSObject>
 
-- (void) reloadTableOnImageGallery;
+- (void) reloadTableForFilename:(NSString *)filename;
 
 @end
 

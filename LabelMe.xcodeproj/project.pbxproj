@@ -330,7 +330,6 @@
 		A55A8448162CCFAA00C917DD /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		A55A844E162CD34C00C917DD /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		A55C7050165E8AF300DDB0E5 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
-		A55C7052165E8B2100DDB0E5 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = ../icon.png; sourceTree = "<group>"; };
 		A55D3515161BD7AE00AC49BC /* labelmelogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = labelmelogo.png; sourceTree = "<group>"; };
 		A55D3516161BD7AE00AC49BC /* my_overlay10by10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = my_overlay10by10.png; sourceTree = "<group>"; };
 		A55D3517161BD7AE00AC49BC /* myball.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = myball.png; sourceTree = "<group>"; };
@@ -358,13 +357,9 @@
 		A56C96EA1656ADEA004A80A6 /* globo3@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "globo3@2x.png"; sourceTree = "<group>"; };
 		A56C96F01656C87E004A80A6 /* globo4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = globo4.png; sourceTree = "<group>"; };
 		A56C96F11656C87E004A80A6 /* globo4@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "globo4@2x.png"; sourceTree = "<group>"; };
-		A570425C16606C88002CDE55 /* app-login-A@2x-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "app-login-A@2x-568h@2x.png"; path = "/Desktop/launchimage/app-login-A@2x-568h@2x.png"; sourceTree = "<absolute>"; };
-		A570425E16607009002CDE55 /* app-login-A@2x-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "app-login-A@2x-Portrait.png"; path = "../app-login-A@2x-Portrait.png"; sourceTree = "<group>"; };
 		A5817E02165932720061FE67 /* WebsiteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebsiteViewController.h; sourceTree = "<group>"; };
 		A5817E03165932720061FE67 /* WebsiteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebsiteViewController.m; sourceTree = "<group>"; };
 		A5817E04165932720061FE67 /* WebsiteViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WebsiteViewController_iPhone.xib; sourceTree = "<group>"; };
-		A5833CA51624AA98005D9757 /* tick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tick.png; path = ../../../../../../Downloads/tick.png; sourceTree = "<group>"; };
-		A5833CA61624AA98005D9757 /* cruz.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cruz.png; path = ../../../../../../Downloads/cruz.png; sourceTree = "<group>"; };
 		A5833CAA1624AABF005D9757 /* badgerojo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badgerojo.png; sourceTree = "<group>"; };
 		A5949C7D1625E18500627709 /* CustomBadge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomBadge.h; sourceTree = "<group>"; };
 		A5949C7E1625E18500627709 /* CustomBadge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomBadge.m; sourceTree = "<group>"; };
@@ -423,7 +418,6 @@
 		A5D91D0C1641D29A00EA0442 /* TagViewController_iPhone5.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagViewController_iPhone5.xib; sourceTree = "<group>"; };
 		A5D91D161641ECEF00EA0442 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A5DCC5A61628F5CB00AC9067 /* LabelMe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LabelMe.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A5DCC5A81628F5CB00AC9067 /* LabelMe-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "LabelMe-Info.plist"; path = "/Users/mingot/Projectes/iOS/relabelmemobile/LabelMe/LabelMe-Info.plist"; sourceTree = "<absolute>"; };
 		A5DEA0F61640B08700DD58D6 /* app-login-A.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "app-login-A.png"; sourceTree = "<group>"; };
 		A5DEA0F71640B08700DD58D6 /* app-login-A@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "app-login-A@2x.png"; sourceTree = "<group>"; };
 		A5DEA0F81640B08700DD58D6 /* app-login-B.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "app-login-B.png"; sourceTree = "<group>"; };
@@ -656,23 +650,22 @@
 		A558D62016134E0C001DED8C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				A5DCC5A81628F5CB00AC9067 /* LabelMe-Info.plist */,
 				FC9F94E017443B9A0004598C /* Abstract */,
+				A5480D6216175CE0009F630D /* Constants.h */,
+				A558D62116134E0C001DED8C /* LabelMe-Info.plist */,
+				A558D62216134E0C001DED8C /* InfoPlist.strings */,
+				A558D62516134E0C001DED8C /* main.m */,
+				A558D62716134E0C001DED8C /* LabelMe-Prefix.pch */,
 				FC5C93A116FCB8C800637B69 /* app-login-A@2x-568h@2x.png */,
 				FC5C939F16FCB8BF00637B69 /* app-login-A@2x-Portrait.png */,
 				FC5C939D16FCB8AE00637B69 /* cruz.png */,
 				FC5C939B16FCB8A600637B69 /* tick.png */,
 				FC5C939916FCB89900637B69 /* app login-11.png */,
-				A570425E16607009002CDE55 /* app-login-A@2x-Portrait.png */,
-				A570425C16606C88002CDE55 /* app-login-A@2x-568h@2x.png */,
-				A55C7052165E8B2100DDB0E5 /* icon.png */,
 				A5E5F9FA1642CC6C00C8C156 /* Default-568h@2x.png */,
 				FCED8971170350F80027CBE1 /* bottle.txt */,
 				A5A2FF94162A324800918301 /* nophoto.gif */,
 				A5F2D2511624DF50002955C2 /* badgenaranja.png */,
 				A5833CAA1624AABF005D9757 /* badgerojo.png */,
-				A5833CA51624AA98005D9757 /* tick.png */,
-				A5833CA61624AA98005D9757 /* cruz.png */,
 				A510E0F0161B947B00BC1B3A /* whiteballoon_2.png */,
 				A510E0F1161B947B00BC1B3A /* whiteballoon_4.png */,
 				A59552CC161B7D3200CA6295 /* whiteballoon_1.png */,
@@ -686,11 +679,6 @@
 				A5A5677F1617FC58008AFE2E /* Icon@2x.png */,
 				A55C7050165E8AF300DDB0E5 /* Icon.png */,
 				A5A567811617FC58008AFE2E /* iTunesArtwork@2x.png */,
-				A5480D6216175CE0009F630D /* Constants.h */,
-				A558D62116134E0C001DED8C /* LabelMe-Info.plist */,
-				A558D62216134E0C001DED8C /* InfoPlist.strings */,
-				A558D62516134E0C001DED8C /* main.m */,
-				A558D62716134E0C001DED8C /* LabelMe-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";

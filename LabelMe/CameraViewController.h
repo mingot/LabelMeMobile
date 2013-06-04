@@ -20,7 +20,7 @@
 
 
 
-@interface CameraViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface CameraViewController : UIViewController 
 
 
 @property (strong, nonatomic) id<CameraViewControllerDeledate> delegate;
@@ -35,7 +35,7 @@
 @property (weak, nonatomic) IBOutlet AYUIButton *switchButton;
 @property (weak, nonatomic) IBOutlet AYUIButton *cancelButton;
 @property (weak, nonatomic) IBOutlet UIImageView *thumbnailCaptureImageView;
-//@property (weak, nonatomic) IBOutlet UIView *cameraView;
+@property (strong, nonatomic) UIView *cameraView;
 
 - (IBAction)captureAction:(id)sender;
 - (IBAction)toggleFrontAction:(id)sender;

@@ -28,6 +28,7 @@
 
 
 - (id) initWithPoints:(CGPoint)upper :(CGPoint)lower;
+- (id) initWIthBox:(Box *)box;
 - (void) setBounds:(CGRect)rect;
 - (int) setUpperLeft:(CGPoint)point;
 - (int) setLowerRight:(CGPoint)point;
@@ -44,5 +45,7 @@
 
 //returns the CGRect of the Box
 - (CGRect) getRectangleForBox;
+//adapt box to image size
+- (void) setBoxDimensionsForImageSize:(CGSize) size;
 
 @end

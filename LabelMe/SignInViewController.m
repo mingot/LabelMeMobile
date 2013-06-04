@@ -19,23 +19,17 @@
 
 
 
+@interface SignInViewController()
+
+//keyboard
+-(void)keyboardDidShow:(NSNotification *)notif;
+-(void)keyboardDidHide:(NSNotification *)notif;
+
+@end
+
+
 
 @implementation SignInViewController
-
-@synthesize scrollView = _scrollView;
-@synthesize usernameField = _usernameField;
-@synthesize passwordField = _passwordField;
-@synthesize signInButton = _signInButton;
-@synthesize forgotPasswordButton = _forgotPasswordButton;
-@synthesize createAccountButton = _createAccountButton;
-@synthesize keyboardToolbar = _keyboardToolbar;
-@synthesize tabBarController = _tabBarController;
-@synthesize popover = _popover;
-@synthesize galleryViewController = _galleryViewController;
-@synthesize settingsViewController = _settingsViewController;
-@synthesize detectorGalleryController = _detectorGalleryController;
-
-
 
 
 #pragma mark
@@ -90,13 +84,13 @@
     previousSession = [self rememberMe];
     
     //sending view
-    sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
-    sendingView.delegate = self;
-    [sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-    sendingView.hidden = YES;
-    sendingView.progressView.hidden = YES;
-    sendingView.textView.text = @"Signing in...";
-    [self.view addSubview:sendingView];
+    self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
+    self.sendingView.delegate = self;
+    [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+    self.sendingView.hidden = YES;
+    self.sendingView.progressView.hidden = YES;
+    self.sendingView.textView.text = @"Signing in...";
+    [self.view addSubview:self.sendingView];
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -174,8 +168,8 @@
 {
 
     [self cancelAction:nil];
-    [sendingView setHidden:NO];
-    [sendingView.activityIndicator startAnimating];
+    [self.sendingView setHidden:NO];
+    [self.sendingView.activityIndicator startAnimating];
 
     [sConnection checkLoginForUsername:self.usernameField.text andPassword:self.passwordField.text];
 }
@@ -206,6 +200,7 @@
     [self.passwordField resignFirstResponder];
 
 }
+
 -(IBAction)createAccountAction:(id)sender
 {
     CreateAccountViewController *createAccountViewController = nil;
@@ -336,8 +331,8 @@
 -(void)cancel
 {
     [sConnection cancelRequestFor:0];
-    [sendingView setHidden:YES];
-    [sendingView.activityIndicator stopAnimating];
+    [self.sendingView setHidden:YES];
+    [self.sendingView.activityIndicator stopAnimating];
 }
 
 
@@ -355,11 +350,13 @@
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         
         if ([UIScreen mainScreen].bounds.size.height == 568) {
+            NSLog(@"iphone 5!!");
             self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone5" bundle:nil];
             self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone5" bundle:nil];
             self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
             
         }else if ([UIScreen mainScreen].bounds.size.height == 480){
+            NSLog(@"iphone 4!!");
             self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone" bundle:nil];
             self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone" bundle:nil];
             self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
@@ -388,8 +385,8 @@
     }
 
     
-    sendingView.hidden = YES;
-    [sendingView.activityIndicator stopAnimating];
+    self.sendingView.hidden = YES;
+    [self.sendingView.activityIndicator stopAnimating];
     [self presentViewController:self.tabBarController animated:YES completion:NULL];
     
     //transferring paths to galleryVC
@@ -411,15 +408,15 @@
     if (previousSession) [self signInComplete];
     else{
         [self errorWithTitle:@"No internet connection" andDescription:@"The app could not connect."];
-        [sendingView setHidden:YES];
-        [sendingView.activityIndicator stopAnimating];
+        [self.sendingView setHidden:YES];
+        [self.sendingView.activityIndicator stopAnimating];
     }
 }
 
 
 -(void)signInError
 {
-    [sendingView setHidden:YES];
+    [self.sendingView setHidden:YES];
 }
 
 

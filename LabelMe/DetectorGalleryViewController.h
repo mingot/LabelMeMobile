@@ -27,6 +27,7 @@
 @property (nonatomic, strong) NSMutableArray *selectedItems;
 
 //view
+@property (strong, nonatomic) UILabel *noImages;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) UIBarButtonItem *editButton;
 @property (nonatomic, strong) UIButton *executeDetectorsButton;

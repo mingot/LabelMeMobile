@@ -161,13 +161,22 @@ using namespace cv;
         [self.imagesHogPyramid addObject:[NSNull null]];
     self.receivedImageIndex = [[NSMutableArray alloc] init];
     
-    // Get the template size and get hog feautures dimension
-    float ratio = trainingSet.templateSize.width/trainingSet.templateSize.height;
+    //set hog dimension according to the max Hog set in user preferences
+    float ratio;
+    if(trainingSet.templateSize.height > trainingSet.templateSize.width){
+        ratio = trainingSet.templateSize.width/trainingSet.templateSize.height;
+        self.sizesP[0] = self.maxHog; //set in user preferences
+        self.sizesP[1] = round(self.sizesP[0]*ratio);
+
+    }else{
+        ratio = trainingSet.templateSize.height/trainingSet.templateSize.width;
+        self.sizesP[1] = self.maxHog;
+        self.sizesP[0] = round(self.sizesP[1]*ratio);
+    }
+    self.sizesP[2] = 31;
+    
     //scalefactor for detection. Used to ajust hog size with images resolution
     self.scaleFactor = [NSNumber numberWithDouble:self.maxHog*6*sqrt(ratio/trainingSet.areaRatio)];
-    self.sizesP[0] = self.maxHog; //set in user preferences
-    self.sizesP[1] = round(self.sizesP[0]*ratio);
-    self.sizesP[2] = 31;
     numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];
     
     [self.delegate sendMessage:[NSString stringWithFormat:@"Hog features: %d %d %d for ratio:%f", self.sizesP[0],self.sizesP[1],self.sizesP[2], ratio]];
@@ -346,6 +355,7 @@ using namespace cv;
             candidatesForLevel = [self getBoundingBoxesIn:imageHog forPyramid:i+self.iniPyramid forIndex:0];
         }else{
             NSLog(@"Error trying to retrieve pyramid %zd, not the correct class",i+self.iniPyramid);
+            NSLog(@"Obtained class: %@", [[pyramid.hogFeatures objectAtIndex:i+self.iniPyramid] class]);
         }
         dispatch_sync(dispatch_get_main_queue(), ^{
             [candidateBoundingBoxes addObjectsFromArray:candidatesForLevel];

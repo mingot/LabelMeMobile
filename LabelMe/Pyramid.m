@@ -89,7 +89,6 @@
     double scale = pow(2, 1.0/SCALES_PER_OCTAVE);
     UIImage *scaledImage = [image scaleImageTo:initialScale/pow(scale,0)]; //TODO: optimize to start to the first true index
     
-    
     __block HogFeature *imageHog;
     dispatch_queue_t pyramidConstructionQueue = dispatch_queue_create("pyramidConstructionQueue", DISPATCH_QUEUE_CONCURRENT);
     dispatch_apply(self.numPyramids, pyramidConstructionQueue, ^(size_t i) {
@@ -97,7 +96,9 @@
             float scaleLevel = pow(1.0/scale, i);
             imageHog = [[scaledImage scaleImageTo:scaleLevel] obtainHogFeatures];
             dispatch_sync(dispatch_get_main_queue(), ^{
-                [self.hogFeatures setObject:imageHog atIndexedSubscript:i];
+                if([self.hogFeatures isKindOfClass:[NSMutableArray class]])
+                    [self.hogFeatures setObject:imageHog atIndexedSubscript:i];
+                else{NSLog(@"Error en pyramid construction, obtained class:%@", [self.hogFeatures class]);}
             });
         }
     });

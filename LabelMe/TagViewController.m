@@ -228,38 +228,34 @@
 
 - (void) loadWhenAppear
 {
-    //check if boxes not saved on the server
-    NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
-    if (dictnum.intValue == 0) [self.sendButton setEnabled:NO];
-    
-    //load image
-    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:self.filename];
-    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-    self.imageView.image = image;
-    self.annotationView.frame = [self getImageFrameFromImageView:self.imageView];
-    
-    //load boxes
-    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
-    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-    [self.annotationView.objects setArray:boxes];
-    
-    [self selectedAnObject:NO];
-    if (self.annotationView.objects.count > 0)
-        [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-    
-    //check for all the boxes have the correct size (correction for the downloaded boxes)
-    for(Box* box in self.annotationView.objects){
-        CGFloat frameWidth = self.annotationView.frame.size.width;
-        CGFloat frameHeight = self.annotationView.frame.size.height;
+    dispatch_async(dispatch_get_main_queue(), ^{
         
-        box.upperLeft = CGPointMake(box.upperLeft.x*frameWidth/box->RIGHTBOUND, box.upperLeft.y*frameHeight/box->LOWERBOUND);
-        box.lowerRight = CGPointMake(box.lowerRight.x*frameWidth/box->RIGHTBOUND, box.lowerRight.y*frameHeight/box->LOWERBOUND);
-        box->RIGHTBOUND = frameWidth;
-        box->LOWERBOUND = frameHeight;
-    }
-    
-    [self.annotationView setNeedsDisplay];
-	keyboardVisible = NO;
+        //check if boxes not saved on the server
+        NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
+        if (dictnum.intValue == 0) [self.sendButton setEnabled:NO];
+        
+        //load image
+        NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:self.filename];
+        UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
+        self.imageView.image = image;
+        self.annotationView.frame = [self getImageFrameFromImageView:self.imageView];
+        
+        //load boxes
+        NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
+        NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
+        [self.annotationView.objects setArray:boxes];
+        
+        [self selectedAnObject:NO];
+        if (self.annotationView.objects.count > 0)
+            [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+        
+        //set the box dimensions for the current context
+        for(Box* box in self.annotationView.objects)
+            [box setBoxDimensionsForImageSize:self.annotationView.frame.size];
+        
+        [self.annotationView setNeedsDisplay];
+        keyboardVisible = NO;
+    });
 }
 
 - (void) viewWillDisappear:(BOOL)animated
@@ -281,6 +277,8 @@
     [self.annotationView setLINEWIDTH:1.0];
     [self.imageView setImage:nil];
     self.label.hidden = YES;
+    [self.annotationView.objects removeAllObjects];
+    
     
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -291,7 +289,9 @@
     //save thumbnail and dictionary
     [self saveThumbnail];
     [self saveDictionary];
-    [self.delegate reloadTableOnImageGallery];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.delegate reloadTableForFilename:self.filename];
+    });
 }
 
 #pragma mark -
@@ -644,6 +644,7 @@
     
     UIButton *button = (UIButton *)sender;
     
+    //select next/previous image filename
     int increase = 2*button.tag - 3;
     int currentIndex = [self.items indexOfObject:self.filename];
     int total = self.items.count;
@@ -736,7 +737,7 @@
 {
     [self.annotationView setSelectedBox:-1];
     [self.annotationView setNeedsDisplay];
-            
+    
     UIGraphicsBeginImageContext(self.annotationView.frame.size);
     [self.composeView.layer renderInContext:UIGraphicsGetCurrentContext()];
     UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -746,15 +747,15 @@
     
     int thumbnailSize = 300;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
-    thumbnailImage  = [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
+    thumbnailImage  = [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
     
     //    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-    //       thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
+    //       thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
     //
-    //    else thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
+    //    else thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
     
     CGImageRelease(imageRef);
-
+    
     dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
     dispatch_sync(saveQueue, ^{
         NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
@@ -1033,33 +1034,6 @@
 
 - (void)viewDidUnload {
     [super viewDidUnload];
-}
-
-- (UIImage *) thumbnailImageFromImage:(UIImage *)image withBoxes:(NSArray *)boxes
-{
-    UIGraphicsBeginImageContext(image.size);
-    [image drawAtPoint:CGPointZero];
-    CGContextRef ctx = UIGraphicsGetCurrentContext();
-    [[UIColor blueColor] setStroke];
-    
-    CGContextSetLineWidth(ctx, 60);
-    CGContextSetStrokeColorWithColor(ctx, [UIColor blueColor].CGColor);
-    
-    for(Box *box in boxes){
-        CGRect rectangle = [box getRectangleForBox];
-        CGContextStrokeRect(ctx, rectangle);
-    }
-    
-    UIImage *resultingImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    //generate thumbnail
-    int thumbnailSize = 300;
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
-    UIImage *thumbnailImage = [[UIImage imageWithCGImage:resultingImage.CGImage] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
-    
-    
-    return thumbnailImage;
 }
 
 

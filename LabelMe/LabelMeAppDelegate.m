@@ -13,22 +13,24 @@
 
 @implementation LabelMeAppDelegate
 
-
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 
-    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
     
     //Decide which device it is using it (iphone, iphone5 or ipad)
     SignInViewController *rootViewController;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        if ([UIScreen mainScreen].bounds.size.height == 568)
+        NSLog(@"screen size: %f", [UIScreen mainScreen].bounds.size.height);
+        if ([UIScreen mainScreen].bounds.size.height == 568){
+            NSLog(@"iphone 5!");
             rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPhone5" bundle:nil];
-        else if ([UIScreen mainScreen].bounds.size.height == 480)
+        }else if ([UIScreen mainScreen].bounds.size.height == 480){
+            NSLog(@"iphone 4!");
             rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPhone" bundle:nil];
+            
+        }
     }else rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPad" bundle:nil];
 
 
@@ -39,7 +41,8 @@
     
     //BACK BUTTON DEFINITION
     UIImage *backButtonImage = [[UIImage imageNamed:@"backButton.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 10, 0, 10)];
-    [[UIBarButtonItem appearance] setBackButtonBackgroundImage:backButtonImage forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+//    [[UIBarButtonItem appearance] setBackButtonBackgroundImage:backButtonImage forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+    
     
 //    //Other menu butotns
 //    [[UIBarButtonItem appearance] setBackgroundImage:[UIImage imageNamed:@"backButton.png"] forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];

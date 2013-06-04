@@ -35,7 +35,7 @@ static float LINEWIDTH = 6;
     
     return self;
 }
-- (id)initWithPoints:(CGPoint)upper :(CGPoint) lower
+- (id)initWithPoints:(CGPoint)upper :(CGPoint)lower
 {
     self = [super init];
     if (self) {
@@ -46,47 +46,64 @@ static float LINEWIDTH = 6;
     }
     return self;
 }
--(void)setBounds:(CGRect)rect{
-   // UPPERBOUND = rect.origin.y;
-    UPPERBOUND = 0;
-    LOWERBOUND = rect.size.height;// - rect.origin.y;
-    //LEFTBOUND = rect.origin.x;
-    LEFTBOUND = 0;
-    RIGHTBOUND = rect.size.width;// - rect.origin.x;
+
+- (id)initWIthBox:(Box *)box
+{
+    self = [super init];
+    if(self){
+        upperLeft = box.upperLeft;
+        lowerRigth = box.lowerRight;
+        UPPERBOUND = box->UPPERBOUND;
+        LOWERBOUND = box->LOWERBOUND;
+        LEFTBOUND = box->LEFTBOUND;
+        RIGHTBOUND = box->RIGHTBOUND;
+        self.label = box.label;
+        self.date = box.date;
+        self.color = box.color;
+        self.downloadDate = box.downloadDate;
+    }
+    return self;
 }
--(int) setUpperLeft:(CGPoint ) point{
+
+-(void)setBounds:(CGRect)rect
+{
+    UPPERBOUND = 0;
+    LOWERBOUND = rect.size.height;
+    LEFTBOUND = 0;
+    RIGHTBOUND = rect.size.width;
+}
+
+
+-(int) setUpperLeft:(CGPoint ) point
+{
     int corner=0;
-    if (point.y<UPPERBOUND+LINEWIDTH/2) {
-        point.y=UPPERBOUND +LINEWIDTH/2;
-    }
-    if (point.x<LEFTBOUND +LINEWIDTH/2) {
-        point.x=LEFTBOUND +LINEWIDTH/2;
-        
-    }
+    if (point.y < UPPERBOUND + LINEWIDTH/2) point.y = UPPERBOUND + LINEWIDTH/2;
+    
+    if (point.x < LEFTBOUND + LINEWIDTH/2) point.x=LEFTBOUND + LINEWIDTH/2;
+    
     upperLeft = point;
-   /* upperLeft.x /= RIGHTBOUND;
-    upperLeft.y /= LOWERBOUND;*/
-    if ((upperLeft.x>lowerRigth.x)) {
+
+    if (upperLeft.x > lowerRigth.x) {
         float copy;
-        copy=upperLeft.x;
-        upperLeft.x=lowerRigth.x;
-        lowerRigth.x=copy;
+        copy = upperLeft.x;
+        upperLeft.x = lowerRigth.x;
+        lowerRigth.x = copy;
         corner++;
     }
-    if ((upperLeft.y>lowerRigth.y)) {
+    
+    if (upperLeft.y > lowerRigth.y) {
         float copy;
-        copy=upperLeft.y;
-        upperLeft.y=lowerRigth.y;
-        lowerRigth.y=copy;
+        copy = upperLeft.y;
+        upperLeft.y = lowerRigth.y;
+        lowerRigth.y = copy;
         corner+=2;
     }
     
-    
     return corner;
-    
-    
 }
--(int) setLowerRight:(CGPoint ) point{
+
+-(int) setLowerRight:(CGPoint ) point
+{
     int corner=0;
     if (point.y>LOWERBOUND-LINEWIDTH/2) {
         point.y=LOWERBOUND-LINEWIDTH/2;
@@ -95,8 +112,7 @@ static float LINEWIDTH = 6;
         point.x=RIGHTBOUND-LINEWIDTH/2;
     }
     lowerRigth = point;
-   /* lowerRigth.x /= RIGHTBOUND;
-    lowerRigth.y /= LOWERBOUND;*/
+
     if ((upperLeft.x>lowerRigth.x)) {
         float copy;
         copy=upperLeft.x;
@@ -284,6 +300,15 @@ static float LINEWIDTH = 6;
     CGRect rectangle = CGRectMake(upperLeft.x, upperLeft.y, lowerRigth.x - upperLeft.x, lowerRigth.y - upperLeft.y);
     return rectangle;
 }
+
+- (void) setBoxDimensionsForImageSize:(CGSize) size
+{    
+    upperLeft = CGPointMake(upperLeft.x*size.width*1.0/RIGHTBOUND, upperLeft.y*size.height*1.0/LOWERBOUND);
+    lowerRigth = CGPointMake(lowerRigth.x*size.width*1.0/RIGHTBOUND, lowerRigth.y*size.height*1.0/LOWERBOUND);
+    RIGHTBOUND = size.width;
+    LOWERBOUND = size.height;
+}
+
 
 - (NSString *)description
 {

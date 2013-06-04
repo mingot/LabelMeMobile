@@ -177,7 +177,6 @@
     self.detectView.prevLayer = self.prevLayer;
     [self.view addSubview:self.HOGimageView];
     [self.view addSubview:self.detectView];
-    
 }
 
 - (void) viewWillAppear:(BOOL)animated
@@ -263,7 +262,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                                               usingNms:YES
                                      deviceOrientation:[[UIDevice currentDevice] orientation]
                                     learningImageIndex:0]];
-        
         //Multiclass detection
         }else{
             
@@ -291,7 +289,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         [self.detectView performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
         
         // Update the navigation controller title with some information about the detection
-        int level=-1;
+        int level = -1;
         float scoreFloat = -1;        
         
         //Put the HOG picture on screen

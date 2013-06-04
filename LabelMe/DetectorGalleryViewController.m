@@ -144,6 +144,25 @@
     [self.navigationController.toolbar setBarStyle:UIBarStyleBlackTranslucent];
     self.selectedItems = [[NSMutableArray alloc] init];
     
+    //noImages view
+    self.noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x + 0.03125*self.view.frame.size.width,
+                                                              self.tableView.frame.origin.y + 0.03125*self.view.frame.size.height,
+                                                              self.tableView.frame.size.width - 0.0625*self.view.frame.size.width,
+                                                              self.tableView.frame.size.height - 0.25*self.view.frame.size.height)];
+    [self.noImages setBackgroundColor:[UIColor whiteColor]];
+    self.noImages.layer.masksToBounds = YES;
+    self.noImages.layer.cornerRadius = 10.0;
+    self.noImages.layer.shadowColor = [UIColor grayColor].CGColor;
+    self.noImages.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
+    self.noImages.shadowColor = [UIColor grayColor];
+    self.noImages.numberOfLines = 3;
+    self.noImages.shadowOffset = CGSizeMake(0.0, 1.0);
+    self.noImages.text = @"You do not have detectors, \nstart training a detector";
+    [self.noImages setTextAlignment:NSTextAlignmentCenter];
+    [self.noImages setUserInteractionEnabled:YES];
+    self.noImages.hidden = YES;
+    [self.view addSubview:self.noImages];
+    
     
     
     [super viewDidLoad];
@@ -153,6 +172,8 @@
 {
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
+    
+    if(self.detectors.count==0) self.noImages.hidden = NO;
 }
 
 
@@ -214,6 +235,8 @@
         [[NSFileManager defaultManager] removeItemAtPath:thumbnailImagePath error:nil];
     }
     
+    if(self.detectors.count==0) self.noImages.hidden = NO;
+    
 }
 
 
@@ -248,7 +271,7 @@
     Classifier *newDetector = [[Classifier alloc] init];
     newDetector.name = @"New Detector";
     newDetector.targetClasses = [NSArray arrayWithObject:@"Not Set"];
-    self.detectorController.availableObjectClasses = self.availableObjectClasses;
+    self.detectorController.availableObjectClasses = [self.availableObjectClasses sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
     self.detectorController.hidesBottomBarWhenPushed = YES;
     self.detectorController.delegate = self;
     self.detectorController.svmClassifier = newDetector;
@@ -360,6 +383,8 @@
     }
     
     [self.tableView reloadData];
+    
+    if(self.detectors.count>0) self.noImages.hidden = YES;
 }
 
 

@@ -48,19 +48,6 @@
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput
                                           deviceInputWithDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo]
                                           error:nil];
-    
-    //Capture output specifications
-    AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
-    captureOutput.alwaysDiscardsLateVideoFrames = YES;
-    
-    // Output queue setting (for receiving captures from AVCaptureSession delegate)
-    dispatch_queue_t queue = dispatch_queue_create("cameraQueue", NULL);
-    [captureOutput setSampleBufferDelegate:self queue:queue];
-    dispatch_release(queue);
-    
-    // Set the video output to store frame in BGRA (It is supposed to be faster)
-    NSDictionary *videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA], kCVPixelBufferPixelFormatTypeKey,nil];
-    [captureOutput setVideoSettings:videoSettings];
 
     //still image capture
     self.stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
@@ -70,7 +57,6 @@
     //Capture session definition
     self.captureSession = [[AVCaptureSession alloc] init];
     [self.captureSession addInput:captureInput];
-    [self.captureSession addOutput:captureOutput]; //video output
     [self.captureSession addOutput:self.stillImageOutput]; //still image output
     [self.captureSession setSessionPreset:AVCaptureSessionPresetPhoto];
     
@@ -78,27 +64,29 @@
     self.prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
     self.prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     self.prevLayer.frame = self.view.frame;
-    [self.captureSession startRunning];
-
+    
     //trick to put de capture previous layer at the back
-    UIView *cameraView = [[UIView alloc] initWithFrame:self.view.frame];
-    [self.view addSubview:cameraView];
-	[self.view sendSubviewToBack:cameraView];
-	[cameraView.layer addSublayer:self.prevLayer];
+    self.cameraView = [[UIView alloc] initWithFrame:self.view.frame];
+    [self.view addSubview:self.cameraView];
+    [self.view sendSubviewToBack:self.cameraView];
+    [self.cameraView.layer addSublayer:self.prevLayer];
 }
 
 -(void) viewWillAppear:(BOOL)animated
 {
-
     self.navigationController.navigationBarHidden = YES;
     self.thumbnailCaptureImageView.image = nil;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // Previous layer to show the video image
+        [self.captureSession startRunning];
+    });
 }
 
-//-(void) viewWillDisappear:(BOOL)animated
-//{
-//    [self.captureSession stopRunning];
-//    [super viewWillDisappear:animated];
-//}
+-(void) viewWillDisappear:(BOOL)animated
+{
+    [self.captureSession stopRunning];
+    [super viewWillDisappear:animated];
+}
 
 #pragma mark -
 #pragma mark IBActions

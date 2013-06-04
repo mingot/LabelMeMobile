@@ -42,7 +42,8 @@
 //models
 @property (nonatomic, strong) NSMutableArray *items; //filenames ordered by update date
 @property (nonatomic, strong) NSMutableArray *labelsOrdered;
-@property (nonatomic, strong) NSMutableDictionary *buttonsDictionary; //buttons stored to select all images when section name tapped
+//@property (nonatomic, strong) NSMutableDictionary *buttonsDictionary; //buttons stored to select all images when section name tapped
+@property (nonatomic, strong) NSMutableArray *buttonsArray; //each object is an array with the buttons for that category
 @property (nonatomic, strong) NSMutableArray *labelsArray; //each element of the array is a dictionary with the label as key and object the array of filenames
 
 
@@ -69,8 +70,8 @@
 - (UIImage *) thumbnailImageFromImage:(UIImage *)image withBoxes:(NSArray *)boxes;
 
 //update the models every time an image is altered. Avoid having to reset the whole models every time
-- (void) updateImageByFilename:(NSString *)filename;
-- (void) deleteImageByFilename:(NSString *)filename;
+//- (void) updateModelByFilename:(NSString *)filename;
+//- (void) deleteImageByFilename:(NSString *)filename;
 - (NSArray *) getLabelsForFilename:(NSString *) filename; //obtain the labels of an image
 
 @end
@@ -129,6 +130,21 @@
     return _items;
 }
 
+- (NSMutableArray *)labelsOrdered
+{
+    if(!_labelsOrdered){
+        NSMutableSet *unorderedLabels = [[NSMutableSet alloc] init];
+        for(NSString *filename in self.items){
+            NSArray *labels = [self getLabelsForFilename:filename];
+            [unorderedLabels addObjectsFromArray:labels];
+        }
+        
+        _labelsOrdered = [NSMutableArray arrayWithArray:[[unorderedLabels allObjects] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
+    }
+    return _labelsOrdered;
+}
+
+
 - (NSMutableArray *) labelsArray
 {
     if(!_labelsArray){
@@ -148,80 +164,61 @@
                 else currentFilenames = [NSMutableArray arrayWithObject:filename];
                 [_labelsArray setObject:currentFilenames atIndexedSubscript:index];
             }
-            if(labels.count==0){ //box has no labels
-                int index = [self.labelsOrdered indexOfObject:@"00None"];
-                NSMutableArray *currentFilenames = [_labelsArray objectAtIndex:index];
-                if([currentFilenames isKindOfClass:[NSMutableDictionary class]]) [currentFilenames addObject:filename];
-                else currentFilenames = [NSMutableArray arrayWithObject:filename];
-                [_labelsArray setObject:currentFilenames atIndexedSubscript:index];
-            }
         }
     }
     return _labelsArray;
 }
 
-- (NSMutableArray *)labelsOrdered
+- (NSMutableArray *) buttonsArray
 {
-    if(!_labelsOrdered){
-        NSMutableSet *unorderedLabels = [[NSMutableSet alloc] init];
-        for(NSString *filename in self.items){
-            NSArray *labels = [self getLabelsForFilename:filename];
-            if(labels.count == 0) [unorderedLabels addObject:@"00None"];
-            [unorderedLabels addObjectsFromArray:labels];
+    if(!_buttonsArray){
+        _buttonsArray = [[NSMutableArray alloc] initWithCapacity:self.labelsOrdered.count];
+        for(NSString *label in self.labelsOrdered){
+            NSArray *buttons = [self buttonsForLabel:label];
+            [_buttonsArray addObject:buttons];
         }
-        [unorderedLabels removeObject:@""];
-
-        _labelsOrdered = [NSMutableArray arrayWithArray:[[unorderedLabels allObjects] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)]];
-    }
-    return _labelsOrdered;
-}
-
-
-- (NSMutableDictionary *) buttonsDictionary
-{
-    if(!_buttonsDictionary){
         
-        _buttonsDictionary = [[NSMutableDictionary alloc] init];
-        for (int i=0;i<self.labelsOrdered.count;i++){
-            NSArray *indexes = [self.labelsArray objectAtIndex:i];
-            NSString *label = [self.labelsOrdered objectAtIndex:i];
-            NSMutableArray *buttons = [[NSMutableArray alloc] init];
-            for(int i=0; i<indexes.count; i++){
-                
-                UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-                button.tag = [self.items indexOfObject:[indexes objectAtIndex:i]];
-                
-                if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-                    button.frame = CGRectMake(0.05*self.view.frame.size.width + 0.225*self.view.frame.size.width*(i%4),
-                                              0.01875*self.view.frame.size.width + 0.225*self.view.frame.size.width*(floor((i/4))),
-                                              0.225*self.view.frame.size.width - 5,
-                                              0.225*self.view.frame.size.width - 5);
-                
-                else button.frame = CGRectMake(0.07*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4),
-                                               0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))),
-                                               0.2*self.view.frame.size.width - 7,
-                                               0.2*self.view.frame.size.width - 7);
-                
-                button.titleLabel.text = label;
-                UIImage *thumbnailImage = [UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[indexes objectAtIndex:i]]];
-                
-                [button addTarget:self
-                           action:@selector(buttonClicked:)
-                 forControlEvents:UIControlEventTouchUpInside];
-                [button setImage:thumbnailImage forState:UIControlStateNormal];
-                
-                //custom badge
-                NSNumber *num = [self.userDictionary objectForKey:[indexes objectAtIndex:i]];
-                [button addSubview:[self correctAccessoryWithBoxes:num forImgeSize:button.frame.size]];
-                
-                [buttons addObject:button];
-            }
-            [_buttonsDictionary setObject:buttons forKey:label];
-        }
-    }
-    return _buttonsDictionary;
+    }return _buttonsArray;
 }
 
+- (NSArray *) buttonsForLabel:(NSString *)label
+{
+    int i = [self.labelsOrdered indexOfObject:label];
+    NSArray *indexes = [self.labelsArray objectAtIndex:i];
+    NSMutableArray *buttons = [[NSMutableArray alloc] init];
+    for(int i=0; i<indexes.count; i++){
+        
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.tag = [self.items indexOfObject:[indexes objectAtIndex:i]];
+        
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+            button.frame = CGRectMake(0.05*self.view.frame.size.width + 0.225*self.view.frame.size.width*(i%4),
+                                      0.01875*self.view.frame.size.width + 0.225*self.view.frame.size.width*(floor((i/4))),
+                                      0.225*self.view.frame.size.width - 5,
+                                      0.225*self.view.frame.size.width - 5);
+        
+        else button.frame = CGRectMake(0.07*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4),
+                                       0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))),
+                                       0.2*self.view.frame.size.width - 7,
+                                       0.2*self.view.frame.size.width - 7);
+        
+        button.titleLabel.text = label;
+        UIImage *thumbnailImage = [UIImage imageWithContentsOfFile:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:[indexes objectAtIndex:i]]];
+        
+        [button addTarget:self
+                   action:@selector(buttonClicked:)
+         forControlEvents:UIControlEventTouchUpInside];
+        [button setImage:thumbnailImage forState:UIControlStateNormal];
+        
+        //custom badge
+        NSNumber *num = [self.userDictionary objectForKey:[indexes objectAtIndex:i]];
+        [button addSubview:[self correctAccessoryWithBoxes:num forImgeSize:button.frame.size]];
+        
+        [buttons addObject:button];
+    }
+    
+    return [NSArray arrayWithArray:buttons];
+}
 
 
 -(NSMutableDictionary *)userDictionary
@@ -230,7 +227,6 @@
         _userDictionary = [[NSMutableDictionary alloc]initWithContentsOfFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username]];
     return _userDictionary;
 }
-
 
 
 #pragma mark -
@@ -387,29 +383,25 @@
 -(void) reloadGallery
 {
     //get sorted files by date of modification of the image
-    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-    dispatch_async(saveQueue, ^{
-        self.items = nil;
-//        self.labelsDictionary = nil;
-//        self.labelsOrdered = nil;
-        self.labelsOrdered = nil;
-        self.labelsArray = nil;
-        self.buttonsDictionary = nil;
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
 
-            if(self.items.count == 0) {
-                self.noImages.hidden = NO;
-                self.tableView.hidden = YES;
-                self.tableViewGrid.hidden = YES;
-            }
-            else self.noImages.hidden = YES;
-            
-            [self.tableView reloadData];
-            [self.tableViewGrid reloadData];
-        });
+    self.items = nil;
+    self.labelsOrdered = nil;
+    self.labelsArray = nil;
+    self.buttonsArray = nil;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+
+        if(self.items.count == 0) {
+            self.noImages.hidden = NO;
+            self.tableView.hidden = YES;
+            self.tableViewGrid.hidden = YES;
+        }
+        else self.noImages.hidden = YES;
+        
+        [self.tableView reloadData];
+        [self.tableViewGrid reloadData];
     });
-    dispatch_release(saveQueue);
+
 }
 
 
@@ -501,11 +493,16 @@
 
 - (IBAction)downloadAction:(id)sender
 {
+    //sending view to show getting images from server
+    self.sendingView.textView.text = @"Retrieving images from server...";
+    self.sendingView.cancelButton.hidden = NO;
+    self.sendingView.progressView.hidden = YES;
+    self.sendingView.sendingViewID = @"retreiving";
+    [self hideTabBar:self.tabBarController];
+    [self.sendingView.activityIndicator startAnimating];
+    self.sendingView.hidden = NO;
     
-    //start spin indicator for the activity
-    self.activityIndicator.hidden = NO;
-    [self.activityIndicator startAnimating];
-    
+    self.cancelDownloading = NO;
     dispatch_queue_t q = dispatch_queue_create("q", NULL);
     dispatch_async(q, ^{
         
@@ -525,6 +522,8 @@
         
         //select NUM images not currently present in iphone
         for (NSDictionary *element in results) {
+            
+            if(self.cancelDownloading) break;
             
             //get the name of the image
             NSString *imageName = [element objectForKey:@"name"];
@@ -604,11 +603,15 @@
         }
         
         dispatch_sync(dispatch_get_main_queue(), ^{
-            self.activityIndicator.hidden = YES;
-            [self.activityIndicator stopAnimating];
+            
+            //sending view
+            self.sendingView.hidden = YES;
+            [self showTabBar:self.tabBarController];
+            [self.sendingView.activityIndicator stopAnimating];
+            self.sendingView.progressView.hidden = NO;
             
             //present the modal depending on the sender button: show images or labels
-            if(self.downloadedThumbnails.count>0){
+            if(self.downloadedThumbnails.count>0 && !self.cancelDownloading){
 
                 self.modalSectionsTVC = [[ModalSectionsTVC alloc] init];
                 self.modalSectionsTVC.showCancelButton = YES;
@@ -618,7 +621,7 @@
                 self.modalSectionsTVC.dataDictionary = self.downloadedLabelsMap;
                 [self presentModalViewController:self.modalSectionsTVC animated:YES];
                     
-            }else{
+            }else if(!self.cancelDownloading){
                 UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
                                                                      message:@"You have all the images"
                                                                     delegate:nil
@@ -936,9 +939,13 @@
 #pragma mark -
 #pragma mark TagVC Delegate
 
-- (void) reloadTableOnImageGallery
+- (void) reloadTableForFilename:(NSString *) filename
 {
     [self reloadGallery];
+//    [self updateModelForFilename:filename];
+//    NSLog(@"%@", self.labelsOrdered);
+//    [self.tableView reloadData];
+//    [self.tableViewGrid reloadData];
 }
 
 
@@ -1148,7 +1155,7 @@
         
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
         
-        NSArray *buttons = [self.buttonsDictionary  objectForKey:[self.labelsOrdered objectAtIndex:indexPath.section]];
+        NSArray *buttons = [self.buttonsArray objectAtIndex:indexPath.section];
         for(UIButton *button in buttons) [cell addSubview:button];
         
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
@@ -1245,8 +1252,11 @@
         [self.sendingView.activityIndicator stopAnimating];
         [self reloadGallery];
     
-    }else if([self.sendingView.sendingViewID isEqualToString:@"download"])
+    }else if([self.sendingView.sendingViewID isEqualToString:@"download"]){
         self.cancelDownloading = YES;
+    }else if([self.sendingView.sendingViewID isEqualToString:@"retreiving"]){
+        self.cancelDownloading = YES;
+    }
 }
 
 
@@ -1332,7 +1342,6 @@
     [super viewDidUnload];
 }
 
-// Method implementations
 - (void)hideTabBar:(UITabBarController *) tabbarcontroller
 {
     self.navigationController.navigationBarHidden = YES;
@@ -1369,17 +1378,19 @@
 
 - (UIImage *) thumbnailImageFromImage:(UIImage *)image withBoxes:(NSArray *)boxes
 {
+    //get image context
     UIGraphicsBeginImageContext(image.size);
     [image drawAtPoint:CGPointZero];
-    CGContextRef ctx = UIGraphicsGetCurrentContext();
-    [[UIColor blueColor] setStroke];
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    //set linewidth(according to image resolution) and color of boxes
+    CGContextSetLineWidth(context, image.size.width/30.0);
+    CGContextSetStrokeColorWithColor(context, [UIColor blueColor].CGColor);
     
-    CGContextSetLineWidth(ctx, 60);
-    CGContextSetStrokeColorWithColor(ctx, [UIColor blueColor].CGColor);
-    
+    //for each box draw a rect
     for(Box *box in boxes){
         CGRect rectangle = [box getRectangleForBox];
-        CGContextStrokeRect(ctx, rectangle);
+        CGContextStrokeRect(context, rectangle);
     }
     
     UIImage *resultingImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -1388,38 +1399,11 @@
     //generate thumbnail
     int thumbnailSize = 300;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
-    UIImage *thumbnailImage = [[UIImage imageWithCGImage:resultingImage.CGImage] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh];
-
+    UIImage *thumbnailImage = [[UIImage imageWithCGImage:resultingImage.CGImage] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
+    
     return thumbnailImage;
 }
 
-
-- (void) updateImageByFilename:(NSString *)filename
-{
-    
-    
-}
-
-//- (void) deleteImageByFilename:(NSString *)filename
-//{
-//    //items
-//    [self.items removeObject:filename];
-//    
-//    //labelsDictionary: for each unique label present in the image
-//    NSArray *labels = [self getLabelsForFilename:filename];
-//    for(NSString *label in labels){
-//        NSMutableArray *objectsForLabel = [self.labelsDictionary objectForKey:label];
-//        [objectsForLabel removeObject:filename];
-//        [self.labelsDictionary setObject:objectsForLabel forKey:label];
-//    }
-//    
-//    //buttonsDictionary
-//    for(NSString *label in labels){
-//        NSMutableArray *buttonsForLabel = [self.buttonsDictionary objectForKey:label];
-//        
-//    }
-//    
-//}
 
 - (NSArray *) getLabelsForFilename:(NSString *) filename
 {
@@ -1427,11 +1411,84 @@
     NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
     NSArray *boxes = [[NSArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
     
-    for(Box *box in boxes)
-        [unorderedLabels addObject:box.label];
+    for(Box *box in boxes){
+        NSString *label = box.label;
+        if([box.label isEqualToString:@""]) label = @"00None"; //boxes with no label
+        [unorderedLabels addObject:label];
+    }
+    
+    if(boxes.count == 0) [unorderedLabels addObject:@"00None"]; //no boxes on image
     
     return [NSArray arrayWithArray:[unorderedLabels allObjects]];
 }
 
+//- (void) updateModelForFilename:(NSString *)filename
+//{
+//    
+//    NSArray *labels = [self getLabelsForFilename:filename];
+//    
+//    //labelsOredered
+//    for(NSString *label in labels){
+//        int index = [self.labelsOrdered indexOfObject:label];
+//        if(index == NSNotFound){ //box contain a new object category
+//            
+//            //insert label
+//            NSUInteger newIndex = [self.labelsOrdered indexOfObject:label
+//                                                     inSortedRange:(NSRange){0, self.labelsOrdered.count}
+//                                                           options:NSBinarySearchingInsertionIndex
+//                                                    usingComparator:^(NSString *a, NSString *b) {
+//                                                            return [a localizedCaseInsensitiveCompare:b];}];
+//            
+//            
+//            [self.labelsOrdered insertObject:label atIndex:newIndex];
+//            
+//            //insert labelsArray
+//            self.labelsArray = nil; //reload
+//            
+//            //insert buttonsArray
+//            NSArray *buttons = [self buttonsForLabel:label];
+//            [self.buttonsArray insertObject:buttons atIndex:newIndex];
+//            
+//        }else{
+//            
+//            //insert in labels Array
+//            self.labelsArray = nil;
+//            
+//            //insert in buttonsArray
+//            NSArray *buttons = [self buttonsForLabel:label];
+//            [self.buttonsArray setObject:buttons atIndexedSubscript:index];
+//            
+//        }
+//    }
+//    
+//    
+//    if(![labels containsObject:@"00None"]){        
+//        //update none label
+//        NSArray *noneButtons = [self buttonsForLabel:@"00None"];
+//        [self.buttonsArray setObject:noneButtons atIndexedSubscript:0];
+//    }
+//    
+//}
+
+//- (void) deleteImageByFilename:(NSString *)filename
+//{
+//    //items
+//    [self.items removeObject:filename];
+//
+//    //labelsDictionary: for each unique label present in the image
+//    NSArray *labels = [self getLabelsForFilename:filename];
+//    for(NSString *label in labels){
+//        NSMutableArray *objectsForLabel = [self.labelsDictionary objectForKey:label];
+//        [objectsForLabel removeObject:filename];
+//        [self.labelsDictionary setObject:objectsForLabel forKey:label];
+//    }
+//
+//    //buttonsDictionary
+//    for(NSString *label in labels){
+//        NSMutableArray *buttonsForLabel = [self.buttonsDictionary objectForKey:label];
+//
+//    }
+//
+//}
 
 @end

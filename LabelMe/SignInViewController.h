@@ -18,7 +18,6 @@
 @interface SignInViewController : UIViewController <UITextFieldDelegate,ServerConnectionDelegate,CreateAccountDelegate, UINavigationControllerDelegate, UIAlertViewDelegate, SendingViewDelegate>
 
 {
-    SendingView *sendingView;
     ServerConnection *sConnection;
     CLLocationManager *locationMng;
     BOOL previousSession;
@@ -35,15 +34,12 @@
 @property (strong,nonatomic) UIToolbar *keyboardToolbar;
 @property (strong,nonatomic) UITabBarController *tabBarController;
 @property (strong,nonatomic) UIPopoverController *popover;
+@property (strong,nonatomic) SendingView *sendingView;
 
 //controllers
 @property (strong,nonatomic) GalleryViewController *galleryViewController;
 @property (strong,nonatomic) SettingsViewController *settingsViewController;
 @property (strong,nonatomic) DetectorGalleryViewController *detectorGalleryController;
-
-//keyboard
--(void)keyboardDidShow:(NSNotification *)notif;
--(void)keyboardDidHide:(NSNotification *)notif;
 
 //actions
 -(IBAction)valueChanged:(id)sender;
