@@ -46,7 +46,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchImageFile</key>
-	<string>icon.png</string>
+	<string>app-login-A</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

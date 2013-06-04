@@ -10,7 +10,7 @@
 
 @interface ResolutionViewController : UIViewController <UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate>
 
-@property (nonatomic,strong) UITableView *tableView;
+@property (nonatomic,weak) IBOutlet UITableView *tableView;
 @property (nonatomic,strong) NSString *username;
 
 @end

@@ -34,12 +34,9 @@
         self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Settings" image:nil tag:3];
         [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"settingsActive.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"settingsDisabled.png"]];
         
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-            if ([UIScreen mainScreen].bounds.size.height == 568)
-                self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPhone5" bundle:nil];
-            else if ([UIScreen mainScreen].bounds.size.height == 480)
-                self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPhone" bundle:nil];
-        }else self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPad" bundle:nil];
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+            self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPhone" bundle:nil];
+        else self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPad" bundle:nil];
     }
     
     return self;
@@ -52,14 +49,9 @@
     
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
     
-    self.tableView = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStyleGrouped];
-    
     UIBarButtonItem *logoutButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Log out" target:self action:@selector(logOutAction:)]];
     self.navigationItem.rightBarButtonItem = logoutButton;
     
-    [self.view addSubview:self.tableView];
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
 
     self.tableView.backgroundColor = [UIColor clearColor];
     [self.tableView setBackgroundView:nil];
@@ -438,12 +430,9 @@
     }else if ((indexPath.section == 3) && (indexPath.row == 1)) {
         
         ResolutionViewController *resolutionVC = nil;
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-            if ([UIScreen mainScreen].bounds.size.height == 568) 
-                resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPhone5" bundle:nil];
-            else if ([UIScreen mainScreen].bounds.size.height == 480)
-                resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPhone" bundle:nil];
-        }else resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPad" bundle:nil];
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+            resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPhone" bundle:nil];
+        else resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPad" bundle:nil];
 
 
         resolutionVC.username = self.username;
@@ -453,12 +442,9 @@
         CreditsViewController *creditsVC = nil;
         
         //choose controller
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-            if ([UIScreen mainScreen].bounds.size.height == 568)
-                creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPhone5" bundle:nil];
-            else if ([UIScreen mainScreen].bounds.size.height == 480)
-                creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPhone" bundle:nil];
-        }else creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPad" bundle:nil];
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+            creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPhone" bundle:nil];
+        else creditsVC = [[CreditsViewController alloc] initWithNibName:@"CreditsViewController_iPad" bundle:nil];
             
         
         [creditsVC setHidesBottomBarWhenPushed:YES];

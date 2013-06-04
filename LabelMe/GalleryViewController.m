@@ -266,9 +266,9 @@
     //Controllers
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if ([UIScreen mainScreen].bounds.size.height == 568)
-            self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone5" bundle:nil];
-        else if ([UIScreen mainScreen].bounds.size.height == 480)
             self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
+        else if ([UIScreen mainScreen].bounds.size.height == 480)
+            self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone5" bundle:nil];
     }else self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPad" bundle:nil];
     self.tagViewController.username = self.username;
     self.tagViewController.delegate = self;
@@ -1345,14 +1345,13 @@
 - (void)hideTabBar:(UITabBarController *) tabbarcontroller
 {
     self.navigationController.navigationBarHidden = YES;
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:0.5];
     
-    for(UIView *view in tabbarcontroller.view.subviews){
+    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+    
+    for(UIView *view in tabbarcontroller.view.subviews){        
         if([view isKindOfClass:[UITabBar class]])
-            [view setFrame:CGRectMake(view.frame.origin.x, 480, view.frame.size.width, view.frame.size.height)];
-        
-        else [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, 480)];
+            [view setFrame:CGRectMake(view.frame.origin.x, screenHeight, view.frame.size.width, view.frame.size.height)];
+        else [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, screenHeight)];
     }
     
     [UIView commitAnimations];
@@ -1361,15 +1360,15 @@
 - (void)showTabBar:(UITabBarController *) tabbarcontroller
 {
     self.navigationController.navigationBarHidden = NO;
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:0.5];
-    for(UIView *view in tabbarcontroller.view.subviews)
-    {
-        if([view isKindOfClass:[UITabBar class]])
-            [view setFrame:CGRectMake(view.frame.origin.x, 431, view.frame.size.width, view.frame.size.height)];
-        
-        else [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, 431)];
-        
+    
+    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+    CGFloat tabBarHeight;
+    
+    for(UIView *view in tabbarcontroller.view.subviews){
+        if([view isKindOfClass:[UITabBar class]]){
+            tabBarHeight = view.frame.size.height;
+            [view setFrame:CGRectMake(view.frame.origin.x, screenHeight - tabBarHeight, view.frame.size.width, tabBarHeight)];
+        }else [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, screenHeight - tabBarHeight)];
     }
     
     [UIView commitAnimations];

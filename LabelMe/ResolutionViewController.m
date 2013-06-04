@@ -13,33 +13,16 @@
 @implementation ResolutionViewController
 
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-        self.username = [[NSString alloc] init];
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.tableView = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStyleGrouped];
-    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlack];
-    [self.tableView setBackgroundView:nil];
+    [self setTitle:@"Image Resolution"];
 
-    [self.tableView setDelegate:self];
-    [self.tableView setDataSource:self];
     self.view.backgroundColor = [UIColor colorWithRed:(200/255.0) green:(200/255.0) blue:(200/255.0) alpha:1.0];
-    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
 
     self.tableView.backgroundColor = [UIColor clearColor];
     [self.tableView setBackgroundView:nil];
-    [self setTitle:@"Image Resolution"];
-    [self.view addSubview:self.tableView];
-
+    
 }
 
 
@@ -53,9 +36,10 @@
 {
      static NSString *CellIdentifier = @"Cell";
      UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-     if (cell == nil) {
-     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-     }
+     if (cell == nil)
+         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+    
+    
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     // change to accomodate user
     NSString *path = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,self.username ];
@@ -129,7 +113,6 @@
     [dict writeToFile:[path stringByAppendingPathComponent:@"settings.plist"] atomically:YES];
     
     [self.tableView reloadData];
-    
 }
 
 

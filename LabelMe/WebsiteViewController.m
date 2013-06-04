@@ -10,11 +10,10 @@
 #import "Reachability.h"
 #import "NSObject+ShowAlert.h"
 
-@interface WebsiteViewController ()
 
-@end
 
 @implementation WebsiteViewController
+
 @synthesize website = _website;
 @synthesize scrollView = _scrollView;
 @synthesize bottomToolbar = _bottomToolbar;
@@ -22,14 +21,7 @@
 @synthesize forward = _forward;
 @synthesize reload = _reload;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // readwrite
-    }
-    return self;
-}
+
 
 - (void)viewDidLoad
 {
@@ -42,8 +34,7 @@
     [self.scrollView setDelegate:self];
     self.scrollView.minimumZoomScale = 1.0;
     self.scrollView.maximumZoomScale = 10.0;
-    /*[self.bottomToolbar setBackgroundImage:[[UIImage imageNamed:@"navbarBg"]resizableImageWithCapInsets:UIEdgeInsetsZero  ] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-    [self.bottomToolbar setTintColor:[UIColor colorWithRed:150/255.0f green:32/255.0f blue:28/255.0f alpha:1.0]];*/
+
     NSString *boundary = @"AaB03x";
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@"http://labelme.csail.mit.edu/Release3.0/browserTools/php/loginiphone.php"]];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
@@ -73,21 +64,14 @@
         [activityIndicator setHidden:YES];
     }
    
-       /* NSString *urlAddress = @"http://labelme2.csail.mit.edu/developers/dolores/LabelMe3.0/";
     
-    //Create a URL object.
-    NSURL *url = [NSURL URLWithString:urlAddress];
-    
-    //URL Requst Object
-    NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
-    
-    //Load the request in the UIWebView.*/
+    //Load the request in the UIWebView.
     [self.website loadRequest:theRequest];
-        [self.scrollView setContentSize:self.website.frame.size];
+    [self.scrollView setContentSize:self.website.frame.size];
 
-    // Do any additional setup after loading the view from its nib.
 }
-- (void) viewWillAppear:(BOOL)animated {
+- (void) viewWillAppear:(BOOL)animated
+{
 	[super viewWillAppear:animated];
     [self.website reload];
     Reachability *networkReachability = [Reachability reachabilityForInternetConnection];
@@ -96,46 +80,56 @@
         [self errorWithTitle:@"No internet connection" andDescription:@"Please, check your connection."];
     }
 }
--(void) viewWillDisappear:(BOOL)animated{
+
+-(void) viewWillDisappear:(BOOL)animated
+{
     [self.website stopLoading];
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [activityIndicator stopAnimating];
     [activityIndicator setHidden:YES];
 }
+
 #pragma mark -
 #pragma mark WebViewDelegate Methods
--(void) webViewDidFinishLoad:(UIWebView *)webView{
+
+-(void) webViewDidFinishLoad:(UIWebView *)webView
+{
     [self.back setEnabled:[webView canGoBack]];
     [self.forward setEnabled:[webView canGoForward]];
      [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     [activityIndicator stopAnimating];
     [activityIndicator setHidden:YES];
-   
-
-
 }
--(void) webViewDidStartLoad:(UIWebView *)webView{
+
+-(void) webViewDidStartLoad:(UIWebView *)webView
+{
      [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [activityIndicator startAnimating];
     [activityIndicator setHidden:NO];
 }
+
+
 #pragma mark -
 #pragma mark ScrollViewDelegate Methods
 - (UIView*)viewForZoomingInScrollView:(UIScrollView *)aScrollView {
     return self.website;
 }
+
+
 #pragma mark -
 #pragma mark IBAction Methods
-
--(IBAction)goBack:(id)sender{
+-(IBAction)goBack:(id)sender
+{
     [self.website goBack];
-    
 }
--(IBAction)goForward:(id)sender{
+
+-(IBAction)goForward:(id)sender
+{
     [self.website goForward];
-    
 }
--(IBAction)reload:(id)sender{
+
+-(IBAction)reload:(id)sender
+{
      [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [activityIndicator startAnimating];
     [activityIndicator setHidden:NO];

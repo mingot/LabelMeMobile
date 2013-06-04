@@ -204,12 +204,9 @@
 -(IBAction)createAccountAction:(id)sender
 {
     CreateAccountViewController *createAccountViewController = nil;
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        if ([UIScreen mainScreen].bounds.size.height == 568)
-            createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPhone5" bundle:nil];
-        else if ([UIScreen mainScreen].bounds.size.height == 480)
-            createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPhone" bundle:nil];
-    }else createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPad" bundle:nil];
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
+        createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPhone" bundle:nil];
+    else createAccountViewController = [[CreateAccountViewController alloc]initWithNibName:@"CreateAccountViewController_iPad" bundle:nil];
 
     createAccountViewController.delegate = self;
 
@@ -348,19 +345,9 @@
     
     //select correct layout
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        
-        if ([UIScreen mainScreen].bounds.size.height == 568) {
-            NSLog(@"iphone 5!!");
-            self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone5" bundle:nil];
-            self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone5" bundle:nil];
-            self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
-            
-        }else if ([UIScreen mainScreen].bounds.size.height == 480){
-            NSLog(@"iphone 4!!");
-            self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone" bundle:nil];
-            self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone" bundle:nil];
-            self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
-        }
+        self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone" bundle:nil];
+        self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone" bundle:nil];
+        self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
         
     }else{
         self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPad" bundle:nil];

@@ -49,6 +49,10 @@
 								<reference key="NSSuperview" ref="370861908"/>
 								<reference key="NSNextKeyView" ref="1013892367"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
+								<object class="NSColor" key="IBUIBackgroundColor">
+									<int key="NSColorSpace">2</int>
+									<bytes key="NSRGB">MSAxIDEAA</bytes>
+								</object>
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								<object class="NSCustomResource" key="IBUIImage">
@@ -208,7 +212,7 @@
 								<reference key="IBUIFont" ref="887725794"/>
 							</object>
 						</array>
-						<string key="NSFrameSize">{320, 480}</string>
+						<string key="NSFrame">{{0, 88}, {320, 480}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSNextKeyView" ref="260811155"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
@@ -218,7 +222,7 @@
 						</object>
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<bool key="IBUIMultipleTouchEnabled">YES</bool>
-						<object class="IBUIScreenMetrics" key="IBUISimulatedDestinationMetrics" id="211522816">
+						<object class="IBUIScreenMetrics" key="IBUISimulatedDestinationMetrics">
 							<string key="IBUISimulatedSizeMetricsClass">IBUIScreenMetrics</string>
 							<object class="NSMutableDictionary" key="IBUINormalizedOrientationToSizeMap">
 								<bool key="EncodedWithXMLCoder">YES</bool>
@@ -238,14 +242,30 @@
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
 				</array>
-				<string key="NSFrameSize">{320, 480}</string>
+				<string key="NSFrameSize">{320, 568}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSNextKeyView" ref="370861908"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
-					<int key="NSColorSpace">1</int>
-					<bytes key="NSRGB">MC45Mjk0MTE3NjQ3IDAuMTA5ODAzOTIxNiAwLjE0MTE3NjQ3MDYAA</bytes>
+					<int key="NSColorSpace">2</int>
+					<bytes key="NSRGB">MC43OTY0MTg3OTU2IDAuMTYzODkxNDIzNCAwLjE3NjQ3MDU5MjYAA</bytes>
 				</object>
-				<reference key="IBUISimulatedDestinationMetrics" ref="211522816"/>
+				<object class="IBUIScreenMetrics" key="IBUISimulatedDestinationMetrics">
+					<string key="IBUISimulatedSizeMetricsClass">IBUIScreenMetrics</string>
+					<object class="NSMutableDictionary" key="IBUINormalizedOrientationToSizeMap">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<array key="dict.sortedKeys">
+							<integer value="1"/>
+							<integer value="3"/>
+						</array>
+						<array key="dict.values">
+							<string>{320, 568}</string>
+							<string>{568, 320}</string>
+						</array>
+					</object>
+					<string key="IBUITargetRuntime">IBCocoaTouchFramework</string>
+					<string key="IBUIDisplayName">Retina 4 Full Screen</string>
+					<int key="IBUIType">2</int>
+				</object>
 				<string key="IBUIRestorationIdentifier"/>
 				<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 			</object>

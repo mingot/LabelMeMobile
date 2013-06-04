@@ -22,15 +22,7 @@
     //Decide which device it is using it (iphone, iphone5 or ipad)
     SignInViewController *rootViewController;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        NSLog(@"screen size: %f", [UIScreen mainScreen].bounds.size.height);
-        if ([UIScreen mainScreen].bounds.size.height == 568){
-            NSLog(@"iphone 5!");
-            rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPhone5" bundle:nil];
-        }else if ([UIScreen mainScreen].bounds.size.height == 480){
-            NSLog(@"iphone 4!");
             rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPhone" bundle:nil];
-            
-        }
     }else rootViewController = [[SignInViewController alloc] initWithNibName:@"SignInViewController_iPad" bundle:nil];
 
 

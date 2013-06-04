@@ -11,7 +11,7 @@
 
 @interface SettingsViewController : UIViewController <UITableViewDataSource,UITableViewDelegate, UIActionSheetDelegate, UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 
-@property (nonatomic,strong) UITableView *tableView;
+@property (nonatomic, weak) IBOutlet UITableView *tableView;
 @property (nonatomic,strong) NSString *username;
 @property (nonatomic,strong) UIPopoverController *popover;
 @property (nonatomic,strong) WebsiteViewController *website;

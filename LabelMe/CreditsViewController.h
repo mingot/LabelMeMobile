@@ -10,6 +10,7 @@
 
 @interface CreditsViewController : UIViewController
 
-@property (nonatomic,strong) IBOutlet UIScrollView *scrollView;
+@property (nonatomic, weak) IBOutlet UIScrollView *scrollView;
+@property (nonatomic, weak) IBOutlet UIImageView *titleView;
 
 @end

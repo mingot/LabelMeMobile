@@ -50,8 +50,7 @@
     UIImageView *logoView = [[UIImageView alloc] initWithImage:logoImage];
     [logoView setFrame:CGRectMake((self.view.frame.size.width-logoView.frame.size.width)/2,  labelmeView.frame.size.height+information.frame.size.height+0.125*self.view.frame.size.width, logoView.frame.size.width, logoView.frame.size.height)];
     [self.scrollView addSubview:logoView];
-    [self.scrollView setContentSize:CGSizeMake(self.view.frame.size.width, labelmeView.frame.size.height+information.frame.size.height+0.125*self.view.frame.size.width+logoView.frame.size.height
-                                               )];
+    [self.scrollView setContentSize:CGSizeMake(self.view.frame.size.width, labelmeView.frame.size.height+information.frame.size.height+0.125*self.view.frame.size.width+logoView.frame.size.height)];
 }
 
 
