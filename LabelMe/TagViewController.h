@@ -35,8 +35,8 @@
 @property (weak, nonatomic) IBOutlet TagView *tagView;
 @property (strong, nonatomic) UITableView *labelsView;
 @property (strong, nonatomic) UIButton *tip;
-@property (strong, nonatomic) UIButton *nextButton;
-@property (strong, nonatomic) UIButton *previousButton;
+@property (weak, nonatomic) IBOutlet UIButton *nextButton;
+@property (weak, nonatomic) IBOutlet UIButton *previousButton;
 
 @property (strong, nonatomic) id<TagViewControllerDelegate> delegate;
 

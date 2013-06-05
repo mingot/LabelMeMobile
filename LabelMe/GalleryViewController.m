@@ -263,9 +263,7 @@
     photosWithErrors = 0;
     
     //Controllers
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
-    else self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPad" bundle:nil];
+    self.tagViewController = [[TagViewController alloc]initWithNibName:@"TagViewController_iPhone" bundle:nil];
     self.tagViewController.username = self.username;
     self.tagViewController.delegate = self;
     self.modalSectionsTVC = [[ModalSectionsTVC alloc] initWithNibName:@"ModalSectionsTVC" bundle:nil];
@@ -313,7 +311,6 @@
     self.tableViewGrid.tag = 0;
     
     //noImages view
-    self.noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x+0.03125*self.view.frame.size.width, self.tableView.frame.origin.y+0.03125*self.view.frame.size.width, self.tableView.frame.size.width-0.0625*self.view.frame.size.width, self.tableView.frame.size.height-0.0625*self.view.frame.size.width)];
     [self.noImages setBackgroundColor:[UIColor whiteColor]];
     self.noImages.layer.masksToBounds = YES;
     self.noImages.layer.cornerRadius = 10.0;

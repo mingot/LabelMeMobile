@@ -344,17 +344,10 @@
     [self createUserFolders:self.usernameField.text];
     
     //select correct layout
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone" bundle:nil];
-        self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone" bundle:nil];
-        self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
-        
-    }else{
-        self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPad" bundle:nil];
-        self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPad" bundle:nil];
-        self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
-    }
-   
+    self.galleryViewController =[[GalleryViewController alloc]initWithNibName:@"GalleryViewController_iPhone" bundle:nil];
+    self.settingsViewController = [[SettingsViewController alloc]initWithNibName:@"SettingsViewController_iPhone" bundle:nil];
+    self.detectorGalleryController = [[DetectorGalleryViewController alloc]initWithNibName:@"DetectorGalleryViewController" bundle:nil];
+
     //set username
     self.galleryViewController.username = self.usernameField.text;
     self.settingsViewController.username = self.usernameField.text;

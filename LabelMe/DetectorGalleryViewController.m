@@ -145,10 +145,6 @@
     self.selectedItems = [[NSMutableArray alloc] init];
     
     //noImages view
-    self.noImages = [[UILabel alloc] initWithFrame:CGRectMake(self.tableView.frame.origin.x + 0.03125*self.view.frame.size.width,
-                                                              self.tableView.frame.origin.y + 0.03125*self.view.frame.size.height,
-                                                              self.tableView.frame.size.width - 0.0625*self.view.frame.size.width,
-                                                              self.tableView.frame.size.height - 0.25*self.view.frame.size.height)];
     [self.noImages setBackgroundColor:[UIColor whiteColor]];
     self.noImages.layer.masksToBounds = YES;
     self.noImages.layer.cornerRadius = 10.0;
@@ -341,7 +337,9 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 80;
+    CGFloat size = 80;
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) size = 160;
+    return size;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

@@ -27,11 +27,13 @@
 
 @property (nonatomic, weak) id <SendingViewDelegate> delegate;
 
+
+
 //view
-@property (strong, nonatomic) UIProgressView *progressView;
-@property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
-@property (strong, nonatomic) UITextView *textView;
-@property (strong, nonatomic) UIButton *cancelButton;
+@property (weak, nonatomic) IBOutlet UIProgressView *progressView;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
+@property (weak, nonatomic) IBOutlet UITextView *textView;
+@property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 
 
 @property (strong, nonatomic) NSString *filename;

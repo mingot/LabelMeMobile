@@ -151,20 +151,9 @@
     self.tagView.delegate = self;
 
     //Next and previous buttons
-    
-    self.nextButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.nextButton.frame = CGRectMake(self.scrollView.frame.size.width - 50, self.scrollView.frame.size.height/2, 50, 50);
-    [self.nextButton setImage:[UIImage imageNamed:@"next_button.png"] forState:UIControlStateNormal];
-    [self.nextButton addTarget:self action:@selector(changeImageAction:) forControlEvents:UIControlEventTouchUpInside];
     self.nextButton.tag = 2;
-    
-    self.previousButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.previousButton.frame  = CGRectMake(0, self.scrollView.frame.size.height/2, 50, 50);
-    [self.previousButton setImage:[UIImage imageNamed:@"next_button.png"] forState:UIControlStateNormal];
-    [self.previousButton addTarget:self action:@selector(changeImageAction:) forControlEvents:UIControlEventTouchUpInside];
     self.previousButton.tag = 1;
 
-    
     //subview hierarchy
     [self.scrollView setContentSize:self.scrollView.frame.size];
     [self.scrollView addSubview:self.composeView];

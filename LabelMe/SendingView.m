@@ -14,41 +14,19 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-    self = [super initWithFrame:frame];
+    self = [[[NSBundle mainBundle] loadNibNamed:@"sendingView" owner:self options:nil] objectAtIndex:0];
     if (self) {
         
-        //general initialization
-        self.filename = [[NSString alloc] init];
-        
-        //progress view bar
-        self.progressView = [[UIProgressView alloc] initWithFrame:CGRectMake((frame.size.width-250)/2, (frame.size.height - 20)/2 - 150, 250, 20)];
-        self.progressView.progressTintColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
-
-        self.activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(self.progressView.frame.origin.x, self.progressView.frame.origin.y + self.progressView.frame.size.height+10, 20, 20)];
-        self.backgroundColor = [UIColor colorWithRed:10/255.0f green:10/255.0f blue:10/255.0f alpha:0.8];
+        //set super frame
+        self.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
         
         //text view
-        self.textView = [[UITextView alloc] initWithFrame:CGRectMake(0,self.progressView.frame.origin.y + 50,320,290)];
-        self.textView.backgroundColor = [UIColor clearColor];
-        self.textView.textColor = [UIColor whiteColor];
-        self.textView.textAlignment = NSTextAlignmentCenter;
         self.textView.text = @"";
-        self.textView.editable = NO;
         
         //cancel button
-        self.cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.cancelButton setFrame:CGRectMake(self.progressView.frame.origin.x + self.progressView.frame.size.width/4, self.textView.frame.origin.y + self.textView.frame.size.height+10, self.progressView.frame.size.width/2, 30)];
-        [self.cancelButton addTarget:self.delegate action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
-        [self.cancelButton setBackgroundImage:[UIImage imageNamed:@"navbarBg.png"] forState:UIControlStateNormal];
-        [self.cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.cancelButton.tintColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
         self.cancelButton.layer.masksToBounds = YES;
         self.cancelButton.layer.cornerRadius = 10.0;
-        
-        [self addSubview:self.progressView];
-        [self addSubview:self.activityIndicator];
-        [self addSubview:self.textView];
-        [self addSubview:self.cancelButton];
         
         num = 1;
         total = 0;

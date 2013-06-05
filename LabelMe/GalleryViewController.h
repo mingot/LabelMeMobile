@@ -30,7 +30,7 @@
 @property (nonatomic, strong) ModalSectionsTVC *modalSectionsTVC;
 
 //view
-@property (nonatomic, strong) UILabel *noImages;
+@property (nonatomic, weak) IBOutlet UILabel *noImages;
 @property (nonatomic, strong) SendingView *sendingView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *editButton;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *deleteButton;

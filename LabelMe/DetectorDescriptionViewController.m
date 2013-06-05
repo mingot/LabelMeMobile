@@ -200,7 +200,7 @@
     
     
     //sending view, responsible for the waiting view
-    self.sendingView = [[SendingView alloc] initWithFrame:self.tabBarController.view.frame];//self.view.frame];
+    self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];//self.tabBarController.view.frame];
     [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
     self.sendingView.delegate = self;
     self.sendingView.hidden = YES;
