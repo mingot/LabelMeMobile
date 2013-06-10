@@ -116,8 +116,6 @@
     self.scrollView.minimumZoomScale = 1.0;
     self.scrollView.maximumZoomScale = 10.0;
     self.scrollView.delegate = self;
-//    CGSize contentSize = CGSizeMake(self.scrollView.frame.size.width*self.items.count, self.scrollView.frame.size.height);
-//    [self.scrollView setContentSize:contentSize];
     
     //labels
     [self.label setBorderStyle:UITextBorderStyleNone];
@@ -931,6 +929,22 @@
     [self barButtonsEnabled:YES];
     [self.deleteButton setEnabled:NO];
 }
+
+#pragma mark -
+#pragma mark Rotation
+
+- (void)willAnimateRotationToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    //reload image and how it is displayed
+    [self loadWhenAppear];
+    
+    //deselect boxes (avoid problems with self.label)
+    [self.tagView setSelectedBox:-1];
+    [self.tagView setNeedsDisplay];
+    
+    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+}
+
 
 #pragma mark -
 #pragma mark ServerConnectionDelegate Methods

@@ -46,8 +46,6 @@
 @property (nonatomic, strong) NSMutableArray *buttonsArray; //each object is an array with the buttons for that category
 @property (nonatomic, strong) NSMutableArray *labelsArray; //each element of the array is a dictionary with the label as key and object the array of filenames
 
-
-
 //table
 @property (nonatomic, strong) NSMutableArray *selectedItems;
 @property (nonatomic, strong) NSMutableArray *selectedItemsSend;
@@ -60,6 +58,7 @@
 @property (nonatomic, strong) NSMutableDictionary *userDictionary;
 @property BOOL cancelDownloading;
 
+@property UIDeviceOrientation lastOrientation;
 
 
 //show/hide tabBarcontroller for the sending view
@@ -190,6 +189,7 @@
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
         button.tag = [self.items indexOfObject:[indexes objectAtIndex:i]];
+        
         
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
             button.frame = CGRectMake(0.05*self.view.frame.size.width + 0.225*self.view.frame.size.width*(i%4),
@@ -342,6 +342,12 @@
 {
     [super viewWillAppear:animated];
     
+    //in case of rotation
+    if(self.lastOrientation != [[UIDevice currentDevice] orientation]){
+        self.buttonsArray = nil;
+        [self.tableViewGrid reloadData];
+    }
+    
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
 }
@@ -350,6 +356,9 @@
 - (void) viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+    
+    //save last orientation (for reconstructing if rotated)
+    self.lastOrientation = [[UIDevice currentDevice] orientation];
 
     //disable edit state if interrupted
     if ([self.editButton.title isEqual: @"Cancel"]) {
@@ -1103,6 +1112,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    
     if(tableView.tag==0){
         NSArray *items = [self.labelsArray objectAtIndex:indexPath.section];
         return (0.225*self.view.frame.size.width*ceil((float)items.count/4) + 0.0375*self.view.frame.size.width);
@@ -1344,6 +1354,17 @@
 
 
 -(void) selectionCancelled{}
+
+#pragma mark -
+#pragma mark Rotation
+
+- (void)willAnimateRotationToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{    
+    self.buttonsArray = nil;
+    [self.tableViewGrid reloadData];
+    
+    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+}
 
 
 #pragma mark -
