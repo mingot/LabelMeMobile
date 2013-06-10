@@ -79,6 +79,9 @@
         self.prevLayer.frame = self.view.frame;
         [self.captureSession startRunning];
     });
+    
+    //fix orientation
+    [self adaptToPhoneOrientation:[[UIDevice currentDevice] orientation]];
 }
 
 -(void) viewWillDisappear:(BOOL)animated
@@ -150,22 +153,16 @@
 
 - (void)willAnimateRotationToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    
-    NSLog(@"rotating...");
-    
-    
+    [self adaptToPhoneOrientation:toInterfaceOrientation];
+    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+}
+
+- (void) adaptToPhoneOrientation:(UIDeviceOrientation) orientation
+{
     [CATransaction begin];
-    if (toInterfaceOrientation == UIInterfaceOrientationLandscapeRight){
-        NSLog(@"landscaperight");
-        self.prevLayer.orientation = UIInterfaceOrientationLandscapeRight;
-    } else if(toInterfaceOrientation == UIInterfaceOrientationPortrait){
-        NSLog(@"portrait");
-        self.prevLayer.orientation = UIInterfaceOrientationPortrait;
-    }
+    self.prevLayer.orientation = orientation;
     self.prevLayer.frame = self.view.frame;
     [CATransaction commit];
-    
-    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
 }
 
 @end

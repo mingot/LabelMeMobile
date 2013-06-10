@@ -38,13 +38,8 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
     
         for (int i=0; i<corners.count; i++){
         
-            
-//            NSLog(@"Bounding box detected: %@", [corners objectAtIndex:i]);
             //convert the point from the device system of reference to the prevLayer system of reference
             p = [self convertBoundingBoxForDetectView:[corners objectAtIndex:i]];
-            
-//            NSLog(@"Bounding box transformed: %@", p);
-//            NSLog(@"detect view frame: %@", NSStringFromCGRect(self.frame));
             
             //set the rectangle within the current boundaries 
             x = max(0,p.xmin);
@@ -65,7 +60,7 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
             CGFloat textBoxHeight = 20;
             
             //handle distinct orientations
-            if(self.frontCamera || self.cameraOrientation == 3){
+            if(self.frontCamera){
                 x = x + w;
                 w = abs(w);
             }

@@ -196,6 +196,9 @@
     
     //Start the capture
     [self.captureSession startRunning];
+    
+    //Fix Orientation
+    [self adaptToPhoneOrientation:[[UIDevice currentDevice] orientation]];
 }
 
 -(void) viewWillDisappear:(BOOL)animated
@@ -254,15 +257,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
         //**** DETECTION ****
         NSMutableArray *nmsArray = [[NSMutableArray alloc] init];
-//        UIImage *image = [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight];
 
         //rotate image depending on the orientation
         UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-        
         UIImage *image;
         if(UIDeviceOrientationIsLandscape(orientation)){
             image = [UIImage imageWithCGImage:imageRef];
-            NSLog(@"Landscape");
         }else image = [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight];
 
         
@@ -519,28 +519,16 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void)willAnimateRotationToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    
-//    AVCaptureConnection *videoConnection = nil;
-    
-//	for (AVCaptureConnection *connection in self.captureOutput.connections){
-//        NSLog(@"connection:%@", connection);
-//		for (AVCaptureInputPort *port in [connection inputPorts])
-//			if ([[port mediaType] isEqual:AVMediaTypeVideo] ){
-//                NSLog(@"changing orientation");
-//				videoConnection = connection;
-//                [videoConnection setVideoOrientation:[UIDevice currentDevice].orientation];
-//				break;
-//			}
-//		if (videoConnection) break;
-//	}
+    [self adaptToPhoneOrientation:toInterfaceOrientation];
+    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+}
 
-    
+- (void) adaptToPhoneOrientation:(UIDeviceOrientation) orientation
+{
     [CATransaction begin];
-    self.prevLayer.orientation = toInterfaceOrientation;
+    self.prevLayer.orientation = orientation;
     self.prevLayer.frame = self.view.frame;
     [CATransaction commit];
-    
-    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
 }
 
 -(BOOL)shouldAutorotateToInterfaceOrientation: (UIInterfaceOrientation)interfaceOrientation
