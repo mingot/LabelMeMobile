@@ -274,6 +274,7 @@
     self.availablePositiveImagesNames = nil; //to reset
     NSMutableArray *imagesList = [[NSMutableArray alloc] init];
     for(NSString *imageName in self.availablePositiveImagesNames){
+        NSLog(@"imageName: %@", imageName);
         [imagesList addObject:[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.resourcesPaths objectAtIndex:THUMB],imageName]]];
         if(self.svmClassifier.imagesUsedTraining == nil || [self.svmClassifier.imagesUsedTraining indexOfObject:imageName]!= NSNotFound)
             [self.modalTVC.selectedItems addObject:[NSNumber numberWithInt:(imagesList.count-1)]];

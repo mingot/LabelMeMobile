@@ -73,6 +73,10 @@
     self.isGrid = [[self.data objectAtIndex:0] isKindOfClass:[UIImage class]];
     self.collectionView.hidden = !self.isGrid;
     self.tableView.hidden = self.isGrid;
+    
+//    //hide subtitle if iphone and landscape
+//    if([[UIDevice currentDevice] userInterfaceIdiom]==UIUserInterfaceIdiomPhone && UIDeviceOrientationIsLandscape([[UIDevice currentDevice] orientation]))
+//        self.subtitleLabel.hidden = YES;
 }
 
 
