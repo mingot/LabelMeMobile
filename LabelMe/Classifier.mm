@@ -176,7 +176,7 @@ using namespace cv;
     self.sizesP[2] = 31;
     
     //scalefactor for detection. Used to ajust hog size with images resolution
-    self.scaleFactor = [NSNumber numberWithDouble:self.maxHog*6*sqrt(ratio/trainingSet.areaRatio)];
+    self.scaleFactor = [NSNumber numberWithDouble:self.maxHog*pixelsPerHogCell*sqrt(ratio/trainingSet.areaRatio)];
     numOfFeatures = self.sizesP[0]*self.sizesP[1]*self.sizesP[2];
     
     [self.delegate sendMessage:[NSString stringWithFormat:@"Hog features: %d %d %d for ratio:%f", self.sizesP[0],self.sizesP[1],self.sizesP[2], ratio]];
@@ -249,15 +249,11 @@ using namespace cv;
   learningImageIndex:(int) imageIndex
 
 {
-    
     NSMutableArray *candidateBoundingBoxes = [[NSMutableArray alloc] init];
-    
-    //rotate image depending on the orientation
-    if(!self.isLearning && UIDeviceOrientationIsLandscape(orientation))
-        image = [UIImage imageWithCGImage:image.CGImage scale:1.0 orientation:UIImageOrientationUp];
 
     //scaling factor for the image
     double initialScale = self.scaleFactor.doubleValue/sqrt(image.size.width*image.size.width);
+    if(UIDeviceOrientationIsLandscape(orientation)) initialScale = initialScale * 1.3;
     double scale = pow(2, 1.0/SCALES_PER_OCTAVE);
 
     //Pyramid limits
@@ -286,6 +282,8 @@ using namespace cv;
         float scaleLevel = pow(1.0/scale, i);
         if(!found){
             imageHog = [[im scaleImageTo:scaleLevel] obtainHogFeatures];
+//            NSLog(@"Pyramid %zd, numblocs x:%d, numblocks y:%d", i, imageHog.numBlocksX, imageHog.numBlocksY);
+            
             if(self.isLearning){
                 imageHogIndex = imageIndex*numberPyramids + i + self.iniPyramid;
                 [self.imagesHogPyramid replaceObjectAtIndex:imageHogIndex withObject:imageHog];
@@ -300,11 +298,11 @@ using namespace cv;
     });
     dispatch_release(pyramidQueue);
     
+    
     //sort array of bounding boxes by score
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"score" ascending:NO];
     NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
     NSArray *candidateBoundingBoxesSorted = [candidateBoundingBoxes sortedArrayUsingDescriptors:sortDescriptors];
-    
     
     NSArray *nmsArray = candidateBoundingBoxesSorted;
     if(useNms) nmsArray = [ConvolutionHelper nms:candidateBoundingBoxesSorted maxOverlapArea:0.25 minScoreThreshold:detectionThreshold]; 
@@ -362,6 +360,12 @@ using namespace cv;
         });
     });
     dispatch_release(pyramidQueue);
+    
+//    int i=0;
+//    for(HogFeature* imageHog in pyramid.hogFeatures){
+//        [candidateBoundingBoxes addObjectsFromArray:[self getBoundingBoxesIn:imageHog forPyramid:i+self.iniPyramid forIndex:0]];
+//        i++;
+//    }
     
     
     //sort array of bounding boxes by score
@@ -535,6 +539,7 @@ using namespace cv;
     int blocks[2] = {imageHog.numBlocksY, imageHog.numBlocksX};
     
     int convolutionSize[2];
+    
     convolutionSize[0] = blocks[0] - self.sizesP[0] + 1;
     convolutionSize[1] = blocks[1] - self.sizesP[1] + 1;
     if ((convolutionSize[0]<=0) || (convolutionSize[1]<=0))
@@ -564,12 +569,17 @@ using namespace cv;
             BoundingBox *p = [[BoundingBox alloc] init];
             p.score = (*(c + x*convolutionSize[0] + y) - bias);
             if( p.score > -1 ){
+//                NSLog(@"Image hog size: %d x %d", blocks[1], blocks[0]);
+//                NSLog(@"Template hog size: %d x %d", self.sizesP[1], self.sizesP[1]);
+                
                 p.xmin = (double)(x + 1)/((double)blocks[1] + 2);
                 p.xmax = (double)(x + 1)/((double)blocks[1] + 2) + ((double)self.sizesP[1]/((double)blocks[1] + 2));
                 p.ymin = (double)(y + 1)/((double)blocks[0] + 2);
                 p.ymax = (double)(y + 1)/((double)blocks[0] + 2) + ((double)self.sizesP[0]/((double)blocks[0] + 2));
                 p.pyramidLevel = pyramidLevel;
                 p.targetClass = [self.targetClasses componentsJoinedByString:@"+"];
+                
+//                NSLog(@"Box obtained: %@", p);
                 
                 //save the location and image hog for the later feature extraction during the learning
                 if(self.isLearning){

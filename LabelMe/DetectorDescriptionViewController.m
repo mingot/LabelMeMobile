@@ -14,8 +14,8 @@
 #import "UIImage+HOG.h"
 #import "UIButton+CustomViews.h"
 
-#import "EditableTableViewCell.h"
 #import "UITableView+TextFieldAdditions.h"
+#import "CustomUITableViewCell.h"
 
 
 #define IMAGES 0
@@ -104,6 +104,12 @@
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[self.svmClassifier.targetClasses componentsJoinedByString:@", "] forKey:@"Class"]];
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[formatter stringFromDate:self.svmClassifier.updateDate] forKey:@"Last Train"]];
         [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.imagesUsedTraining.count] forKey:@"Images"]];
+        
+        //just shown on ipad
+        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.numberSV.intValue] forKey:@"Number SV"]];
+        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.numberOfPositives.intValue] forKey:@"Number Positives"]];
+        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"HOG Dimensions: %@ x %@",[self.svmClassifier.sizes objectAtIndex:0],[self.svmClassifier.sizes objectAtIndex:1] ] forKey:@"HOG dimensions"]];
+        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%.2f seconds", self.svmClassifier.timeLearning.floatValue] forKey:@"Time Learning"]];
     }
     return _classifierProperties;
 }
@@ -112,6 +118,7 @@
 
 #pragma mark -
 #pragma mark Life cycle
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -145,10 +152,8 @@
     self.detectorHogView.layer.shadowRadius = 5;
     self.detectorHogView.layer.shadowOffset = CGSizeMake(-1,-1);
     
-    
     //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
-    
     
     //description table view
     self.descriptionTableView.layer.cornerRadius = 10;
@@ -172,7 +177,7 @@
     [undoButtonView addTarget:self action:@selector(undoAction:) forControlEvents:UIControlEventTouchUpInside];
     self.undoButtonBar = [[UIBarButtonItem alloc] initWithCustomView:undoButtonView];
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    [self.bottomToolbar setItems:[NSArray arrayWithObjects:self.executeButtonBar,flexibleSpace,self.trainButtonBar, flexibleSpace, self.infoButtonBar,flexibleSpace,self.undoButtonBar,nil]];
+    [self.bottomToolbar setItems:[NSArray arrayWithObjects:flexibleSpace,self.executeButtonBar,flexibleSpace,self.trainButtonBar, flexibleSpace, self.infoButtonBar,flexibleSpace,self.undoButtonBar,flexibleSpace,nil]];
     
     self.undoButtonBar.enabled = NO;
 
@@ -293,6 +298,7 @@
     self.sendingView.hidden = NO;
     self.sendingView.cancelButton.hidden = NO;
     self.sendingView.progressView.hidden = YES;
+    self.sendingView.activityIndicator.hidden = YES;
     [self.sendingView clearScreen];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Detector %@", self.svmClassifier.name]];
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images:%d", self.svmClassifier.imagesUsedTraining.count]];
@@ -513,48 +519,50 @@
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
 {
-    return self.classifierProperties.count;
+    int orientation = [[UIDevice currentDevice] orientation];
+    BOOL isIpad = [[UIDevice currentDevice] userInterfaceIdiom]==UIUserInterfaceIdiomPad;
+    
+//    if([[UIDevice currentDevice] userInterfaceIdiom]==UIUserInterfaceIdiomPad) return self.classifierProperties.count;
+//    else return 4;
+    
+    if(isIpad && orientation == UIInterfaceOrientationPortrait) return self.classifierProperties.count;
+    else if(isIpad) return 6;
+    else if(!isIpad && orientation == UIInterfaceOrientationPortrait) return 4;
+    else return 2;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
     NSDictionary *property = [self.classifierProperties objectAtIndex:indexPath.row];
     NSString *propertyName = [[property allKeys] objectAtIndex:0];
+
+    static NSString *kCellIdent = @"DetectorDescriptionTableCell";
+    CustomUITableViewCell *cell = [[CustomUITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:kCellIdent];
+    if (!cell)cell = [[CustomUITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2  reuseIdentifier:kCellIdent];
+    
     if([propertyName isEqualToString:@"Name"]){
-        NSString * const kCellID = @"editableCell";
-        EditableTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: kCellID];
-        if(!cell) cell = [[EditableTableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier: kCellID];
-        
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.textLabel.text = propertyName;
-        cell.textLabel.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
-        cell.textLabel.backgroundColor = [UIColor clearColor];
-        cell.backgroundColor = [UIColor colorWithWhite:247/256.0 alpha:1];
+        cell.isEditable = YES;
         cell.textField.placeholder = [property objectForKey:propertyName];
         cell.textField.delegate = self;
         cell.textField.returnKeyType = UIReturnKeyDone;
         cell.textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
         cell.textField.autocorrectionType = UITextAutocorrectionTypeNo;
         if (!self.isFirstTraining) cell.textField.text = [property objectForKey:propertyName];
-        return cell;
-    
     }else{
-        static NSString *MyIdentifier = @"DetectorDescriptionTableCell";
-        UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:MyIdentifier];
-        if (cell == nil)cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2  reuseIdentifier:MyIdentifier];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        
-        cell.textLabel.text = propertyName;
-        cell.textLabel.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
-        cell.textLabel.backgroundColor = [UIColor clearColor];
         cell.detailTextLabel.text = [property objectForKey:propertyName];
         cell.detailTextLabel.backgroundColor = [UIColor clearColor];
-        cell.backgroundColor = [UIColor colorWithWhite:247/256.0 alpha:1];
-
-        return cell;
     }
+    
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.textLabel.text = propertyName;
+    cell.textLabel.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
+    cell.textLabel.backgroundColor = [UIColor clearColor];
+    cell.backgroundColor = [UIColor colorWithWhite:247/256.0 alpha:1];
+    
+    return cell;
+    
+    
     
 }
 
@@ -682,7 +690,7 @@
     NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
     for(BoundingBox *cp in trainingSet.groundTruthBoundingBoxes){
         UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
-        UIImage *croppedImage = [wholeImage croppedImage:[[cp increaseSizeByFactor:0.2] rectangleForImage:wholeImage]];
+        UIImage *croppedImage = [wholeImage croppedImage:[[cp increaseSizeByFactor:0.2] rectangleForImage:wholeImage]]; //
         [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationLow]];
     }
     self.averageImage = [self imageAveraging:listOfImages];
@@ -791,7 +799,6 @@
 
 - (void) loadDetectorInfo
 {
-    
     //images
     self.detectorHogView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
     self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];

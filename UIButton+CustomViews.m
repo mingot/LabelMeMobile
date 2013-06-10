@@ -55,6 +55,7 @@
     button.layer.shadowOpacity = 1;
     button.layer.shadowRadius = 2;
     button.layer.shadowOffset = CGSizeMake(0,1);
+    button.layer.cornerRadius = 5;
 }
 
 @end

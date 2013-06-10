@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1552</int>
-		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.SystemVersion">12E55</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -57,7 +57,8 @@
 							<object class="IBUITableView" id="593681213">
 								<reference key="NSNextResponder" ref="448342639"/>
 								<int key="NSvFlags">298</int>
-								<string key="NSFrame">{{18, 149}, {282, 198}}</string>
+								<array class="NSMutableArray" key="NSSubviews"/>
+								<string key="NSFrame">{{18, 72}, {282, 426}}</string>
 								<reference key="NSSuperview" ref="448342639"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="926755696"/>
@@ -206,6 +207,38 @@
 								<reference key="IBUIFontDescription" ref="1039136824"/>
 								<reference key="IBUIFont" ref="615290970"/>
 							</object>
+							<object class="IBUIImageView" id="328023872">
+								<reference key="NSNextResponder" ref="448342639"/>
+								<int key="NSvFlags">300</int>
+								<string key="NSFrame">{{18, 175}, {240, 260}}</string>
+								<reference key="NSSuperview" ref="448342639"/>
+								<reference key="NSWindow"/>
+								<string key="NSReuseIdentifierKey">_NS:9</string>
+								<bool key="IBUIUserInteractionEnabled">NO</bool>
+								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+							</object>
+							<object class="IBUIButton" id="631729418">
+								<reference key="NSNextResponder" ref="448342639"/>
+								<int key="NSvFlags">300</int>
+								<string key="NSFrame">{{18, 437}, {73, 44}}</string>
+								<reference key="NSSuperview" ref="448342639"/>
+								<reference key="NSWindow"/>
+								<string key="NSReuseIdentifierKey">_NS:9</string>
+								<bool key="IBUIOpaque">NO</bool>
+								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+								<int key="IBUIContentHorizontalAlignment">0</int>
+								<int key="IBUIContentVerticalAlignment">0</int>
+								<int key="IBUIButtonType">1</int>
+								<string key="IBUINormalTitle">Button</string>
+								<reference key="IBUIHighlightedTitleColor" ref="1006502998"/>
+								<object class="NSColor" key="IBUINormalTitleColor">
+									<int key="NSColorSpace">1</int>
+									<bytes key="NSRGB">MC4xOTYwNzg0MzQ2IDAuMzA5ODAzOTMyOSAwLjUyMTU2ODY1NgA</bytes>
+								</object>
+								<reference key="IBUINormalTitleShadowColor" ref="625965607"/>
+								<reference key="IBUIFontDescription" ref="1039136824"/>
+								<reference key="IBUIFont" ref="615290970"/>
+							</object>
 						</array>
 						<string key="NSFrameSize">{320, 548}</string>
 						<reference key="NSSuperview" ref="191373211"/>
@@ -220,13 +253,7 @@
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="160973348"/>
-				<object class="NSColor" key="IBUIBackgroundColor">
-					<int key="NSColorSpace">3</int>
-					<bytes key="NSWhite">MQA</bytes>
-					<object class="NSColorSpace" key="NSCustomColorSpace">
-						<int key="NSID">2</int>
-					</object>
-				</object>
+				<reference key="IBUIBackgroundColor" ref="1006502998"/>
 				<object class="IBUISimulatedStatusBarMetrics" key="IBUISimulatedStatusBarMetrics"/>
 				<object class="IBUIScreenMetrics" key="IBUISimulatedDestinationMetrics">
 					<string key="IBUISimulatedSizeMetricsClass">IBUIScreenMetrics</string>
@@ -323,6 +350,14 @@
 					<int key="connectionID">521</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">imageView</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="328023872"/>
+					</object>
+					<int key="connectionID">524</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">cancelAction:</string>
 						<reference key="source" ref="135774460"/>
@@ -364,6 +399,15 @@
 						<int key="IBEventType">7</int>
 					</object>
 					<int key="connectionID">522</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">takePictureAction:</string>
+						<reference key="source" ref="631729418"/>
+						<reference key="destination" ref="372490531"/>
+						<int key="IBEventType">7</int>
+					</object>
+					<int key="connectionID">528</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -409,6 +453,8 @@
 							<reference ref="892097150"/>
 							<reference ref="1008412850"/>
 							<reference ref="926755696"/>
+							<reference ref="631729418"/>
+							<reference ref="328023872"/>
 						</array>
 						<reference key="parent" ref="191373211"/>
 					</object>
@@ -447,6 +493,16 @@
 						<array class="NSMutableArray" key="children"/>
 						<reference key="parent" ref="448342639"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">523</int>
+						<reference key="object" ref="328023872"/>
+						<reference key="parent" ref="448342639"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">526</int>
+						<reference key="object" ref="631729418"/>
+						<reference key="parent" ref="448342639"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -468,6 +524,8 @@
 				<string key="510.CustomClassName">AYUIButton</string>
 				<string key="510.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<real value="0.0" key="510.IBUIButtonInspectorSelectedStateConfigurationMetadataKey"/>
+				<string key="523.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
+				<string key="526.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="9.CustomClassName">DetectView</string>
 				<string key="9.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 			</dictionary>
@@ -475,7 +533,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">522</int>
+			<int key="maxID">528</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -504,6 +562,7 @@
 						<string key="sliderChangeAction:">id</string>
 						<string key="switchCameras:">id</string>
 						<string key="switchValueDidChange:">UISwitch</string>
+						<string key="takePictureAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="cancelAction:">
@@ -526,12 +585,17 @@
 							<string key="name">switchValueDidChange:</string>
 							<string key="candidateClassName">UISwitch</string>
 						</object>
+						<object class="IBActionInfo" key="takePictureAction:">
+							<string key="name">takePictureAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="HOGimageView">UIImageView</string>
 						<string key="cancelButton">AYUIButton</string>
 						<string key="detectView">DetectView</string>
 						<string key="detectionThresholdSliderButton">UISlider</string>
+						<string key="imageView">UIImageView</string>
 						<string key="infoLabel">UILabel</string>
 						<string key="settingsButton">AYUIButton</string>
 						<string key="settingsTableView">UITableView</string>
@@ -554,6 +618,10 @@
 						<object class="IBToOneOutletInfo" key="detectionThresholdSliderButton">
 							<string key="name">detectionThresholdSliderButton</string>
 							<string key="candidateClassName">UISlider</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="imageView">
+							<string key="name">imageView</string>
+							<string key="candidateClassName">UIImageView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="infoLabel">
 							<string key="name">infoLabel</string>

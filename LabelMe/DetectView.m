@@ -38,8 +38,13 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
     
         for (int i=0; i<corners.count; i++){
         
+            
+//            NSLog(@"Bounding box detected: %@", [corners objectAtIndex:i]);
             //convert the point from the device system of reference to the prevLayer system of reference
             p = [self convertBoundingBoxForDetectView:[corners objectAtIndex:i]];
+            
+//            NSLog(@"Bounding box transformed: %@", p);
+//            NSLog(@"detect view frame: %@", NSStringFromCGRect(self.frame));
             
             //set the rectangle within the current boundaries 
             x = max(0,p.xmin);
@@ -68,7 +73,7 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
             CGRect textBox = CGRectMake(x - 2, y - 20 - 2, w/2.0, textBoxHeight);
             CGContextFillRect(context, textBox);
             CGContextSetFillColorWithColor(context,[UIColor blackColor].CGColor);
-            [p.targetClass drawInRect:textBox withFont:[UIFont systemFontOfSize:15]];
+            [[NSString stringWithFormat:@" %@", p.targetClass] drawInRect:textBox withFont:[UIFont systemFontOfSize:15]];
         }
         
     }

@@ -12,7 +12,9 @@
 
 #define PI 3.14159265
 #define eps 0.00001
-#define sbin 6 //pixels per block
+//#define pixelsPerHogCell 6 //pixels per block
+
+//static const int pixelsPerHogCell = 6;
 
 
 double uu[9] = {1.0000, //non oriented HOG representants, sweeping from (1,0) to (-1,0).
@@ -78,20 +80,6 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
 @end
 
 
-@interface UIImage () // private method of the category
-
-+ (void)blockPicture:(double *)features // compute the block picture for a block of HOG
-                    :(UInt8 *)im //Image where to store the results
-                    :(int)bs //pixels per block
-                    :(int)x //x position of the block
-                    :(int)y //y position of the block
-                    :(int)blockw // block sizes width and height
-                    :(int)blockh;
-
-
-@end
-
-
 @implementation UIImage (HOG)
 
 
@@ -125,8 +113,8 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     int dims[2] = {height, width};
 
     int blocks[2]; //HOG features size
-    blocks[0] = (int)round((double)dims[0]/(double)sbin); //HOG Cell of (sbin)x(sbin) pixels
-    blocks[1] = (int)round((double)dims[1]/(double)sbin);
+    blocks[0] = (int)round((double)dims[0]/(double)pixelsPerHogCell); //HOG Cell of (pixelsPerHogCell)x(pixelsPerHogCell) pixels
+    blocks[1] = (int)round((double)dims[1]/(double)pixelsPerHogCell);
     
     double *hist = (double *) calloc(blocks[0]*blocks[1]*18,sizeof(double)); //histogram for each block of the HOG with its 18 histograms channel per each.
     double *norm = (double *) calloc(blocks[0]*blocks[1],sizeof(double)); //pointer to end value of histogram
@@ -140,8 +128,8 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     hog.features = malloc(hog.totalNumberOfFeatures*sizeof(double)); // pointer to the HOG features (this is the return value!)
     double *feat = hog.features;
     int visible[2]; // Each visible pixel (ie taking into account the round made in defining blocks size and neglecting the edge pixels)
-    visible[0] = blocks[0]*sbin;
-    visible[1] = blocks[1]*sbin;
+    visible[0] = blocks[0]*pixelsPerHogCell;
+    visible[1] = blocks[1]*pixelsPerHogCell;
     
     
     for (int y = 1; y < visible[0]-1; y++) { //Take care to begin with the first one and end before the last one: not calculating the gradient at the edge
@@ -201,8 +189,8 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
             
             
             // Now the histogram value is computed, it is added to the for hog features around the pixel and proportionally weighted.
-            double xp = ((double)x+0.5)/(double)sbin - 0.5;
-            double yp = ((double)y+0.5)/(double)sbin - 0.5;
+            double xp = ((double)x+0.5)/(double)pixelsPerHogCell - 0.5;
+            double yp = ((double)y+0.5)/(double)pixelsPerHogCell - 0.5;
             int ixp = (int)floor(xp); //index of the HOG feature in *hist
             int iyp = (int)floor(yp);
             double vx0 = xp-ixp; // decimal part of xp. Use to ponderate the strength of the vote to the gradient
@@ -335,8 +323,8 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     int dims[2] = {height, width};
     
     int blocks[2]; //HOG features size
-    blocks[0] = (int)round((double)dims[0]/(double)sbin); //define block size for computing HOG. HOG Cell of (sbin)x(sbin)
-    blocks[1] = (int)round((double)dims[1]/(double)sbin);
+    blocks[0] = (int)round((double)dims[0]/(double)pixelsPerHogCell); //define block size for computing HOG. HOG Cell of (pixelsPerHogCell)x(pixelsPerHogCell)
+    blocks[1] = (int)round((double)dims[1]/(double)pixelsPerHogCell);
     
     //define hog dimensions
     hogSize[0] = max(blocks[0]-2, 0); // Take out a strip of pixels of the boundaries of the image

@@ -99,13 +99,22 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
 
 - (BoundingBox *)increaseSizeByFactor:(float)factor
 {
-    
     BoundingBox *newBox = [[BoundingBox alloc] initWithBoundingBox:self];
-    newBox.xmax = min(self.xmax*(1+factor), 1);
-    newBox.ymax = min(self.ymax*(1+factor), 1);
-    newBox.xmin = max(self.xmin*(1-factor), 0);
-    newBox.ymin = min(self.ymin*(1-factor), 0);
+    CGFloat newWidth = (newBox.xmax - newBox.xmin)*(1 + factor);
+    CGFloat newHeight = (newBox.ymax - newBox.ymin)*(1 + factor);
+    CGFloat midX = (newBox.xmin + newBox.xmax)/2.0;
+    CGFloat midY = (newBox.ymin + newBox.ymax)/2.0;
+    
+    newBox.xmax = min(midX + newWidth/2, 1);
+    newBox.ymax = min(midY + newHeight/2, 1);
+    newBox.xmin = max(midX - newWidth/2, 0);
+    newBox.ymin = max(midY - newHeight/2, 0);
     return newBox;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"upperLeft = (%.2f,%.2f), lowerRight = (%.2f,%.2f)",self.xmin, self.ymin, self.xmax, self.ymax];
 }
 
 @end

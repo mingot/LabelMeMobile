@@ -10,11 +10,16 @@
 #import "ModalTVC.h"
 #import "UIImage+Border.h"
 
+
+
+#define NUMBER_IMAGE_COLUMNS 4.0
+
 @interface ModalTVC()
 
 @property BOOL isGrid;
 
 - (void) toggleDoneButton;
+- (void) setStateSelected:(BOOL) selected forCell:(ImageCell *)cell;
 
 @end
 
@@ -47,21 +52,28 @@
         self.doneButton.enabled = NO;
         self.doneButton.alpha = 0.6f;
     }
-    
-    //select grid (for images) or list (for text) as table view type depending on the data
-    self.isGrid = NO;
-    if([[self.data objectAtIndex:0] isKindOfClass:[UIImage class]])
-        self.isGrid = YES;
-    
     self.cancelButton.hidden = !self.showCancelButton;
     
-    if(self.isGrid)
-        self.tableView.rowHeight = (0.225*self.view.frame.size.width*ceil((float)self.data.count/4) + 0.0375*self.view.frame.size.width);
-    
+    //TODO: Size for iPad!!
+    [self.collectionView registerClass:[ImageCell class] forCellWithReuseIdentifier:@"cvCell"];
+    UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
+    CGFloat imageSize = [UIScreen mainScreen].bounds.size.width/NUMBER_IMAGE_COLUMNS;
+    [flowLayout setItemSize:CGSizeMake(imageSize, imageSize)];
+    [flowLayout setScrollDirection:UICollectionViewScrollDirectionVertical];
+    [self.collectionView setCollectionViewLayout:flowLayout];    
     
     //TODO: in grid mode, no distinction between multiplechoice.
 }
 
+- (void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    //show images or text?
+    self.isGrid = [[self.data objectAtIndex:0] isKindOfClass:[UIImage class]];
+    self.collectionView.hidden = !self.isGrid;
+    self.tableView.hidden = self.isGrid;
+}
 
 
 #pragma mark
@@ -69,109 +81,80 @@
 
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
-{
-    NSInteger ret = 0;
-    
-    //grid
-    if (self.isGrid && (self.data.count>0))
-        ret = 1;
-    
-    //list
-    else ret = self.data.count;
-    
-    return ret;
+{    
+    return self.data.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if(self.isGrid){
-        UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-        
-        for(int i = 0; i < self.data.count; i++) {
-            @autoreleasepool {
-                
-                UIView *imview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width)];
-                
-                UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0.0375*self.view.frame.size.width,0.4125*self.view.frame.size.width, 0.4125*self.view.frame.size.width)];
-                imageView.image = [self.data objectAtIndex:i];
-                
-                [imview addSubview:imageView];
-                
-                //unselected image
-                UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width,0.45*self.view.frame.size.width));
-                [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
-                UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-                UIGraphicsEndImageContext();
-                
-                //selected image
-                UIGraphicsBeginImageContext(CGSizeMake(0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width));
-                imview.alpha = 0.65;
-                [imview.layer  renderInContext:UIGraphicsGetCurrentContext()];
-                UIImage *imageSelected = UIGraphicsGetImageFromCurrentImageContext();
-                UIGraphicsEndImageContext();
-                
-                UIButton * button = [UIButton buttonWithType:UIButtonTypeCustom];
-                button.tag = i;
-                
-                if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
-                    button.frame = CGRectMake(0.05*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.225*self.view.frame.size.width, 0.225*self.view.frame.size.width);
-                
-                else button.frame = CGRectMake(0.07*self.view.frame.size.width+0.225*self.view.frame.size.width*(i%4), 0.01875*self.view.frame.size.width+0.225*self.view.frame.size.width*(floor((i/4))), 0.2*self.view.frame.size.width, 0.2*self.view.frame.size.width);
-                
-                //if the cell is a selected item
-                if ([self.selectedItems indexOfObject:[NSNumber numberWithInt:i]] == NSNotFound)
-                    button.selected = NO;
-                else button.selected = YES;
-                
-                [button addTarget:self
-                           action:@selector(imageSelectedAction:)
-                 forControlEvents:UIControlEventTouchUpInside];
-                [button setImage:image forState:UIControlStateNormal];
-                [button setImage:[imageSelected addBorderForViewFrame:self.view.frame] forState:UIControlStateSelected];
-                
-                [cell addSubview:button];
-            }
-        }
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        
-        return cell;
-    }
+    static NSString *kCellIdentifier = @"tvCell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellIdentifier];
+    if (cell == nil)
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:kCellIdentifier];
     
-    //list
-    else{
-        static NSString *CellIdentifier = @"Cell";
-        UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil)
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-        
-        NSNumber *row = [NSNumber numberWithInt:indexPath.row];
-        if([self.selectedItems indexOfObject:row] != NSNotFound) cell.accessoryType = UITableViewCellAccessoryCheckmark;
-        else cell.accessoryType = UITableViewCellAccessoryNone;
-        
-        cell.textLabel.text = [self.data objectAtIndex:indexPath.row];
-        
-        return cell;
-    }
+    NSNumber *row = [NSNumber numberWithInt:indexPath.row];
+    if([self.selectedItems indexOfObject:row] != NSNotFound) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    else cell.accessoryType = UITableViewCellAccessoryNone;
     
+    if(!self.isGrid) cell.textLabel.text = [self.data objectAtIndex:indexPath.row];
     
+    return cell;
 }
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    //list
-    if(!self.isGrid){
-        NSNumber *row = [NSNumber numberWithInt:indexPath.row];
-        if([self.selectedItems indexOfObject:row] == NSNotFound){
-            if(!self.multipleChoice) [self.selectedItems removeAllObjects];
-            [self.selectedItems addObject:row];
-            
-        }else [self.selectedItems removeObject:row];
+    NSNumber *row = [NSNumber numberWithInt:indexPath.row];
+    if([self.selectedItems indexOfObject:row] == NSNotFound){
+        if(!self.multipleChoice) [self.selectedItems removeAllObjects];
+        [self.selectedItems addObject:row];
         
-        //Enable done button when at list on item selected
-        [self toggleDoneButton];
-        
-        [tableView reloadData];
+    }else [self.selectedItems removeObject:row];
+    
+    //Enable done button when at list on item selected
+    [self toggleDoneButton];
+    
+    [tableView reloadData];
+}
+
+#pragma mark
+#pragma mark - CollectionView Delegate and Datasource
+
+//Data source
+
+- (NSInteger)collectionView:(UICollectionView *)view numberOfItemsInSection:(NSInteger)section
+{
+    return self.data.count;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)cv cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+
+    ImageCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"cvCell" forIndexPath:indexPath];
+    
+    cell.backgroundColor = [UIColor whiteColor];
+    NSNumber *row = [NSNumber numberWithInt:indexPath.row];
+    if([self.selectedItems indexOfObject:row] != NSNotFound){
+        [self setStateSelected:YES forCell:cell];
+    }else [self setStateSelected:NO forCell:cell];
+    
+    if(self.isGrid) cell.imageView.image = [self.data objectAtIndex:indexPath.row];
+    return cell;
+}
+
+
+//Delegate
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSNumber *row = [NSNumber numberWithInt:indexPath.row];
+    ImageCell *selectedCell = (ImageCell *) [collectionView cellForItemAtIndexPath:indexPath];
+    if([self.selectedItems indexOfObject:row] == NSNotFound){
+        [self.selectedItems addObject:row];
+        [self setStateSelected:YES forCell:selectedCell];
+    }else{
+        [self.selectedItems removeObject:row];
+        [self setStateSelected:NO forCell:selectedCell];
     }
 }
 
@@ -185,20 +168,12 @@
     [self dismissModalViewControllerAnimated:YES];
 }
 
-- (IBAction)imageSelectedAction:(UIButton *)button
-{
-    if(button.selected) [self.selectedItems removeObject:[NSNumber numberWithInt:button.tag]];
-    else [self.selectedItems addObject:[NSNumber numberWithInt:button.tag]];
-    
-    button.selected = button.selected ? NO:YES;
-    
-    [self toggleDoneButton];
-}
-
 - (IBAction)cancelAction:(id)sender {
     [self dismissModalViewControllerAnimated:YES];
     [self.delegate selectionCancelled];
 }
+
+
 
 #pragma mark
 #pragma mark - Private methods
@@ -217,10 +192,26 @@
 }
 
 
-- (void)viewDidUnload {
+- (void)viewDidUnload
+{
     [self setCancelButton:nil];
     [self setTitleLabel:nil];
     [self setSubtitleLabel:nil];
+    [self setCollectionView:nil];
     [super viewDidUnload];
 }
+
+- (void) setStateSelected:(BOOL) selected forCell:(ImageCell *) cell
+{
+    if(selected){
+        cell.layer.borderWidth = 4;
+        cell.layer.borderColor = [UIColor colorWithRed:160/256.0 green:32/256.0 blue:28/256.0 alpha:1].CGColor;
+        cell.imageView.alpha = 0.5;
+    }else{
+        cell.layer.borderWidth = 0;
+        cell.imageView.alpha = 1;
+    }
+    [cell setNeedsDisplay];
+}
+
 @end

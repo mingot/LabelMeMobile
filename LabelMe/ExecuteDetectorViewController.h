@@ -48,6 +48,7 @@
 //AVCapture
 @property (nonatomic, strong) AVCaptureSession *captureSession;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *prevLayer;
+@property (nonatomic, strong) AVCaptureVideoDataOutput *captureOutput;
 
 //self views
 @property (nonatomic, weak) IBOutlet UIImageView *HOGimageView;
@@ -68,5 +69,13 @@
 - (IBAction)cancelAction:(id)sender;
 - (IBAction)switchCameras:(id)sender;
 - (IBAction)switchValueDidChange:(UISwitch *)sw;
+
+//tests
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+- (IBAction)takePictureAction:(id)sender;
+@property BOOL takePicture;
+
+
+
 
 @end

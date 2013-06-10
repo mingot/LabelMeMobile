@@ -288,7 +288,7 @@
     [self.deleteButton setTintColor:[UIColor redColor]];
     [self.deleteButton setWidth:self.view.frame.size.width/2 - 11];
     [self.deleteButton setEnabled:NO];
-    self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(editAction:)]];
+    self.editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editAction:)];
     self.navigationItem.rightBarButtonItem = self.editButton;
     self.sendButton = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleBordered target:self action:@selector(sendAction:)];
     [self.sendButton setWidth:self.view.frame.size.width/2 - 11];
@@ -324,7 +324,7 @@
     [self.noImages setUserInteractionEnabled:YES];
     
     //sendingView 
-    self.sendingView = [[SendingView alloc] initWithFrame:self.tabBarController.view.frame];
+    self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [self.sendingView setHidden:YES];
     self.sendingView.delegate = self;
@@ -485,6 +485,19 @@
 
 - (IBAction)downloadAction:(id)sender
 {
+    
+    //check for internet connection
+    Reachability *networkReachability = [Reachability reachabilityForInternetConnection];
+    NetworkStatus networkStatus = [networkReachability currentReachabilityStatus];
+    BOOL wifiOnly = [self.userDictionary objectForKey:@"wifi"];
+    if (networkStatus == NotReachable) {
+        [self errorWithTitle:@"Check your connection" andDescription:@"Sorry, no connection found."];
+        return;
+    }else if(networkStatus != ReachableViaWiFi && wifiOnly){
+        [self errorWithTitle:@"Check your settings" andDescription:@"Sorry, wifi connection required."];
+        return;
+    }
+    
     //sending view to show getting images from server
     self.sendingView.textView.text = @"Retrieving images from server...";
     self.sendingView.cancelButton.hidden = NO;
@@ -1093,7 +1106,11 @@
     if(tableView.tag==0){
         NSArray *items = [self.labelsArray objectAtIndex:indexPath.section];
         return (0.225*self.view.frame.size.width*ceil((float)items.count/4) + 0.0375*self.view.frame.size.width);
-    }else return tableView.rowHeight;
+    }else{
+        CGFloat size = 80;
+        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) size = 160;
+        return size;
+    }
 }
 
 
@@ -1175,8 +1192,14 @@
             [button setTitle:@"Update" forState:UIControlStateNormal];
             [button setTitleColor:[UIColor colorWithRed:(237.0/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0] forState:UIControlStateNormal];
         }
-        [button setFrame:CGRectMake(self.view.frame.size.width-0.40625*self.view.frame.size.width, 0.0625*self.view.frame.size.width, 0.234375*self.view.frame.size.width, 0.109375*self.view.frame.size.width)];
-        [button setTag:indexPath.row+10];
+        float factor = 1;
+        if([[UIDevice currentDevice] userInterfaceIdiom]==UIUserInterfaceIdiomPad) factor = 0.6;
+        float buttonWidth = 0.234375*self.view.frame.size.width*factor;
+        [button setFrame:CGRectMake(self.view.frame.size.width - 1.5*buttonWidth,
+                                    0.0625*self.view.frame.size.width,
+                                    buttonWidth,
+                                    0.109375*self.view.frame.size.width*factor)];
+        [button setTag:indexPath.row + 10];
         [button addTarget:self action:@selector(listSendAction:) forControlEvents:UIControlEventTouchUpInside];
         [cell.contentView addSubview:button];
         if ([self.editButton.title isEqual: @"Done"]) [button setHidden:YES];
@@ -1374,7 +1397,9 @@
     CGContextRef context = UIGraphicsGetCurrentContext();
 
     //set linewidth(according to image resolution) and color of boxes
-    CGContextSetLineWidth(context, image.size.width/30.0);
+    CGFloat boxWidth = image.size.width/30.0;
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) boxWidth = boxWidth/2;
+    CGContextSetLineWidth(context, boxWidth);
     CGContextSetStrokeColorWithColor(context, [UIColor blueColor].CGColor);
     
     //for each box draw a rect
@@ -1412,73 +1437,5 @@
     return [NSArray arrayWithArray:[unorderedLabels allObjects]];
 }
 
-//- (void) updateModelForFilename:(NSString *)filename
-//{
-//    
-//    NSArray *labels = [self getLabelsForFilename:filename];
-//    
-//    //labelsOredered
-//    for(NSString *label in labels){
-//        int index = [self.labelsOrdered indexOfObject:label];
-//        if(index == NSNotFound){ //box contain a new object category
-//            
-//            //insert label
-//            NSUInteger newIndex = [self.labelsOrdered indexOfObject:label
-//                                                     inSortedRange:(NSRange){0, self.labelsOrdered.count}
-//                                                           options:NSBinarySearchingInsertionIndex
-//                                                    usingComparator:^(NSString *a, NSString *b) {
-//                                                            return [a localizedCaseInsensitiveCompare:b];}];
-//            
-//            
-//            [self.labelsOrdered insertObject:label atIndex:newIndex];
-//            
-//            //insert labelsArray
-//            self.labelsArray = nil; //reload
-//            
-//            //insert buttonsArray
-//            NSArray *buttons = [self buttonsForLabel:label];
-//            [self.buttonsArray insertObject:buttons atIndex:newIndex];
-//            
-//        }else{
-//            
-//            //insert in labels Array
-//            self.labelsArray = nil;
-//            
-//            //insert in buttonsArray
-//            NSArray *buttons = [self buttonsForLabel:label];
-//            [self.buttonsArray setObject:buttons atIndexedSubscript:index];
-//            
-//        }
-//    }
-//    
-//    
-//    if(![labels containsObject:@"00None"]){        
-//        //update none label
-//        NSArray *noneButtons = [self buttonsForLabel:@"00None"];
-//        [self.buttonsArray setObject:noneButtons atIndexedSubscript:0];
-//    }
-//    
-//}
-
-//- (void) deleteImageByFilename:(NSString *)filename
-//{
-//    //items
-//    [self.items removeObject:filename];
-//
-//    //labelsDictionary: for each unique label present in the image
-//    NSArray *labels = [self getLabelsForFilename:filename];
-//    for(NSString *label in labels){
-//        NSMutableArray *objectsForLabel = [self.labelsDictionary objectForKey:label];
-//        [objectsForLabel removeObject:filename];
-//        [self.labelsDictionary setObject:objectsForLabel forKey:label];
-//    }
-//
-//    //buttonsDictionary
-//    for(NSString *label in labels){
-//        NSMutableArray *buttonsForLabel = [self.buttonsDictionary objectForKey:label];
-//
-//    }
-//
-//}
 
 @end

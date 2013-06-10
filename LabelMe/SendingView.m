@@ -10,6 +10,16 @@
 #import <QuartzCore/QuartzCore.h>
 
 
+@interface SendingView()
+{
+    int total;
+    int num;
+}
+
+@end
+
+
+
 @implementation SendingView
 
 - (id)initWithFrame:(CGRect)frame

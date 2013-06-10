@@ -26,4 +26,5 @@
 //modify the actual ground truth bounding boxes to handle a special confilictive case in learning. That case was when images with rectangular ground truth bb combined horizontal anv vertical rectangles. This methods transforms all those rectangles in the circumscrite square containing them
 - (void) unifyGroundTruthBoundingBoxes;
 
+
 @end

@@ -63,10 +63,8 @@
     // Previous layer to show the video image
     self.prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
     self.prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-    self.prevLayer.frame = self.view.frame;
     
     //trick to put de capture previous layer at the back
-    self.cameraView = [[UIView alloc] initWithFrame:self.view.frame];
     [self.view addSubview:self.cameraView];
     [self.view sendSubviewToBack:self.cameraView];
     [self.cameraView.layer addSublayer:self.prevLayer];
@@ -78,6 +76,7 @@
     self.thumbnailCaptureImageView.image = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
         // Previous layer to show the video image
+        self.prevLayer.frame = self.view.frame;
         [self.captureSession startRunning];
     });
 }
@@ -144,6 +143,29 @@
 {
     self.navigationController.navigationBarHidden = NO;
     [self.navigationController popViewControllerAnimated:NO];
+}
+
+#pragma mark -
+#pragma mark Rotation
+
+- (void)willAnimateRotationToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    
+    NSLog(@"rotating...");
+    
+    
+    [CATransaction begin];
+    if (toInterfaceOrientation == UIInterfaceOrientationLandscapeRight){
+        NSLog(@"landscaperight");
+        self.prevLayer.orientation = UIInterfaceOrientationLandscapeRight;
+    } else if(toInterfaceOrientation == UIInterfaceOrientationPortrait){
+        NSLog(@"portrait");
+        self.prevLayer.orientation = UIInterfaceOrientationPortrait;
+    }
+    self.prevLayer.frame = self.view.frame;
+    [CATransaction commit];
+    
+    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
 }
 
 @end

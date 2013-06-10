@@ -19,15 +19,6 @@
 
 
 @interface SendingView : UIView
-{
-    int total;
-    int num;
-}
-
-
-@property (nonatomic, weak) id <SendingViewDelegate> delegate;
-
-
 
 //view
 @property (weak, nonatomic) IBOutlet UIProgressView *progressView;
@@ -35,11 +26,8 @@
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 @property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 
-
-@property (strong, nonatomic) NSString *filename;
 @property (strong, nonatomic) NSString *sendingViewID; //to identify
-
-
+@property (nonatomic, weak) id <SendingViewDelegate> delegate;
 
 -(void)setTotal:(int) i;
 -(void)incrementNum;

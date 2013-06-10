@@ -32,7 +32,7 @@
 	CGContextSetStrokeColorWithColor(ctx, [UIColor colorWithRed:(160/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0].CGColor);
     
 	//Set the width of the pen mark
-	CGFloat borderWidth = (float) frame.size.width*0.4125*0.075;
+	CGFloat borderWidth = 6;
 	CGContextSetLineWidth(ctx, borderWidth);
     
 	//Start at 0,0 and draw a square

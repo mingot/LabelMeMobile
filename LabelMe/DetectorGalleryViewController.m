@@ -29,7 +29,6 @@
 
 @implementation DetectorGalleryViewController
 
-
 @synthesize detectors = _detectors;
 @synthesize tableView = _tableView;
 @synthesize detectorController = _detectorController;
@@ -37,7 +36,6 @@
 @synthesize resourcesPaths = _resourcesPaths;
 @synthesize availableObjectClasses = _availableObjectClasses;
 @synthesize userPath = _userPath;
-
 
 
 #pragma mark
@@ -108,6 +106,9 @@
 {
     self.title = @"Detectors"; //for back button
     
+    UIImage *barButtonItem = [[UIImage imageNamed:@"barItemButton.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 5, 0, 5)];
+    [[UIBarButtonItem appearance] setBackgroundImage:barButtonItem forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+    
     //load detectors and create directory if it does not exist
     NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"];
     self.detectors = [NSKeyedUnarchiver unarchiveObjectWithFile:detectorsPath];
@@ -126,10 +127,13 @@
     titleView.image = titleImage;
     [self.navigationItem setTitleView:titleView];
     
-    
-    self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(edit:)]];
+    //previous buttons
+    //self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(edit:)]];
+    //self.plusButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton plusBarButtonWithTarget:self action:@selector(addDetector:)]];
+    self.editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(edit:)];
     self.navigationItem.rightBarButtonItem = self.editButton;
-    self.plusButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton plusBarButtonWithTarget:self action:@selector(addDetector:)]];
+
+    self.plusButton =[[UIBarButtonItem alloc] initWithTitle:@"+" style:UIBarButtonItemStylePlain target:self action:@selector(addDetector:)];
     self.navigationItem.leftBarButtonItem = self.plusButton;
     self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
     
@@ -158,8 +162,6 @@
     [self.noImages setUserInteractionEnabled:YES];
     self.noImages.hidden = YES;
     [self.view addSubview:self.noImages];
-    
-    
     
     [super viewDidLoad];
 }

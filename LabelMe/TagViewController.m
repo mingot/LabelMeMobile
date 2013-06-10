@@ -69,9 +69,17 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
     self.title = @"Annotation Tool";
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbarBg.png"] forBarMetrics:UIBarMetricsDefault];
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
+    
+    //disable keyboard when touching the background
+    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboardAction:)];
+    // For selecting cell.
+    gestureRecognizer.cancelsTouchesInView = NO;
+    [self.tagView addGestureRecognizer:gestureRecognizer];
+    
     
     //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
@@ -124,6 +132,7 @@
     UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.scrollView.frame];
     [backgroundView setImage:globo];
     [self.labelsView setBackgroundView:backgroundView];
+
 
     //tip
     self.tip = [[UIButton alloc] initWithFrame:CGRectMake(25, 2*self.scrollView.frame.size.height/3, self.scrollView.frame.size.width/2, self.scrollView.frame.size.height/3)];
@@ -489,11 +498,16 @@
     [self selectedAnObject:YES];
 }
 
+- (IBAction)hideKeyboardAction:(id)sender
+{
+    [self.view endEditing:YES];
+}
+
 - (IBAction)labelFinish:(id)sender
 {
-    int selected=[self.tagView SelectedBox];
+   int selected = [self.tagView SelectedBox];
    self.label.text = [self.label.text replaceByUnderscore];
-        Box *box = [[self.tagView objects] objectAtIndex: selected];
+        Box *box = [self.tagView.objects objectAtIndex: selected];
         if (![box.label isEqualToString:self.label.text]) {
             
             box.label = self.label.text;

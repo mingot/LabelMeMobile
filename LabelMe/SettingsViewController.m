@@ -15,7 +15,6 @@
 #import "CreditsViewController.h"
 #import "NSObject+Folders.h"
 #import "UIImage+Resize.h"
-#import "UIButton+CustomViews.h"
 #import "LMUINavigationController.h"
 
 
@@ -35,7 +34,7 @@
         
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
             self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPhone" bundle:nil];
-        else self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPad" bundle:nil];
+        else self.website = [[WebsiteViewController alloc] initWithNibName:@"WebsiteViewController_iPhone" bundle:nil];
     }
     
     return self;
@@ -47,9 +46,10 @@
     [super viewDidLoad];
     
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
+
+    UIBarButtonItem *logOutButton = [[UIBarButtonItem alloc] initWithTitle:@"Log out" style:UIBarButtonItemStylePlain target:self action:@selector(logOutAction:)];
     
-    UIBarButtonItem *logoutButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Log out" target:self action:@selector(logOutAction:)]];
-    self.navigationItem.rightBarButtonItem = logoutButton;
+    self.navigationItem.rightBarButtonItem = logOutButton;
     
 
     self.tableView.backgroundColor = [UIColor clearColor];
@@ -432,7 +432,7 @@
         ResolutionViewController *resolutionVC = nil;
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
             resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPhone" bundle:nil];
-        else resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPad" bundle:nil];
+        else resolutionVC = [[ResolutionViewController alloc] initWithNibName:@"ResolutionViewController_iPhone" bundle:nil];
 
 
         resolutionVC.username = self.username;

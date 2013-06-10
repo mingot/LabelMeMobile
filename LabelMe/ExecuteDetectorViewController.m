@@ -96,6 +96,8 @@
 {
     [super viewDidLoad];
     
+    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    
     self.infoLabel.lineBreakMode = UILineBreakModeWordWrap;
     self.infoLabel.numberOfLines = 0;
     
@@ -146,12 +148,12 @@
 										  error:nil];
     
     //Capture output specifications
-	AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
-	captureOutput.alwaysDiscardsLateVideoFrames = YES;
+	self.captureOutput = [[AVCaptureVideoDataOutput alloc] init];
+	self.captureOutput.alwaysDiscardsLateVideoFrames = YES;
 	
     // Output queue setting (for receiving captures from AVCaptureSession delegate)
 	dispatch_queue_t queue = dispatch_queue_create("cameraQueue", NULL);
-	[captureOutput setSampleBufferDelegate:self queue:queue];
+	[self.captureOutput setSampleBufferDelegate:self queue:queue];
 	dispatch_release(queue);
     
     // Set the video output to store frame in BGRA (It is supposed to be faster)
@@ -159,13 +161,13 @@
                                    dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA],
                                    kCVPixelBufferPixelFormatTypeKey,
                                    nil];
-	[captureOutput setVideoSettings:videoSettings];
+	[self.captureOutput setVideoSettings:videoSettings];
     
     
     //Capture session definition
 	self.captureSession = [[AVCaptureSession alloc] init];
 	[self.captureSession addInput:captureInput];
-	[self.captureSession addOutput:captureOutput];
+	[self.captureSession addOutput:self.captureOutput];
     [self.captureSession setSessionPreset:AVCaptureSessionPresetMedium];
     
     // Previous layer to show the video image
@@ -215,6 +217,7 @@
 - (void)viewDidUnload
 {
     [self setSwitchButton:nil];
+    [self setImageView:nil];
     [super viewDidUnload];
 }
 
@@ -232,14 +235,14 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         NSDate * start = [NSDate date];
         
         CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-        CVPixelBufferLockBaseAddress(imageBuffer,0); //Lock the image buffer ??Why
+        CVPixelBufferLockBaseAddress(imageBuffer,0); 
         
         //Get information about the image
         uint8_t *baseAddress = (uint8_t *)CVPixelBufferGetBaseAddress(imageBuffer);
         size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
         size_t width = CVPixelBufferGetWidth(imageBuffer);
         size_t height = CVPixelBufferGetHeight(imageBuffer);
-        
+
         //Create a CGImageRef from the CVImageBufferRef
         CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
         CGContextRef newContext = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
@@ -251,7 +254,24 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
         //**** DETECTION ****
         NSMutableArray *nmsArray = [[NSMutableArray alloc] init];
-        UIImage *image = [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight];
+//        UIImage *image = [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight];
+
+        //rotate image depending on the orientation
+        UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+        
+        UIImage *image;
+        if(UIDeviceOrientationIsLandscape(orientation)){
+            image = [UIImage imageWithCGImage:imageRef];
+            NSLog(@"Landscape");
+        }else image = [UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight];
+
+        
+        if(self.takePicture){
+            [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:NO];
+            self.takePicture = NO;
+        }
+        
+        
         //single class detection
         if(self.svmClassifiers.count == 1){
             Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:0];
@@ -260,7 +280,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                                       minimumThreshold:detectionThreshold
                                               pyramids:self.numPyramids
                                               usingNms:YES
-                                     deviceOrientation:[[UIDevice currentDevice] orientation]
+                                     deviceOrientation:orientation
                                     learningImageIndex:0]];
         //Multiclass detection
         }else{
@@ -273,7 +293,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             dispatch_apply(self.svmClassifiers.count, classifierQueue, ^(size_t i) {
                 Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:i];
                 float detectionThreshold = -1 + 2*svmClassifier.detectionThreshold.floatValue;
-                candidatesForClassifier = [svmClassifier detect:self.hogPyramid minimumThreshold:detectionThreshold usingNms:YES orientation:[[UIDevice currentDevice] orientation]];
+                candidatesForClassifier = [svmClassifier detect:self.hogPyramid minimumThreshold:detectionThreshold usingNms:YES orientation:orientation];
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     [nmsArray addObject:candidatesForClassifier];
                 });
@@ -285,6 +305,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         // set boundaries of the detection and redraw
         self.detectView.cameraOrientation = [[UIDevice currentDevice] orientation];
+//        if([(NSMutableArray *)[nmsArray objectAtIndex:0] count]>0)NSLog(@"boxes:%@", [nmsArray objectAtIndex:0]);
         self.detectView.cornersArray = nmsArray;
         [self.detectView performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
         
@@ -316,6 +337,45 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
     }
 }
+
+
+//- (void) writeOnImage:(UIImage *)image
+//{
+////    //correct the orientation diference between UIImage and the underlying CGImage to make them coincide
+////    UIImage *correctedImage = [self fixOrientation];
+//    
+//    // Inizialization
+//    CGImageRef imageRef = image.CGImage;
+//    
+//    // Get the image in bits: Create a context and draw the image there to get the image in bits
+//    NSUInteger width = CGImageGetWidth(imageRef); //#pixels width
+//    NSUInteger height = CGImageGetHeight(imageRef); //#pixels height
+//    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+//    int bytesPerPixel = 4;
+//    int bytesPerRow = bytesPerPixel * width;
+//    int bitsPerComponent = 8;
+//    UInt8 *im = (UInt8 *)malloc(height * width * 4);
+//    
+//    CGContextRef contextImage = CGBitmapContextCreate(im, width, height,
+//                                                      bitsPerComponent, bytesPerRow, colorSpace,
+//                                                      kCGImageAlphaPremultipliedLast| kCGBitmapByteOrder32Big );
+//    CGColorSpaceRelease(colorSpace);
+//    CGContextDrawImage(contextImage, CGRectMake(0, 0, width, height), imageRef);
+//    CGContextRelease(contextImage);
+//    
+//    for(int j=0;j<height;j++)
+//        for(int i=0;i<width;i++)
+//            NSLog(@"component (%d,%d): R=%d, G=%d, B=%d, A=%d",i,j,im[4*j*width + i*4],im[4*j*width + i*4 + 1],im[4*j*width + i*4 + 2],im[4*j*width + i*4 + 3]);
+//    
+//    NSLog(@"Fin");
+//    
+//    //create an image from the current graphics context
+//    UIGraphicsBeginImageContext(myView.bounds.size);
+//    [myView.layer renderInContext:UIGraphicsGetCurrentContext()];
+//    viewImage = UIGraphicsGetImageFromCurrentImageContext();
+//    UIGraphicsEndImageContext();
+//    
+//}
 
 #pragma mark -
 #pragma mark Settings delegate
@@ -451,5 +511,51 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     return cell;
 }
 
+
+
+
+#pragma mark -
+#pragma mark Rotation
+
+- (void)willAnimateRotationToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    
+//    AVCaptureConnection *videoConnection = nil;
+    
+//	for (AVCaptureConnection *connection in self.captureOutput.connections){
+//        NSLog(@"connection:%@", connection);
+//		for (AVCaptureInputPort *port in [connection inputPorts])
+//			if ([[port mediaType] isEqual:AVMediaTypeVideo] ){
+//                NSLog(@"changing orientation");
+//				videoConnection = connection;
+//                [videoConnection setVideoOrientation:[UIDevice currentDevice].orientation];
+//				break;
+//			}
+//		if (videoConnection) break;
+//	}
+
+    
+    [CATransaction begin];
+    self.prevLayer.orientation = toInterfaceOrientation;
+    self.prevLayer.frame = self.view.frame;
+    [CATransaction commit];
+    
+    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+}
+
+-(BOOL)shouldAutorotateToInterfaceOrientation: (UIInterfaceOrientation)interfaceOrientation
+{
+    
+    [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeLeft animated:NO];
+    
+    return (interfaceOrientation == UIInterfaceOrientationLandscapeLeft);
+}
+
+
+
+- (IBAction)takePictureAction:(id)sender
+{
+    self.takePicture = YES;
+}
 @end
 

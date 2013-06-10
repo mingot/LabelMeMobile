@@ -43,8 +43,10 @@
             NSArray *indexes = [self.dataDictionary objectForKey:label];
             NSMutableArray *buttons = [[NSMutableArray alloc] init];
             for(int i=0; i<indexes.count; i++){
+                
                 UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
                 button.tag = [[indexes objectAtIndex:i] intValue];
+
                 
                 //button views generation
                 UIView *imview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0.45*self.view.frame.size.width, 0.45*self.view.frame.size.width)];
@@ -219,7 +221,8 @@
 }
 
 
-- (IBAction)cancelAction:(id)sender {
+- (IBAction)cancelAction:(id)sender
+{
     [self dismissModalViewControllerAnimated:YES];
     [self.delegate selectionCancelled];
 }
