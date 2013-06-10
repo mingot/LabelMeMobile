@@ -38,7 +38,7 @@
     self.captureButton.frame = CGRectMake(captButton.origin.x, captButton.origin.y, captButton.size.width, captButton.size.height*1.2);
     [self.captureButton setTitle:@"" forState:UIControlStateNormal];
     [self.captureButton setImage:[UIImage imageNamed:@"camera.png"] forState:UIControlStateNormal];
-    self.captureButton.backgroundColor = [UIColor blackColor];
+//    self.captureButton.backgroundColor = [UIColor blackColor];
     
     self.thumbnailCaptureImageView.layer.borderColor = [[UIColor blackColor] CGColor];
     self.thumbnailCaptureImageView.layer.borderWidth = 1;
@@ -96,9 +96,19 @@
 
 - (IBAction)captureAction:(id)sender
 {
+    //animation
+    [UIView animateWithDuration:0.2f
+                     animations:^{
+                         [self.cameraView setAlpha:0.3f];
+                     }
+                     completion:^(BOOL finished){
+                         [self.cameraView setAlpha:1];
+                         NSLog(@"Finished animation");
+                     }
+     ];
     
+    //orientation
 	AVCaptureConnection *videoConnection = nil;
-    
 	for (AVCaptureConnection *connection in self.stillImageOutput.connections){
 		for (AVCaptureInputPort *port in [connection inputPorts])
 			if ([[port mediaType] isEqual:AVMediaTypeVideo] ){
@@ -109,7 +119,7 @@
 		if (videoConnection) break; 
 	}
 	
-    
+    //image taken
 	[self.stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler: ^(CMSampleBufferRef imageSampleBuffer, NSError *error){
         
         
