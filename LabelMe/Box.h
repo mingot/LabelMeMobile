@@ -18,7 +18,7 @@
     @public float LOWERBOUND;
     @public float LEFTBOUND;
     @public float RIGHTBOUND;
-    BOOL    sent;
+    BOOL sent;
 }
 
 @property (strong, nonatomic) NSString *label;

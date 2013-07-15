@@ -51,6 +51,11 @@
     
     self.navigationItem.rightBarButtonItem = logOutButton;
     
+    //titleView: LabelMe Logo and title images
+    UIImage *titleImage = [UIImage imageNamed:@"settingsTitle.png"];
+    UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
+    titleView.image = titleImage;
+    [self.navigationItem setTitleView:titleView];
 
     self.tableView.backgroundColor = [UIColor clearColor];
     [self.tableView setBackgroundView:nil];
@@ -127,16 +132,8 @@
                 break;
         }
     }
-
-//    }else{
-//        UISlider *slider = (UISlider *)sender;
-//        dictnum = [NSNumber numberWithFloat:[slider value]];
-//        [dict removeObjectForKey:@"resolution"];
-//        [dict setObject:dictnum forKey:@"resolution"];
-//    }
     
     [dict writeToFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"] atomically:NO];
-
 }
 
 -(IBAction)stepperDidChange:(id)sender
@@ -304,6 +301,7 @@
     //Profile picture
     if (indexPath.section == 0) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
+        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         UIButton *profilePictureButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [cell.imageView setBackgroundColor:[UIColor clearColor]];
         cell.imageView.layer.masksToBounds = YES;
@@ -322,6 +320,7 @@
     //number of images
     }else if (indexPath.section == 1){
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         NSNumber *numberfiles =[NSNumber numberWithInteger: [[filemng contentsOfDirectoryAtPath:[paths objectAtIndex:THUMB] error:NULL] count]];
         
         [cell.textLabel setText:@"Number of images: "];
@@ -332,6 +331,7 @@
     //go to labelme website
     }else if (indexPath.section == 2){
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
         
         [cell.textLabel setText:@"Go to LabelMe Website"];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
@@ -341,6 +341,7 @@
     //advanced settings
     }else if (indexPath.section == 3){
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectZero];
         [sw setOnTintColor:[UIColor colorWithRed:(180.0/255.0) green:(28.0/255.0) blue:(36.0/255.0) alpha:1.0]];
 
@@ -361,6 +362,7 @@
             case 1:
                 [cell.textLabel setText:@"Image resolution"];
                 [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+                [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
                 break;
                 
             case 2:
@@ -396,6 +398,7 @@
         stepper.minimumValue = 4;
         
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         cell.textLabel.text = [NSString stringWithFormat: @"Max HOG: %d", (int) stepper.value];
         cell.accessoryView = stepper;
         [stepper addTarget:self action:@selector(stepperDidChange:) forControlEvents:UIControlEventValueChanged];
@@ -403,6 +406,7 @@
     //about
     }else if (indexPath.section == 5){
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
         
         [cell.textLabel setText:@"About LabelMe"];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
@@ -412,7 +416,7 @@
 
     
 
-    [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+    
     
     return cell;
 

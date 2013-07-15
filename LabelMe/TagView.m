@@ -11,16 +11,19 @@
 #import "Constants.h"
 #import "UITextField+CorrectOrientation.h"
 
+
+
 @implementation TagView
 
+#define NO_BOX_SELECTED -1
 
 #pragma mark -
 #pragma mark Initialization
 
 - (void) initialize
 {
-    [self setBackgroundColor:[UIColor clearColor ]];
-    self.objects = [[NSMutableArray alloc]init] ;
+    [self setBackgroundColor:[UIColor clearColor]];
+    self.boxes = [[NSMutableArray alloc] init];
     
     move = NO;
     size = NO;
@@ -49,61 +52,55 @@
 
 - (void)drawRect:(CGRect)rect
 {
-    int count = self.objects.count;
-    if (count<1) {
+    if (self.boxes.count<1)
         return;
-    }
    
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetLineWidth(context, LINEWIDTH);
-    if (selectedBox==-1) {
-        for (int i= 0; i<count; i++) {
-            [self drawBox:context:[self.objects objectAtIndex:i]:1];
-        }
-
-    }
-    else{
-        for (int i=0; i<count; i++) {
-            if (i == selectedBox) continue;
-            [self drawBox:context:[self.objects objectAtIndex:i]:0.3];
-        }
-        [self drawSelectedBox:context:[self.objects objectAtIndex:selectedBox]];
+    
+    for(int i=0; i<self.boxes.count; i++){
+        
+        Box *box = [self.boxes objectAtIndex:i];
+        if(selectedBox == NO_BOX_SELECTED)
+            [self drawBox:box context:context alpha:1 corners:false];
+        else if(selectedBox == i)
+            [self drawBox:box context:context alpha:1 corners:true];
+        else
+            [self drawBox:box context:context alpha:0.3 corners:false];
+                
     }
 }
 
--(void) drawSelectedBox:(CGContextRef )context :(Box *) box1
+
+-(void) drawBox:(Box *)box context:(CGContextRef)context alpha:(CGFloat)alpha corners:(BOOL)hasCorners
 {
     
-    CGPoint upperRight = CGPointMake([box1 lowerRight].x, [box1 upperLeft].y);
-    CGPoint lowerLeft = CGPointMake([box1 upperLeft].x, [box1 lowerRight].y);
+    CGPoint upperRight = CGPointMake([box lowerRight].x, [box upperLeft].y);
+    CGPoint lowerLeft = CGPointMake([box upperLeft].x, [box lowerRight].y);
+    
     // DRAW RECT
-    CGRect rect = CGRectMake([box1 upperLeft].x, [box1 upperLeft].y, [box1 lowerRight].x-[box1 upperLeft].x, [box1 lowerRight].y-[box1 upperLeft].y);
-    //CGContextSetRGBStrokeColor(context, 255, 0, 0, 1);
-    CGContextSetStrokeColorWithColor(context, box1.color.CGColor);
-    CGContextStrokeRect(context, rect );
-    // DRAW CORNERS
-    CGContextStrokeEllipseInRect(context, CGRectMake([box1 upperLeft].x-LINEWIDTH, [box1 upperLeft].y-LINEWIDTH, 2*LINEWIDTH, 2*LINEWIDTH));
-    CGContextStrokeEllipseInRect(context, CGRectMake([box1 lowerRight].x-LINEWIDTH, [box1 lowerRight].y-LINEWIDTH, 2*LINEWIDTH, 2*LINEWIDTH));
-    CGContextStrokeEllipseInRect(context, CGRectMake(upperRight.x-LINEWIDTH, upperRight.y-LINEWIDTH, 2*LINEWIDTH, 2*LINEWIDTH));
-    CGContextStrokeEllipseInRect(context, CGRectMake(lowerLeft.x-LINEWIDTH, lowerLeft.y-LINEWIDTH, 2*LINEWIDTH, 2*LINEWIDTH));
-    CGContextSetRGBStrokeColor(context, 255, 255, 255, 1);
-    CGContextSetLineWidth(context, 1);
-    CGContextStrokeEllipseInRect(context, CGRectMake([box1 upperLeft].x-1.5*LINEWIDTH, [box1 upperLeft].y-1.5*LINEWIDTH, 3*LINEWIDTH, 3*LINEWIDTH));
-    CGContextStrokeEllipseInRect(context, CGRectMake([box1 lowerRight].x-1.5*LINEWIDTH, [box1 lowerRight].y-1.5*LINEWIDTH, 3*LINEWIDTH, 3*LINEWIDTH));
-    CGContextStrokeEllipseInRect(context, CGRectMake(upperRight.x-1.5*LINEWIDTH, upperRight.y-1.5*LINEWIDTH, 3*LINEWIDTH, 3*LINEWIDTH));
-    CGContextStrokeEllipseInRect(context, CGRectMake(lowerLeft.x-1.5*LINEWIDTH, lowerLeft.y-1.5*LINEWIDTH, 3*LINEWIDTH, 3*LINEWIDTH));
+    CGContextSetLineWidth(context, LINEWIDTH);
+    CGRect rect = CGRectMake([box upperLeft].x, [box upperLeft].y, [box lowerRight].x-[box upperLeft].x, [box lowerRight].y-[box upperLeft].y);
+    const CGFloat *components = CGColorGetComponents(box.color.CGColor);
+    CGContextSetRGBStrokeColor(context, components[0] ,components[1],components[2], alpha);
+    CGContextStrokeRect(context, rect);
     
+    // DRAW CORNERS
+    if(hasCorners){
+        CGContextStrokeEllipseInRect(context, CGRectMake([box upperLeft].x-LINEWIDTH, [box upperLeft].y-LINEWIDTH, 2*LINEWIDTH, 2*LINEWIDTH));
+        CGContextStrokeEllipseInRect(context, CGRectMake([box lowerRight].x-LINEWIDTH, [box lowerRight].y-LINEWIDTH, 2*LINEWIDTH, 2*LINEWIDTH));
+        CGContextStrokeEllipseInRect(context, CGRectMake(upperRight.x-LINEWIDTH, upperRight.y-LINEWIDTH, 2*LINEWIDTH, 2*LINEWIDTH));
+        CGContextStrokeEllipseInRect(context, CGRectMake(lowerLeft.x-LINEWIDTH, lowerLeft.y-LINEWIDTH, 2*LINEWIDTH, 2*LINEWIDTH));
+        CGContextSetRGBStrokeColor(context, 255, 255, 255, 1);
+        CGContextSetLineWidth(context, 1);
+        CGContextStrokeEllipseInRect(context, CGRectMake([box upperLeft].x-1.5*LINEWIDTH, [box upperLeft].y-1.5*LINEWIDTH, 3*LINEWIDTH, 3*LINEWIDTH));
+        CGContextStrokeEllipseInRect(context, CGRectMake([box lowerRight].x-1.5*LINEWIDTH, [box lowerRight].y-1.5*LINEWIDTH, 3*LINEWIDTH, 3*LINEWIDTH));
+        CGContextStrokeEllipseInRect(context, CGRectMake(upperRight.x-1.5*LINEWIDTH, upperRight.y-1.5*LINEWIDTH, 3*LINEWIDTH, 3*LINEWIDTH));
+        CGContextStrokeEllipseInRect(context, CGRectMake(lowerLeft.x-1.5*LINEWIDTH, lowerLeft.y-1.5*LINEWIDTH, 3*LINEWIDTH, 3*LINEWIDTH));
+    }
 }
 
--(void) drawBox:(CGContextRef )context :(Box *)box1 :(CGFloat) alpha
-{
-    const CGFloat *components = CGColorGetComponents(box1.color.CGColor);
-    CGContextBeginPath(context);
-    CGContextSetRGBStrokeColor(context, components[0] ,components[1],components[2], alpha);
-    CGContextAddRect(context, CGRectMake([box1 upperLeft].x, [box1 upperLeft].y, [box1 lowerRight].x-[box1 upperLeft].x, [box1 lowerRight].y-[box1 upperLeft].y) );
-    CGContextClosePath(context);
-    CGContextStrokePath(context);
-}
+
 
 
 #pragma mark -
@@ -116,7 +113,7 @@
     
     //a box is selected
     if (selectedBox != -1) {
-        Box *currentBox = [self.objects objectAtIndex: selectedBox];
+        Box *currentBox = [self.boxes objectAtIndex: selectedBox];
         [currentBox setBounds:self.frame];
 
         if ((CGRectContainsPoint(CGRectMake([currentBox upperLeft].x-DET*LINEWIDTH, [currentBox upperLeft].y-DET*LINEWIDTH,2*DET*LINEWIDTH,2*DET*LINEWIDTH), location)))  {
@@ -158,7 +155,7 @@
         
         if (selectedBox != -1) {
             [self.delegate hiddenTextField:NO];
-            Box *currentBox=[self.objects objectAtIndex: selectedBox];
+            Box *currentBox=[self.boxes objectAtIndex: selectedBox];
             [self.delegate selectedAnObject:YES];
             [currentBox setBounds:self.frame];
 
@@ -184,12 +181,12 @@
     [self.delegate hiddenTextField:YES];
     Box *currentBox;
     if (move) {
-        currentBox = [self.objects objectAtIndex:selectedBox];
+        currentBox = [self.boxes objectAtIndex:selectedBox];
         [currentBox updatePoints:firstLocation :location];        
     }
     
     else if (size){
-        currentBox = [self.objects objectAtIndex:selectedBox];
+        currentBox = [self.boxes objectAtIndex:selectedBox];
 
         switch (corner) {
             case 1:
@@ -220,7 +217,7 @@
         [self.delegate objectModified];
     
     if (selectedBox != -1) {
-        Box *currentBox =  [self.objects objectAtIndex: selectedBox];
+        Box *currentBox =  [self.boxes objectAtIndex: selectedBox];
         [self.delegate correctOrientation:currentBox.upperLeft :currentBox.lowerRight SuperviewFrame:self.frame];
         [self.delegate hiddenTextField:NO];
     }
@@ -239,13 +236,13 @@
 -(int)boxInterior:(int)i :(CGPoint)point
 {
 
-    int num = [self.objects count];
+    int num = [self.boxes count];
     for (int j=i+1; j<num; j++) {
-        Box *newBox = [self.objects objectAtIndex: j];
+        Box *newBox = [self.boxes objectAtIndex: j];
        // [newBox setBounds:self.frame];
 
         if (CGRectContainsPoint( CGRectMake([newBox upperLeft].x-LINEWIDTH, [newBox upperLeft].y-LINEWIDTH, [newBox lowerRight].x-[newBox upperLeft].x+2*LINEWIDTH, [newBox lowerRight].y-[newBox upperLeft].y+2*LINEWIDTH),point)) {
-            Box *currentBox = [self.objects objectAtIndex: i];
+            Box *currentBox = [self.boxes objectAtIndex: i];
            // [currentBox setBounds:self.frame];
 
             if (CGRectContainsRect( CGRectMake([newBox upperLeft].x-LINEWIDTH, [newBox upperLeft].y-LINEWIDTH, [newBox lowerRight].x-[newBox upperLeft].x+2*LINEWIDTH, [newBox lowerRight].y-[newBox upperLeft].y+2*LINEWIDTH),CGRectMake([currentBox upperLeft].x-LINEWIDTH, [currentBox upperLeft].y-LINEWIDTH, [currentBox lowerRight].x-[currentBox upperLeft].x+2*LINEWIDTH, [currentBox lowerRight].y-[currentBox upperLeft].y+2*LINEWIDTH))){
@@ -262,10 +259,10 @@
 
 -(int)whereIs:(CGPoint) point
 {
-    int num = [self.objects count];
+    int num = [self.boxes count];
     
     for (int j=0; j<num; j++) {
-        Box *newBox = [self.objects objectAtIndex: j];
+        Box *newBox = [self.boxes objectAtIndex: j];
         if (CGRectContainsPoint( CGRectMake([newBox upperLeft].x-LINEWIDTH, [newBox upperLeft].y-LINEWIDTH, [newBox lowerRight].x-[newBox upperLeft].x+2*LINEWIDTH, [newBox lowerRight].y-[newBox upperLeft].y+2*LINEWIDTH),point)) {
             return [self boxInterior:j :point];
         }
@@ -306,7 +303,7 @@
 
     selectedBox = i;
     if(i!=-1){
-        Box *currentBox = [self.objects objectAtIndex: selectedBox];
+        Box *currentBox = [self.boxes objectAtIndex: selectedBox];
 
         [self.delegate hiddenTextField:NO];
         [self.delegate stringLabel:currentBox.label];
@@ -327,7 +324,7 @@
 {
     [self.delegate hiddenTextField:YES];
     selectedBox = -1;
-    [self.objects removeAllObjects];
+    [self.boxes removeAllObjects];
     move = NO;
     size = NO;
 }

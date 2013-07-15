@@ -55,11 +55,13 @@
     
     //Load the request in the UIWebView.
 
+    dispatch_async(dispatch_get_main_queue(), ^{
     [self.website loadRequest:theRequest];
     [self.scrollView setContentSize:self.website.frame.size];
-
-
+    });
 }
+
+
 - (void) viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];

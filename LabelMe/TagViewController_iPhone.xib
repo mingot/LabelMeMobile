@@ -41,7 +41,6 @@
 				<int key="NSvFlags">-2147483356</int>
 				<string key="NSFrameSize">{130, 43}</string>
 				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
 				<string key="NSReuseIdentifierKey">_NS:9</string>
 				<bool key="IBUIOpaque">NO</bool>
 				<bool key="IBUIClipsSubviews">YES</bool>
@@ -85,7 +84,6 @@
 										<int key="NSvFlags">274</int>
 										<string key="NSFrameSize">{320, 460}</string>
 										<reference key="NSSuperview" ref="650956121"/>
-										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="304413901"/>
 										<string key="NSReuseIdentifierKey">_NS:9</string>
 										<int key="IBUIContentMode">1</int>
@@ -98,7 +96,6 @@
 										<array class="NSMutableArray" key="NSSubviews"/>
 										<string key="NSFrameSize">{320, 460}</string>
 										<reference key="NSSuperview" ref="650956121"/>
-										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="766307334"/>
 										<string key="NSReuseIdentifierKey">_NS:9</string>
 										<object class="NSColor" key="IBUIBackgroundColor" id="754136081">
@@ -111,7 +108,6 @@
 								</array>
 								<string key="NSFrameSize">{320, 460}</string>
 								<reference key="NSSuperview" ref="295885509"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="565334420"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -122,10 +118,9 @@
 								<array class="NSMutableArray" key="NSSubviews">
 									<object class="IBUIButton" id="717266463">
 										<reference key="NSNextResponder" ref="766307334"/>
-										<int key="NSvFlags">297</int>
-										<string key="NSFrame">{{260, 190}, {40, 79}}</string>
+										<int key="NSvFlags">265</int>
+										<string key="NSFrame">{{260, 361}, {40, 79}}</string>
 										<reference key="NSSuperview" ref="766307334"/>
-										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="402870903"/>
 										<string key="NSReuseIdentifierKey">_NS:9</string>
 										<bool key="IBUIOpaque">NO</bool>
@@ -147,7 +142,7 @@
 										</object>
 										<object class="NSCustomResource" key="IBUINormalImage">
 											<string key="NSClassName">NSImage</string>
-											<string key="NSResourceName">arowRight.png</string>
+											<string key="NSResourceName">arrowRight.png</string>
 										</object>
 										<object class="IBUIFontDescription" key="IBUIFontDescription" id="875739413">
 											<int key="type">2</int>
@@ -161,10 +156,9 @@
 									</object>
 									<object class="IBUIButton" id="912341066">
 										<reference key="NSNextResponder" ref="766307334"/>
-										<int key="NSvFlags">300</int>
-										<string key="NSFrame">{{20, 190}, {43, 79}}</string>
+										<int key="NSvFlags">268</int>
+										<string key="NSFrame">{{20, 361}, {43, 79}}</string>
 										<reference key="NSSuperview" ref="766307334"/>
-										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="717266463"/>
 										<string key="NSReuseIdentifierKey">_NS:9</string>
 										<bool key="IBUIOpaque">NO</bool>
@@ -180,7 +174,7 @@
 										<reference key="IBUINormalTitleShadowColor" ref="652894627"/>
 										<object class="NSCustomResource" key="IBUINormalImage">
 											<string key="NSClassName">NSImage</string>
-											<string key="NSResourceName">arowLeft.png</string>
+											<string key="NSResourceName">arrowLeft.png</string>
 										</object>
 										<reference key="IBUIFontDescription" ref="875739413"/>
 										<reference key="IBUIFont" ref="800667210"/>
@@ -188,7 +182,6 @@
 								</array>
 								<string key="NSFrameSize">{320, 460}</string>
 								<reference key="NSSuperview" ref="295885509"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="912341066"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<reference key="IBUIBackgroundColor" ref="754136081"/>
@@ -197,7 +190,6 @@
 						</array>
 						<string key="NSFrameSize">{320, 460}</string>
 						<reference key="NSSuperview" ref="191373211"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="650956121"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
@@ -216,7 +208,6 @@
 						<int key="NSvFlags">266</int>
 						<string key="NSFrame">{{0, 460}, {320, 44}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
-						<reference key="NSWindow"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -277,7 +268,6 @@
 				</array>
 				<string key="NSFrame">{{0, 64}, {320, 504}}</string>
 				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="295885509"/>
 				<object class="IBUISimulatedStatusBarMetrics" key="IBUISimulatedStatusBarMetrics">
 					<int key="IBUIStatusBarStyle">2</int>
@@ -829,8 +819,8 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="arowLeft.png">{25, 79}</string>
-			<string key="arowRight.png">{25, 79}</string>
+			<string key="arrowLeft.png">{30, 30}</string>
+			<string key="arrowRight.png">{30, 30}</string>
 		</dictionary>
 		<string key="IBCocoaTouchPluginVersion">2083</string>
 	</data>

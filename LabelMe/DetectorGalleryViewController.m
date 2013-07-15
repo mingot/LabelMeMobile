@@ -134,6 +134,7 @@
     self.navigationItem.rightBarButtonItem = self.editButton;
 
     self.plusButton =[[UIBarButtonItem alloc] initWithTitle:@"+" style:UIBarButtonItemStylePlain target:self action:@selector(addDetector:)];
+    [self.plusButton setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:20], UITextAttributeFont,nil] forState:UIControlStateNormal];
     self.navigationItem.leftBarButtonItem = self.plusButton;
     self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
     

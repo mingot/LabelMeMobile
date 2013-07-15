@@ -42,7 +42,7 @@
 //models
 @property (nonatomic, strong) NSMutableArray *items; //filenames ordered by update date
 @property (nonatomic, strong) NSMutableArray *labelsOrdered;
-//@property (nonatomic, strong) NSMutableDictionary *buttonsDictionary; //buttons stored to select all images when section name tapped
+
 @property (nonatomic, strong) NSMutableArray *buttonsArray; //each object is an array with the buttons for that category
 @property (nonatomic, strong) NSMutableArray *labelsArray; //each element of the array is a dictionary with the label as key and object the array of filenames
 
@@ -238,14 +238,14 @@
     if (self) {
         
         //objects initialization
-        self.selectedItems = [[NSMutableArray alloc]init];
-        self.selectedItemsSend = [[NSMutableArray alloc]init];
-        self.selectedItemsDelete = [[NSMutableArray alloc]init];
+        self.selectedItems = [[NSMutableArray alloc] init];
+        self.selectedItemsSend = [[NSMutableArray alloc] init];
+        self.selectedItemsDelete = [[NSMutableArray alloc] init];
         self.serverConnection = [[ServerConnection alloc] init];
         
         //tab bar
-        self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Gallery" image:nil tag:0];
-        [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"home.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"homeActive.png"]];
+        self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Labels" image:nil tag:0];
+        [self.tabBarItem setFinishedSelectedImage:[UIImage imageNamed:@"labels.png"] withFinishedUnselectedImage:[UIImage imageNamed:@"labelsDisabled.png"]];
         
         //saving Queue
         savingQueue = dispatch_queue_create("savingQueue", NULL);
@@ -259,7 +259,7 @@
     [super viewDidLoad];
 
     self.serverConnection.delegate = self;
-    self.title = @"Gallery"; //for back button
+    self.title = @"Labels"; //for back button
     photosWithErrors = 0;
     
     //Controllers
@@ -278,7 +278,7 @@
     [self.navigationController.toolbar setBarStyle:UIBarStyleBlackTranslucent];
 
     //titleView: LabelMe Logo and title images
-    UIImage *titleImage = [UIImage imageNamed:@"galleryTitle.png"];
+    UIImage *titleImage = [UIImage imageNamed:@"labelsTitle.png"];
     UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
     titleView.image = titleImage;
     [self.navigationItem setTitleView:titleView];
@@ -342,7 +342,7 @@
 {
     [super viewWillAppear:animated];
     
-    //in case of rotation
+    //in case of rotation, update view
     if(self.lastOrientation != [[UIDevice currentDevice] orientation]){
         self.buttonsArray = nil;
         [self.tableViewGrid reloadData];
@@ -384,7 +384,6 @@
 -(void) reloadGallery
 {
     //get sorted files by date of modification of the image
-
     self.items = nil;
     self.labelsOrdered = nil;
     self.labelsArray = nil;
