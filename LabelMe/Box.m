@@ -16,7 +16,6 @@
 @synthesize date = _date;
 @synthesize downloadDate = _downloadDate;
 
-static float LINEWIDTH = 6;
 
 - (id)init
 {
@@ -27,7 +26,6 @@ static float LINEWIDTH = 6;
         lowerRigth = CGPointMake(150, 150);
         self.label= @"";
         self.date= @"";
-
         self.color = [[UIColor alloc] init];
         sent = NO;
         
@@ -218,18 +216,17 @@ static float LINEWIDTH = 6;
 
 
 -(void)generateDateString
-{    
+{
+    const NSArray *MONTHS = [[NSArray alloc] initWithObjects:@"Jan",@"Feb",@"Mar",@"Apr",@"May",@"Jun",@"Jul",@"Aug",@"Sep",@"Oct",@"Nov",@"Dec",nil];
+    
     NSString *originalDate = [[NSString alloc] initWithString:[[[NSDate date] description] substringToIndex:19]];
     //NSString *originalDate = [[NSString alloc] initWithString:@"0101010101010101010"];
     NSString *time = [[NSString alloc] initWithString:[originalDate substringFromIndex:11]];
     NSString *day = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(8, 2)]];
     NSString *year = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(0, 4)]];
     NSString *month = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(5, 2)]];
-    int m = [month intValue];
-    
-    NSArray *months = [[NSArray alloc] initWithObjects:@"Jan",@"Feb",@"Mar",@"Apr",@"May",@"Jun",@"Jul",@"Aug",@"Sep",@"Oct",@"Nov",@"Dec",nil];
-    NSString *month2 = [months objectAtIndex:m-1];
-    NSString *tmp = [[NSString alloc] initWithFormat:@"%@-%@-%@-%@",day,month2,year,time ];
+    month = [MONTHS objectAtIndex:[month intValue]-1];
+    NSString *tmp = [[NSString alloc] initWithFormat:@"%@-%@-%@-%@",day,month,year,time ];
     self.date = tmp;
 }
 
@@ -288,11 +285,6 @@ static float LINEWIDTH = 6;
 -(CGPoint)bounds
 {
     return CGPointMake(RIGHTBOUND, LOWERBOUND);
-}
-
-+(void)setLINEWIDTH:(float)value
-{
-    LINEWIDTH = value;
 }
 
 - (CGRect) getRectangleForBox

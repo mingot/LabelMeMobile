@@ -37,8 +37,6 @@
     float RIGHTBOUND;
     float lineOriginal;
     float LINEWIDTH;
-    CGRect visibleFrame;
-
 }
 
 @property (nonatomic, weak) id <TagViewDelegate> delegate;
@@ -46,18 +44,12 @@
 @property (nonatomic, strong) NSArray *colorArray;
 @property (nonatomic, strong) NSString *filename; //Image filename
 
-
-
 - (void) setSelectedBox:(int) i;
 - (int) SelectedBox;
-- (void) drawBox:(CGContextRef )context :(Box *)box1 :(CGFloat)alpha;
-- (void) drawSelectedBox:(CGContextRef )context :(Box *) box;
+- (void) drawBox:(Box *)box context:(CGContextRef)context alpha:(CGFloat)alpha corners:(BOOL)hasCorners;
 - (void) reset;
 - (void)setLINEWIDTH:(float)factor;
 - (int)whereIs:(CGPoint) point;
 - (int)boxInterior:(int)i :(CGPoint)point;
-- (void)setVisibleFrame:(CGRect)rect;
-- (CGRect)visibleFrame;
-- (BOOL) anyBoxSelected;
 
 @end

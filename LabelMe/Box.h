@@ -18,6 +18,7 @@
     @public float LOWERBOUND;
     @public float LEFTBOUND;
     @public float RIGHTBOUND;
+    @public float LINEWIDTH;
     BOOL sent;
 }
 
@@ -40,7 +41,6 @@
 - (CGPoint) bounds;
 - (void) setSent:(BOOL)value;
 - (BOOL) sent;
-+ (void) setLINEWIDTH:(float)value;
 - (void) generateDateString;
 
 //returns the CGRect of the Box

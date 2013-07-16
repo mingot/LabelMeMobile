@@ -352,44 +352,13 @@
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    //calculate the visible frame for when adding a new box being adapted to the box
+    
+    self.previousButton.hidden = NO;
+    self.nextButton.hidden = NO;
+    
     if (scrollView.zoomScale > 1.0) {
-        
-        //disable buttons
         self.nextButton.hidden = YES;
         self.previousButton.hidden = YES;
-        
-        CGPoint point = self.tagView.frame.origin; // origin
-        CGPoint point2 = CGPointMake(0, 0); // size
-        
-        if (scrollView.contentOffset.y < self.tagView.frame.origin.y*scrollView.zoomScale) {
-            
-            point.y = scrollView.contentOffset.y/scrollView.zoomScale;
-            point2.y += self.tagView.frame.origin.y*scrollView.zoomScale - scrollView.contentOffset.y;
-        }
-        if ((scrollView.contentOffset.y + scrollView.frame.size.height-self.tagView.frame.origin.y*scrollView.zoomScale)>(self.tagView.frame.size.height)*scrollView.zoomScale) {
-            
-            point2.y += scrollView.contentOffset.y + scrollView.frame.size.height -(self.tagView.frame.size.height + self.tagView.frame.origin.y)*scrollView.zoomScale;
-            
-        }
-        if (scrollView.contentOffset.x< self.tagView.frame.origin.x*scrollView.zoomScale) {
-            point.x = scrollView.contentOffset.x/scrollView.zoomScale;
-            point2.x += self.tagView.frame.origin.x*scrollView.zoomScale - scrollView.contentOffset.x;
-            
-            
-        }
-        if ((scrollView.contentOffset.x + scrollView.frame.size.width -self.tagView.frame.size.width*scrollView.zoomScale)>(self.tagView.frame.origin.x)*scrollView.zoomScale) {
-            point2.x += scrollView.contentOffset.x + scrollView.frame.size.width -(self.tagView.frame.size.width + self.tagView.frame.origin.x)*scrollView.zoomScale;
-            
-            
-        }
-        CGRect rectvisible = CGRectMake(scrollView.contentOffset.x/scrollView.zoomScale - point.x, scrollView.contentOffset.y/scrollView.zoomScale - point.y, (scrollView.frame.size.width-point2.x)/scrollView.zoomScale, (scrollView.frame.size.height-point2.y)/scrollView.zoomScale);
-        [self.tagView setVisibleFrame:rectvisible];
-        
-    }else {
-        [self.tagView setVisibleFrame:CGRectMake(0, 0, self.tagView.frame.size.width, self.tagView.frame.size.height)];
-        self.previousButton.hidden = NO;
-        self.nextButton.hidden = NO;
     }
 }
 
@@ -450,8 +419,11 @@
  
     if (![self.tip isHidden])[self.tip setHidden:YES];
     
-    Box *box = [[Box alloc]initWithPoints:CGPointMake(self.tagView.visibleFrame.origin.x+(self.tagView.frame.size.width  - 100)/(2*self.scrollView.zoomScale),
-                                                      self.tagView.visibleFrame.origin.y+(self.tagView.frame.size.height  - 100)/(2*self.scrollView.zoomScale)) :CGPointMake(self.tagView.visibleFrame.origin.x+(self.tagView.frame.size.width  + 100)/(2*self.scrollView.zoomScale),self.tagView.visibleFrame.origin.y+(self.tagView.frame.size.height  + 100)/(2*self.scrollView.zoomScale))];
+    //get the current visible area
+    CGRect visibleRect = [self.scrollView convertRect:self.scrollView.bounds toView:self.composeView];
+    
+    Box *box = [[Box alloc] initWithPoints:CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width  - 100)/(2*self.scrollView.zoomScale),
+                                                      visibleRect.origin.y+(self.tagView.frame.size.height  - 100)/(2*self.scrollView.zoomScale)) :CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width  + 100)/(2*self.scrollView.zoomScale),visibleRect.origin.y+(self.tagView.frame.size.height  + 100)/(2*self.scrollView.zoomScale))];
     
     int num = self.tagView.boxes.count;
     [box setBounds:self.tagView.frame];
