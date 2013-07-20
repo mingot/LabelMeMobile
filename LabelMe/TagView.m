@@ -174,7 +174,7 @@
             [currentBox setBounds:self.frame];
 
             [self.delegate stringLabel:currentBox.label];
-            [self.delegate correctOrientation:currentBox.upperLeft :currentBox.lowerRight SuperviewFrame:self.frame];
+            [self.delegate correctOrientationForBox:currentBox SuperviewFrame:self.frame];
             move = NO;
             size = NO;
             
@@ -233,7 +233,7 @@
     
     if (selectedBox != NO_BOX_SELECTED) {
         Box *currentBox =  [self.boxes objectAtIndex: selectedBox];
-        [self.delegate correctOrientation:currentBox.upperLeft :currentBox.lowerRight SuperviewFrame:self.frame];
+        [self.delegate correctOrientationForBox:currentBox SuperviewFrame:self.frame];
         [self.delegate hiddenTextField:NO];
     }
     
@@ -293,11 +293,9 @@
 
 -(void) setSelectedBox:(int) i
 {
-
     selectedBox = i;
     if(i != NO_BOX_SELECTED){
-        Box *currentBox = [self.boxes objectAtIndex: selectedBox];
-
+        Box *currentBox = [self.boxes objectAtIndex:selectedBox];
         [self.delegate hiddenTextField:NO];
         [self.delegate stringLabel:currentBox.label];
     

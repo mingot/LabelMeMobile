@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Box.h"
 
 @interface UITextField (CorrectOrientation)
 
--(void)setCorrectOrientationWithCorners:(CGPoint)upperLeft : (CGPoint)lowerRight subviewFrame:(CGRect)viewFrame andViewSize:(CGSize)viewSize andScale:(float)scale;
+-(void)setCorrectOrientationForBox:(Box *)box subviewFrame:(CGRect)viewFrame andViewSize:(CGSize)viewSize andScale:(float)scale;
 
 @end

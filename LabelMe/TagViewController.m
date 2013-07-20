@@ -116,9 +116,11 @@
     self.scrollView.maximumZoomScale = 10.0;
     self.scrollView.delegate = self;
     
-    //labels
+    //labels (for labeling a new object)
     [self.label setBorderStyle:UITextBorderStyleNone];
     [self.label setKeyboardAppearance:UIKeyboardAppearanceAlert];
+    
+    //labelsview (for the table showing the boxes in the image)
     [self.labelsView setBackgroundColor:[UIColor clearColor]];
     [self.labelsView setHidden:YES];
     [self.labelsView setDelegate:self];
@@ -427,13 +429,20 @@
     
     int num = self.tagView.boxes.count;
     [box setBounds:self.tagView.frame];
-    [box generateDateString];
-    box.downloadDate = [NSDate date];
     box.color=[[self.tagView colorArray] objectAtIndex:(num%8)];
-    [[self.tagView boxes] addObject:box];
+    [self.tagView.boxes addObject:box];
     [self.tagView setSelectedBox:num];
 
-    [self.label setCorrectOrientationWithCorners:box.upperLeft :box.lowerRight subviewFrame:self.tagView.frame andViewSize:self.scrollView.frame.size andScale:self.scrollView.zoomScale];
+    //show the label
+    NSLog(@"tagview frame: %@", NSStringFromCGRect(self.tagView.frame));
+    NSLog(@"scrollview frame: %@", NSStringFromCGRect(self.scrollView.frame));
+    NSLog(@"visiblerect: %@", NSStringFromCGRect(visibleRect));
+    NSLog(@"");
+    
+    [self.label setCorrectOrientationForBox:box
+                               subviewFrame:self.tagView.frame
+                                andViewSize:self.scrollView.frame.size
+                                   andScale:self.scrollView.zoomScale];
     self.label.text = @"";
     self.label.hidden = NO;
     [self.tagView setNeedsDisplay];
@@ -443,15 +452,16 @@
         [self.labelsButton setSelected:NO];
     }
     
-
+    //TODO: refactor userDictionary and the way
+    //Update the number of boxes to be send
     NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
     if (dictnum.intValue < 0){
-        NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue -1];
+        NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue - 1];
         [self.userDictionary removeObjectForKey:self.filename];
         [self.userDictionary setObject:newdictnum forKey:self.filename];
     
     }else{
-        NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
+        NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue + 1];
         [self.userDictionary removeObjectForKey:self.filename];
         [self.userDictionary setObject:newdictnum forKey:self.filename];
     }
@@ -467,27 +477,29 @@
 
 - (IBAction)labelFinish:(id)sender
 {
-   int selected = [self.tagView SelectedBox];
-   self.label.text = [self.label.text replaceByUnderscore];
-        Box *box = [self.tagView.boxes objectAtIndex: selected];
-        if (![box.label isEqualToString:self.label.text]) {
-            
-            box.label = self.label.text;
-            [box.label replaceByUnderscore];
+    int selected = [self.tagView SelectedBox];
+    self.label.text = [self.label.text replaceByUnderscore];
+    Box *box = [self.tagView.boxes objectAtIndex:selected];
+    if (![box.label isEqualToString:self.label.text]) { //update the name
+
+        box.label = self.label.text;
+        [box.label replaceByUnderscore];
         
-            if (![self.label.text isEqualToString:@""]) {
-                for (int i=0; i<self.tagView.boxes.count; i++) {
-                    if (i==selected)
-                        continue;
-                    Box *b=[[self.tagView boxes] objectAtIndex: i];
-                    if ([box.label isEqualToString:b.label]) {
-                        box.color = b.color;
-                        break;
-                    }
+        //put the boxes corresponding to the same object with the same color
+        if (![self.label.text isEqualToString:@""]) {
+            for (int i=0; i<self.tagView.boxes.count; i++) {
+                if (i==selected)
+                    continue;
+                Box *oldBox = [self.tagView.boxes objectAtIndex:i];
+                if ([box.label isEqualToString:oldBox.label]) {
+                    box.color = oldBox.color;
+                    break;
                 }
             }
-            [self objectModified];
         }
+        [self objectModified];
+    }
+    
     [self.tagView setNeedsDisplay];
 }
 
@@ -765,9 +777,12 @@
     [self.label setHidden:value];
 }
 
--(void)correctOrientation:(CGPoint)upperLeft :(CGPoint)lowerRight SuperviewFrame:(CGRect)viewSize
+-(void)correctOrientationForBox:(Box *)box SuperviewFrame:(CGRect)viewSize
 {
-    [self.label setCorrectOrientationWithCorners:upperLeft :lowerRight subviewFrame:viewSize andViewSize:self.scrollView.frame.size andScale:self.scrollView.zoomScale];
+    [self.label setCorrectOrientationForBox:box
+                               subviewFrame:viewSize
+                                andViewSize:self.scrollView.frame.size
+                                   andScale:self.scrollView.zoomScale];
 }
 
 -(void)selectedAnObject:(BOOL)value
@@ -882,7 +897,7 @@
     [self.scrollView zoomToRect:CGRectMake(box.upperLeft.x+self.tagView.frame.origin.x-10, box.upperLeft.y+self.tagView.frame.origin.y-10, box.lowerRight.x - box.upperLeft.x+20, box.lowerRight.y - box.upperLeft.y+20) animated:YES];
     [self.tagView setLINEWIDTH:self.scrollView.zoomScale];
     [self selectedAnObject:YES];
-    [self correctOrientation:box.upperLeft :box.lowerRight SuperviewFrame:self.tagView.frame];
+    [self correctOrientationForBox:box SuperviewFrame:self.tagView.frame];
 }
 
 

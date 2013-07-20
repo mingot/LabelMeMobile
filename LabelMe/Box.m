@@ -25,8 +25,9 @@
         upperLeft = CGPointMake(0, 0 );
         lowerRigth = CGPointMake(150, 150);
         self.label= @"";
-        self.date= @"";
+        self.date= [self generateDateString];
         self.color = [[UIColor alloc] init];
+        self.downloadDate = [NSDate date];
         sent = NO;
         
     }
@@ -39,7 +40,9 @@
     if (self) {
         upperLeft = upper;
         lowerRigth = lower;
+        self.date = [self generateDateString];
         self.label= [NSString stringWithFormat:@""];
+        self.downloadDate = [NSDate date];
         sent = NO;
     }
     return self;
@@ -215,7 +218,7 @@
 }
 
 
--(void)generateDateString
+- (NSString *)generateDateString
 {
     const NSArray *MONTHS = [[NSArray alloc] initWithObjects:@"Jan",@"Feb",@"Mar",@"Apr",@"May",@"Jun",@"Jul",@"Aug",@"Sep",@"Oct",@"Nov",@"Dec",nil];
     
@@ -226,8 +229,8 @@
     NSString *year = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(0, 4)]];
     NSString *month = [[NSString alloc] initWithString:[originalDate substringWithRange:NSMakeRange(5, 2)]];
     month = [MONTHS objectAtIndex:[month intValue]-1];
-    NSString *tmp = [[NSString alloc] initWithFormat:@"%@-%@-%@-%@",day,month,year,time ];
-    self.date = tmp;
+    
+    return [[NSString alloc] initWithFormat:@"%@-%@-%@-%@",day,month,year,time ]; 
 }
 
 -(id) initWithCoder:(NSCoder *)aDecoder

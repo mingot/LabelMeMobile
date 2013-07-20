@@ -17,7 +17,7 @@
 -(void)selectedAnObject:(BOOL)value;
 -(void)hiddenTextField:(BOOL)value;
 -(void)stringLabel:(NSString *)string;
--(void)correctOrientation:(CGPoint)upperLeft : (CGPoint)lowerRight SuperviewFrame:(CGRect)viewSize;
+-(void)correctOrientationForBox:(Box *)box SuperviewFrame:(CGRect)viewSize;
 
 @end
 

@@ -41,7 +41,7 @@
 - (CGPoint) bounds;
 - (void) setSent:(BOOL)value;
 - (BOOL) sent;
-- (void) generateDateString;
+- (NSString *) generateDateString;
 
 //returns the CGRect of the Box
 - (CGRect) getRectangleForBox;
