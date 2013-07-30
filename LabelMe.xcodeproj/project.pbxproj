@@ -155,6 +155,8 @@
 		FC3A87DD1767CE5E00236A9B /* labelsTitle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC3A87DB1767CE5E00236A9B /* labelsTitle@2x.png */; };
 		FC3A87E01767CFC500236A9B /* settingsTitle.png in Resources */ = {isa = PBXBuildFile; fileRef = FC3A87DE1767CFC400236A9B /* settingsTitle.png */; };
 		FC3A87E11767CFC500236A9B /* settingsTitle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC3A87DF1767CFC500236A9B /* settingsTitle@2x.png */; };
+		FC447A7617A84ACC004AA88B /* BoxTouchHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A7517A84ACC004AA88B /* BoxTouchHandler.m */; };
+		FC447A7917A84AE4004AA88B /* BoxDrawer.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A7817A84AE4004AA88B /* BoxDrawer.m */; };
 		FC4B0A2C172EC0C200A099A0 /* switch_camera.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2B172EC0C200A099A0 /* switch_camera.png */; };
 		FC4C5E1D174D63D100D26331 /* UIImage+Rotation.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */; };
 		FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC4D68801716164E002A73AD /* CoreMotion.framework */; };
@@ -415,6 +417,10 @@
 		FC3A87DB1767CE5E00236A9B /* labelsTitle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "labelsTitle@2x.png"; sourceTree = "<group>"; };
 		FC3A87DE1767CFC400236A9B /* settingsTitle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settingsTitle.png; sourceTree = "<group>"; };
 		FC3A87DF1767CFC500236A9B /* settingsTitle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "settingsTitle@2x.png"; sourceTree = "<group>"; };
+		FC447A7417A84ACC004AA88B /* BoxTouchHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BoxTouchHandler.h; path = ../BoxTouchHandler.h; sourceTree = "<group>"; };
+		FC447A7517A84ACC004AA88B /* BoxTouchHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BoxTouchHandler.m; path = ../BoxTouchHandler.m; sourceTree = "<group>"; };
+		FC447A7717A84AE4004AA88B /* BoxDrawer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BoxDrawer.h; path = ../BoxDrawer.h; sourceTree = "<group>"; };
+		FC447A7817A84AE4004AA88B /* BoxDrawer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BoxDrawer.m; path = ../BoxDrawer.m; sourceTree = "<group>"; };
 		FC4B0A2B172EC0C200A099A0 /* switch_camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switch_camera.png; sourceTree = "<group>"; };
 		FC4C5E1B174D63D100D26331 /* UIImage+Rotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Rotation.h"; sourceTree = "<group>"; };
 		FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Rotation.m"; sourceTree = "<group>"; };
@@ -863,6 +869,10 @@
 				A5480D6F16179557009F630D /* TagViewController_iPhone.xib */,
 				A5480D721617969A009F630D /* TagView.h */,
 				A5480D731617969A009F630D /* TagView.m */,
+				FC447A7717A84AE4004AA88B /* BoxDrawer.h */,
+				FC447A7817A84AE4004AA88B /* BoxDrawer.m */,
+				FC447A7417A84ACC004AA88B /* BoxTouchHandler.h */,
+				FC447A7517A84ACC004AA88B /* BoxTouchHandler.m */,
 				A5480D7516179D8E009F630D /* Box.h */,
 				A5480D7616179D8E009F630D /* Box.m */,
 			);
@@ -1335,6 +1345,8 @@
 				FC4C5E1D174D63D100D26331 /* UIImage+Rotation.m in Sources */,
 				FCB97DBB175F9486007B5AEE /* ImageCell.m in Sources */,
 				FCB97DC0175FDBC2007B5AEE /* CustomUITableViewCell.m in Sources */,
+				FC447A7617A84ACC004AA88B /* BoxTouchHandler.m in Sources */,
+				FC447A7917A84AE4004AA88B /* BoxDrawer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

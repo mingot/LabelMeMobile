@@ -63,6 +63,8 @@
 //info label
 @property (weak, nonatomic) IBOutlet UILabel *infoLabel;
 
+
+
 //settings view
 @property (weak, nonatomic) IBOutlet UIView *settingsView;
 - (IBAction)showSettingsAction:(id)sender;

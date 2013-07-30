@@ -419,10 +419,10 @@
         accessory.image = [UIImage imageNamed:@"tick.png"];
         ret = accessory;
         
-    }else{
-        int number = num.intValue < 0 ? abs(num.intValue+1):num.intValue;
+    }else{ 
+        int numberBoxesToUpdate = num.intValue < 0 ? abs(num.intValue+1):num.intValue;
         UIColor *color = num.intValue < 0 ? [UIColor redColor]:[UIColor orangeColor];
-        NSString *numberString = [NSString stringWithFormat:@"%d", number];
+        NSString *numberString = [NSString stringWithFormat:@"%d", numberBoxesToUpdate];
         CustomBadge *accessory = [CustomBadge customBadgeWithString:numberString withStringColor:[UIColor whiteColor] withInsetColor:color withBadgeFrame:YES withBadgeFrameColor:[UIColor whiteColor] withScale:1.0 withShining:YES];
         accessory.frame = CGRectMake(size.width- 0.30*size2.width, 0, 0.30*size2.width, 0.30*size2.width);
         ret = accessory;

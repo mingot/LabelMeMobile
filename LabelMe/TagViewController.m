@@ -439,10 +439,8 @@
     NSLog(@"visiblerect: %@", NSStringFromCGRect(visibleRect));
     NSLog(@"");
     
-    [self.label setCorrectOrientationForBox:box
-                               subviewFrame:self.tagView.frame
-                                andViewSize:self.scrollView.frame.size
-                                   andScale:self.scrollView.zoomScale];
+    [self.label fitForBox:box onTagViewFrame:self.tagView.frame andScale:self.scrollView.zoomScale];
+    
     self.label.text = @"";
     self.label.hidden = NO;
     [self.tagView setNeedsDisplay];
@@ -778,11 +776,8 @@
 }
 
 -(void)correctOrientationForBox:(Box *)box SuperviewFrame:(CGRect)viewSize
-{
-    [self.label setCorrectOrientationForBox:box
-                               subviewFrame:viewSize
-                                andViewSize:self.scrollView.frame.size
-                                   andScale:self.scrollView.zoomScale];
+{    
+    [self.label fitForBox:box onTagViewFrame:self.tagView.frame andScale:self.scrollView.zoomScale];
 }
 
 -(void)selectedAnObject:(BOOL)value

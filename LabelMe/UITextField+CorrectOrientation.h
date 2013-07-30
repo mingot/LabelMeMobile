@@ -11,6 +11,6 @@
 
 @interface UITextField (CorrectOrientation)
 
--(void)setCorrectOrientationForBox:(Box *)box subviewFrame:(CGRect)viewFrame andViewSize:(CGSize)viewSize andScale:(float)scale;
+-(void)fitForBox:(Box *)box onTagViewFrame:(CGRect)viewFrame andScale:(float)scale;
 
 @end

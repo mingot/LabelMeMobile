@@ -10,67 +10,63 @@
 
 @implementation UITextField (CorrectOrientation)
 
--(void)setCorrectOrientationForBox:(Box *)box subviewFrame:(CGRect)viewFrame andViewSize:(CGSize)viewSize andScale:(float)scale
+-(void)fitForBox:(Box *)box onTagViewFrame:(CGRect)tagViewFrame andScale:(float)scale;
 {
-    //viewframe = tagview.frame
-    //viewsize = scrollview.frame.size
-    //scael = scrollview.zoomscale
-    float topDif = box.upperLeft.y + viewFrame.origin.y;
-    float bottomDif = viewSize.height - box.lowerRight.y - viewFrame.origin.y;
-    float rightDif = viewSize.width - box.lowerRight.x - viewFrame.origin.x;
-    float leftDif = box.upperLeft.x + viewFrame.origin.x;
+    float topDif = box.upperLeft.y + tagViewFrame.origin.y;
+    float topWidthDif = tagViewFrame.size.width - box.upperLeft.x;
+    float topHeightDif = tagViewFrame.size.height - box.upperLeft.y;
+    float bottomDif = tagViewFrame.size.height - box.lowerRight.y;
+    float rightDif = tagViewFrame.size.width - box.lowerRight.x;
+    float leftDif = box.upperLeft.x + tagViewFrame.origin.x;
     
-    if ((topDif >= self.frame.size.height) && (viewFrame.size.width - box.upperLeft.x >= self.frame.size.width) ){
+    NSString *imageName;
+    CGFloat x, y;
+    int tag;
+    
+    if (topDif >= self.frame.size.height && topWidthDif >= self.frame.size.width){
 
-        // op1 115x87; 57x43
-        [self setBackground:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )]];
-        self.frame = CGRectMake((box.upperLeft.x + viewFrame.origin.x)*scale,
-                                (box.upperLeft.y + viewFrame.origin.y)*scale - self.frame.size.height,
-                                self.frame.size.width,
-                                self.frame.size.height);
-        self.tag = 0;
+        //top
+        imageName = @"globo.png";
+        x = (box.upperLeft.x + tagViewFrame.origin.x)*scale;
+        y = (box.upperLeft.y + tagViewFrame.origin.y)*scale - self.frame.size.height;
+        tag = 0;
         
-    }else if ((rightDif >= self.frame.size.width) && (viewFrame.size.height - box.upperLeft.y >= self.frame.size.height) ){
+    }else if (rightDif >= self.frame.size.width && topHeightDif >= self.frame.size.height){
         
-        // op 3
-        [self setBackground:[[UIImage imageNamed:@"globo2.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )]];
-        self.frame = CGRectMake((box.lowerRight.x +viewFrame.origin.x)*scale,
-                                (box.upperLeft.y +viewFrame.origin.y)*scale,
-                                self.frame.size.width,
-                                self.frame.size.height);
-        self.tag = 2;
+        //right
+        imageName = @"globo2.png";
+        x = (box.lowerRight.x + tagViewFrame.origin.x)*scale;
+        y = (box.upperLeft.y + tagViewFrame.origin.y)*scale;
+        tag = 2;
         
-    }else if((bottomDif >= self.frame.size.height) && (viewFrame.size.width - box.upperLeft.x >= self.frame.size.width)){
+    }else if(bottomDif >= self.frame.size.height && topWidthDif >= self.frame.size.width){
         
-        // op2
-        [self setBackground:[[UIImage imageNamed:@"globo2.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )]];
-        self.frame = CGRectMake((box.upperLeft.x+viewFrame.origin.x)*scale,
-                                (box.lowerRight.y+viewFrame.origin.y)*scale,
-                                self.frame.size.width,
-                                self.frame.size.height);
-        self.tag = 1;
-     
+        //bottom
+        imageName = @"globo2.png";
+        x = (box.upperLeft.x + tagViewFrame.origin.x)*scale;
+        y = (box.lowerRight.y + tagViewFrame.origin.y)*scale;
+        tag = 1;
         
-    }else if ((leftDif >= self.frame.size.width) && (viewFrame.size.height - box.upperLeft.y >= self.frame.size.height)){
+    }else if (leftDif >= self.frame.size.width && topHeightDif >= self.frame.size.height){
         
-        // op 4
-        [self setBackground:[[UIImage imageNamed:@"globo3.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23)]];
-        self.frame = CGRectMake((box.upperLeft.x +viewFrame.origin.x)*scale -self.frame.size.width,
-                                (box.upperLeft.y +viewFrame.origin.y)*scale,
-                                self.frame.size.width,
-                                self.frame.size.height);
-        self.tag = 3;
+        //left
+        imageName = @"globo3.png";
+        x = (box.upperLeft.x + tagViewFrame.origin.x)*scale - self.frame.size.width;
+        y = (box.upperLeft.y + tagViewFrame.origin.y)*scale;
+        tag = 3;
 
     }else{
         
         // OP 5
-        [self setBackground:[[UIImage imageNamed:@"globo2.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )]];
-        self.frame = CGRectMake((box.upperLeft.x+viewFrame.origin.x)*scale,
-                                (box.upperLeft.y +viewFrame.origin.y)*scale,
-                                self.frame.size.width,
-                                self.frame.size.height);
-        self.tag = 4;
+        imageName = @"globo2.png";
+        x = (box.upperLeft.x + tagViewFrame.origin.x)*scale;
+        y = (box.upperLeft.y + tagViewFrame.origin.y)*scale;
+        tag = 4;
     }
+    
+    [self setBackground:[[UIImage imageNamed:imageName] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )]];
+    self.frame = CGRectMake(x, y, self.frame.size.width, self.frame.size.height);
+    self.tag = tag;
 }
 
 @end

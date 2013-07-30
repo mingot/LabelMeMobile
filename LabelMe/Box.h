@@ -36,8 +36,8 @@
 - (CGPoint) upperLeft;
 - (CGPoint) lowerRight;
 - (void) updatePoints:(CGPoint)start :(CGPoint) end;
-- (void) updateUpperLeft:(CGPoint)start :(CGPoint) end;
-- (void) updateLowerRight:(CGPoint)start :(CGPoint) end;
+//- (void) updateUpperLeft:(CGPoint)start :(CGPoint) end;
+//- (void) updateLowerRight:(CGPoint)start :(CGPoint) end;
 - (CGPoint) bounds;
 - (void) setSent:(BOOL)value;
 - (BOOL) sent;
