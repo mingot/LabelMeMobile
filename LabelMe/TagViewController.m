@@ -116,10 +116,6 @@
     self.scrollView.maximumZoomScale = 10.0;
     self.scrollView.delegate = self;
     
-    //labels (for labeling a new object)
-    [self.label setBorderStyle:UITextBorderStyleNone];
-    [self.label setKeyboardAppearance:UIKeyboardAppearanceAlert];
-    
     //labelsview (for the table showing the boxes in the image)
     [self.labelsView setBackgroundColor:[UIColor clearColor]];
     [self.labelsView setHidden:YES];
@@ -168,7 +164,6 @@
     [self.scrollView addSubview:self.tip];
     [self.scrollView addSubview:self.nextButton];
     [self.scrollView addSubview:self.previousButton];
-    [self.scrollView addSubview:self.label];
     [self.scrollView addSubview:self.labelsView];
     [self.scrollView addSubview:self.sendingView];
     
@@ -234,7 +229,7 @@
     if (!self.tagView.userInteractionEnabled){
         self.tagView.userInteractionEnabled = YES;
         self.scrollView.frame = CGRectMake(0 , 0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
-        [self.label resignFirstResponder];
+//        [self.label resignFirstResponder];
     }
     
     self.labelsView.hidden = YES;
@@ -243,7 +238,6 @@
     [self.scrollView setZoomScale:1.0 animated:NO];
     [self.tagView setLineWidthForZoomFactor:1.0];
     [self.imageView setImage:nil];
-    self.label.hidden = YES;
     [self.tagView.boxes removeAllObjects];
     
     
@@ -395,7 +389,7 @@
 
 	self.scrollView.frame = viewFrame;
 
-    [self.scrollView scrollRectToVisible:self.label.frame animated:YES];
+//    [self.scrollView scrollRectToVisible:self.label.frame animated:YES];
 	keyboardVisible = YES;
 }
 
@@ -432,17 +426,7 @@
     int num = self.tagView.boxes.count;
     [self.tagView.boxes addObject:box];
     [self.tagView setSelectedBox:num];
-
-    //show the label
-    NSLog(@"tagview frame: %@", NSStringFromCGRect(self.tagView.frame));
-    NSLog(@"scrollview frame: %@", NSStringFromCGRect(self.scrollView.frame));
-    NSLog(@"visiblerect: %@", NSStringFromCGRect(visibleRect));
-    NSLog(@"");
     
-    [self.label fitForBox:box onTagViewFrame:self.tagView.frame andScale:self.scrollView.zoomScale];
-    
-    self.label.text = @"";
-    self.label.hidden = NO;
     [self.tagView setNeedsDisplay];
 
     if (!self.labelsView.hidden) {
@@ -473,35 +457,6 @@
     [self.view endEditing:YES];
 }
 
-- (IBAction)labelFinish:(id)sender
-{
-    int selected = self.tagView.selectedBox;
-    self.label.text = [self.label.text replaceByUnderscore];
-    Box *box = [self.tagView.boxes objectAtIndex:selected];
-    if (![box.label isEqualToString:self.label.text]) { //update the name
-
-        box.label = self.label.text;
-        [box.label replaceByUnderscore];
-        
-        //put the boxes corresponding to the same object with the same color
-        if (![self.label.text isEqualToString:@""]) {
-            for (int i=0; i<self.tagView.boxes.count; i++) {
-                if (i==selected)
-                    continue;
-                Box *oldBox = [self.tagView.boxes objectAtIndex:i];
-                if ([box.label isEqualToString:oldBox.label]) {
-                    box.color = oldBox.color;
-                    break;
-                }
-            }
-        }
-        [self objectModified];
-    }
-    
-    [self.tagView setNeedsDisplay];
-}
-
-
 -(IBAction)doneAction:(id)sender
 {
     [self.scrollView setZoomScale:1.0 animated:NO];
@@ -528,13 +483,7 @@
     [self sendPhoto];
 }
 
--(IBAction)labelAction:(id)sender
-{    
-    //self.navigationItem.rightBarButtonItems = nil;
-    
-    /*UIBarButtonItem *labelBar = [[UIBarButtonItem alloc] initWithCustomView:self.label];
-    self.navigationItem.rightBarButtonItem =labelBar;*/
-}
+
 
 -(IBAction)deleteAction:(id)sender
 {
@@ -659,7 +608,6 @@
 
         [self.tagView.boxes removeObjectAtIndex:self.tagView.selectedBox];
         [self.tagView setSelectedBox:-1];
-        self.label.hidden=YES;
         [self saveThumbnail];
         [self saveDictionary];
         [self.tagView setNeedsDisplay];
@@ -765,20 +713,6 @@
     [self saveDictionary];
 }
 
--(void)stringLabel:(NSString *)string
-{
-    [self.label setText:string];
-}
-
--(void)hiddenTextField:(BOOL)value
-{
-    [self.label setHidden:value];
-}
-
--(void)correctOrientationForBox:(Box *)box SuperviewFrame:(CGRect)viewSize
-{    
-    [self.label fitForBox:box onTagViewFrame:self.tagView.frame andScale:self.scrollView.zoomScale];
-}
 
 -(void)selectedAnObject:(BOOL)value
 {    
@@ -892,7 +826,6 @@
     [self.scrollView zoomToRect:CGRectMake(box.upperLeft.x+self.tagView.frame.origin.x-10, box.upperLeft.y+self.tagView.frame.origin.y-10, box.lowerRight.x - box.upperLeft.x+20, box.lowerRight.y - box.upperLeft.y+20) animated:YES];
     [self.tagView setLineWidthForZoomFactor:self.scrollView.zoomScale];
     [self selectedAnObject:YES];
-    [self correctOrientationForBox:box SuperviewFrame:self.tagView.frame];
 }
 
 

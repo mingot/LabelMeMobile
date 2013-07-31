@@ -9,10 +9,20 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>LabelMeLogicTests.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>A5DCC5571628F5CB00AC9067</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FC447A7E17A99FC6004AA88B</key>
 		<dict>
 			<key>primary</key>
 			<true/>

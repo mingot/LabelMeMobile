@@ -155,8 +155,11 @@
 		FC3A87DD1767CE5E00236A9B /* labelsTitle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC3A87DB1767CE5E00236A9B /* labelsTitle@2x.png */; };
 		FC3A87E01767CFC500236A9B /* settingsTitle.png in Resources */ = {isa = PBXBuildFile; fileRef = FC3A87DE1767CFC400236A9B /* settingsTitle.png */; };
 		FC3A87E11767CFC500236A9B /* settingsTitle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FC3A87DF1767CFC500236A9B /* settingsTitle@2x.png */; };
-		FC447A7617A84ACC004AA88B /* BoxTouchHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A7517A84ACC004AA88B /* BoxTouchHandler.m */; };
-		FC447A7917A84AE4004AA88B /* BoxDrawer.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A7817A84AE4004AA88B /* BoxDrawer.m */; };
+		FC447A8117A99FC6004AA88B /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC447A8017A99FC6004AA88B /* SenTestingKit.framework */; };
+		FC447A8217A99FC6004AA88B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A558D61916134E0C001DED8C /* UIKit.framework */; };
+		FC447A8317A99FC6004AA88B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A558D61B16134E0C001DED8C /* Foundation.framework */; };
+		FC447A8917A99FC6004AA88B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FC447A8717A99FC6004AA88B /* InfoPlist.strings */; };
+		FC447A8C17A99FC6004AA88B /* LabelMeLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A8B17A99FC6004AA88B /* LabelMeLogicTests.m */; };
 		FC4B0A2C172EC0C200A099A0 /* switch_camera.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2B172EC0C200A099A0 /* switch_camera.png */; };
 		FC4C5E1D174D63D100D26331 /* UIImage+Rotation.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */; };
 		FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC4D68801716164E002A73AD /* CoreMotion.framework */; };
@@ -417,10 +420,13 @@
 		FC3A87DB1767CE5E00236A9B /* labelsTitle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "labelsTitle@2x.png"; sourceTree = "<group>"; };
 		FC3A87DE1767CFC400236A9B /* settingsTitle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settingsTitle.png; sourceTree = "<group>"; };
 		FC3A87DF1767CFC500236A9B /* settingsTitle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "settingsTitle@2x.png"; sourceTree = "<group>"; };
-		FC447A7417A84ACC004AA88B /* BoxTouchHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BoxTouchHandler.h; path = ../BoxTouchHandler.h; sourceTree = "<group>"; };
-		FC447A7517A84ACC004AA88B /* BoxTouchHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BoxTouchHandler.m; path = ../BoxTouchHandler.m; sourceTree = "<group>"; };
-		FC447A7717A84AE4004AA88B /* BoxDrawer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BoxDrawer.h; path = ../BoxDrawer.h; sourceTree = "<group>"; };
-		FC447A7817A84AE4004AA88B /* BoxDrawer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BoxDrawer.m; path = ../BoxDrawer.m; sourceTree = "<group>"; };
+		FC447A7F17A99FC6004AA88B /* LabelMeLogicTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LabelMeLogicTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC447A8017A99FC6004AA88B /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		FC447A8617A99FC6004AA88B /* LabelMeLogicTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "LabelMeLogicTests-Info.plist"; sourceTree = "<group>"; };
+		FC447A8817A99FC6004AA88B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		FC447A8A17A99FC6004AA88B /* LabelMeLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LabelMeLogicTests.h; sourceTree = "<group>"; };
+		FC447A8B17A99FC6004AA88B /* LabelMeLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LabelMeLogicTests.m; sourceTree = "<group>"; };
+		FC447A8D17A99FC6004AA88B /* LabelMeLogicTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LabelMeLogicTests-Prefix.pch"; sourceTree = "<group>"; };
 		FC4B0A2B172EC0C200A099A0 /* switch_camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switch_camera.png; sourceTree = "<group>"; };
 		FC4C5E1B174D63D100D26331 /* UIImage+Rotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Rotation.h"; sourceTree = "<group>"; };
 		FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Rotation.m"; sourceTree = "<group>"; };
@@ -551,6 +557,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FC447A7B17A99FC6004AA88B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC447A8117A99FC6004AA88B /* SenTestingKit.framework in Frameworks */,
+				FC447A8217A99FC6004AA88B /* UIKit.framework in Frameworks */,
+				FC447A8317A99FC6004AA88B /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -577,6 +593,7 @@
 			isa = PBXGroup;
 			children = (
 				A558D61F16134E0C001DED8C /* LabelMe */,
+				FC447A8417A99FC6004AA88B /* LabelMeLogicTests */,
 				A558D61816134E0C001DED8C /* Frameworks */,
 				A558D61616134E0C001DED8C /* Products */,
 			);
@@ -586,6 +603,7 @@
 			isa = PBXGroup;
 			children = (
 				A5DCC5A61628F5CB00AC9067 /* LabelMe.app */,
+				FC447A7F17A99FC6004AA88B /* LabelMeLogicTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -609,6 +627,7 @@
 				A558D61916134E0C001DED8C /* UIKit.framework */,
 				A558D61B16134E0C001DED8C /* Foundation.framework */,
 				A558D61D16134E0C001DED8C /* CoreGraphics.framework */,
+				FC447A8017A99FC6004AA88B /* SenTestingKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -784,6 +803,26 @@
 			name = "Navigation Bar";
 			sourceTree = "<group>";
 		};
+		FC447A8417A99FC6004AA88B /* LabelMeLogicTests */ = {
+			isa = PBXGroup;
+			children = (
+				FC447A8A17A99FC6004AA88B /* LabelMeLogicTests.h */,
+				FC447A8B17A99FC6004AA88B /* LabelMeLogicTests.m */,
+				FC447A8517A99FC6004AA88B /* Supporting Files */,
+			);
+			path = LabelMeLogicTests;
+			sourceTree = "<group>";
+		};
+		FC447A8517A99FC6004AA88B /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FC447A8617A99FC6004AA88B /* LabelMeLogicTests-Info.plist */,
+				FC447A8717A99FC6004AA88B /* InfoPlist.strings */,
+				FC447A8D17A99FC6004AA88B /* LabelMeLogicTests-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		FC4B0A2D172F352D00A099A0 /* news */ = {
 			isa = PBXGroup;
 			children = (
@@ -869,10 +908,6 @@
 				A5480D6F16179557009F630D /* TagViewController_iPhone.xib */,
 				A5480D721617969A009F630D /* TagView.h */,
 				A5480D731617969A009F630D /* TagView.m */,
-				FC447A7717A84AE4004AA88B /* BoxDrawer.h */,
-				FC447A7817A84AE4004AA88B /* BoxDrawer.m */,
-				FC447A7417A84ACC004AA88B /* BoxTouchHandler.h */,
-				FC447A7517A84ACC004AA88B /* BoxTouchHandler.m */,
 				A5480D7516179D8E009F630D /* Box.h */,
 				A5480D7616179D8E009F630D /* Box.m */,
 			);
@@ -1087,6 +1122,24 @@
 			productReference = A5DCC5A61628F5CB00AC9067 /* LabelMe.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FC447A7E17A99FC6004AA88B /* LabelMeLogicTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC447A9117A99FC6004AA88B /* Build configuration list for PBXNativeTarget "LabelMeLogicTests" */;
+			buildPhases = (
+				FC447A7A17A99FC6004AA88B /* Sources */,
+				FC447A7B17A99FC6004AA88B /* Frameworks */,
+				FC447A7C17A99FC6004AA88B /* Resources */,
+				FC447A7D17A99FC6004AA88B /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LabelMeLogicTests;
+			productName = LabelMeLogicTests;
+			productReference = FC447A7F17A99FC6004AA88B /* LabelMeLogicTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1110,6 +1163,7 @@
 			projectRoot = "";
 			targets = (
 				A5DCC5571628F5CB00AC9067 /* LabelMe */,
+				FC447A7E17A99FC6004AA88B /* LabelMeLogicTests */,
 			);
 		};
 /* End PBXProject section */
@@ -1294,7 +1348,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FC447A7C17A99FC6004AA88B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC447A8917A99FC6004AA88B /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		FC447A7D17A99FC6004AA88B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A5DCC5581628F5CB00AC9067 /* Sources */ = {
@@ -1345,8 +1423,14 @@
 				FC4C5E1D174D63D100D26331 /* UIImage+Rotation.m in Sources */,
 				FCB97DBB175F9486007B5AEE /* ImageCell.m in Sources */,
 				FCB97DC0175FDBC2007B5AEE /* CustomUITableViewCell.m in Sources */,
-				FC447A7617A84ACC004AA88B /* BoxTouchHandler.m in Sources */,
-				FC447A7917A84AE4004AA88B /* BoxDrawer.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC447A7A17A99FC6004AA88B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC447A8C17A99FC6004AA88B /* LabelMeLogicTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1357,6 +1441,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				A558D62316134E0C001DED8C /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		FC447A8717A99FC6004AA88B /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FC447A8817A99FC6004AA88B /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1507,6 +1599,67 @@
 			};
 			name = "Ad Hoc";
 		};
+		FC447A8E17A99FC6004AA88B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "LabelMeLogicTests/LabelMeLogicTests-Prefix.pch";
+				INFOPLIST_FILE = "LabelMeLogicTests/LabelMeLogicTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		FC447A8F17A99FC6004AA88B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "LabelMeLogicTests/LabelMeLogicTests-Prefix.pch";
+				INFOPLIST_FILE = "LabelMeLogicTests/LabelMeLogicTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+		FC447A9017A99FC6004AA88B /* Ad Hoc */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "LabelMeLogicTests/LabelMeLogicTests-Prefix.pch";
+				INFOPLIST_FILE = "LabelMeLogicTests/LabelMeLogicTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = "Ad Hoc";
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1529,6 +1682,15 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		FC447A9117A99FC6004AA88B /* Build configuration list for PBXNativeTarget "LabelMeLogicTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC447A8E17A99FC6004AA88B /* Debug */,
+				FC447A8F17A99FC6004AA88B /* Release */,
+				FC447A9017A99FC6004AA88B /* Ad Hoc */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

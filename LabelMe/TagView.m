@@ -11,6 +11,9 @@
 #import "Constants.h"
 #import "UITextField+CorrectOrientation.h"
 
+#import "NSString+checkValidity.h" //replacebyunderscore
+#import "UITextField+CorrectOrientation.h" //correct label position when selecting a box.
+
 #define NO_BOX_SELECTED -1
 #define kLineWidth 6
 
@@ -55,6 +58,20 @@
 
     selectedBox = NO_BOX_SELECTED;
     _lineWidth = kLineWidth;
+    
+    //label initialization
+    self.label = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 130, 40)];
+    [self.label setBorderStyle:UITextBorderStyleNone];
+    [self.label setKeyboardAppearance:UIKeyboardAppearanceAlert];
+    [self.label addTarget:self
+                   action:@selector(labelFinish:)
+         forControlEvents:UIControlEventEditingDidEndOnExit];
+    [self addSubview:self.label];
+    self.label.placeholder = @"Enter Label:";
+    self.label.textAlignment = UITextAlignmentCenter;
+    self.label.adjustsFontSizeToFitWidth = YES;
+    self.label.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+    self.label.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
 }
 
 - (id) initWithCoder:(NSCoder *)aDecoder
@@ -78,10 +95,11 @@
     selectedBox = i;
     if(i != NO_BOX_SELECTED){
         Box *currentBox = [self.boxes objectAtIndex:selectedBox];
-        [self.delegate hiddenTextField:NO];
-        [self.delegate stringLabel:currentBox.label];
+        [self.label fitForBox:currentBox onTagViewFrame:self.frame andScale:1.0];
+        self.label.hidden = NO;
+        self.label.text = currentBox.label;
         
-    }else [self.delegate hiddenTextField:YES];
+    }else self.label.hidden = YES; 
 }
 
 -(int) selectedBox
@@ -175,7 +193,7 @@
         }else if(corner == kExteriorBox){
             [self.delegate selectedAnObject:NO];
             selectedBox = NO_BOX_SELECTED;
-            [self.delegate hiddenTextField:YES];
+            self.label.hidden = YES;
             
         }else{
             size = YES;
@@ -188,13 +206,15 @@
         selectedBox = [self whereIs:location];
         
         if (selectedBox != NO_BOX_SELECTED) {
-            [self.delegate hiddenTextField:NO];
+            self.label.hidden = NO;
             [self.delegate selectedAnObject:YES];
             
-            Box *currentBox=[self.boxes objectAtIndex: selectedBox];
+            
+            Box *currentBox = [self.boxes objectAtIndex:selectedBox];
             currentBox.imageSize = self.frame.size;
-            [self.delegate stringLabel:currentBox.label];
-            [self.delegate correctOrientationForBox:currentBox SuperviewFrame:self.frame];
+            
+            self.label.text = currentBox.label;
+            [self.label fitForBox:currentBox onTagViewFrame:self.frame andScale:1];
             
             move = NO;
             size = NO;
@@ -211,7 +231,7 @@
 {
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint location = [touch locationInView:touch.view];
-    [self.delegate hiddenTextField:YES];
+    self.label.hidden = YES;
     
     if(selectedBox != NO_BOX_SELECTED){
         Box *currentBox = [self.boxes objectAtIndex:selectedBox];
@@ -229,13 +249,46 @@
     
     if (selectedBox != NO_BOX_SELECTED) {
         Box *currentBox =  [self.boxes objectAtIndex: selectedBox];
-        [self.delegate correctOrientationForBox:currentBox SuperviewFrame:self.frame];
-        [self.delegate hiddenTextField:NO];
+        
+        [self.label fitForBox:currentBox onTagViewFrame:self.frame andScale:1];
+        self.label.hidden = NO;
+        
     }
     
     move = NO;
     size = NO;
 
+    [self setNeedsDisplay];
+}
+
+#pragma mark -
+#pragma mark Label Handling
+
+- (IBAction)labelFinish:(id)sender
+{
+    int selected = self.selectedBox;
+    self.label.text = [self.label.text replaceByUnderscore];
+    Box *box = [self.boxes objectAtIndex:selected];
+    if (![box.label isEqualToString:self.label.text]) { //update the name
+        
+        box.label = self.label.text;
+        [box.label replaceByUnderscore];
+        
+        //put the boxes corresponding to the same object with the same color
+        if (![self.label.text isEqualToString:@""]) {
+            for (int i=0; i<self.boxes.count; i++) {
+                if (i==selected)
+                    continue;
+                Box *oldBox = [self.boxes objectAtIndex:i];
+                if ([box.label isEqualToString:oldBox.label]) {
+                    box.color = oldBox.color;
+                    break;
+                }
+            }
+        }
+        [self.delegate objectModified];
+    }
+    
     [self setNeedsDisplay];
 }
 

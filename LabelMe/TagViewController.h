@@ -29,7 +29,6 @@
 //views
 @property (weak, nonatomic) IBOutlet SendingView *sendingView;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
-@property (weak, nonatomic) IBOutlet UITextField *label;
 @property (weak, nonatomic) IBOutlet UIView *composeView;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet TagView *tagView;
@@ -61,8 +60,6 @@
 
 -(IBAction)addAction:(id)sender;
 - (IBAction)hideKeyboardAction:(id)sender;
--(IBAction)labelFinish:(id)sender;
--(IBAction)labelAction:(id)sender;
 -(IBAction)deleteAction:(id)sender;
 -(IBAction)sendAction:(id)sender;
 -(IBAction)doneAction:(id)sender;

@@ -65,7 +65,7 @@
     }
     
     [self setBackground:[[UIImage imageNamed:imageName] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )]];
-    self.frame = CGRectMake(x, y, self.frame.size.width, self.frame.size.height);
+    self.frame = CGRectMake(x, y-20, self.frame.size.width, self.frame.size.height);
     self.tag = tag;
 }
 

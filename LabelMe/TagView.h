@@ -13,11 +13,8 @@
 @protocol TagViewDelegate <NSObject>
 
 @optional
--(void)objectModified;
+-(void)objectModified; //saving purposes
 -(void)selectedAnObject:(BOOL)value;
--(void)hiddenTextField:(BOOL)value;
--(void)stringLabel:(NSString *)string;
--(void)correctOrientationForBox:(Box *)box SuperviewFrame:(CGRect)viewSize;
 
 @end
 
@@ -25,11 +22,15 @@
 @interface TagView : UIView
 
 @property (nonatomic, weak) id <TagViewDelegate> delegate;
-@property (nonatomic, strong) NSMutableArray *boxes;
-@property (nonatomic, strong) NSString *filename; //Image filename
+@property (nonatomic, strong) UITextField* label;
+@property (nonatomic, strong) NSMutableArray* boxes;
+@property (nonatomic, strong) NSString* filename; //Image filename
 @property int selectedBox;
 
 //restarts
 - (void) setLineWidthForZoomFactor:(float)factor;
+
+//labelHandling
+- (IBAction)labelFinish:(id)sender;
 
 @end
