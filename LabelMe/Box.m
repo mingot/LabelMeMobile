@@ -9,6 +9,8 @@
 #import "Box.h"
 #import "Constants.h"
 
+//    self.colorArray=[[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
+
 @interface Box()
 {
 }
@@ -27,9 +29,13 @@
     if (self) {
         upperLeft = upper;
         lowerRigth = lower;
-        self.date = [self generateDateString];
+        
         self.label= [NSString stringWithFormat:@""];
+        self.date = [self generateDateString];
+        self.color = [UIColor colorWithRed:(random()%100)/(float)100 green:(random()%100)/(float)100 blue:(random()%100)/(float)100 alpha:1];
         self.downloadDate = [NSDate date];
+//        self.lineWidth = ;
+//        self.imageSize = ;
         self.sent = NO;
     }
     return self;

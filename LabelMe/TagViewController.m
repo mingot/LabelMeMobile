@@ -429,7 +429,6 @@
     
     int num = self.tagView.boxes.count;
     box.imageSize = self.tagView.frame.size;
-    box.color=[[self.tagView colorArray] objectAtIndex:(num%8)];
     [self.tagView.boxes addObject:box];
     [self.tagView setSelectedBox:num];
 

@@ -13,6 +13,23 @@
 
 #define NO_BOX_SELECTED -1
 #define DET 2
+#define kLineWidth 6
+
+
+@interface TagView()
+{
+    float LINEWIDTH;
+    int selectedBox;
+    int corner;
+    BOOL move;
+    BOOL size;
+    CGPoint firstLocation;
+}
+
+- (int)whereIs:(CGPoint) point;
+- (int)boxInterior:(int)i :(CGPoint)point;
+- (void) drawBox:(Box *)box context:(CGContextRef)context alpha:(CGFloat)alpha corners:(BOOL)hasCorners;
+@end
 
 
 @implementation TagView
@@ -29,9 +46,7 @@
     move = NO;
     size = NO;
     corner = -1;
-    self.colorArray=[[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
     selectedBox = NO_BOX_SELECTED;
-    lineOriginal = 6;
     LINEWIDTH = 6;
 }
 
@@ -344,7 +359,7 @@
 
 -(void)setLINEWIDTH:(float)factor
 {
-    LINEWIDTH = lineOriginal / factor;
+    LINEWIDTH = kLineWidth / factor;
     [self setNeedsDisplay];
 }
 
