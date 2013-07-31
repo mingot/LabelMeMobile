@@ -269,6 +269,7 @@
     int num = [self.boxes count];
     for (int j=i+1; j<num; j++) {
         Box *newBox = [self.boxes objectAtIndex: j];
+        NSLog(@"%@", [newBox description]);
        // [newBox setBounds:self.frame];
 
         if (CGRectContainsPoint( CGRectMake([newBox upperLeft].x-LINEWIDTH, [newBox upperLeft].y-LINEWIDTH, [newBox lowerRight].x-[newBox upperLeft].x+2*LINEWIDTH, [newBox lowerRight].y-[newBox upperLeft].y+2*LINEWIDTH),point)) {

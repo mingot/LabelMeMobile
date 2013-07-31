@@ -19,13 +19,13 @@
     @public float LEFTBOUND;
     @public float RIGHTBOUND;
     @public float LINEWIDTH;
-    BOOL sent;
 }
 
 @property (strong, nonatomic) NSString *label;
 @property (strong, nonatomic) NSString *date;
 @property (strong, nonatomic) UIColor *color;
 @property (strong, nonatomic) NSDate *downloadDate;
+@property BOOL sent;
 
 
 - (id) initWithPoints:(CGPoint)upper :(CGPoint)lower;
@@ -36,11 +36,7 @@
 - (CGPoint) upperLeft;
 - (CGPoint) lowerRight;
 - (void) updatePoints:(CGPoint)start :(CGPoint) end;
-//- (void) updateUpperLeft:(CGPoint)start :(CGPoint) end;
-//- (void) updateLowerRight:(CGPoint)start :(CGPoint) end;
 - (CGPoint) bounds;
-- (void) setSent:(BOOL)value;
-- (BOOL) sent;
 - (NSString *) generateDateString;
 
 //returns the CGRect of the Box

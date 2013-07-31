@@ -9,6 +9,13 @@
 #import "Box.h"
 #import "Constants.h"
 
+@interface Box()
+{
+}
+
+@end
+
+
 @implementation Box
 
 @synthesize label = _label;
@@ -28,7 +35,7 @@
         self.date= [self generateDateString];
         self.color = [[UIColor alloc] init];
         self.downloadDate = [NSDate date];
-        sent = NO;
+        self.sent = NO;
         
     }
     
@@ -43,7 +50,7 @@
         self.date = [self generateDateString];
         self.label= [NSString stringWithFormat:@""];
         self.downloadDate = [NSDate date];
-        sent = NO;
+        self.sent = NO;
     }
     return self;
 }
@@ -134,10 +141,13 @@
     
 }
 
--(CGPoint) upperLeft{
+-(CGPoint) upperLeft
+{
     return upperLeft;
 }
--(CGPoint) lowerRight{
+
+-(CGPoint) lowerRight
+{
     return lowerRigth;
 }
 
@@ -168,54 +178,7 @@
 }
 
 
-//-(void) updateUpperLeft:(CGPoint)start :(CGPoint)end
-//{
-//    upperLeft.x=upperLeft.x+end.x-start.x;
-//    upperLeft.y=upperLeft.y+end.y-start.y;
-//    if (upperLeft.y<UPPERBOUND +LINEWIDTH/2) {
-//        upperLeft.y=UPPERBOUND +LINEWIDTH/2;
-//    }
-//    if (upperLeft.x<LEFTBOUND +LINEWIDTH/2) {
-//        upperLeft.x=LEFTBOUND +LINEWIDTH/2;
-//    }
-//    if ((upperLeft.x>lowerRigth.x)) {
-//        float copy;
-//        copy=upperLeft.x;
-//        upperLeft.x=lowerRigth.x;
-//        lowerRigth.x=copy;
-//    }
-//    if ((upperLeft.y>lowerRigth.y)) {
-//        float copy;
-//        copy=upperLeft.y;
-//        upperLeft.y=lowerRigth.y;
-//        lowerRigth.y=copy;
-//    }
-//}
-//
-//
-//-(void) updateLowerRight:(CGPoint)start :(CGPoint) end
-//{
-//    lowerRigth.x=lowerRigth.x+end.x-start.x;
-//    lowerRigth.y=lowerRigth.y+end.y-start.y;
-//    if (lowerRigth.y>LOWERBOUND-LINEWIDTH/2) {
-//        lowerRigth.y=LOWERBOUND-LINEWIDTH/2;
-//    }
-//    if (lowerRigth.x>RIGHTBOUND-LINEWIDTH/2) {
-//        lowerRigth.x=RIGHTBOUND-LINEWIDTH/2;
-//    }
-//    if ((upperLeft.x>lowerRigth.x)) {
-//        float copy;
-//        copy=upperLeft.x;
-//        upperLeft.x=lowerRigth.x;
-//        lowerRigth.x=copy;
-//    }
-//    if ((upperLeft.y>lowerRigth.y)) {
-//        float copy;
-//        copy=upperLeft.y;
-//        upperLeft.y=lowerRigth.y;
-//        lowerRigth.y=copy;
-//    }
-//}
+
 
 
 - (NSString *)generateDateString
@@ -249,7 +212,7 @@
         RIGHTBOUND = [aDecoder decodeFloatForKey:@"RIGHTBOUND"];
         LEFTBOUND = [aDecoder decodeFloatForKey:@"LEFTBOUND"];
         LINEWIDTH = [aDecoder decodeFloatForKey:@"LINEWIDTH"];
-        sent = [aDecoder decodeBoolForKey:@"sent"];
+        self.sent = [aDecoder decodeBoolForKey:@"sent"];
 
 
 
@@ -271,19 +234,11 @@
     [aCoder encodeFloat:RIGHTBOUND forKey:@"RIGHTBOUND"];
     [aCoder encodeFloat:LEFTBOUND forKey:@"LEFTBOUND"];
     [aCoder encodeFloat:LINEWIDTH forKey:@"LINEWIDTH"];
-    [aCoder encodeBool:sent forKey:@"sent"];
+    [aCoder encodeBool:self.sent forKey:@"sent"];
 }
 
 
--(void)setSent:(BOOL)value
-{
-    sent = value;
-}
 
--(BOOL)sent
-{
-    return sent;
-}
 
 -(CGPoint)bounds
 {
