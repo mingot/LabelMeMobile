@@ -597,12 +597,12 @@
                     }
                     
                     //box construction
-                    Box *box = [[Box alloc] initWithPoints:CGPointMake(xmin*1.0, ymin*1.0) :CGPointMake(xmax*1.0, ymax*1.0)];
+                    CGSize boxImageSize = CGSizeMake([[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0, [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0);
+                    
+                    Box *box = [[Box alloc] initWithUpperLeft:CGPointMake(xmin*1.0, ymin*1.0) lowerRight:CGPointMake(xmax*1.0, ymax*1.0) forImageSize:boxImageSize];
                     box.label = label;
                     box.sent = YES;
                     box.color = [colors objectAtIndex:arc4random() % colors.count];  //choose random color
-                    box.imageSize = CGSizeMake([[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0, [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0);
-                    NSLog(@"BOX: %@", box);
                     box.downloadDate = [NSDate date];
                     
                     [boundingBoxes addObject:box];

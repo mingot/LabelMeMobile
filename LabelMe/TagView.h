@@ -27,11 +27,9 @@
 @property (nonatomic, weak) id <TagViewDelegate> delegate;
 @property (nonatomic, strong) NSMutableArray *boxes;
 @property (nonatomic, strong) NSString *filename; //Image filename
-
-- (void) setSelectedBox:(int) i;
-- (int) SelectedBox;
+@property int selectedBox;
 
 - (void) reset;
-- (void) setLINEWIDTH:(float)factor;
+- (void) setLineWidthForZoomFactor:(float)factor;
 
 @end

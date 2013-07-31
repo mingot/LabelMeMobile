@@ -11,11 +11,25 @@
 
 //    self.colorArray=[[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
 
+#define kLineWidth 6
+#define kExteriorBox 0
+#define kUpperLeft 1
+#define kUpperRight 2
+#define kLowerLeft 3
+#define kLowerRight 4
+#define kInteriorBox 5
+
+
 @interface Box()
 {
+    int _corner;
+    CGPoint _firstLocation;
+    
 }
 
+
 - (NSString *) generateDateString;
+- (CGPoint) innerPointForPoint:(CGPoint) point;
 
 @end
 
@@ -23,116 +37,111 @@
 @implementation Box
 
 
-- (id)initWithPoints:(CGPoint)upper :(CGPoint)lower
+@synthesize upperLeft = _upperLeft;
+@synthesize lowerRight = _lowerRight;
+
+- (id) initWithUpperLeft:(CGPoint)upper lowerRight:(CGPoint)lower forImageSize:(CGSize)imageSize
 {
     self = [super init];
     if (self) {
-        upperLeft = upper;
-        lowerRigth = lower;
+        self.imageSize = imageSize;
+        self.upperLeft = upper;
+        self.lowerRight = lower;
         
         self.label= [NSString stringWithFormat:@""];
         self.date = [self generateDateString];
         self.color = [UIColor colorWithRed:(random()%100)/(float)100 green:(random()%100)/(float)100 blue:(random()%100)/(float)100 alpha:1];
         self.downloadDate = [NSDate date];
-//        self.lineWidth = ;
-//        self.imageSize = ;
+        self.lineWidth = kLineWidth;
         self.sent = NO;
     }
     return self;
 }
 
+#pragma mark -
+#pragma mark Box resizing
 
--(int) setUpperLeft:(CGPoint ) point
+- (void) resizeLowerRightToPoint:(CGPoint)lowerRight
 {
-    int corner=0;
-    if (point.y < 0 + self.lineWidth/2) point.y = 0 + self.lineWidth/2;
-    if (point.x < 0 + self.lineWidth/2) point.x = 0 + self.lineWidth/2;
-    
-    upperLeft = point;
-
-    if (upperLeft.x > lowerRigth.x) {
+    self.lowerRight = lowerRight;
+    int rotation = 0;
+    if (_upperLeft.x > _lowerRight.x) {
         float copy;
-        copy = upperLeft.x;
-        upperLeft.x = lowerRigth.x;
-        lowerRigth.x = copy;
-        corner++;
+        copy = _upperLeft.x;
+        _upperLeft.x = _lowerRight.x;
+        _lowerRight.x = copy;
+        rotation++;
     }
-    
-    if (upperLeft.y > lowerRigth.y) {
+    if (_upperLeft.y > _lowerRight.y) {
         float copy;
-        copy = upperLeft.y;
-        upperLeft.y = lowerRigth.y;
-        lowerRigth.y = copy;
-        corner+=2;
+        copy = _upperLeft.y;
+        _upperLeft.y = _lowerRight.y;
+        _lowerRight.y = copy;
+        rotation+=2;
     }
     
-    return corner;
+    self.cornerMoving -= rotation;
 }
 
--(CGPoint) upperLeft
+- (void) resizeUpperLeftToPoint:(CGPoint)upperLeft
 {
-    return upperLeft;
-}
-
--(int) setLowerRight:(CGPoint ) point
-{
-    int corner=0;
-    if (point.y > self.imageSize.height - self.lineWidth/2) point.y = self.imageSize.height - self.lineWidth/2;
-    if (point.x > self.imageSize.width - self.lineWidth/2) point.x = self.imageSize.width - self.lineWidth/2;
-
-    lowerRigth = point;
-
-    if ((upperLeft.x>lowerRigth.x)) {
+    self.upperLeft = upperLeft;
+    int rotation = 0;
+    if (_upperLeft.x > _lowerRight.x) {
         float copy;
-        copy=upperLeft.x;
-        upperLeft.x=lowerRigth.x;
-        lowerRigth.x=copy;
-        corner++;
+        copy = _upperLeft.x;
+        _upperLeft.x = _lowerRight.x;
+        _lowerRight.x = copy;
+        rotation++;
     }
-    if ((upperLeft.y>lowerRigth.y)) {
+    
+    if (_upperLeft.y > _lowerRight.y) {
         float copy;
-        copy=upperLeft.y;
-        upperLeft.y=lowerRigth.y;
-        lowerRigth.y=copy;
-        corner+=2;
+        copy = _upperLeft.y;
+        _upperLeft.y = _lowerRight.y;
+        _lowerRight.y = copy;
+        rotation+=2;
     }
-    
-    
-    return corner;
-    
+    self.cornerMoving +=rotation;
 }
 
--(CGPoint) lowerRight
+
+#pragma mark - 
+#pragma mark Box moving
+
+- (void) moveFromPoint:(CGPoint)start toPoint:(CGPoint)end;
 {
-    return lowerRigth;
-}
-
--(void) updatePoints:(CGPoint)start :(CGPoint) end
-{
-    if (upperLeft.y + end.y - start.y<0 + self.lineWidth/2) {
-        end.y = 0 + self.lineWidth/2 - upperLeft.y + start.y;
+    if (self.upperLeft.y + end.y - start.y < 0 + self.lineWidth/2) {
+        end.y = 0 + self.lineWidth/2 - self.upperLeft.y + start.y;
         
     }
-    if (lowerRigth.y + end.y - start.y > self.imageSize.height - self.lineWidth/2) {
-        end.y = self.imageSize.height - self.lineWidth/2 - lowerRigth.y + start.y;
+    if (self.lowerRight.y + end.y - start.y > self.imageSize.height - self.lineWidth/2) {
+        end.y = self.imageSize.height - self.lineWidth/2 - self.lowerRight.y + start.y;
         
         
     }
-    if (upperLeft.x + end.x - start.x < 0 + self.lineWidth/2) {
-        end.x = 0 + self.lineWidth/2 - upperLeft.x + start.x;
+    if (self.upperLeft.x + end.x - start.x < 0 + self.lineWidth/2) {
+        end.x = 0 + self.lineWidth/2 - self.upperLeft.x + start.x;
         
     }
-    if (lowerRigth.x + end.x - start.x > self.imageSize.width - self.lineWidth/2) {
-        end.x = self.imageSize.width - self.lineWidth/2 - lowerRigth.x + start.x;
+    if (self.lowerRight.x + end.x - start.x > self.imageSize.width - self.lineWidth/2) {
+        end.x = self.imageSize.width - self.lineWidth/2 - self.lowerRight.x + start.x;
         
     }
     
-    upperLeft.x = (upperLeft.x+end.x - start.x);
-    upperLeft.y = (upperLeft.y+end.y - start.y);
-    lowerRigth.x = (lowerRigth.x+end.x - start.x);
-    lowerRigth.y = (lowerRigth.y+end.y - start.y);
+    self.upperLeft = CGPointMake((self.upperLeft.x + end.x - start.x), (self.upperLeft.y + end.y - start.y));
+    self.lowerRight = CGPointMake((self.lowerRight.x + end.x - start.x), (self.lowerRight.y + end.y - start.y));
 }
 
+- (CGPoint) innerPointForPoint:(CGPoint) point
+{
+    if(point.x > self.imageSize.width - self.lineWidth/2) point.x = self.imageSize.width - self.lineWidth/2;
+    else if(point.x < self.lineWidth/2) point.x = self.lineWidth/2;
+    if(point.y > self.imageSize.height - self.lineWidth/2) point.y = self.imageSize.height - self.lineWidth/2;
+    else if(point.y < self.lineWidth/2) point.y = self.lineWidth/2;
+    
+    return point;
+}
 
 
 - (NSString *)generateDateString
@@ -153,13 +162,14 @@
 {
     if (self = [super init]) {
         
+        _upperLeft.x = [aDecoder decodeFloatForKey:@"upperLeftx"];
+        _upperLeft.y = [aDecoder decodeFloatForKey:@"upperLefty"];
+        
+        _lowerRight.x = [aDecoder decodeFloatForKey:@"lowerRightx"];
+        _lowerRight.y = [aDecoder decodeFloatForKey:@"lowerRighty"];
         self.label = [aDecoder decodeObjectForKey:@"label"];
         self.color = [aDecoder decodeObjectForKey:@"color"];
         self.date = [aDecoder decodeObjectForKey:@"date"];
-        upperLeft.x = [aDecoder decodeFloatForKey:@"upperLeftx"];
-        upperLeft.y = [aDecoder decodeFloatForKey:@"upperLefty"];
-        lowerRigth.x = [aDecoder decodeFloatForKey:@"lowerRightx"];
-        lowerRigth.y = [aDecoder decodeFloatForKey:@"lowerRighty"];
         self.imageSize = [aDecoder decodeCGSizeForKey:@"imageSize"];
         self.lineWidth = [aDecoder decodeFloatForKey:@"lineWidth"];
         self.sent = [aDecoder decodeBoolForKey:@"sent"];
@@ -170,13 +180,13 @@
 
 - (void) encodeWithCoder:(NSCoder *)aCoder
 {
-    [aCoder encodeObject: self.label forKey:@"label"];
+    [aCoder encodeFloat:self.upperLeft.x forKey:@"upperLeftx"];
+    [aCoder encodeFloat:self.upperLeft.y forKey:@"upperLefty"];
+    [aCoder encodeFloat:self.lowerRight.x forKey:@"lowerRightx"];
+    [aCoder encodeFloat:self.lowerRight.y forKey:@"lowerRighty"];
+    [aCoder encodeObject:self.label forKey:@"label"];
     [aCoder encodeObject:self.color forKey:@"color"];
     [aCoder encodeObject:self.date forKey:@"date"];
-    [aCoder encodeFloat:upperLeft.x forKey:@"upperLeftx"];
-    [aCoder encodeFloat:upperLeft.y forKey:@"upperLefty"];
-    [aCoder encodeFloat:lowerRigth.x forKey:@"lowerRightx"];
-    [aCoder encodeFloat:lowerRigth.y forKey:@"lowerRighty"];
     [aCoder encodeCGSize:self.imageSize forKey:@"imageSize"];
     [aCoder encodeFloat:self.lineWidth forKey:@"lineWidth"];
     [aCoder encodeBool:self.sent forKey:@"sent"];
@@ -186,20 +196,20 @@
 
 - (CGRect) getRectangleForBox
 {
-    CGRect rectangle = CGRectMake(upperLeft.x, upperLeft.y, lowerRigth.x - upperLeft.x, lowerRigth.y - upperLeft.y);
+    CGRect rectangle = CGRectMake(self.upperLeft.x, self.upperLeft.y, self.lowerRight.x - self.upperLeft.x, self.lowerRight.y - self.upperLeft.y);
     return rectangle;
 }
 
 - (void) setBoxDimensionsForImageSize:(CGSize) size
 {    
-    upperLeft = CGPointMake(upperLeft.x*size.width*1.0/self.imageSize.width, upperLeft.y*size.height*1.0/self.imageSize.height);
-    lowerRigth = CGPointMake(lowerRigth.x*size.width*1.0/self.imageSize.width, lowerRigth.y*size.height*1.0/self.imageSize.height);
+    self.upperLeft = CGPointMake(self.upperLeft.x*size.width*1.0/self.imageSize.width, self.upperLeft.y*size.height*1.0/self.imageSize.height);
+    self.lowerRight = CGPointMake(self.lowerRight.x*size.width*1.0/self.imageSize.width, self.lowerRight.y*size.height*1.0/self.imageSize.height);
     self.imageSize = size;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"upperLeft = (%.1f,%.1f), lowerRight = (%.1f,%.1f). Upper, lower, left and right bounds = (%.1f,%.1f,%.1f,%.1f)",upperLeft.x, upperLeft.y, lowerRigth.x,lowerRigth.y, 0.0, self.imageSize.height, 0.0, self.imageSize.width];
+    return [NSString stringWithFormat:@"upperLeft = (%.1f,%.1f), lowerRight = (%.1f,%.1f). Upper, lower, left and right bounds = (%.1f,%.1f,%.1f,%.1f)",self.upperLeft.x, self.upperLeft.y, self.lowerRight.x,self.lowerRight.y, 0.0, self.imageSize.height, 0.0, self.imageSize.width];
 }
 
 

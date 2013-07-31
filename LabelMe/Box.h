@@ -11,10 +11,6 @@
 #import <Foundation/Foundation.h>
 
 @interface Box : NSObject <NSCoding>
-{
-    CGPoint upperLeft;
-    CGPoint lowerRigth;
-}
 
 @property (strong, nonatomic) NSString *label;
 @property (strong, nonatomic) NSString *date;
@@ -22,18 +18,22 @@
 @property (strong, nonatomic) NSDate *downloadDate;
 @property float lineWidth;
 @property CGSize imageSize;
+@property CGPoint upperLeft;
+@property CGPoint lowerRight;
 @property BOOL sent;
 
+@property int cornerMoving;
 
-- (id) initWithPoints:(CGPoint)upper :(CGPoint)lower;
+- (id) initWithUpperLeft:(CGPoint)upper lowerRight:(CGPoint)lower forImageSize:(CGSize)imageSize;
 
-- (int) setUpperLeft:(CGPoint)point;
-- (CGPoint) upperLeft;
 
-- (int) setLowerRight:(CGPoint)point;
-- (CGPoint) lowerRight;
 
-- (void) updatePoints:(CGPoint)start :(CGPoint) end;
+- (void) resizeUpperLeftToPoint:(CGPoint)upperLeft;
+- (void) resizeLowerRightToPoint:(CGPoint)lowerRight;
+//- (void) resizeForCorner:(int)corner toPoint:(CGPoint)point;
+
+//- (void) updatePoints:(CGPoint)start :(CGPoint) end;
+- (void) moveFromPoint:(CGPoint)start toPoint:(CGPoint)end;
 
 //returns the CGRect of the Box
 - (CGRect) getRectangleForBox;

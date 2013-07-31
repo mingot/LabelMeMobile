@@ -241,7 +241,7 @@
     self.labelsButton.selected = NO;
     if (![self.sendingView isHidden]) self.sendingView.hidden = YES;
     [self.scrollView setZoomScale:1.0 animated:NO];
-    [self.tagView setLINEWIDTH:1.0];
+    [self.tagView setLineWidthForZoomFactor:1.0];
     [self.imageView setImage:nil];
     self.label.hidden = YES;
     [self.tagView.boxes removeAllObjects];
@@ -366,7 +366,7 @@
 
 - (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
 {
-    [self.tagView setLINEWIDTH:scale];
+    [self.tagView setLineWidthForZoomFactor:scale];
 }
 
 #pragma mark -
@@ -424,11 +424,12 @@
     //get the current visible area
     CGRect visibleRect = [self.scrollView convertRect:self.scrollView.bounds toView:self.composeView];
     
-    Box *box = [[Box alloc] initWithPoints:CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width  - 100)/(2*self.scrollView.zoomScale),
-                                                      visibleRect.origin.y+(self.tagView.frame.size.height  - 100)/(2*self.scrollView.zoomScale)) :CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width  + 100)/(2*self.scrollView.zoomScale),visibleRect.origin.y+(self.tagView.frame.size.height  + 100)/(2*self.scrollView.zoomScale))];
+    Box *box = [[Box alloc] initWithUpperLeft:CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width  - 100)/(2*self.scrollView.zoomScale),
+                                                      visibleRect.origin.y+(self.tagView.frame.size.height  - 100)/(2*self.scrollView.zoomScale))
+                                   lowerRight:CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width  + 100)/(2*self.scrollView.zoomScale),visibleRect.origin.y+(self.tagView.frame.size.height  + 100)/(2*self.scrollView.zoomScale))
+                                 forImageSize:self.tagView.frame.size];
     
     int num = self.tagView.boxes.count;
-    box.imageSize = self.tagView.frame.size;
     [self.tagView.boxes addObject:box];
     [self.tagView setSelectedBox:num];
 
@@ -474,7 +475,7 @@
 
 - (IBAction)labelFinish:(id)sender
 {
-    int selected = [self.tagView SelectedBox];
+    int selected = self.tagView.selectedBox;
     self.label.text = [self.label.text replaceByUnderscore];
     Box *box = [self.tagView.boxes objectAtIndex:selected];
     if (![box.label isEqualToString:self.label.text]) { //update the name
@@ -523,7 +524,7 @@
     [self.sendingView.progressView setProgress:0];
     [self.sendingView.activityIndicator startAnimating];
     [self.scrollView setZoomScale:1.0 animated:NO];
-    [self.tagView setLINEWIDTH:1.0];
+    [self.tagView setLineWidthForZoomFactor:1.0];
     [self sendPhoto];
 }
 
@@ -537,7 +538,7 @@
 
 -(IBAction)deleteAction:(id)sender
 {
-    if(([self.tagView SelectedBox]!=-1)&&(!keyboardVisible)){
+    if((self.tagView.selectedBox != -1)&&(!keyboardVisible)){
         UIActionSheet *actionSheet = [[UIActionSheet alloc]  initWithTitle:@"" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Object" otherButtonTitles:nil, nil];
         actionSheet.actionSheetStyle = UIBarStyleBlackTranslucent;
         [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
@@ -590,7 +591,7 @@
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
     // Disallow recognition of tap gestures in the segmented control.
-    if ([self.tagView SelectedBox] != -1)
+    if (self.tagView.selectedBox != -1)
         return NO;
     else return YES;
 }
@@ -626,12 +627,12 @@
     if (buttonIndex==0) {
         int num=[[self.tagView boxes] count];
 
-        if((num<1)||([self.tagView SelectedBox]==-1))
+        if((num<1)||(self.tagView.selectedBox == -1))
             return;
 
         NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
         if (dictnum.intValue < 0){
-            if (![[[self.tagView boxes] objectAtIndex:[self.tagView SelectedBox] ] sent]) {
+            if (![[[self.tagView boxes] objectAtIndex: self.tagView.selectedBox ] sent]) {
                 NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
                 [self.userDictionary removeObjectForKey:self.filename];
                 [self.userDictionary setObject:newdictnum forKey:self.filename];
@@ -640,7 +641,7 @@
         }
         else if(dictnum.intValue >= 0){
 
-            if (![[[self.tagView boxes] objectAtIndex:[self.tagView SelectedBox] ] sent]) {
+            if (![[[self.tagView boxes] objectAtIndex:self.tagView.selectedBox ] sent]) {
                 NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue-1];
 
                 [self.userDictionary removeObjectForKey:self.filename];
@@ -656,7 +657,7 @@
     
         [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
 
-        [self.tagView.boxes removeObjectAtIndex:[self.tagView SelectedBox]];
+        [self.tagView.boxes removeObjectAtIndex:self.tagView.selectedBox];
         [self.tagView setSelectedBox:-1];
         self.label.hidden=YES;
         [self saveThumbnail];
@@ -739,11 +740,11 @@
 
 -(void)objectModified
 {   
-    if ([self.tagView SelectedBox] == -1)
+    if (self.tagView.selectedBox == -1)
         return;
 
-    if ([[self.tagView.boxes objectAtIndex:[self.tagView SelectedBox]] sent]) {
-        [[self.tagView.boxes objectAtIndex:[self.tagView SelectedBox]] setSent:NO];
+    if ([[self.tagView.boxes objectAtIndex:self.tagView.selectedBox] sent]) {
+        [[self.tagView.boxes objectAtIndex:self.tagView.selectedBox] setSent:NO];
         NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
 
         if (dictnum.intValue < 0){
@@ -870,7 +871,7 @@
         
     }
     [cell.detailTextLabel setText:[NSString stringWithFormat:@"%d x %d",(int)((b.lowerRight.x - b.upperLeft.x)*self.imageView.image.size.width/self.tagView.frame.size.width),(int)((b.lowerRight.y - b.upperLeft.y)*self.imageView.image.size.height/self.tagView.frame.size.height)]];
-    if (indexPath.row == [self.tagView SelectedBox])
+    if (indexPath.row == self.tagView.selectedBox)
         [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
     
     else [cell setAccessoryType:UITableViewCellAccessoryNone];
@@ -889,7 +890,7 @@
     [self listAction:self.labelsButton];
     Box *box = [self.tagView.boxes objectAtIndex:indexPath.row];
     [self.scrollView zoomToRect:CGRectMake(box.upperLeft.x+self.tagView.frame.origin.x-10, box.upperLeft.y+self.tagView.frame.origin.y-10, box.lowerRight.x - box.upperLeft.x+20, box.lowerRight.y - box.upperLeft.y+20) animated:YES];
-    [self.tagView setLINEWIDTH:self.scrollView.zoomScale];
+    [self.tagView setLineWidthForZoomFactor:self.scrollView.zoomScale];
     [self selectedAnObject:YES];
     [self correctOrientationForBox:box SuperviewFrame:self.tagView.frame];
 }
