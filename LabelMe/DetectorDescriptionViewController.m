@@ -662,10 +662,10 @@
                 if([box.label isEqualToString:class]){ //add bounding box
                     containedClass = YES;
                     BoundingBox *cp = [[BoundingBox alloc] init];
-                    cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
-                    cp.ymin = box.upperLeft.y/box->LOWERBOUND;
-                    cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
-                    cp.ymax = box.lowerRight.y/box->LOWERBOUND;
+                    cp.xmin = box.upperLeft.x/box.imageSize.width;
+                    cp.ymin = box.upperLeft.y/box.imageSize.height;
+                    cp.xmax = box.lowerRight.x/box.imageSize.width;
+                    cp.ymax = box.lowerRight.y/box.imageSize.height;
                     cp.imageIndex = trainingSet.images.count;
                     cp.label = 1;
                     [trainingSet.groundTruthBoundingBoxes addObject:cp];
@@ -722,10 +722,10 @@
                 if([box.label isEqualToString:class]){ //add bounding box
                     containedClass = YES;
                     BoundingBox *cp = [[BoundingBox alloc] init];
-                    cp.xmin = box.upperLeft.x/box->RIGHTBOUND;
-                    cp.ymin = box.upperLeft.y/box->LOWERBOUND;
-                    cp.xmax = box.lowerRight.x/box->RIGHTBOUND;
-                    cp.ymax = box.lowerRight.y/box->LOWERBOUND;
+                    cp.xmin = box.upperLeft.x/box.imageSize.width;
+                    cp.ymin = box.upperLeft.y/box.imageSize.height;
+                    cp.xmax = box.lowerRight.x/box.imageSize.width;
+                    cp.ymax = box.lowerRight.y/box.imageSize.height;
                     cp.imageIndex = testSet.images.count;
                     cp.label = 1;
                     [testSet.groundTruthBoundingBoxes addObject:cp];

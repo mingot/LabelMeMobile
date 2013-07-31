@@ -11,6 +11,10 @@
 
 @interface Box()
 {
+    float UPPERBOUND;
+    float LOWERBOUND;
+    float LEFTBOUND;
+    float RIGHTBOUND;
 }
 
 @end
@@ -213,9 +217,7 @@
         LEFTBOUND = [aDecoder decodeFloatForKey:@"LEFTBOUND"];
         LINEWIDTH = [aDecoder decodeFloatForKey:@"LINEWIDTH"];
         self.sent = [aDecoder decodeBoolForKey:@"sent"];
-
-
-
+        self.imageSize = CGSizeMake(RIGHTBOUND, LOWERBOUND);
     }
     return self;
 }
@@ -257,8 +259,17 @@
     lowerRigth = CGPointMake(lowerRigth.x*size.width*1.0/RIGHTBOUND, lowerRigth.y*size.height*1.0/LOWERBOUND);
     RIGHTBOUND = size.width;
     LOWERBOUND = size.height;
+    self.imageSize = size;
 }
 
+- (void) setLimitsForImageSize:(CGSize) size
+{
+    UPPERBOUND = 0;
+    LEFTBOUND = 0;
+    RIGHTBOUND = size.width;
+    LOWERBOUND = size.height;
+    self.imageSize = size;
+}
 
 - (NSString *)description
 {

@@ -601,10 +601,9 @@
                     box.label = label;
                     box.sent = YES;
                     box.color = [colors objectAtIndex:arc4random() % colors.count];  //choose random color
-                    box->UPPERBOUND = 0;
-                    box->LOWERBOUND = [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
-                    box->LEFTBOUND = 0;
-                    box->RIGHTBOUND = [[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0;
+                    [box setLimitsForImageSize:CGSizeMake([[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0,
+                                                           [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0)];
+                    NSLog(@"BOX: %@", box);
                     box.downloadDate = [NSDate date];
                     
                     [boundingBoxes addObject:box];

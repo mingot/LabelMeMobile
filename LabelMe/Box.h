@@ -14,10 +14,6 @@
 {
     CGPoint upperLeft;
     CGPoint lowerRigth;
-    @public float UPPERBOUND;
-    @public float LOWERBOUND;
-    @public float LEFTBOUND;
-    @public float RIGHTBOUND;
     @public float LINEWIDTH;
 }
 
@@ -25,6 +21,7 @@
 @property (strong, nonatomic) NSString *date;
 @property (strong, nonatomic) UIColor *color;
 @property (strong, nonatomic) NSDate *downloadDate;
+@property CGSize imageSize;
 @property BOOL sent;
 
 
@@ -41,7 +38,9 @@
 
 //returns the CGRect of the Box
 - (CGRect) getRectangleForBox;
+
 //adapt box to image size
 - (void) setBoxDimensionsForImageSize:(CGSize) size;
+- (void) setLimitsForImageSize:(CGSize) size;
 
 @end
