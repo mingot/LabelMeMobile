@@ -29,7 +29,7 @@
 @property (nonatomic, strong) NSString *filename; //Image filename
 @property int selectedBox;
 
-- (void) reset;
+//restarts
 - (void) setLineWidthForZoomFactor:(float)factor;
 
 @end

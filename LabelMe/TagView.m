@@ -12,7 +12,6 @@
 #import "UITextField+CorrectOrientation.h"
 
 #define NO_BOX_SELECTED -1
-#define DET 2
 #define kLineWidth 6
 
 
@@ -31,13 +30,12 @@
     int selectedBox;
     BOOL move;
     BOOL size;
-    CGPoint _firstLocation;
 }
 
 - (int) whereIs:(CGPoint) point;
 - (int) boxInterior:(int)i :(CGPoint)point;
 - (void) drawBox:(Box *)box context:(CGContextRef)context alpha:(CGFloat)alpha corners:(BOOL)hasCorners;
-- (int) cornerForBox:(Box *) box forTouchPoint:(CGPoint) point;
+
 @end
 
 
@@ -67,7 +65,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-    if (self= [super initWithFrame:frame]) [self initialize];
+    if (self = [super initWithFrame:frame]) [self initialize];
     return self;
 }
 
@@ -94,15 +92,6 @@
 #pragma mark -
 #pragma mark Public Methods
 
--(void) reset
-{
-    [self.delegate hiddenTextField:YES];
-    selectedBox = NO_BOX_SELECTED;
-    [self.boxes removeAllObjects];
-    move = NO;
-    size = NO;
-}
-
 - (void) setLineWidthForZoomFactor:(float)factor;
 {
     _lineWidth = kLineWidth / factor;
@@ -119,7 +108,6 @@
         return;
    
     CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetLineWidth(context, _lineWidth);
     
     for(int i=0; i<self.boxes.count; i++){
         
@@ -177,21 +165,22 @@
     //a box is selected
     if (selectedBox != NO_BOX_SELECTED) {
         Box *currentBox = [self.boxes objectAtIndex:selectedBox];
-        currentBox.imageSize =  self.frame.size;
 
-        int corner = [self cornerForBox:currentBox forTouchPoint:location];
-        currentBox.cornerMoving = corner;
+        int corner = [currentBox touchAtPoint:location];
         
         if(corner == kInteriorBox){
             move = YES;
-            _firstLocation = location;
+            [currentBox moveBeginAtPoint:location];
             
         }else if(corner == kExteriorBox){
             [self.delegate selectedAnObject:NO];
             selectedBox = NO_BOX_SELECTED;
             [self.delegate hiddenTextField:YES];
             
-        }else size = YES;
+        }else{
+            size = YES;
+            [currentBox resizeBeginAtPoint:location];
+        }
         
     }else{
         
@@ -200,12 +189,13 @@
         
         if (selectedBox != NO_BOX_SELECTED) {
             [self.delegate hiddenTextField:NO];
-            Box *currentBox=[self.boxes objectAtIndex: selectedBox];
             [self.delegate selectedAnObject:YES];
+            
+            Box *currentBox=[self.boxes objectAtIndex: selectedBox];
             currentBox.imageSize = self.frame.size;
-
             [self.delegate stringLabel:currentBox.label];
             [self.delegate correctOrientationForBox:currentBox SuperviewFrame:self.frame];
+            
             move = NO;
             size = NO;
             
@@ -223,47 +213,19 @@
     CGPoint location = [touch locationInView:touch.view];
     [self.delegate hiddenTextField:YES];
     
-    Box *currentBox;
-    if (move) {
-        currentBox = [self.boxes objectAtIndex:selectedBox];
-        [currentBox moveFromPoint:_firstLocation toPoint:location];
+    if(selectedBox != NO_BOX_SELECTED){
+        Box *currentBox = [self.boxes objectAtIndex:selectedBox];
+        if (move) [currentBox moveToPoint:location];
+        else if (size) [currentBox resizeToPoint:location];
     }
     
-    else if (size){ 
-        currentBox = [self.boxes objectAtIndex:selectedBox];
-        
-        switch (currentBox.cornerMoving) {
-            case kUpperLeft:
-                [currentBox resizeUpperLeftToPoint:location];
-                break;
-                
-            case kUpperRight:
-                [currentBox resizeUpperLeftToPoint:CGPointMake(currentBox.upperLeft.x, location.y)];
-                [currentBox resizeLowerRightToPoint:CGPointMake(location.x, currentBox.lowerRight.y)];
-                break;
-                
-            case kLowerLeft:
-                [currentBox resizeUpperLeftToPoint:CGPointMake(location.x, currentBox.upperLeft.y)];
-                [currentBox resizeLowerRightToPoint:CGPointMake(currentBox.lowerRight.x, location.y)];
-                break;
-                
-            case kLowerRight:
-                [currentBox resizeLowerRightToPoint:location];
-                break;
-                
-            default:
-                break;
-        }
-    }
-     _firstLocation = location;
     [self setNeedsDisplay];
 }
 
 -(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
 
-    if ((move) || (size))
-        [self.delegate objectModified];
+    if ((move) || (size)) [self.delegate objectModified];
     
     if (selectedBox != NO_BOX_SELECTED) {
         Box *currentBox =  [self.boxes objectAtIndex: selectedBox];
@@ -302,8 +264,6 @@
     int num = [self.boxes count];
     for (int j=i+1; j<num; j++) {
         Box *newBox = [self.boxes objectAtIndex: j];
-        NSLog(@"%@", [newBox description]);
-       // [newBox setBounds:self.frame];
 
         if (CGRectContainsPoint( CGRectMake([newBox upperLeft].x-_lineWidth, [newBox upperLeft].y-_lineWidth, [newBox lowerRight].x-[newBox upperLeft].x+2*_lineWidth, [newBox lowerRight].y-[newBox upperLeft].y+2*_lineWidth),point)) {
             Box *currentBox = [self.boxes objectAtIndex: i];
@@ -334,49 +294,6 @@
     return [NSString stringWithFormat:@"%@-%@-%@ -%@",day,month,year,time];
 }
 
-
-- (int) cornerForBox:(Box *) box forTouchPoint:(CGPoint) point
-{
-    int boxCorner = kExteriorBox;
-    
-    if ((CGRectContainsPoint(CGRectMake(box.upperLeft.x - DET*_lineWidth,
-                                        box.upperLeft.y - DET*_lineWidth,
-                                        2*DET*_lineWidth,
-                                        2*DET*_lineWidth), point)))  {
-        
-        
-        boxCorner = kUpperLeft;
-        
-    } else if ((CGRectContainsPoint(CGRectMake(box.lowerRight.x - DET*_lineWidth,
-                                               box.lowerRight.y - DET*_lineWidth,
-                                               2*DET*_lineWidth,
-                                               2*DET*_lineWidth), point)))  {
-        
-        boxCorner = kLowerRight;
-        
-    } else if ((CGRectContainsPoint(CGRectMake(box.lowerRight.x - DET*_lineWidth,
-                                               box.upperLeft.y - DET*_lineWidth,
-                                               2*DET*_lineWidth,
-                                               2*DET*_lineWidth), point)))  {
-        
-        boxCorner = kUpperRight;
-        
-    } else if ((CGRectContainsPoint(CGRectMake(box.upperLeft.x - DET*_lineWidth,
-                                               box.lowerRight.y - DET*_lineWidth,
-                                               2*DET*_lineWidth,
-                                               2*DET*_lineWidth), point)))  {
-        
-        boxCorner = kLowerLeft;
-        
-    }else if ((CGRectContainsPoint(CGRectMake(box.upperLeft.x - _lineWidth/2,
-                                              box.upperLeft.y - _lineWidth/2,
-                                              box.lowerRight.x - box.upperLeft.x + _lineWidth,
-                                              box.lowerRight.y - box.upperLeft.y + _lineWidth) , point))) {
-        boxCorner = kInteriorBox;
-    }
-    
-    return boxCorner;
-}
 
 
 @end

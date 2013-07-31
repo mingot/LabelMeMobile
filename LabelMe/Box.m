@@ -11,7 +11,10 @@
 
 //    self.colorArray=[[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
 
+
+#define DET 2 //Factor that represents the touchable area of the box corners
 #define kLineWidth 6
+
 #define kExteriorBox 0
 #define kUpperLeft 1
 #define kUpperRight 2
@@ -22,14 +25,15 @@
 
 @interface Box()
 {
-    int _corner;
+    int _cornerResizing;
     CGPoint _firstLocation;
-    
 }
 
 
 - (NSString *) generateDateString;
-- (CGPoint) innerPointForPoint:(CGPoint) point;
+
+- (void) resizeUpperLeftToPoint:(CGPoint)upperLeft;
+- (void) resizeLowerRightToPoint:(CGPoint)lowerRight;
 
 @end
 
@@ -59,7 +63,88 @@
 }
 
 #pragma mark -
+#pragma mark Touch Handling
+- (int) touchAtPoint:(CGPoint)point
+{
+
+    int boxCorner = kExteriorBox;
+    
+    if ((CGRectContainsPoint(CGRectMake(self.upperLeft.x - DET*_lineWidth,
+                                        self.upperLeft.y - DET*_lineWidth,
+                                        2*DET*_lineWidth,
+                                        2*DET*_lineWidth), point)))  {
+        
+        
+        boxCorner = kUpperLeft;
+        
+    } else if ((CGRectContainsPoint(CGRectMake(self.lowerRight.x - DET*_lineWidth,
+                                               self.lowerRight.y - DET*_lineWidth,
+                                               2*DET*_lineWidth,
+                                               2*DET*_lineWidth), point)))  {
+        
+        boxCorner = kLowerRight;
+        
+    } else if ((CGRectContainsPoint(CGRectMake(self.lowerRight.x - DET*_lineWidth,
+                                               self.upperLeft.y - DET*_lineWidth,
+                                               2*DET*_lineWidth,
+                                               2*DET*_lineWidth), point)))  {
+        
+        boxCorner = kUpperRight;
+        
+    } else if ((CGRectContainsPoint(CGRectMake(self.upperLeft.x - DET*_lineWidth,
+                                               self.lowerRight.y - DET*_lineWidth,
+                                               2*DET*_lineWidth,
+                                               2*DET*_lineWidth), point)))  {
+        
+        boxCorner = kLowerLeft;
+        
+    }else if ((CGRectContainsPoint(CGRectMake(self.upperLeft.x - _lineWidth/2,
+                                              self.upperLeft.y - _lineWidth/2,
+                                              self.lowerRight.x - self.upperLeft.x + _lineWidth,
+                                              self.lowerRight.y - self.upperLeft.y + _lineWidth) , point))) {
+        boxCorner = kInteriorBox;
+    }
+    
+    return boxCorner;
+
+}
+
+
+#pragma mark -
 #pragma mark Box resizing
+
+- (void) resizeBeginAtPoint:(CGPoint)point
+{
+    int corner = [self touchAtPoint:point];
+    _cornerResizing = corner;
+}
+
+- (void) resizeToPoint:(CGPoint)point
+{
+    switch (_cornerResizing) {
+        case kUpperLeft:
+            [self resizeUpperLeftToPoint:point];
+            break;
+            
+        case kUpperRight:
+            [self resizeUpperLeftToPoint:CGPointMake(self.upperLeft.x, point.y)];
+            [self resizeLowerRightToPoint:CGPointMake(point.x, self.lowerRight.y)];
+            break;
+            
+        case kLowerLeft:
+            [self resizeUpperLeftToPoint:CGPointMake(point.x, self.upperLeft.y)];
+            [self resizeLowerRightToPoint:CGPointMake(self.lowerRight.x, point.y)];
+            break;
+            
+        case kLowerRight:
+            [self resizeLowerRightToPoint:point];
+            break;
+            
+        default:
+            break;
+    }
+}
+
 
 - (void) resizeLowerRightToPoint:(CGPoint)lowerRight
 {
@@ -80,7 +165,7 @@
         rotation+=2;
     }
     
-    self.cornerMoving -= rotation;
+    _cornerResizing -= rotation;
 }
 
 - (void) resizeUpperLeftToPoint:(CGPoint)upperLeft
@@ -102,47 +187,46 @@
         _lowerRight.y = copy;
         rotation+=2;
     }
-    self.cornerMoving +=rotation;
+    _cornerResizing +=rotation;
 }
 
 
 #pragma mark - 
 #pragma mark Box moving
 
-- (void) moveFromPoint:(CGPoint)start toPoint:(CGPoint)end;
+- (void) moveBeginAtPoint:(CGPoint)point
 {
-    if (self.upperLeft.y + end.y - start.y < 0 + self.lineWidth/2) {
-        end.y = 0 + self.lineWidth/2 - self.upperLeft.y + start.y;
+    _firstLocation = point;
+}
+
+- (void) moveToPoint:(CGPoint)end
+{
+    if (self.upperLeft.y + end.y - _firstLocation.y < 0 + self.lineWidth/2) {
+        end.y = 0 + self.lineWidth/2 - self.upperLeft.y + _firstLocation.y;
         
     }
-    if (self.lowerRight.y + end.y - start.y > self.imageSize.height - self.lineWidth/2) {
-        end.y = self.imageSize.height - self.lineWidth/2 - self.lowerRight.y + start.y;
+    if (self.lowerRight.y + end.y - _firstLocation.y > self.imageSize.height - self.lineWidth/2) {
+        end.y = self.imageSize.height - self.lineWidth/2 - self.lowerRight.y + _firstLocation.y;
         
         
     }
-    if (self.upperLeft.x + end.x - start.x < 0 + self.lineWidth/2) {
-        end.x = 0 + self.lineWidth/2 - self.upperLeft.x + start.x;
+    if (self.upperLeft.x + end.x - _firstLocation.x < 0 + self.lineWidth/2) {
+        end.x = 0 + self.lineWidth/2 - self.upperLeft.x + _firstLocation.x;
         
     }
-    if (self.lowerRight.x + end.x - start.x > self.imageSize.width - self.lineWidth/2) {
-        end.x = self.imageSize.width - self.lineWidth/2 - self.lowerRight.x + start.x;
+    if (self.lowerRight.x + end.x - _firstLocation.x > self.imageSize.width - self.lineWidth/2) {
+        end.x = self.imageSize.width - self.lineWidth/2 - self.lowerRight.x + _firstLocation.x;
         
     }
     
-    self.upperLeft = CGPointMake((self.upperLeft.x + end.x - start.x), (self.upperLeft.y + end.y - start.y));
-    self.lowerRight = CGPointMake((self.lowerRight.x + end.x - start.x), (self.lowerRight.y + end.y - start.y));
-}
-
-- (CGPoint) innerPointForPoint:(CGPoint) point
-{
-    if(point.x > self.imageSize.width - self.lineWidth/2) point.x = self.imageSize.width - self.lineWidth/2;
-    else if(point.x < self.lineWidth/2) point.x = self.lineWidth/2;
-    if(point.y > self.imageSize.height - self.lineWidth/2) point.y = self.imageSize.height - self.lineWidth/2;
-    else if(point.y < self.lineWidth/2) point.y = self.lineWidth/2;
+    self.upperLeft = CGPointMake((self.upperLeft.x + end.x - _firstLocation.x), (self.upperLeft.y + end.y - _firstLocation.y));
+    self.lowerRight = CGPointMake((self.lowerRight.x + end.x - _firstLocation.x), (self.lowerRight.y + end.y - _firstLocation.y));
     
-    return point;
+    _firstLocation = end;
 }
 
+#pragma mark -
+#pragma mark Private Methods
 
 - (NSString *)generateDateString
 {

@@ -22,23 +22,31 @@
 @property CGPoint lowerRight;
 @property BOOL sent;
 
-@property int cornerMoving;
 
 - (id) initWithUpperLeft:(CGPoint)upper lowerRight:(CGPoint)lower forImageSize:(CGSize)imageSize;
 
+// Returns the position of the touch with respect the box.
+- (int) touchAtPoint:(CGPoint)point;
+
+// Box Resize
+// Indicate the touch point that initiates the resizing. This method fixes
+// the |_cornerResizing| that stores the corner being used to resize
+- (void) resizeBeginAtPoint:(CGPoint) point;
+// Resizes from the |_cornerResizing| to the point
+- (void) resizeToPoint:(CGPoint) point;
 
 
-- (void) resizeUpperLeftToPoint:(CGPoint)upperLeft;
-- (void) resizeLowerRightToPoint:(CGPoint)lowerRight;
-//- (void) resizeForCorner:(int)corner toPoint:(CGPoint)point;
+// Box Move
+// Used when initiating a move to fix the origin point of the move
+- (void) moveBeginAtPoint:(CGPoint) point;
+// Moves from the previous fixed to the new one
+- (void) moveToPoint:(CGPoint)end;
 
-//- (void) updatePoints:(CGPoint)start :(CGPoint) end;
-- (void) moveFromPoint:(CGPoint)start toPoint:(CGPoint)end;
-
-//returns the CGRect of the Box
+// When needed returns a CGRect from the box
 - (CGRect) getRectangleForBox;
 
-//adapt box to image size
+// When loading, adjusts the box size to the iamgeSize provided. Used when
+// rotating the phone that the boxes need to reajust to the new image size.
 - (void) setBoxDimensionsForImageSize:(CGSize) size;
 
 @end
