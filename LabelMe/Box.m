@@ -41,6 +41,7 @@
     
     return self;
 }
+
 - (id)initWithPoints:(CGPoint)upper :(CGPoint)lower
 {
     self = [super init];
@@ -55,20 +56,6 @@
     return self;
 }
 
-- (id)initWIthBox:(Box *)box
-{
-    self = [super init];
-    if(self){
-        upperLeft = box.upperLeft;
-        lowerRigth = box.lowerRight;
-        self.label = box.label;
-        self.date = box.date;
-        self.color = box.color;
-        self.downloadDate = box.downloadDate;
-        self.imageSize = box.imageSize;
-    }
-    return self;
-}
 
 -(void)setBounds:(CGRect)rect
 {
@@ -79,9 +66,9 @@
 -(int) setUpperLeft:(CGPoint ) point
 {
     int corner=0;
-    if (point.y < 0 + LINEWIDTH/2) point.y = 0 + LINEWIDTH/2;
+    if (point.y < 0 + self.lineWidth/2) point.y = 0 + self.lineWidth/2;
     
-    if (point.x < 0 + LINEWIDTH/2) point.x = 0 + LINEWIDTH/2;
+    if (point.x < 0 + self.lineWidth/2) point.x = 0 + self.lineWidth/2;
     
     upperLeft = point;
 
@@ -107,11 +94,11 @@
 -(int) setLowerRight:(CGPoint ) point
 {
     int corner=0;
-    if (point.y > self.imageSize.height - LINEWIDTH/2) {
-        point.y = self.imageSize.height - LINEWIDTH/2;
+    if (point.y > self.imageSize.height - self.lineWidth/2) {
+        point.y = self.imageSize.height - self.lineWidth/2;
     }
-    if (point.x > self.imageSize.width - LINEWIDTH/2) {
-        point.x = self.imageSize.width - LINEWIDTH/2;
+    if (point.x > self.imageSize.width - self.lineWidth/2) {
+        point.x = self.imageSize.width - self.lineWidth/2;
     }
     lowerRigth = point;
 
@@ -147,21 +134,21 @@
 
 -(void) updatePoints:(CGPoint)start :(CGPoint) end
 {
-    if (upperLeft.y + end.y - start.y<0 + LINEWIDTH/2) {
-        end.y = 0 + LINEWIDTH/2 - upperLeft.y + start.y;
+    if (upperLeft.y + end.y - start.y<0 + self.lineWidth/2) {
+        end.y = 0 + self.lineWidth/2 - upperLeft.y + start.y;
         
     }
-    if (lowerRigth.y + end.y - start.y > self.imageSize.height - LINEWIDTH/2) {
-        end.y = self.imageSize.height - LINEWIDTH/2 - lowerRigth.y + start.y;
+    if (lowerRigth.y + end.y - start.y > self.imageSize.height - self.lineWidth/2) {
+        end.y = self.imageSize.height - self.lineWidth/2 - lowerRigth.y + start.y;
         
         
     }
-    if (upperLeft.x + end.x - start.x < 0 + LINEWIDTH/2) {
-        end.x = 0 + LINEWIDTH/2 - upperLeft.x + start.x;
+    if (upperLeft.x + end.x - start.x < 0 + self.lineWidth/2) {
+        end.x = 0 + self.lineWidth/2 - upperLeft.x + start.x;
         
     }
-    if (lowerRigth.x + end.x - start.x > self.imageSize.width - LINEWIDTH/2) {
-        end.x = self.imageSize.width - LINEWIDTH/2 - lowerRigth.x + start.x;
+    if (lowerRigth.x + end.x - start.x > self.imageSize.width - self.lineWidth/2) {
+        end.x = self.imageSize.width - self.lineWidth/2 - lowerRigth.x + start.x;
         
     }
     
@@ -201,7 +188,7 @@
         lowerRigth.x = [aDecoder decodeFloatForKey:@"lowerRightx"];
         lowerRigth.y = [aDecoder decodeFloatForKey:@"lowerRighty"];
         self.imageSize = [aDecoder decodeCGSizeForKey:@"imageSize"];
-        LINEWIDTH = [aDecoder decodeFloatForKey:@"LINEWIDTH"];
+        self.lineWidth = [aDecoder decodeFloatForKey:@"lineWidth"];
         self.sent = [aDecoder decodeBoolForKey:@"sent"];
 
     }
@@ -218,7 +205,7 @@
     [aCoder encodeFloat:lowerRigth.x forKey:@"lowerRightx"];
     [aCoder encodeFloat:lowerRigth.y forKey:@"lowerRighty"];
     [aCoder encodeCGSize:self.imageSize forKey:@"imageSize"];
-    [aCoder encodeFloat:LINEWIDTH forKey:@"LINEWIDTH"];
+    [aCoder encodeFloat:self.lineWidth forKey:@"lineWidth"];
     [aCoder encodeBool:self.sent forKey:@"sent"];
 }
 

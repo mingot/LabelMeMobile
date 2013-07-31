@@ -14,19 +14,18 @@
 {
     CGPoint upperLeft;
     CGPoint lowerRigth;
-    @public float LINEWIDTH;
 }
 
 @property (strong, nonatomic) NSString *label;
 @property (strong, nonatomic) NSString *date;
 @property (strong, nonatomic) UIColor *color;
 @property (strong, nonatomic) NSDate *downloadDate;
+@property float lineWidth;
 @property CGSize imageSize;
 @property BOOL sent;
 
 
 - (id) initWithPoints:(CGPoint)upper :(CGPoint)lower;
-- (id) initWIthBox:(Box *)box;
 - (void) setBounds:(CGRect)rect;
 - (int) setUpperLeft:(CGPoint)point;
 - (int) setLowerRight:(CGPoint)point;

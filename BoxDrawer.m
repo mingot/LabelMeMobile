@@ -38,7 +38,7 @@
     
     CGPoint upperRight = CGPointMake([box lowerRight].x, [box upperLeft].y);
     CGPoint lowerLeft = CGPointMake([box upperLeft].x, [box lowerRight].y);
-    CGFloat LINEWIDTH = box->LINEWIDTH;
+    CGFloat LINEWIDTH = box.lineWidth;
     
     // DRAW RECT
     CGContextSetLineWidth(context, LINEWIDTH);
