@@ -115,7 +115,7 @@
     //a box is selected
     if (selectedBox != NO_BOX_SELECTED) {
         Box *currentBox = [self.boxes objectAtIndex:selectedBox];
-        [currentBox setBounds:self.frame];
+        currentBox.imageSize =  self.frame.size;
 
         
         if ((CGRectContainsPoint(CGRectMake([currentBox upperLeft].x-DET*LINEWIDTH,
@@ -171,7 +171,7 @@
             [self.delegate hiddenTextField:NO];
             Box *currentBox=[self.boxes objectAtIndex: selectedBox];
             [self.delegate selectedAnObject:YES];
-            [currentBox setBounds:self.frame];
+            currentBox.imageSize = self.frame.size;
 
             [self.delegate stringLabel:currentBox.label];
             [self.delegate correctOrientationForBox:currentBox SuperviewFrame:self.frame];

@@ -601,8 +601,7 @@
                     box.label = label;
                     box.sent = YES;
                     box.color = [colors objectAtIndex:arc4random() % colors.count];  //choose random color
-                    [box setLimitsForImageSize:CGSizeMake([[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0,
-                                                           [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0)];
+                    box.imageSize = CGSizeMake([[(NSString *)[imageSize objectForKey:@"ncols"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0, [[(NSString *)[imageSize objectForKey:@"nrows"] stringByReplacingOccurrencesOfString:@"\n" withString:@""] intValue]*1.0);
                     NSLog(@"BOX: %@", box);
                     box.downloadDate = [NSDate date];
                     
@@ -857,7 +856,7 @@
     if (annotation.count >0) {
         double f =image.size.height/image.size.width;
         box = [annotation objectAtIndex:0];
-        point = f>1 ? CGPointMake(image.size.height/([box bounds].x*f), image.size.height/[box bounds].y) : CGPointMake(image.size.width/([box bounds].x), image.size.width*f/([box bounds].y));
+        point = f>1 ? CGPointMake(image.size.height/(box.imageSize.width*f), image.size.height/box.imageSize.height) : CGPointMake(image.size.width/(box.imageSize.width), image.size.width*f/(box.imageSize.height));
     }
     
     // Photo is not in the server

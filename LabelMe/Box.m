@@ -13,34 +13,13 @@
 {
 }
 
+- (NSString *) generateDateString;
+
 @end
 
 
 @implementation Box
 
-@synthesize label = _label;
-@synthesize color = _color;
-@synthesize date = _date;
-@synthesize downloadDate = _downloadDate;
-
-
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        // Initialization code here.
-        upperLeft = CGPointMake(0, 0 );
-        lowerRigth = CGPointMake(150, 150);
-        self.label= @"";
-        self.date= [self generateDateString];
-        self.color = [[UIColor alloc] init];
-        self.downloadDate = [NSDate date];
-        self.sent = NO;
-        
-    }
-    
-    return self;
-}
 
 - (id)initWithPoints:(CGPoint)upper :(CGPoint)lower
 {
@@ -57,17 +36,10 @@
 }
 
 
--(void)setBounds:(CGRect)rect
-{
-    self.imageSize = rect.size;
-}
-
-
 -(int) setUpperLeft:(CGPoint ) point
 {
     int corner=0;
     if (point.y < 0 + self.lineWidth/2) point.y = 0 + self.lineWidth/2;
-    
     if (point.x < 0 + self.lineWidth/2) point.x = 0 + self.lineWidth/2;
     
     upperLeft = point;
@@ -91,15 +63,17 @@
     return corner;
 }
 
+-(CGPoint) upperLeft
+{
+    return upperLeft;
+}
+
 -(int) setLowerRight:(CGPoint ) point
 {
     int corner=0;
-    if (point.y > self.imageSize.height - self.lineWidth/2) {
-        point.y = self.imageSize.height - self.lineWidth/2;
-    }
-    if (point.x > self.imageSize.width - self.lineWidth/2) {
-        point.x = self.imageSize.width - self.lineWidth/2;
-    }
+    if (point.y > self.imageSize.height - self.lineWidth/2) point.y = self.imageSize.height - self.lineWidth/2;
+    if (point.x > self.imageSize.width - self.lineWidth/2) point.x = self.imageSize.width - self.lineWidth/2;
+
     lowerRigth = point;
 
     if ((upperLeft.x>lowerRigth.x)) {
@@ -120,11 +94,6 @@
     
     return corner;
     
-}
-
--(CGPoint) upperLeft
-{
-    return upperLeft;
 }
 
 -(CGPoint) lowerRight
@@ -157,8 +126,6 @@
     lowerRigth.x = (lowerRigth.x+end.x - start.x);
     lowerRigth.y = (lowerRigth.y+end.y - start.y);
 }
-
-
 
 
 
@@ -211,12 +178,6 @@
 
 
 
-
--(CGPoint)bounds
-{
-    return CGPointMake(self.imageSize.width, self.imageSize.height);
-}
-
 - (CGRect) getRectangleForBox
 {
     CGRect rectangle = CGRectMake(upperLeft.x, upperLeft.y, lowerRigth.x - upperLeft.x, lowerRigth.y - upperLeft.y);
@@ -227,11 +188,6 @@
 {    
     upperLeft = CGPointMake(upperLeft.x*size.width*1.0/self.imageSize.width, upperLeft.y*size.height*1.0/self.imageSize.height);
     lowerRigth = CGPointMake(lowerRigth.x*size.width*1.0/self.imageSize.width, lowerRigth.y*size.height*1.0/self.imageSize.height);
-    self.imageSize = size;
-}
-
-- (void) setLimitsForImageSize:(CGSize)size
-{
     self.imageSize = size;
 }
 

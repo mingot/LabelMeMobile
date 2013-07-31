@@ -428,7 +428,7 @@
                                                       visibleRect.origin.y+(self.tagView.frame.size.height  - 100)/(2*self.scrollView.zoomScale)) :CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width  + 100)/(2*self.scrollView.zoomScale),visibleRect.origin.y+(self.tagView.frame.size.height  + 100)/(2*self.scrollView.zoomScale))];
     
     int num = self.tagView.boxes.count;
-    [box setBounds:self.tagView.frame];
+    box.imageSize = self.tagView.frame.size;
     box.color=[[self.tagView colorArray] objectAtIndex:(num%8)];
     [self.tagView.boxes addObject:box];
     [self.tagView setSelectedBox:num];
