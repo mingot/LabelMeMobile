@@ -13,7 +13,6 @@
 #import "GalleryViewController.h"
 #import "NSObject+Folders.h"
 #import "ServerConnection.h"
-#import "UITextField+CorrectOrientation.h"
 #import "NSObject+ShowAlert.h"
 #import "NSString+checkValidity.h"
 #import "LMUINavigationController.h"
@@ -106,66 +105,74 @@
     [self.labelsButton addTarget:self action:@selector(listAction:) forControlEvents:UIControlEventTouchUpInside];
     self.labelsButtonItem.customView = self.labelsButton;
     
-
-    //Scroll view
-    [self.scrollView setBackgroundColor:[UIColor blackColor]];
-	[self.scrollView setCanCancelContentTouches:NO];
-	self.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
-	self.scrollView.clipsToBounds = YES;		
-    self.scrollView.minimumZoomScale = 1.0;
-    self.scrollView.maximumZoomScale = 10.0;
-    self.scrollView.delegate = self;
-    
-    //labelsview (for the table showing the boxes in the image)
-    [self.labelsView setBackgroundColor:[UIColor clearColor]];
-    [self.labelsView setHidden:YES];
-    [self.labelsView setDelegate:self];
-    [self.labelsView setDataSource:self];
-    [self.labelsView setRowHeight:30];
-    self.labelsView.scrollEnabled = NO;
-    UIImage *globo = [[UIImage imageNamed:@"globo4.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )];
-    UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.scrollView.frame];
-    [backgroundView setImage:globo];
-    [self.labelsView setBackgroundView:backgroundView];
-
-
-    //tip
-    self.tip = [[UIButton alloc] initWithFrame:CGRectMake(25, 2*self.scrollView.frame.size.height/3, self.scrollView.frame.size.width/2, self.scrollView.frame.size.height/3)];
-    [self.tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )] forState:UIControlStateNormal];
-    UILabel *tiplabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 12, self.tip.frame.size.width-24, self.tip.frame.size.height-24)];
-    tiplabel.numberOfLines = 4;
-    tiplabel.text = @"Tip:\nPress this button \nto add a bounding box!";
-    tiplabel.textColor = [UIColor redColor];
-    tiplabel.backgroundColor = [UIColor clearColor];
-    [self.tip addSubview:tiplabel];
-    [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
-    if ((self.items.count>1) || (self.tagView.boxes.count != 0))
-        self.tip.hidden = YES;
-
-    //sending view
-    self.sendingView.hidden = YES;
-    self.sendingView.textView.text = @"Uploading to the server...";
-    [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-    self.sendingView.delegate = self;
-
-    //model
+    //tagimageview
     self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
-    
-    //annotation view
-    self.tagView.delegate = self;
+    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:self.filename];
+    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
+    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
+    NSArray *boxes = [[NSArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
+    self.tagImageView = [[TagImageView alloc] initWithFrame:self.view.frame WithBoxes:boxes forImage:image];
+    [self.view addSubview:self.tagImageView];
 
-    //Next and previous buttons
-    self.nextButton.tag = 2;
-    self.previousButton.tag = 1;
+//    //Scroll view
+//    [self.scrollView setBackgroundColor:[UIColor blackColor]];
+//	[self.scrollView setCanCancelContentTouches:NO];
+//	self.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
+//	self.scrollView.clipsToBounds = YES;		
+//    self.scrollView.minimumZoomScale = 1.0;
+//    self.scrollView.maximumZoomScale = 10.0;
+//    self.scrollView.delegate = self;
+//    
+//    //labelsview (for the table showing the boxes in the image)
+//    [self.labelsView setBackgroundColor:[UIColor clearColor]];
+//    [self.labelsView setHidden:YES];
+//    [self.labelsView setDelegate:self];
+//    [self.labelsView setDataSource:self];
+//    [self.labelsView setRowHeight:30];
+//    self.labelsView.scrollEnabled = NO;
+//    UIImage *globo = [[UIImage imageNamed:@"globo4.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )];
+//    UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.scrollView.frame];
+//    [backgroundView setImage:globo];
+//    [self.labelsView setBackgroundView:backgroundView];
 
-    //subview hierarchy
-    [self.scrollView setContentSize:self.scrollView.frame.size];
-    [self.scrollView addSubview:self.composeView];
-    [self.scrollView addSubview:self.tip];
-    [self.scrollView addSubview:self.nextButton];
-    [self.scrollView addSubview:self.previousButton];
-    [self.scrollView addSubview:self.labelsView];
-    [self.scrollView addSubview:self.sendingView];
+
+//    //tip
+//    self.tip = [[UIButton alloc] initWithFrame:CGRectMake(25, 2*self.scrollView.frame.size.height/3, self.scrollView.frame.size.width/2, self.scrollView.frame.size.height/3)];
+//    [self.tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )] forState:UIControlStateNormal];
+//    UILabel *tiplabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 12, self.tip.frame.size.width-24, self.tip.frame.size.height-24)];
+//    tiplabel.numberOfLines = 4;
+//    tiplabel.text = @"Tip:\nPress this button \nto add a bounding box!";
+//    tiplabel.textColor = [UIColor redColor];
+//    tiplabel.backgroundColor = [UIColor clearColor];
+//    [self.tip addSubview:tiplabel];
+//    [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
+//    if ((self.items.count>1) || (self.tagView.boxes.count != 0))
+//        self.tip.hidden = YES;
+
+//    //sending view
+//    self.sendingView.hidden = YES;
+//    self.sendingView.textView.text = @"Uploading to the server...";
+//    [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+//    self.sendingView.delegate = self;
+//
+//    //model
+//    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
+//    
+//    //annotation view
+    self.tagImageView. tagView.delegate = self;
+//
+//    //Next and previous buttons
+//    self.nextButton.tag = 2;
+//    self.previousButton.tag = 1;
+//
+//    //subview hierarchy
+//    [self.scrollView setContentSize:self.scrollView.frame.size];
+//    [self.scrollView addSubview:self.composeView];
+//    [self.scrollView addSubview:self.tip];
+//    [self.scrollView addSubview:self.nextButton];
+//    [self.scrollView addSubview:self.previousButton];
+//    [self.scrollView addSubview:self.labelsView];
+//    [self.scrollView addSubview:self.sendingView];
     
 }
 
@@ -206,17 +213,19 @@
         NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
         NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
         [self.tagView.boxes setArray:boxes];
+
         
-        [self selectedAnObject:NO];
-        if (self.tagView.boxes.count > 0)
-            [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-        
-        //set the box dimensions for the current context
-        for(Box* box in self.tagView.boxes)
-            [box setBoxDimensionsForImageSize:self.tagView.frame.size];
+//        [self selectedAnObject:NO];
+//        if (self.tagView.boxes.count > 0)
+//            [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+//        
+//        //set the box dimensions for the current context
+//        for(Box* box in self.tagView.boxes)
+//            [box setBoxDimensionsForImageSize:self.tagView.frame.size];
         
         [self.tagView setNeedsDisplay];
         keyboardVisible = NO;
+    
     });
 }
 

@@ -9,8 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "Box.h"
 
-@interface UITextField (CorrectOrientation)
+@interface UITextField (BoxLabeling)
 
--(void)fitForBox:(Box *)box onTagViewFrame:(CGRect)viewFrame andScale:(float)scale;
+- (void) initialSetup;
+
+- (void) fitForBox:(Box *)box insideViewFrame:(CGRect)viewFrame andScale:(float)scale;
 
 @end

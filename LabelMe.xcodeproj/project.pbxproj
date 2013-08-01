@@ -89,7 +89,7 @@
 		A5DCC5671628F5CB00AC9067 /* UIImage+RoundedCorner.m in Sources */ = {isa = PBXBuildFile; fileRef = A5480D7E1617A364009F630D /* UIImage+RoundedCorner.m */; };
 		A5DCC5681628F5CB00AC9067 /* TagViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A52C36771617C99400FEF74D /* TagViewController.m */; };
 		A5DCC5691628F5CB00AC9067 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5A567731617D756008AFE2E /* SettingsViewController.m */; };
-		A5DCC56A1628F5CB00AC9067 /* UITextField+CorrectOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = A510E0ED161B857400BC1B3A /* UITextField+CorrectOrientation.m */; };
+		A5DCC56A1628F5CB00AC9067 /* UITextField+BoxLabeling.m in Sources */ = {isa = PBXBuildFile; fileRef = A510E0ED161B857400BC1B3A /* UITextField+BoxLabeling.m */; };
 		A5DCC56B1628F5CB00AC9067 /* CustomBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = A5949C7E1625E18500627709 /* CustomBadge.m */; };
 		A5DCC56D1628F5CB00AC9067 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A52C36741617C33C00FEF74D /* AVFoundation.framework */; };
 		A5DCC56E1628F5CB00AC9067 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A52C36721617C32D00FEF74D /* CoreData.framework */; };
@@ -160,6 +160,7 @@
 		FC447A8317A99FC6004AA88B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A558D61B16134E0C001DED8C /* Foundation.framework */; };
 		FC447A8917A99FC6004AA88B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FC447A8717A99FC6004AA88B /* InfoPlist.strings */; };
 		FC447A8C17A99FC6004AA88B /* LabelMeLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A8B17A99FC6004AA88B /* LabelMeLogicTests.m */; };
+		FC447A9417A9E30C004AA88B /* TagImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A9317A9E30B004AA88B /* TagImageView.m */; };
 		FC4B0A2C172EC0C200A099A0 /* switch_camera.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2B172EC0C200A099A0 /* switch_camera.png */; };
 		FC4C5E1D174D63D100D26331 /* UIImage+Rotation.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */; };
 		FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC4D68801716164E002A73AD /* CoreMotion.framework */; };
@@ -246,8 +247,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A510E0EC161B857400BC1B3A /* UITextField+CorrectOrientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextField+CorrectOrientation.h"; sourceTree = "<group>"; };
-		A510E0ED161B857400BC1B3A /* UITextField+CorrectOrientation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+CorrectOrientation.m"; sourceTree = "<group>"; };
+		A510E0EC161B857400BC1B3A /* UITextField+BoxLabeling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextField+BoxLabeling.h"; sourceTree = "<group>"; };
+		A510E0ED161B857400BC1B3A /* UITextField+BoxLabeling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+BoxLabeling.m"; sourceTree = "<group>"; };
 		A510E0F0161B947B00BC1B3A /* whiteballoon_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteballoon_2.png; sourceTree = "<group>"; };
 		A510E0F1161B947B00BC1B3A /* whiteballoon_4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteballoon_4.png; sourceTree = "<group>"; };
 		A511BCAC162B7BC500126149 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
@@ -427,6 +428,8 @@
 		FC447A8A17A99FC6004AA88B /* LabelMeLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LabelMeLogicTests.h; sourceTree = "<group>"; };
 		FC447A8B17A99FC6004AA88B /* LabelMeLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LabelMeLogicTests.m; sourceTree = "<group>"; };
 		FC447A8D17A99FC6004AA88B /* LabelMeLogicTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LabelMeLogicTests-Prefix.pch"; sourceTree = "<group>"; };
+		FC447A9217A9E30B004AA88B /* TagImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagImageView.h; sourceTree = "<group>"; };
+		FC447A9317A9E30B004AA88B /* TagImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagImageView.m; sourceTree = "<group>"; };
 		FC4B0A2B172EC0C200A099A0 /* switch_camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switch_camera.png; sourceTree = "<group>"; };
 		FC4C5E1B174D63D100D26331 /* UIImage+Rotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Rotation.h"; sourceTree = "<group>"; };
 		FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Rotation.m"; sourceTree = "<group>"; };
@@ -704,8 +707,8 @@
 			isa = PBXGroup;
 			children = (
 				A5480D781617A364009F630D /* UIImage-categories */,
-				A510E0EC161B857400BC1B3A /* UITextField+CorrectOrientation.h */,
-				A510E0ED161B857400BC1B3A /* UITextField+CorrectOrientation.m */,
+				A510E0EC161B857400BC1B3A /* UITextField+BoxLabeling.h */,
+				A510E0ED161B857400BC1B3A /* UITextField+BoxLabeling.m */,
 				A5480D5E16173525009F630D /* NSObject+Folders.h */,
 				A5480D5F16173525009F630D /* NSObject+Folders.m */,
 				A558D6451613A29C001DED8C /* NSObject+ShowAlert.h */,
@@ -906,6 +909,8 @@
 				A52C36771617C99400FEF74D /* TagViewController.m */,
 				FCF1C0B01757ED52003DC895 /* TagViewController_withUIScroll */,
 				A5480D6F16179557009F630D /* TagViewController_iPhone.xib */,
+				FC447A9217A9E30B004AA88B /* TagImageView.h */,
+				FC447A9317A9E30B004AA88B /* TagImageView.m */,
 				A5480D721617969A009F630D /* TagView.h */,
 				A5480D731617969A009F630D /* TagView.m */,
 				A5480D7516179D8E009F630D /* Box.h */,
@@ -1395,7 +1400,7 @@
 				A5DCC5671628F5CB00AC9067 /* UIImage+RoundedCorner.m in Sources */,
 				A5DCC5681628F5CB00AC9067 /* TagViewController.m in Sources */,
 				A5DCC5691628F5CB00AC9067 /* SettingsViewController.m in Sources */,
-				A5DCC56A1628F5CB00AC9067 /* UITextField+CorrectOrientation.m in Sources */,
+				A5DCC56A1628F5CB00AC9067 /* UITextField+BoxLabeling.m in Sources */,
 				A5DCC56B1628F5CB00AC9067 /* CustomBadge.m in Sources */,
 				A55A8449162CCFAA00C917DD /* Reachability.m in Sources */,
 				A5C8BFCF162F4EC4009A39E0 /* ResolutionViewController.m in Sources */,
@@ -1423,6 +1428,7 @@
 				FC4C5E1D174D63D100D26331 /* UIImage+Rotation.m in Sources */,
 				FCB97DBB175F9486007B5AEE /* ImageCell.m in Sources */,
 				FCB97DC0175FDBC2007B5AEE /* CustomUITableViewCell.m in Sources */,
+				FC447A9417A9E30C004AA88B /* TagImageView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,11 +6,24 @@
 //  Copyright (c) 2012 CSAIL. All rights reserved.
 //
 
-#import "UITextField+CorrectOrientation.h"
+#import "UITextField+BoxLabeling.h"
 
-@implementation UITextField (CorrectOrientation)
+@implementation UITextField (BoxLabeling)
 
--(void)fitForBox:(Box *)box onTagViewFrame:(CGRect)tagViewFrame andScale:(float)scale;
+
+- (void) initialSetup
+{
+    [self setBorderStyle:UITextBorderStyleNone];
+    [self setKeyboardAppearance:UIKeyboardAppearanceAlert];
+    self.placeholder = @"Enter Label:";
+    self.textAlignment = UITextAlignmentCenter;
+    self.adjustsFontSizeToFitWidth = YES;
+    self.hidden = YES;
+    self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+    self.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+}
+
+-(void)fitForBox:(Box *)box insideViewFrame:(CGRect)tagViewFrame andScale:(float)scale;
 {
     float topDif = box.upperLeft.y + tagViewFrame.origin.y;
     float topWidthDif = tagViewFrame.size.width - box.upperLeft.x;
@@ -64,7 +77,7 @@
         tag = 4;
     }
     
-    [self setBackground:[[UIImage imageNamed:imageName] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )]];
+    [self setBackground:[[UIImage imageNamed:imageName] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23)]];
     self.frame = CGRectMake(x, y-20, self.frame.size.width, self.frame.size.height);
     self.tag = tag;
 }

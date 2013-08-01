@@ -11,7 +11,7 @@
 #import "Box.h"
 #import "ServerConnection.h"
 #import "SendingView.h"
-
+#import "TagImageView.h"
 
 @protocol TagViewControllerDelegate <NSObject>
 
@@ -54,6 +54,8 @@
 @property (strong, nonatomic) NSArray *items;
 @property (strong, nonatomic) NSMutableDictionary *userDictionary;
 
+
+@property (strong, nonatomic) TagImageView *tagImageView;
 
 - (void) keyboardDidShow:(NSNotification *)notif;
 - (void) keyboardDidHide:(NSNotification *)notif;

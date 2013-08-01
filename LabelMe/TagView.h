@@ -21,13 +21,17 @@
 
 @interface TagView : UIView
 
+// Responsible to handle when the box has been modified
 @property (nonatomic, weak) id <TagViewDelegate> delegate;
-@property (nonatomic, strong) UITextField* label;
 @property (nonatomic, strong) NSMutableArray* boxes;
-@property (nonatomic, strong) NSString* filename; //Image filename
+@property (nonatomic, strong) UITextField* label;
+
+// Index of the selected box
 @property int selectedBox;
 
-//restarts
+
+
+// When the superview performs a zoom through UIScrollView
 - (void) setLineWidthForZoomFactor:(float)factor;
 
 //labelHandling

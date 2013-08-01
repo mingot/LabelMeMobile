@@ -9,10 +9,9 @@
 
 #import "TagView.h"
 #import "Constants.h"
-#import "UITextField+CorrectOrientation.h"
-
+#import "UITextField+BoxLabeling.h"
 #import "NSString+checkValidity.h" //replacebyunderscore
-#import "UITextField+CorrectOrientation.h" //correct label position when selecting a box.
+
 
 #define NO_BOX_SELECTED -1
 #define kLineWidth 6
@@ -61,17 +60,11 @@
     
     //label initialization
     self.label = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 130, 40)];
-    [self.label setBorderStyle:UITextBorderStyleNone];
-    [self.label setKeyboardAppearance:UIKeyboardAppearanceAlert];
+    [self.label initialSetup];
     [self.label addTarget:self
                    action:@selector(labelFinish:)
          forControlEvents:UIControlEventEditingDidEndOnExit];
     [self addSubview:self.label];
-    self.label.placeholder = @"Enter Label:";
-    self.label.textAlignment = UITextAlignmentCenter;
-    self.label.adjustsFontSizeToFitWidth = YES;
-    self.label.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
-    self.label.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
 }
 
 - (id) initWithCoder:(NSCoder *)aDecoder
@@ -95,7 +88,7 @@
     selectedBox = i;
     if(i != NO_BOX_SELECTED){
         Box *currentBox = [self.boxes objectAtIndex:selectedBox];
-        [self.label fitForBox:currentBox onTagViewFrame:self.frame andScale:1.0];
+        [self.label fitForBox:currentBox insideViewFrame:self.frame andScale:1.0];
         self.label.hidden = NO;
         self.label.text = currentBox.label;
         
@@ -214,7 +207,7 @@
             currentBox.imageSize = self.frame.size;
             
             self.label.text = currentBox.label;
-            [self.label fitForBox:currentBox onTagViewFrame:self.frame andScale:1];
+            [self.label fitForBox:currentBox insideViewFrame:self.frame andScale:1];
             
             move = NO;
             size = NO;
@@ -250,9 +243,8 @@
     if (selectedBox != NO_BOX_SELECTED) {
         Box *currentBox =  [self.boxes objectAtIndex: selectedBox];
         
-        [self.label fitForBox:currentBox onTagViewFrame:self.frame andScale:1];
+        [self.label fitForBox:currentBox insideViewFrame:self.frame andScale:1];
         self.label.hidden = NO;
-        
     }
     
     move = NO;
