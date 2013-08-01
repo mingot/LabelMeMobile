@@ -27,14 +27,11 @@
 
 @implementation TagImageView
 
-- (id)initWithFrame:(CGRect)frame WithBoxes:(NSArray *)boxes forImage:(UIImage *) image
+- (id)initWithFrame:(CGRect)frame //WithBoxes:(NSArray *)boxes forImage:(UIImage *) image
 {
     self = [super initWithFrame:frame];
     if (self) {
         
-        self.image = image;
-        self.boxes = boxes;
-    
         self.zoomScrollView = [[UIScrollView alloc] initWithFrame:self.frame];
         [self.zoomScrollView setBackgroundColor:[UIColor blackColor]];
         [self.zoomScrollView setCanCancelContentTouches:NO];
@@ -49,15 +46,9 @@
         
         self.imageView = [[UIImageView alloc] initWithFrame:self.frame];
         self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.imageView.image = self.image;
         
-        
-        
-        self.tagView = [[TagView alloc] initWithFrame:[self getImageFrameFromImageView:self.imageView]];
-        self.tagView.boxes = [NSMutableArray arrayWithArray:self.boxes];
+        self.tagView = [[TagView alloc] initWithFrame:self.frame];
         self.tagView.delegate = self;
-        for(Box* box in self.tagView.boxes)
-            [box setBoxDimensionsForImageSize:self.tagView.frame.size];
         
         [self.composeView addSubview:self.imageView];
         [self.composeView addSubview:self.tagView];
@@ -70,6 +61,31 @@
     return self;
 }
 
+
+#pragma mark -
+#pragma mark Getters and Setters
+
+- (void) setBoxes:(NSArray *)boxes
+{
+    if(boxes!=_boxes){
+        _boxes = boxes;
+        self.tagView.boxes = [NSMutableArray arrayWithArray:boxes];
+        for(Box* box in self.tagView.boxes)
+            [box setBoxDimensionsForImageSize:self.tagView.frame.size];
+        
+        [self setNeedsDisplay];
+    }
+}
+
+-(void) setImage:(UIImage *)image
+{
+    if(image!=_image){
+        _image = image;
+        self.imageView.image = image;
+        self.tagView.frame = [self getImageFrameFromImageView:self.imageView];
+        [self setNeedsDisplay];
+    }
+}
 
 #pragma mark -
 #pragma mark UIScrollViewDelegate

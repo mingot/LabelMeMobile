@@ -16,6 +16,6 @@
 
 @property (nonatomic, strong) TagView *tagView;
 
-- (id)initWithFrame:(CGRect)frame WithBoxes:(NSArray *)boxes forImage:(UIImage *) image;
+//- (id)initWithFrame:(CGRect)frame WithBoxes:(NSArray *)boxes forImage:(UIImage *) image;
 
 @end
