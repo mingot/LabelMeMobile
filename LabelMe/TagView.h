@@ -12,7 +12,6 @@
 
 @protocol TagViewDelegate <NSObject>
 
-@optional
 -(void)objectModified; //saving purposes
 -(void)selectedAnObject:(BOOL)value;
 

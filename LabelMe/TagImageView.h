@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "TagView.h"
 
-@interface TagImageView : UIView <UIScrollViewDelegate>
+@interface TagImageView : UIView <UIScrollViewDelegate, TagViewDelegate>
 
 @property (nonatomic, strong) NSArray *boxes;
 @property (nonatomic, strong) UIImage *image;

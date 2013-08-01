@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-
 #import <Foundation/Foundation.h>
+
+
 
 @interface Box : NSObject <NSCoding>
 
@@ -16,11 +17,13 @@
 @property (strong, nonatomic) NSString *date;
 @property (strong, nonatomic) UIColor *color;
 @property (strong, nonatomic) NSDate *downloadDate;
-@property float lineWidth;
 @property CGSize imageSize;
 @property CGPoint upperLeft;
 @property CGPoint lowerRight;
 @property BOOL sent;
+@property CGFloat lineWidth;
+
+
 
 
 - (id) initWithUpperLeft:(CGPoint)upper lowerRight:(CGPoint)lower forImageSize:(CGSize)imageSize;
@@ -48,5 +51,8 @@
 // When loading, adjusts the box size to the iamgeSize provided. Used when
 // rotating the phone that the boxes need to reajust to the new image size.
 - (void) setBoxDimensionsForImageSize:(CGSize) size;
+
+
+
 
 @end

@@ -16,7 +16,7 @@
 
 @property (nonatomic, strong) UIScrollView *zoomScrollView;
 @property (nonatomic, strong) UIImageView *imageView;
-@property (nonatomic, strong) UIView *composeView; //container view for |imageView| and |zoomScrollView|
+@property (nonatomic, strong) UIView *composeView; //container view for |ImageView| and |TagView|
 
 
 // Needed when we want the TagView to adapt to the image size inside UIScrollView
@@ -55,6 +55,7 @@
         
         self.tagView = [[TagView alloc] initWithFrame:[self getImageFrameFromImageView:self.imageView]];
         self.tagView.boxes = [NSMutableArray arrayWithArray:self.boxes];
+        self.tagView.delegate = self;
         for(Box* box in self.tagView.boxes)
             [box setBoxDimensionsForImageSize:self.tagView.frame.size];
         
@@ -71,7 +72,7 @@
 
 
 #pragma mark -
-#pragma mark Scroll View Delegate
+#pragma mark UIScrollViewDelegate
 
 
 - (UIView*)viewForZoomingInScrollView:(UIScrollView *)aScrollView
@@ -83,6 +84,21 @@
 {
     [self.tagView setLineWidthForZoomFactor:scale];
 }
+
+
+#pragma mark -
+#pragma mark TagViewDelegate
+
+-(void)selectedAnObject:(BOOL)value
+{
+    //disable scrolling when a box is selected
+    self.zoomScrollView.scrollEnabled = !value;
+}
+
+-(void)objectModified
+{
+}
+
 
 #pragma mark -
 #pragma mark Private Methods

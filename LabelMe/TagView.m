@@ -123,6 +123,7 @@
     for(int i=0; i<self.boxes.count; i++){
         
         Box *box = [self.boxes objectAtIndex:i];
+        box.lineWidth = _lineWidth;
         if(selectedBox == NO_BOX_SELECTED)
             [self drawBox:box context:context alpha:1 corners:false];
         else if(selectedBox == i)
@@ -201,6 +202,7 @@
         if (selectedBox != NO_BOX_SELECTED) {
             self.label.hidden = NO;
             [self.delegate selectedAnObject:YES];
+            NSLog(@"Object selected in TagView!");
             
             
             Box *currentBox = [self.boxes objectAtIndex:selectedBox];

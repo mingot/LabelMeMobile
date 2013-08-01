@@ -56,7 +56,6 @@
         self.date = [self generateDateString];
         self.color = [UIColor colorWithRed:(random()%100)/(float)100 green:(random()%100)/(float)100 blue:(random()%100)/(float)100 alpha:1];
         self.downloadDate = [NSDate date];
-        self.lineWidth = kLineWidth;
         self.sent = NO;
     }
     return self;
@@ -68,40 +67,40 @@
 {
 
     int boxCorner = kExteriorBox;
-    
-    if ((CGRectContainsPoint(CGRectMake(self.upperLeft.x - DET*_lineWidth,
-                                        self.upperLeft.y - DET*_lineWidth,
-                                        2*DET*_lineWidth,
-                                        2*DET*_lineWidth), point)))  {
+
+    if ((CGRectContainsPoint(CGRectMake(self.upperLeft.x - DET*self.lineWidth,
+                                        self.upperLeft.y - DET*self.lineWidth,
+                                        2*DET*self.lineWidth,
+                                        2*DET*self.lineWidth), point)))  {
         
         
         boxCorner = kUpperLeft;
         
-    } else if ((CGRectContainsPoint(CGRectMake(self.lowerRight.x - DET*_lineWidth,
-                                               self.lowerRight.y - DET*_lineWidth,
-                                               2*DET*_lineWidth,
-                                               2*DET*_lineWidth), point)))  {
+    } else if ((CGRectContainsPoint(CGRectMake(self.lowerRight.x - DET*self.lineWidth,
+                                               self.lowerRight.y - DET*self.lineWidth,
+                                               2*DET*self.lineWidth,
+                                               2*DET*self.lineWidth), point)))  {
         
         boxCorner = kLowerRight;
         
-    } else if ((CGRectContainsPoint(CGRectMake(self.lowerRight.x - DET*_lineWidth,
-                                               self.upperLeft.y - DET*_lineWidth,
-                                               2*DET*_lineWidth,
-                                               2*DET*_lineWidth), point)))  {
+    } else if ((CGRectContainsPoint(CGRectMake(self.lowerRight.x - DET*self.lineWidth,
+                                               self.upperLeft.y - DET*self.lineWidth,
+                                               2*DET*self.lineWidth,
+                                               2*DET*self.lineWidth), point)))  {
         
         boxCorner = kUpperRight;
         
-    } else if ((CGRectContainsPoint(CGRectMake(self.upperLeft.x - DET*_lineWidth,
-                                               self.lowerRight.y - DET*_lineWidth,
-                                               2*DET*_lineWidth,
-                                               2*DET*_lineWidth), point)))  {
+    } else if ((CGRectContainsPoint(CGRectMake(self.upperLeft.x - DET*self.lineWidth,
+                                               self.lowerRight.y - DET*self.lineWidth,
+                                               2*DET*self.lineWidth,
+                                               2*DET*self.lineWidth), point)))  {
         
         boxCorner = kLowerLeft;
         
-    }else if ((CGRectContainsPoint(CGRectMake(self.upperLeft.x - _lineWidth/2,
-                                              self.upperLeft.y - _lineWidth/2,
-                                              self.lowerRight.x - self.upperLeft.x + _lineWidth,
-                                              self.lowerRight.y - self.upperLeft.y + _lineWidth) , point))) {
+    }else if ((CGRectContainsPoint(CGRectMake(self.upperLeft.x - self.lineWidth/2,
+                                              self.upperLeft.y - self.lineWidth/2,
+                                              self.lowerRight.x - self.upperLeft.x + self.lineWidth,
+                                              self.lowerRight.y - self.upperLeft.y + self.lineWidth) , point))) {
         boxCorner = kInteriorBox;
     }
     
@@ -201,6 +200,7 @@
 
 - (void) moveToPoint:(CGPoint)end
 {
+    
     if (self.upperLeft.y + end.y - _firstLocation.y < 0 + self.lineWidth/2) {
         end.y = 0 + self.lineWidth/2 - self.upperLeft.y + _firstLocation.y;
         
@@ -255,7 +255,6 @@
         self.color = [aDecoder decodeObjectForKey:@"color"];
         self.date = [aDecoder decodeObjectForKey:@"date"];
         self.imageSize = [aDecoder decodeCGSizeForKey:@"imageSize"];
-        self.lineWidth = [aDecoder decodeFloatForKey:@"lineWidth"];
         self.sent = [aDecoder decodeBoolForKey:@"sent"];
 
     }
@@ -272,7 +271,6 @@
     [aCoder encodeObject:self.color forKey:@"color"];
     [aCoder encodeObject:self.date forKey:@"date"];
     [aCoder encodeCGSize:self.imageSize forKey:@"imageSize"];
-    [aCoder encodeFloat:self.lineWidth forKey:@"lineWidth"];
     [aCoder encodeBool:self.sent forKey:@"sent"];
 }
 

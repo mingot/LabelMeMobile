@@ -159,7 +159,7 @@
 //    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
 //    
 //    //annotation view
-    self.tagImageView. tagView.delegate = self;
+//    self.tagImageView.tagView.delegate = self;
 //
 //    //Next and previous buttons
 //    self.nextButton.tag = 2;
@@ -729,7 +729,7 @@
     self.deleteButton.enabled = value;
     self.scrollView.scrollEnabled = !value;
     self.sendButton.enabled = dictnum!=0 ?  YES : NO;
-    
+    NSLog(@"object selected in tagviewController");
     [self.labelsView reloadData];
 }
 
