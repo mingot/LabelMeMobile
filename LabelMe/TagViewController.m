@@ -110,11 +110,13 @@
     NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:self.filename];
     UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
     NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
-    NSArray *boxes = [[NSArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-    self.tagImageView = [[TagImageView alloc] initWithFrame:self.view.frame];
+    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
     self.tagImageView.image = image;
-    self.tagImageView.boxes = boxes;
+    self.tagImageView.tagView.boxes = boxes;
     [self.view addSubview:self.tagImageView];
+    
+    //register for notifications if box is selected
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
 
 //    //Scroll view
 //    [self.scrollView setBackgroundColor:[UIColor blackColor]];
@@ -186,9 +188,9 @@
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
     
-    //show buttons
-    self.previousButton.hidden = NO;
-    self.nextButton.hidden = NO;
+//    //show buttons
+//    self.previousButton.hidden = NO;
+//    self.nextButton.hidden = NO;
     
     //make some ajustments on the loaded boxes
     [self loadWhenAppear];
@@ -264,6 +266,11 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.delegate reloadTableForFilename:self.filename];
     });
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    NSLog(@"box selected:%d", self.tagImageView.tagView.selectedBox);
 }
 
 #pragma mark -
@@ -400,44 +407,41 @@
 
 -(IBAction)addAction:(id)sender
 {
-// 
-//    if (![self.tip isHidden])[self.tip setHidden:YES];
-//    
-//    //get the current visible area
-//    CGRect visibleRect = [self.scrollView convertRect:self.scrollView.bounds toView:self.composeView];
-//    
-//    Box *box = [[Box alloc] initWithUpperLeft:CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width  - 100)/(2*self.scrollView.zoomScale),
+ 
+    if (![self.tip isHidden])[self.tip setHidden:YES];
+    
+//    Box *box = [[Box alloc] initWithUpperLeft:CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width - 100)/(2*self.scrollView.zoomScale),
 //                                                      visibleRect.origin.y+(self.tagView.frame.size.height  - 100)/(2*self.scrollView.zoomScale))
 //                                   lowerRight:CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width  + 100)/(2*self.scrollView.zoomScale),visibleRect.origin.y+(self.tagView.frame.size.height  + 100)/(2*self.scrollView.zoomScale))
 //                                 forImageSize:self.tagView.frame.size];
-//    
-//    int num = self.tagView.boxes.count;
-//    [self.tagView.boxes addObject:box];
-//    [self.tagView setSelectedBox:num];
-//    
-//    [self.tagView setNeedsDisplay];
-//
-//    if (!self.labelsView.hidden) {
-//        [self.labelsView setHidden:YES];
-//        [self.labelsButton setSelected:NO];
-//    }
-//    
-//    //TODO: refactor userDictionary and the way
-//    //Update the number of boxes to be send
-//    NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
-//    if (dictnum.intValue < 0){
-//        NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue - 1];
-//        [self.userDictionary removeObjectForKey:self.filename];
-//        [self.userDictionary setObject:newdictnum forKey:self.filename];
-//    
-//    }else{
-//        NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue + 1];
-//        [self.userDictionary removeObjectForKey:self.filename];
-//        [self.userDictionary setObject:newdictnum forKey:self.filename];
-//    }
-//
-//    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
-//    [self selectedAnObject:YES];
+    
+//    NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.tagImageView.boxes];
+//    int num = boxes.count;
+//    [boxes addObject:box];
+//    self.tagImageView.boxes = boxes;
+//    self.tagImageView.tagView.selectedBox = num;
+    
+    [self.tagImageView addNewBox];
+
+    if (!self.labelsView.hidden) {
+        [self.labelsView setHidden:YES];
+        [self.labelsButton setSelected:NO];
+    }
+    
+    //TODO: refactor userDictionary and the way
+    //Update the number of boxes to be send
+    NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
+    if (dictnum.intValue < 0){
+        NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue - 1];
+        [self.userDictionary removeObjectForKey:self.filename];
+        [self.userDictionary setObject:newdictnum forKey:self.filename];
+    
+    }else{
+        NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue + 1];
+        [self.userDictionary removeObjectForKey:self.filename];
+        [self.userDictionary setObject:newdictnum forKey:self.filename];
+    }
+    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
 }
 
 - (IBAction)hideKeyboardAction:(id)sender
@@ -480,6 +484,8 @@
 //        actionSheet.actionSheetStyle = UIBarStyleBlackTranslucent;
 //        [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
 //    }
+    
+    [self.tagImageView removeSelectedBox];
 }
 
 -(IBAction)listAction:(id)sender
@@ -702,14 +708,16 @@
 }
 
 
--(void)selectedAnObject:(BOOL)value
-{    
-//    int dictnum  = [[self.userDictionary objectForKey:self.filename] intValue];
-//    self.deleteButton.enabled = value;
-//    self.scrollView.scrollEnabled = !value;
-//    self.sendButton.enabled = dictnum!=0 ?  YES : NO;
-//    NSLog(@"object selected in tagviewController");
-//    [self.labelsView reloadData];
+#pragma mark -
+#pragma mark NSNotificationCenter Messages
+
+-(void)isBoxSelected:(NSNotification *) notification
+{
+    NSNumber *isSelected = [notification object];
+    int dictnum  = [[self.userDictionary objectForKey:self.filename] intValue];
+    self.deleteButton.enabled = isSelected.boolValue;
+    self.sendButton.enabled = dictnum!=0 ?  YES : NO;
+    [self.labelsView reloadData];
 }
 
 
@@ -723,14 +731,14 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (section == 0) return self.tagImageView.tagView.boxes.count;
+    if (section == 0) return 1;//self.tagImageView.tagView.boxes.count;
     else return 0;
 }
 
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-    if (section == 0) return [NSString stringWithFormat:@"%d objects",self.tagImageView.tagView.boxes.count];
+    if (section == 0) return @"0";//[NSString stringWithFormat:@"%d objects",self.tagImageView.tagView.boxes.count];
     else return  @"";
 }
 
@@ -766,42 +774,42 @@
      if (cell == nil)
          cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
 
-    [cell setBackgroundColor:[UIColor clearColor]];
-    Box *b = [self.tagImageView.tagView.boxes objectAtIndex:indexPath.row];
-    if (b.label.length != 0) {
-        if ([cell.textLabel respondsToSelector:@selector(setAttributedText:)]) {
-            NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:b.label];
-            [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, b.label.length)];
-            [attrString addAttribute:NSStrokeColorAttributeName value:b.color range:NSMakeRange(0, b.label.length)];
-            [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, b.label.length)];
-
-            cell.textLabel.attributedText = attrString;
-            
-        }else [cell.textLabel setText:b.label];
-        
-    }else{
-        if ([cell.textLabel respondsToSelector:@selector(setAttributedText:)]) {
-            NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:@"(No Label)"];
-
-            [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0,10)];
-            [attrString addAttribute:NSStrokeColorAttributeName value:b.color range:NSMakeRange(0, 10)];
-            [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, 10)];
-            
-            cell.textLabel.attributedText = attrString;
-            
-        }else [cell.textLabel setText:@"(No Label)"];
-        
-    }
-//    [cell.detailTextLabel setText:[NSString stringWithFormat:@"%d x %d",(int)((b.lowerRight.x - b.upperLeft.x)*self.imageView.image.size.width/self.tagImageView.tagView.frame.size.width),(int)((b.lowerRight.y - b.upperLeft.y)*self.imageView.image.size.height/self.tagImageView.tagView.frame.size.height)]];
-    
-    [cell.detailTextLabel setText:@"TBD"];
-    
-    if (indexPath.row == self.tagImageView.tagView.selectedBox)
-        [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
-    
-    else [cell setAccessoryType:UITableViewCellAccessoryNone];
-    
-    [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+//    [cell setBackgroundColor:[UIColor clearColor]];
+//    Box *b = nil;//[self.tagImageView.tagView.boxes objectAtIndex:indexPath.row];
+//    if (b.label.length != 0) {
+//        if ([cell.textLabel respondsToSelector:@selector(setAttributedText:)]) {
+//            NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:b.label];
+//            [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, b.label.length)];
+//            [attrString addAttribute:NSStrokeColorAttributeName value:b.color range:NSMakeRange(0, b.label.length)];
+//            [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, b.label.length)];
+//
+//            cell.textLabel.attributedText = attrString;
+//            
+//        }else [cell.textLabel setText:b.label];
+//        
+//    }else{
+//        if ([cell.textLabel respondsToSelector:@selector(setAttributedText:)]) {
+//            NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:@"(No Label)"];
+//
+//            [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0,10)];
+//            [attrString addAttribute:NSStrokeColorAttributeName value:b.color range:NSMakeRange(0, 10)];
+//            [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, 10)];
+//            
+//            cell.textLabel.attributedText = attrString;
+//            
+//        }else [cell.textLabel setText:@"(No Label)"];
+//        
+//    }
+////    [cell.detailTextLabel setText:[NSString stringWithFormat:@"%d x %d",(int)((b.lowerRight.x - b.upperLeft.x)*self.imageView.image.size.width/self.tagImageView.tagView.frame.size.width),(int)((b.lowerRight.y - b.upperLeft.y)*self.imageView.image.size.height/self.tagImageView.tagView.frame.size.height)]];
+//    
+//    [cell.detailTextLabel setText:@"TBD"];
+//    
+//    if (indexPath.row == self.tagImageView.tagView.selectedBox)
+//        [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
+//    
+//    else [cell setAccessoryType:UITableViewCellAccessoryNone];
+//    
+//    [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     
     return cell;
 }

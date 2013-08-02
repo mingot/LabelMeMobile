@@ -8,14 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import "TagView.h"
+#import "Box.h"
 
-@interface TagImageView : UIView <UIScrollViewDelegate, TagViewDelegate>
+@interface TagImageView : UIView <UIScrollViewDelegate>
 
-@property (nonatomic, strong) NSArray *boxes;
 @property (nonatomic, strong) UIImage *image;
-
 @property (nonatomic, strong) TagView *tagView;
 
-//- (id)initWithFrame:(CGRect)frame WithBoxes:(NSArray *)boxes forImage:(UIImage *) image;
+- (void) addNewBox;
+- (void) removeSelectedBox;
 
 @end

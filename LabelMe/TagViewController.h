@@ -55,7 +55,7 @@
 @property (strong, nonatomic) NSMutableDictionary *userDictionary;
 
 
-@property (strong, nonatomic) TagImageView *tagImageView;
+@property (weak, nonatomic) IBOutlet TagImageView *tagImageView;
 
 - (void) keyboardDidShow:(NSNotification *)notif;
 - (void) keyboardDidHide:(NSNotification *)notif;

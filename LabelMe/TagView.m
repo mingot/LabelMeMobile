@@ -29,20 +29,22 @@
 @interface TagView()
 {
     float _lineWidth;
-    int selectedBox;
     BOOL move;
     BOOL size;
 }
 
+
 - (int) whereIs:(CGPoint) point;
 - (int) boxInterior:(int)i :(CGPoint)point;
 - (void) drawBox:(Box *)box context:(CGContextRef)context alpha:(CGFloat)alpha corners:(BOOL)hasCorners;
+
 
 @end
 
 
 @implementation TagView
 
+@synthesize selectedBox = _selectedBox;
 
 #pragma mark -
 #pragma mark Initialization
@@ -50,12 +52,11 @@
 - (void) initialize
 {
     [self setBackgroundColor:[UIColor clearColor]];
-    self.boxes = [[NSMutableArray alloc] init];
     
     move = NO;
     size = NO;
 
-    selectedBox = NO_BOX_SELECTED;
+    _selectedBox = NO_BOX_SELECTED;
     _lineWidth = kLineWidth;
     
     //label initialization
@@ -85,19 +86,24 @@
 
 -(void) setSelectedBox:(int) i
 {
-    selectedBox = i;
-    if(i != NO_BOX_SELECTED){
-        Box *currentBox = [self.boxes objectAtIndex:selectedBox];
+    NSLog(@"selected box: %d",i);
+    _selectedBox = i;
+    BOOL isBoxSelected = i != NO_BOX_SELECTED;
+    if(isBoxSelected){
+        Box *currentBox = [self.boxes objectAtIndex:_selectedBox];
         [self.label fitForBox:currentBox insideViewFrame:self.frame andScale:1.0];
-        self.label.hidden = NO;
         self.label.text = currentBox.label;
-        
-    }else self.label.hidden = YES; 
+    }
+    
+    self.label.hidden = !isBoxSelected;
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"isBoxSelected" object:[NSNumber numberWithBool:isBoxSelected]];
+
+    [self setNeedsDisplay];
 }
 
 -(int) selectedBox
 {
-    return selectedBox;
+    return _selectedBox;
 }
 
 #pragma mark -
@@ -109,6 +115,37 @@
     [self setNeedsDisplay];
 }
 
+- (void) setBoxes:(NSArray *) boxes
+{
+    if(boxes != _boxes){
+        _boxes = boxes;
+        self.selectedBox = NO_BOX_SELECTED;
+        //ajust each box to the size of the TagViewFrame
+        for(Box* box in _boxes)
+            [box setBoxDimensionsForImageSize:self.frame.size];
+    }
+    [self setNeedsDisplay];
+}
+
+- (void) addBox:(Box *)box
+{
+    NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.boxes];
+    [boxes addObject:box];
+    _boxes = [NSArray arrayWithArray:boxes];
+    self.selectedBox = boxes.count - 1;
+    [self setNeedsDisplay];
+}
+
+- (void) deleteSelectedBox
+{
+    if(self.selectedBox != NO_BOX_SELECTED){
+        NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.boxes];
+        [boxes removeObjectAtIndex:self.selectedBox];
+        _boxes = [NSArray arrayWithArray:boxes];
+    }
+    self.selectedBox = - 1;
+    [self setNeedsDisplay];
+}
 
 #pragma mark -
 #pragma mark Draw Rect
@@ -124,9 +161,9 @@
         
         Box *box = [self.boxes objectAtIndex:i];
         box.lineWidth = _lineWidth;
-        if(selectedBox == NO_BOX_SELECTED)
+        if(self.selectedBox == NO_BOX_SELECTED)
             [self drawBox:box context:context alpha:1 corners:false];
-        else if(selectedBox == i)
+        else if(self.selectedBox == i)
             [self drawBox:box context:context alpha:1 corners:true];
         else
             [self drawBox:box context:context alpha:0.3 corners:false];
@@ -174,9 +211,9 @@
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint location = [touch locationInView:touch.view];
     
-    //a box is selected
-    if (selectedBox != NO_BOX_SELECTED) {
-        Box *currentBox = [self.boxes objectAtIndex:selectedBox];
+    //a box was previously selected
+    if (self.selectedBox != NO_BOX_SELECTED) {
+        Box *currentBox = [self.boxes objectAtIndex:self.selectedBox];
 
         int corner = [currentBox touchAtPoint:location];
         
@@ -185,9 +222,9 @@
             [currentBox moveBeginAtPoint:location];
             
         }else if(corner == kExteriorBox){
-            [self.delegate selectedAnObject:NO];
-            selectedBox = NO_BOX_SELECTED;
-            self.label.hidden = YES;
+
+            
+            self.selectedBox = NO_BOX_SELECTED;
             
         }else{
             size = YES;
@@ -197,15 +234,12 @@
     }else{
         
         //locate if there is any box at the point touched
-        selectedBox = [self whereIs:location];
+        self.selectedBox = [self whereIs:location];
         
-        if (selectedBox != NO_BOX_SELECTED) {
-            self.label.hidden = NO;
-            [self.delegate selectedAnObject:YES];
-            NSLog(@"Object selected in TagView!");
+        if (self.selectedBox != NO_BOX_SELECTED) {
+
             
-            
-            Box *currentBox = [self.boxes objectAtIndex:selectedBox];
+            Box *currentBox = [self.boxes objectAtIndex:self.selectedBox];
             currentBox.imageSize = self.frame.size;
             
             self.label.text = currentBox.label;
@@ -217,7 +251,6 @@
         }else{
             size = NO;
             move = NO;
-            [self.delegate selectedAnObject:NO];            
         }
     }
 }
@@ -228,8 +261,8 @@
     CGPoint location = [touch locationInView:touch.view];
     self.label.hidden = YES;
     
-    if(selectedBox != NO_BOX_SELECTED){
-        Box *currentBox = [self.boxes objectAtIndex:selectedBox];
+    if(self.selectedBox != NO_BOX_SELECTED){
+        Box *currentBox = [self.boxes objectAtIndex:self.selectedBox];
         if (move) [currentBox moveToPoint:location];
         else if (size) [currentBox resizeToPoint:location];
     }
@@ -242,8 +275,8 @@
 
     if ((move) || (size)) [self.delegate objectModified];
     
-    if (selectedBox != NO_BOX_SELECTED) {
-        Box *currentBox =  [self.boxes objectAtIndex: selectedBox];
+    if (self.selectedBox != NO_BOX_SELECTED) {
+        Box *currentBox =  [self.boxes objectAtIndex: self.selectedBox];
         
         [self.label fitForBox:currentBox insideViewFrame:self.frame andScale:1];
         self.label.hidden = NO;
@@ -327,6 +360,7 @@
     }    
     return i;  
 }
+
 
 -(NSString *)generateDateString
 {

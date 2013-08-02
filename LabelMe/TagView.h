@@ -13,7 +13,7 @@
 @protocol TagViewDelegate <NSObject>
 
 -(void)objectModified; //saving purposes
--(void)selectedAnObject:(BOOL)value;
+
 
 @end
 
@@ -22,18 +22,19 @@
 
 // Responsible to handle when the box has been modified
 @property (nonatomic, weak) id <TagViewDelegate> delegate;
-@property (nonatomic, strong) NSMutableArray* boxes;
 @property (nonatomic, strong) UITextField* label;
+@property (nonatomic, strong) NSArray* boxes;
 
 // Index of the selected box
 @property int selectedBox;
-
-
 
 // When the superview performs a zoom through UIScrollView
 - (void) setLineWidthForZoomFactor:(float)factor;
 
 //labelHandling
 - (IBAction)labelFinish:(id)sender;
+
+- (void) addBox:(Box *)box;
+- (void) deleteSelectedBox;
 
 @end

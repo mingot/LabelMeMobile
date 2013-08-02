@@ -24,8 +24,6 @@
 @property CGFloat lineWidth;
 
 
-
-
 - (id) initWithUpperLeft:(CGPoint)upper lowerRight:(CGPoint)lower forImageSize:(CGSize)imageSize;
 
 // Returns the position of the touch with respect the box.

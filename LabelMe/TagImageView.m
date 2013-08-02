@@ -16,7 +16,7 @@
 
 @property (nonatomic, strong) UIScrollView *zoomScrollView;
 @property (nonatomic, strong) UIImageView *imageView;
-@property (nonatomic, strong) UIView *composeView; //container view for |ImageView| and |TagView|
+@property (nonatomic, strong) UIView *containerView; //container view for |ImageView| and |TagView|
 
 
 // Needed when we want the TagView to adapt to the image size inside UIScrollView
@@ -27,37 +27,48 @@
 
 @implementation TagImageView
 
-- (id)initWithFrame:(CGRect)frame //WithBoxes:(NSArray *)boxes forImage:(UIImage *) image
+#pragma mark -
+#pragma mark Initialization
+
+- (void) initialize
 {
-    self = [super initWithFrame:frame];
-    if (self) {
-        
-        self.zoomScrollView = [[UIScrollView alloc] initWithFrame:self.frame];
-        [self.zoomScrollView setBackgroundColor:[UIColor blackColor]];
-        [self.zoomScrollView setCanCancelContentTouches:NO];
-        self.zoomScrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
-        self.zoomScrollView.clipsToBounds = YES;
-        self.zoomScrollView.minimumZoomScale = 1.0;
-        self.zoomScrollView.maximumZoomScale = 10.0;
-        self.zoomScrollView.delegate = self;
-        [self addSubview:self.zoomScrollView];
-        
-        self.composeView = [[UIView alloc] initWithFrame:self.frame];
-        
-        self.imageView = [[UIImageView alloc] initWithFrame:self.frame];
-        self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        
-        self.tagView = [[TagView alloc] initWithFrame:self.frame];
-        self.tagView.delegate = self;
-        
-        [self.composeView addSubview:self.imageView];
-        [self.composeView addSubview:self.tagView];
-        [self.zoomScrollView addSubview:self.composeView];
-        
-        
-        [self.zoomScrollView setContentSize:self.zoomScrollView.frame.size];
-        
-    }
+    self.zoomScrollView = [[UIScrollView alloc] initWithFrame:self.frame];
+    [self.zoomScrollView setBackgroundColor:[UIColor blackColor]];
+    [self.zoomScrollView setCanCancelContentTouches:NO];
+    self.zoomScrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
+    self.zoomScrollView.clipsToBounds = YES;
+    self.zoomScrollView.minimumZoomScale = 1.0;
+    self.zoomScrollView.maximumZoomScale = 10.0;
+    self.zoomScrollView.delegate = self;
+    [self.zoomScrollView setContentSize:self.zoomScrollView.frame.size];
+    
+    self.containerView = [[UIView alloc] initWithFrame:self.frame];
+    
+    self.imageView = [[UIImageView alloc] initWithFrame:self.frame];
+    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    
+    self.tagView = [[TagView alloc] initWithFrame:self.frame];
+    
+    [self addSubview:self.zoomScrollView];
+    [self.containerView addSubview:self.imageView];
+    [self.containerView addSubview:self.tagView];
+    [self.zoomScrollView addSubview:self.containerView];
+    
+    //register for notifications if box is selected
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
+    
+}
+
+
+- (id) initWithCoder:(NSCoder *)aDecoder
+{
+    if(self = [super initWithCoder:aDecoder]) [self initialize];
+    return self;
+}
+
+- (id)initWithFrame:(CGRect)frame 
+{
+    if (self = [super initWithFrame:frame]) [self initialize];
     return self;
 }
 
@@ -65,26 +76,40 @@
 #pragma mark -
 #pragma mark Getters and Setters
 
-- (void) setBoxes:(NSArray *)boxes
-{
-    if(boxes!=_boxes){
-        _boxes = boxes;
-        self.tagView.boxes = [NSMutableArray arrayWithArray:boxes];
-        for(Box* box in self.tagView.boxes)
-            [box setBoxDimensionsForImageSize:self.tagView.frame.size];
-        
-        [self setNeedsDisplay];
-    }
-}
 
 -(void) setImage:(UIImage *)image
 {
     if(image!=_image){
         _image = image;
-        self.imageView.image = image;
+        [self.imageView setImage:image];
+        
+        //ajust the frame to be the same as the displayed image, not the whole view
         self.tagView.frame = [self getImageFrameFromImageView:self.imageView];
+        
         [self setNeedsDisplay];
     }
+}
+
+#pragma mark -
+#pragma mark Public methods
+
+
+- (void) addNewBox
+{
+    //get the current visible area
+    CGRect visibleRect = [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView];
+    
+    CGPoint newUpperLeft = CGPointMake(visibleRect.origin.x + 0.3*visibleRect.size.width, visibleRect.origin.y + 0.3*visibleRect.size.height);
+    CGPoint newLowerRight = CGPointMake(visibleRect.origin.x + 0.7*visibleRect.size.width, visibleRect.origin.y + 0.7*visibleRect.size.height);
+    Box *newBox = [[Box alloc] initWithUpperLeft:newUpperLeft lowerRight:newLowerRight forImageSize:self.imageView.image.size];
+    
+    [self.tagView addBox:newBox];
+    
+}
+
+- (void) removeSelectedBox
+{
+    [self.tagView deleteSelectedBox];
 }
 
 #pragma mark -
@@ -93,7 +118,7 @@
 
 - (UIView*)viewForZoomingInScrollView:(UIScrollView *)aScrollView
 {
-    return self.composeView;
+    return self.containerView;
 }
 
 - (void) scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
@@ -103,13 +128,17 @@
 
 
 #pragma mark -
-#pragma mark TagViewDelegate
+#pragma mark NSNotificationCenter Messages
 
--(void)selectedAnObject:(BOOL)value
+-(void)isBoxSelected:(NSNotification *) notification
 {
     //disable scrolling when a box is selected
-    self.zoomScrollView.scrollEnabled = !value;
+    NSNumber *isSelected = [notification object];
+    self.zoomScrollView.scrollEnabled = !isSelected.boolValue;
 }
+
+#pragma mark -
+#pragma mark TagViewDelegate
 
 -(void)objectModified
 {
