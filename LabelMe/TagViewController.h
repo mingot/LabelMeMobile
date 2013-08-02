@@ -20,18 +20,13 @@
 @end
 
 
-@interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate,UITextFieldDelegate>
+@interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate>
 {
-    BOOL keyboardVisible;
     ServerConnection *sConnection;
 }
 
 //views
-@property (weak, nonatomic) IBOutlet SendingView *sendingView;
-@property (strong, nonatomic) UITableView *labelsView;
-@property (strong, nonatomic) UIButton *tip;
-@property (weak, nonatomic) IBOutlet UIButton *nextButton;
-@property (weak, nonatomic) IBOutlet UIButton *previousButton;
+@property (weak, nonatomic) IBOutlet TagImageView *tagImageView;
 
 @property (strong, nonatomic) id<TagViewControllerDelegate> delegate;
 
@@ -39,29 +34,24 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *addButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *deleteButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *sendButton;
-@property (strong, nonatomic) UIButton *labelsButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *labelsButtonItem;
 @property (strong, nonatomic) IBOutlet UIToolbar *bottomToolbar;
 
 //model
 @property (strong, nonatomic) NSString *filename;
-@property (strong, nonatomic) NSArray *paths;
 @property (strong, nonatomic) NSString *username;
+
+@property (strong, nonatomic) NSArray *paths;
 @property (strong, nonatomic) NSArray *items;
 @property (strong, nonatomic) NSMutableDictionary *userDictionary;
 
 
-@property (weak, nonatomic) IBOutlet TagImageView *tagImageView;
-
-- (void) keyboardDidShow:(NSNotification *)notif;
-- (void) keyboardDidHide:(NSNotification *)notif;
 
 -(IBAction)addAction:(id)sender;
-- (IBAction)hideKeyboardAction:(id)sender;
 -(IBAction)deleteAction:(id)sender;
 -(IBAction)sendAction:(id)sender;
--(IBAction)doneAction:(id)sender;
 -(IBAction)listAction:(id)sender;
+
 -(IBAction)hideTip:(id)sender;
 -(IBAction)changeImageAction:(id)sender;
 

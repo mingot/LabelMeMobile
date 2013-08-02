@@ -18,7 +18,7 @@
 @end
 
 
-@interface TagView : UIView
+@interface TagView : UIView <UITextFieldDelegate>
 
 // Responsible to handle when the box has been modified
 @property (nonatomic, weak) id <TagViewDelegate> delegate;
@@ -34,7 +34,14 @@
 //labelHandling
 - (IBAction)labelFinish:(id)sender;
 
+// Draws and adds the given box
 - (void) addBox:(Box *)box;
-- (void) deleteSelectedBox;
+
+// Create a random box in a visible rect
+// Needed when zoom is in to know where to put the initial points of the box
+- (void) addBoxInVisibleRect:(CGRect)visibleRect;
+
+// If anyboxselected, it removes it
+- (void) removeSelectedBox;
 
 @end

@@ -162,6 +162,7 @@
 		FC447A8C17A99FC6004AA88B /* LabelMeLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A8B17A99FC6004AA88B /* LabelMeLogicTests.m */; };
 		FC447A9417A9E30C004AA88B /* TagImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A9317A9E30B004AA88B /* TagImageView.m */; };
 		FC447A9717AB4F2E004AA88B /* KeyboardHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A9617AB4F2E004AA88B /* KeyboardHandler.m */; };
+		FC447A9A17AC1412004AA88B /* FilenameResourcesHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A9917AC1411004AA88B /* FilenameResourcesHandler.m */; };
 		FC4B0A2C172EC0C200A099A0 /* switch_camera.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2B172EC0C200A099A0 /* switch_camera.png */; };
 		FC4C5E1D174D63D100D26331 /* UIImage+Rotation.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */; };
 		FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC4D68801716164E002A73AD /* CoreMotion.framework */; };
@@ -433,6 +434,8 @@
 		FC447A9317A9E30B004AA88B /* TagImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagImageView.m; sourceTree = "<group>"; };
 		FC447A9517AB4F2D004AA88B /* KeyboardHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardHandler.h; sourceTree = "<group>"; };
 		FC447A9617AB4F2E004AA88B /* KeyboardHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyboardHandler.m; sourceTree = "<group>"; };
+		FC447A9817AC1411004AA88B /* FilenameResourcesHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilenameResourcesHandler.h; sourceTree = "<group>"; };
+		FC447A9917AC1411004AA88B /* FilenameResourcesHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilenameResourcesHandler.m; sourceTree = "<group>"; };
 		FC4B0A2B172EC0C200A099A0 /* switch_camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switch_camera.png; sourceTree = "<group>"; };
 		FC4C5E1B174D63D100D26331 /* UIImage+Rotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Rotation.h"; sourceTree = "<group>"; };
 		FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Rotation.m"; sourceTree = "<group>"; };
@@ -908,9 +911,10 @@
 				A5CAAF4E16163A870095D703 /* GalleryViewController.h */,
 				A5CAAF4F16163A870095D703 /* GalleryViewController.m */,
 				A5CAAF5016163A870095D703 /* GalleryViewController_iPhone.xib */,
+				FC447A9817AC1411004AA88B /* FilenameResourcesHandler.h */,
+				FC447A9917AC1411004AA88B /* FilenameResourcesHandler.m */,
 				A52C36761617C99400FEF74D /* TagViewController.h */,
 				A52C36771617C99400FEF74D /* TagViewController.m */,
-				FCF1C0B01757ED52003DC895 /* TagViewController_withUIScroll */,
 				A5480D6F16179557009F630D /* TagViewController_iPhone.xib */,
 				FC447A9217A9E30B004AA88B /* TagImageView.h */,
 				FC447A9317A9E30B004AA88B /* TagImageView.m */,
@@ -920,6 +924,7 @@
 				A5480D731617969A009F630D /* TagView.m */,
 				A5480D7516179D8E009F630D /* Box.h */,
 				A5480D7616179D8E009F630D /* Box.m */,
+				FCF1C0B01757ED52003DC895 /* TagViewController_withUIScroll */,
 			);
 			name = "Image Gallery";
 			sourceTree = "<group>";
@@ -1435,6 +1440,7 @@
 				FCB97DC0175FDBC2007B5AEE /* CustomUITableViewCell.m in Sources */,
 				FC447A9417A9E30C004AA88B /* TagImageView.m in Sources */,
 				FC447A9717AB4F2E004AA88B /* KeyboardHandler.m in Sources */,
+				FC447A9A17AC1412004AA88B /* FilenameResourcesHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

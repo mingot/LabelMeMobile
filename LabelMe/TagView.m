@@ -63,6 +63,8 @@
     //label initialization
     self.label = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 130, 40)];
     [self.label initialSetup];
+    [self.label setDelegate:self];
+    [self.label setReturnKeyType:UIReturnKeyDone];
     [self.label addTarget:self
                    action:@selector(labelFinish:)
          forControlEvents:UIControlEventEditingDidEndOnExit];
@@ -139,7 +141,16 @@
     [self setNeedsDisplay];
 }
 
-- (void) deleteSelectedBox
+- (void) addBoxInVisibleRect:(CGRect)visibleRect
+{
+    CGPoint newUpperLeft = CGPointMake(visibleRect.origin.x + 0.3*visibleRect.size.width, visibleRect.origin.y + 0.3*visibleRect.size.height);
+    CGPoint newLowerRight = CGPointMake(visibleRect.origin.x + 0.7*visibleRect.size.width, visibleRect.origin.y + 0.7*visibleRect.size.height);
+    Box *newBox = [[Box alloc] initWithUpperLeft:newUpperLeft lowerRight:newLowerRight forImageSize:self.frame.size];
+    
+    [self addBox:newBox];
+}
+
+- (void) removeSelectedBox
 {
     if(self.selectedBox != NO_BOX_SELECTED){
         NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.boxes];
@@ -295,6 +306,7 @@
 
 - (IBAction)labelFinish:(id)sender
 {
+    
     int selected = self.selectedBox;
     self.label.text = [self.label.text replaceByUnderscore];
     Box *box = [self.boxes objectAtIndex:selected];

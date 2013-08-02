@@ -12,9 +12,6 @@
 
 
 @interface TagImageView()
-{
-    
-}
 
 @property (nonatomic, strong) UIScrollView *zoomScrollView;
 @property (nonatomic, strong) UIImageView *imageView;
@@ -101,22 +98,6 @@
     [self.tagView setLineWidthForZoomFactor:1.0];
 }
 
-- (void) addNewBox
-{
-    //get the current visible area
-    CGRect visibleRect = [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView];
-    
-    CGPoint newUpperLeft = CGPointMake(visibleRect.origin.x + 0.3*visibleRect.size.width, visibleRect.origin.y + 0.3*visibleRect.size.height);
-    CGPoint newLowerRight = CGPointMake(visibleRect.origin.x + 0.7*visibleRect.size.width, visibleRect.origin.y + 0.7*visibleRect.size.height);
-    Box *newBox = [[Box alloc] initWithUpperLeft:newUpperLeft lowerRight:newLowerRight forImageSize:self.tagView.frame.size];
-    
-    [self.tagView addBox:newBox];
-}
-
-- (void) removeSelectedBox
-{
-    [self.tagView deleteSelectedBox];
-}
 
 - (UIImage *) takeThumbnailImage
 {
@@ -134,14 +115,14 @@
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
     UIImage *thumbnailImage  = [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
     
-    //    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-    //       thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
-    //
-    //    else thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
-    
     CGImageRelease(imageRef);
     
     return thumbnailImage;
+}
+
+- (CGRect) getVisibleRect
+{
+    return [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView]; 
 }
 
 #pragma mark -
@@ -167,13 +148,6 @@
     //disable scrolling when a box is selected
     NSNumber *isSelected = [notification object];
     self.zoomScrollView.scrollEnabled = !isSelected.boolValue;
-}
-
-#pragma mark -
-#pragma mark TagViewDelegate
-
--(void)objectModified
-{
 }
 
 

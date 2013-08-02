@@ -10,17 +10,20 @@
 #import "TagView.h"
 #import "Box.h"
 
+// Provides Image and TagView with zooming capabilities
+
 @interface TagImageView : UIView <UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, strong) TagView *tagView;
 
-// return to the initial state of zoom
+// Return to the initial state of zoom
 - (void) resetZoomView;
 
 - (UIImage *) takeThumbnailImage;
 
-- (void) addNewBox;
-- (void) removeSelectedBox;
+// Returns the visible rectabgle when zooming
+// Needed to create a new box when zoom is in
+- (CGRect) getVisibleRect;
 
 @end

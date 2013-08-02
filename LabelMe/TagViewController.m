@@ -15,40 +15,29 @@
 #import "NSString+checkValidity.h"
 #import "LMUINavigationController.h"
 #import "UIButton+CustomViews.h"
+#import "FilenameResourcesHandler.h"
+
 
 
 @interface TagViewController()
+{
+    FilenameResourcesHandler *_filenameResourceHandler;
+}
 
-//UIScroll view
-//@property int currentScrollIndex;
-//@property (nonatomic, strong) NSMutableArray *composeViewsArray; //array of compose views to set in each part of the scroll view.
+@property (strong, nonatomic) UITableView *labelsView;
+@property (strong, nonatomic) UIButton *tip;
+@property (strong, nonatomic) UIButton *labelsButton;
+@property (strong, nonatomic) SendingView *sendingView;
 
-// instructions to execute when loading and unloading images
-- (void) loadWhenAppear;
-- (void) loadWhenDisappear;
+
 
 @end
 
 
 @implementation TagViewController
 
-
 #pragma mark -
-#pragma mark Getters and Setters
-
-//- (NSMutableArray *) composeViewsArray
-//{
-//    if(!_composeViewsArray){
-//        _composeViewsArray = [[NSMutableArray alloc] initWithCapacity:self.items.count];
-//        for(int i=0;i<self.items.count;i++)
-//            [_composeViewsArray addObject:[NSNull null]];
-//    }
-//    return _composeViewsArray;
-//}
-
-
-#pragma mark -
-#pragma mark View lifecycle
+#pragma mark Initialization
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -61,23 +50,8 @@
     return self;
 }
 
-
-- (void)viewDidLoad
+- (void) initializeBottomToolbar
 {
-    [super viewDidLoad];
-    
-    
-    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbarBg.png"] forBarMetrics:UIBarMetricsDefault];
-    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
-    
-//    //disable keyboard when touching the background
-//    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboardAction:)];
-//    // For selecting cell.
-//    gestureRecognizer.cancelsTouchesInView = NO;
-//    [self.tagView addGestureRecognizer:gestureRecognizer];
-    
-    
-    //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
     
     UIButton *addButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
@@ -96,19 +70,66 @@
     [sendButtonView setImage:[UIImage imageNamed:@"send.png"] forState:UIControlStateNormal];
     [sendButtonView addTarget:self action:@selector(sendAction:) forControlEvents:UIControlEventTouchUpInside];
     self.sendButton.customView = sendButtonView;
-
+    
     self.labelsButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,self.bottomToolbar.frame.size.height)];
     [self.labelsButton setImage:[UIImage imageNamed:@"labelsList.png"] forState:UIControlStateNormal];
     [self.labelsButton setImage:[UIImage imageNamed:@"labelsList-white.png"] forState:UIControlStateSelected];
     [self.labelsButton addTarget:self action:@selector(listAction:) forControlEvents:UIControlEventTouchUpInside];
     self.labelsButtonItem.customView = self.labelsButton;
-    
-    //tagimageview
-    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
-    [self.view addSubview:self.tagImageView];
-    
+}
 
-//    
+- (void) initializeAndAddTipView
+{
+    //tip
+    CGRect tipRect = CGRectMake(25, 2*self.view.frame.size.height/3, self.view.frame.size.width/2, self.view.frame.size.height/3);
+    self.tip = [[UIButton alloc] initWithFrame:tipRect];
+    [self.tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )] forState:UIControlStateNormal];
+    UILabel *tiplabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 12, self.tip.frame.size.width-24, self.tip.frame.size.height-24)];
+    tiplabel.numberOfLines = 4;
+    tiplabel.text = @"Tip:\nPress this button \nto add a bounding box!";
+    tiplabel.textColor = [UIColor redColor];
+    tiplabel.backgroundColor = [UIColor clearColor];
+    [self.tip addSubview:tiplabel];
+    [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
+    
+    if (self.tagImageView.tagView.boxes.count != 0)
+        self.tip.hidden = YES;
+    
+    [self.view addSubview:self.tip];
+}
+
+- (void) initializeAndAddSendingView
+{
+
+    self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
+    self.sendingView.hidden = YES;
+    self.sendingView.textView.text = @"Uploading to the server...";
+    [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+    self.sendingView.delegate = self;
+    [self.view addSubview:self.sendingView];
+}
+
+#pragma mark -
+#pragma mark View Life Cycle
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    //model
+    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
+    _filenameResourceHandler = [[FilenameResourcesHandler alloc] initForUsername:self.username andFilename:self.filename];
+    
+    
+    
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbarBg.png"] forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
+    
+    [self initializeBottomToolbar];
+    [self initializeAndAddTipView];
+    [self initializeAndAddSendingView];
+    
+    
 //    //labelsview (for the table showing the boxes in the image)
 //    [self.labelsView setBackgroundColor:[UIColor clearColor]];
 //    [self.labelsView setHidden:YES];
@@ -120,31 +141,9 @@
 //    UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.scrollView.frame];
 //    [backgroundView setImage:globo];
 //    [self.labelsView setBackgroundView:backgroundView];
-
-
-//    //tip
-//    self.tip = [[UIButton alloc] initWithFrame:CGRectMake(25, 2*self.scrollView.frame.size.height/3, self.scrollView.frame.size.width/2, self.scrollView.frame.size.height/3)];
-//    [self.tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )] forState:UIControlStateNormal];
-//    UILabel *tiplabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 12, self.tip.frame.size.width-24, self.tip.frame.size.height-24)];
-//    tiplabel.numberOfLines = 4;
-//    tiplabel.text = @"Tip:\nPress this button \nto add a bounding box!";
-//    tiplabel.textColor = [UIColor redColor];
-//    tiplabel.backgroundColor = [UIColor clearColor];
-//    [self.tip addSubview:tiplabel];
-//    [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
-//    if ((self.items.count>1) || (self.tagView.boxes.count != 0))
-//        self.tip.hidden = YES;
-
-//    //sending view
-//    self.sendingView.hidden = YES;
-//    self.sendingView.textView.text = @"Uploading to the server...";
-//    [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-//    self.sendingView.delegate = self;
-//
-
     
-}
 
+}
 
 - (void) viewWillAppear:(BOOL)animated
 {
@@ -170,8 +169,6 @@
     //check if boxes not saved on the server
     NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
     if (dictnum.intValue == 0) [self.sendButton setEnabled:NO];
-    
-    keyboardVisible = NO;
     
 ////        [self selectedAnObject:NO];
 ////        if (self.tagView.boxes.count > 0)
@@ -201,8 +198,6 @@
 //    self.labelsButton.selected = NO;
 //    if (![self.sendingView isHidden]) self.sendingView.hidden = YES;
 
-    
-    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -298,50 +293,6 @@
 
 
 #pragma mark -
-#pragma mark Keyboard Notifications
-
-//- (void) keyboardDidShow:(NSNotification *)notif
-//{
-//    self.tagView.userInteractionEnabled = NO;
-//    [self.scrollView setScrollEnabled:YES];
-//    [self.labelsView setHidden:YES];
-//    [self.labelsButton setSelected:NO];
-//	if (keyboardVisible) return;
-//	
-//	// Get the origin of the keyboard when it finishes animating
-//	NSDictionary *info = [notif userInfo];
-//	NSValue *aValue = [info objectForKey:UIKeyboardFrameEndUserInfoKey];
-//	
-//	// Get the top of the keyboard in view's coordinate system. 
-//	// We need to set the bottom of the scrollview to line up with it
-//
-//	CGRect keyboardRect = [aValue CGRectValue];
-//    keyboardRect = [self.view convertRect:keyboardRect fromView:nil];
-//	CGFloat keyboardTop = keyboardRect.origin.y;
-//    CGRect viewFrame = self.scrollView.frame;
-//	viewFrame.size.height = keyboardTop;
-//
-//	self.scrollView.frame = viewFrame;
-//
-////    [self.scrollView scrollRectToVisible:self.label.frame animated:YES];
-//	keyboardVisible = YES;
-//}
-//
-//- (void) keyboardDidHide:(NSNotification *)notif
-//{
-//    [self.scrollView setScrollEnabled:NO];
-//
-//	if (!keyboardVisible)
-//		return;
-//	
-//    self.scrollView.frame = CGRectMake(0,0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
-//
-//	keyboardVisible = NO;
-//    self.tagView.userInteractionEnabled=YES;
-//}
-
-
-#pragma mark -
 #pragma mark IBAction 
 
 -(IBAction)addAction:(id)sender
@@ -349,7 +300,7 @@
  
     if (![self.tip isHidden])[self.tip setHidden:YES];
     
-    [self.tagImageView addNewBox];
+    [self.tagImageView.tagView addBoxInVisibleRect:[self.tagImageView getVisibleRect]];
 
     if (!self.labelsView.hidden) {
         [self.labelsView setHidden:YES];
@@ -372,18 +323,6 @@
     [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
 }
 
-- (IBAction) hideKeyboardAction:(id)sender
-{
-    [self.view endEditing:YES];
-}
-
--(IBAction) doneAction:(id)sender
-{
-    NSLog(@"Leaving with %d boxes", self.tagImageView.tagView.boxes.count);
-    [self saveThumbnail];
-    [self saveDictionary];
-    [self dismissViewControllerAnimated:NO completion:NULL];
-}
 
 -(IBAction)sendAction:(id)sender
 {
@@ -393,7 +332,7 @@
     [self barButtonsEnabled:NO];
     
     //sending view
-    [self.sendingView setHidden:NO];
+    self.sendingView.hidden = NO;
     [self.sendingView.progressView setProgress:0];
     [self.sendingView.activityIndicator startAnimating];
     [self.tagImageView resetZoomView];
@@ -401,14 +340,11 @@
 }
 
 
-
 -(IBAction)deleteAction:(id)sender
 {
-    if((self.tagImageView.tagView.selectedBox != -1)&&(!keyboardVisible)){
-        UIActionSheet *actionSheet = [[UIActionSheet alloc]  initWithTitle:@"" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Object" otherButtonTitles:nil, nil];
-        actionSheet.actionSheetStyle = UIBarStyleBlackTranslucent;
-        [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
-    }
+    UIActionSheet *actionSheet = [[UIActionSheet alloc]  initWithTitle:@"" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Object" otherButtonTitles:nil, nil];
+    actionSheet.actionSheetStyle = UIBarStyleBlackTranslucent;
+    [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
 }
 
 -(IBAction)listAction:(id)sender
@@ -454,13 +390,6 @@
     [self.tip setHidden:YES];
 }
 
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
-{
-//    // Disallow recognition of tap gestures in the segmented control.
-//    if (self.tagView.selectedBox != -1)
-//        return NO;
-//    else return YES;
-}
 
 - (IBAction)changeImageAction:(id)sender
 {
@@ -520,7 +449,7 @@
     
         [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
         
-        [self.tagImageView removeSelectedBox];
+        [self.tagImageView.tagView removeSelectedBox];
         [self saveThumbnail];
         [self saveDictionary];
 //        [self selectedAnObject:NO];
@@ -749,8 +678,10 @@
 
 - (void)willAnimateRotationToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
+    
+    // TODO
     //reload image and how it is displayed
-    [self loadWhenAppear];
+    
     
     //deselect boxes (avoid problems with self.label)
     [self.tagImageView.tagView setSelectedBox:-1];
@@ -824,26 +755,14 @@
     [self.userDictionary removeObjectForKey:filename];
     [self.userDictionary setObject:newdictnum forKey:filename];
     [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
+    
     [self sendAction:self.sendButton];
 }
 
-#pragma mark -
-#pragma mark Private methods
 
-- (CGRect) getImageFrameFromImageView: (UIImageView *)iv
-{
-    CGSize imageSize = iv.image.size;
-    CGFloat imageScale = fminf(CGRectGetWidth(iv.bounds)/imageSize.width, CGRectGetHeight(iv.bounds)/imageSize.height);
-    CGSize scaledImageSize = CGSizeMake(imageSize.width*imageScale, imageSize.height*imageScale);
-    CGRect imageFrame = CGRectMake(floorf(0.5f*(CGRectGetWidth(iv.bounds)-scaledImageSize.width)), floorf(0.5f*(CGRectGetHeight(iv.bounds)-scaledImageSize.height)), scaledImageSize.width, scaledImageSize.height);
-    
-    return imageFrame;
-}
 
-- (void)viewDidUnload {
-    [self setLabelsButtonItem:nil];
-    [super viewDidUnload];
-}
+
+
 
 
 @end
