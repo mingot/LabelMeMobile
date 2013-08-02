@@ -12,8 +12,9 @@
 
 @protocol TagViewDelegate <NSObject>
 
--(void)objectModified; //saving purposes
 
+// send when and object is: moved, resized or changed the label
+- (void)objectModified;
 
 @end
 
@@ -28,8 +29,12 @@
 // Index of the selected box
 @property int selectedBox;
 
+// Returns nil if no box selected
+- (Box *) getSelectedBox;
+
 // When the superview performs a zoom through UIScrollView
-- (void) setLineWidthForZoomFactor:(float)factor;
+// Redraws at the correct size the lines width and the labels
+- (void) setUpViewForZoomScale:(float)factor;
 
 //labelHandling
 - (IBAction)labelFinish:(id)sender;
@@ -43,5 +48,6 @@
 
 // If anyboxselected, it removes it
 - (void) removeSelectedBox;
+
 
 @end

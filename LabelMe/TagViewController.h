@@ -41,7 +41,7 @@
 
 //@property (strong, nonatomic) NSArray *paths;
 @property (strong, nonatomic) NSArray *items;
-@property (strong, nonatomic) NSMutableDictionary *userDictionary;
+//@property (strong, nonatomic) NSMutableDictionary *userDictionary;
 
 
 

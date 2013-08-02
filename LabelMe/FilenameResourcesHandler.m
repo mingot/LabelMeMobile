@@ -50,11 +50,13 @@
 - (void) setFilename:(NSString *)filename
 {
     if(filename!=_filename){
+        _filename = filename;
         _imagePath = [[_paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
         _boxesPath = [[_paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
         _thumbnailPath = [[_paths objectAtIndex:THUMB] stringByAppendingPathComponent:filename];
         _dictionaryValue = [[_userDictionary objectForKey:filename] intValue];
         _boxesNotSent = _dictionaryValue > -1 ? _dictionaryValue : abs(_dictionaryValue) - 1;
+        
     }
 }
 
@@ -111,14 +113,20 @@
         _boxesNotSent = boxesNotSent;
         
         //update dictionary values
-        int dictValue;
-        if([self imageNotSent]) dictValue = - (1 + boxesNotSent);
-        else dictValue = boxesNotSent;
+        if([self imageNotSent]) _dictionaryValue = - (1 + boxesNotSent);
+        else _dictionaryValue = boxesNotSent;
+        
+        if(boxesNotSent == 0) _dictionaryValue = 0;
         
         //save it to a file
-        [_userDictionary setObject:[NSNumber numberWithInt:dictValue] forKey:_filename];
+        [_userDictionary setObject:[NSNumber numberWithInt:_dictionaryValue] forKey:_filename];
         [_userDictionary writeToFile:[[_paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",_username] atomically:NO];
     }
+}
+
+- (NSString *) getBoxesPath
+{
+    return [_paths objectAtIndex:OBJECTS];
 }
 
 @end

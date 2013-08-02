@@ -26,4 +26,7 @@
 // Needed to create a new box when zoom is in
 - (CGRect) getVisibleRect;
 
+// Reajust subviews after rotation
+- (void) reloadForRotation;
+
 @end

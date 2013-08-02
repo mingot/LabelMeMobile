@@ -93,7 +93,9 @@
     [self.tip addSubview:tiplabel];
     [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
     
-    if (self.tagImageView.tagView.boxes.count != 0)
+    //TODO: Check also if there are other images
+    NSArray *boxes = [_filenameResourceHandler getBoxes];
+    if (boxes.count != 0)
         self.tip.hidden = YES;
     
     [self.view addSubview:self.tip];
@@ -118,10 +120,7 @@
     [super viewDidLoad];
     
     //model
-//    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
     _filenameResourceHandler = [[FilenameResourcesHandler alloc] initForUsername:self.username andFilename:self.filename];
-    
-    
     
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbarBg.png"] forBarMetrics:UIBarMetricsDefault];
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
@@ -150,12 +149,15 @@
 {
 	[super viewWillAppear:animated];
     
+    _filenameResourceHandler.filename = self.filename;
+    
     //title
     int index = [self.items indexOfObject:self.filename];
     self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
 
     self.tagImageView.image = [_filenameResourceHandler getImage];;
     self.tagImageView.tagView.boxes = [_filenameResourceHandler getBoxes];
+    self.tagImageView.tagView.delegate = self;
     
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
@@ -164,8 +166,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
     
     //check if boxes not saved on the server
-    NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
-    if (dictnum.intValue == 0) [self.sendButton setEnabled:NO];
+    if (_filenameResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
     
 ////        [self selectedAnObject:NO];
 ////        if (self.tagView.boxes.count > 0)
@@ -303,21 +304,9 @@
         [self.labelsView setHidden:YES];
         [self.labelsButton setSelected:NO];
     }
-    
-    //TODO: refactor userDictionary and the way
+
     //Update the number of boxes to be send
-    NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
-    if (dictnum.intValue < 0){
-        NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue - 1];
-        [self.userDictionary removeObjectForKey:self.filename];
-        [self.userDictionary setObject:newdictnum forKey:self.filename];
-    
-    }else{
-        NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue + 1];
-        [self.userDictionary removeObjectForKey:self.filename];
-        [self.userDictionary setObject:newdictnum forKey:self.filename];
-    }
-    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
+    _filenameResourceHandler.boxesNotSent++;
 }
 
 
@@ -346,6 +335,7 @@
 
 -(IBAction)listAction:(id)sender
 {
+    NSLog(@"Boxes to be send: %d", _filenameResourceHandler.boxesNotSent);
 //    [self.labelsView reloadData];
 //    if (self.labelsView.hidden) {
 //        
@@ -417,34 +407,13 @@
 {
 
     if (buttonIndex==0) {
-        int num=[[self.tagImageView.tagView boxes] count];
+        int num = self.tagImageView.tagView.boxes.count;
 
-        if((num<1)||(self.tagImageView.tagView.selectedBox == -1))
+        if( num<1 || self.tagImageView.tagView.selectedBox == -1)
             return;
 
-        NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
-        if (dictnum.intValue < 0){
-            if (![[self.tagImageView.tagView.boxes objectAtIndex:self.tagImageView.tagView.selectedBox] sent]) {
-                NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
-                [self.userDictionary removeObjectForKey:self.filename];
-                [self.userDictionary setObject:newdictnum forKey:self.filename];
-            }
-           
-        }else if(dictnum.intValue >= 0){
-
-            if (![[self.tagImageView.tagView.boxes objectAtIndex:self.tagImageView.tagView.selectedBox] sent]) {
-                NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue - 1];
-                [self.userDictionary removeObjectForKey:self.filename];
-                [self.userDictionary setObject:newdictnum forKey:self.filename];
-
-            }else{
-                NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue + 1];
-                [self.userDictionary removeObjectForKey:self.filename];
-                [self.userDictionary setObject:newdictnum forKey:self.filename];
-            }
-        }
-    
-        [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
+        BOOL boxWasSent = [[self.tagImageView.tagView.boxes objectAtIndex:self.tagImageView.tagView.selectedBox] sent];
+        if(!boxWasSent) _filenameResourceHandler.boxesNotSent--;
         
         [self.tagImageView.tagView removeSelectedBox];
         [self saveThumbnail];
@@ -467,11 +436,12 @@
 
 -(void)sendPhoto
 {
-    NSNumber *num = [self.userDictionary objectForKey:self.filename];
     CGPoint point = CGPointMake(self.tagImageView.image.size.width/self.tagImageView.tagView.frame.size.width, self.tagImageView.image.size.height/self.tagImageView.tagView.frame.size.height);
     
     NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.tagImageView.tagView.boxes];
-    if (num.intValue<0) [sConnection sendPhoto:self.tagImageView.image filename:self.filename path:[self.paths objectAtIndex:OBJECTS] withSize:point andAnnotation:boxes];
+    NSString *boxesPath = [_filenameResourceHandler getBoxesPath];
+    if ([_filenameResourceHandler imageNotSent])
+        [sConnection sendPhoto:self.tagImageView.image filename:self.filename path:boxesPath withSize:point andAnnotation:boxes];
     else [sConnection updateAnnotationFrom:self.filename withSize:point :boxes];
 }
 
@@ -481,29 +451,11 @@
 
 -(void) saveThumbnail
 {
-    
-//    UIImage *thumbnailImage = [self.tagImageView takeThumbnailImage];
-//    
-//    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-//    dispatch_sync(saveQueue, ^{
-//        NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
-//        [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil];
-//    });
-//    dispatch_release(saveQueue);
-    
     [_filenameResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
 }
 
 -(void)saveDictionary
-{
-
-//    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-//    dispatch_sync(saveQueue, ^{
-//        NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
-//        [NSKeyedArchiver archiveRootObject:self.tagImageView.tagView.boxes toFile:pathObject];
-//    });
-//    dispatch_release(saveQueue);
-    
+{    
     [_filenameResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
 }
 
@@ -512,30 +464,15 @@
 #pragma mark TagViewDelegate Methods
 
 -(void)objectModified
-{   
-//    if (self.tagView.selectedBox == -1)
-//        return;
-//
-//    if ([[self.tagView.boxes objectAtIndex:self.tagView.selectedBox] sent]) {
-//        [[self.tagView.boxes objectAtIndex:self.tagView.selectedBox] setSent:NO];
-//        NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
-//
-//        if (dictnum.intValue < 0){
-//            NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue-1];
-//            [self.userDictionary removeObjectForKey:self.filename];
-//            [self.userDictionary setObject:newdictnum forKey:self.filename];
-//
-//        }else{
-//            NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
-//            [self.userDictionary removeObjectForKey:self.filename];
-//            [self.userDictionary setObject:newdictnum forKey:self.filename];
-//        }
-//        
-//        [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
-//        [self.sendButton setEnabled:YES];
-//    }
-//    
-//    [self saveDictionary];
+{
+    // if the box was sent, update 
+    Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
+    if(selectedBox && selectedBox.sent){
+        selectedBox.sent = NO;
+        _filenameResourceHandler.boxesNotSent ++;
+    }
+
+    [self saveDictionary];
 }
 
 
@@ -544,10 +481,13 @@
 
 -(void)isBoxSelected:(NSNotification *) notification
 {
+    
+    //TODO: just activate sending button if box was not previously sent
     NSNumber *isSelected = [notification object];
-    int dictnum  = [[self.userDictionary objectForKey:self.filename] intValue];
     self.deleteButton.enabled = isSelected.boolValue;
-    self.sendButton.enabled = dictnum!=0 ?  YES : NO;
+    Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
+    if(!selectedBox.sent) self.sendButton.enabled = YES;
+    self.sendButton.enabled = _filenameResourceHandler.boxesNotSent!=0 ?  YES : NO;
     [self.labelsView reloadData];
 }
 
@@ -680,13 +620,10 @@
 - (void)willAnimateRotationToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
     
-    // TODO
-    //reload image and how it is displayed
-    
-    
     //deselect boxes (avoid problems with self.label)
-    [self.tagImageView.tagView setSelectedBox:-1];
-    [self.tagImageView.tagView setNeedsDisplay];
+    self.tagImageView.tagView.selectedBox = -1;
+    
+    [self.tagImageView reloadForRotation];
     
     [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
 }
@@ -718,29 +655,21 @@
     
     [self saveDictionary];
 
-    
-    NSNumber *newdictnum = [[NSNumber alloc]initWithInt:0];
-    
     [self.navigationItem setHidesBackButton:NO];
 
-        [self.sendingView setHidden:YES];
-        [self.sendingView.progressView setProgress:0];
-        [self.sendingView.activityIndicator stopAnimating];
+    [self.sendingView setHidden:YES];
+    [self.sendingView.progressView setProgress:0];
+    [self.sendingView.activityIndicator stopAnimating];
     
     [self barButtonsEnabled:YES];
     [self.sendButton setEnabled:NO];
     [self.deleteButton setEnabled:NO];
-
-    [self.userDictionary removeObjectForKey:filename];
-    [self.userDictionary setObject:newdictnum forKey:filename];
-    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
+    
+    _filenameResourceHandler.boxesNotSent = 0;
 }
 
 -(void)photoNotOnServer:(NSString *)filename
 {
-    
-    NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
-    
     NSArray *boxes = [_filenameResourceHandler getBoxes];
     if (boxes != nil) {
         for (int i=0; i<boxes.count; i++)
@@ -748,18 +677,9 @@
         [self saveDictionary];
     }
     
-    NSNumber *newdictnum = [[NSNumber alloc]initWithInt:-objects.count-1];
-    [self.userDictionary removeObjectForKey:filename];
-    [self.userDictionary setObject:newdictnum forKey:filename];
-    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
+    _filenameResourceHandler.boxesNotSent = boxes.count;
     
     [self sendAction:self.sendButton];
 }
-
-
-
-
-
-
 
 @end

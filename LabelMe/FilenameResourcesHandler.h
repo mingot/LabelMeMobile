@@ -29,5 +29,7 @@
 
 - (BOOL) imageNotSent;
 
+//TODO: not to be used
+- (NSString *) getBoxesPath;
 
 @end

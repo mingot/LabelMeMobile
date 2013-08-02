@@ -213,6 +213,7 @@
         //custom badge
         NSNumber *num = [self.userDictionary objectForKey:[indexes objectAtIndex:i]];
         [button addSubview:[self correctAccessoryWithBoxes:num forImgeSize:button.frame.size]];
+        NSLog(@"modifying badges! Num obtained: %@", num);
         
         [buttons addObject:button];
     }
@@ -384,10 +385,12 @@
 -(void) reloadGallery
 {
     //get sorted files by date of modification of the image
+    self.userDictionary = nil;
     self.items = nil;
     self.labelsOrdered = nil;
     self.labelsArray = nil;
     self.buttonsArray = nil;
+    
     
     dispatch_async(dispatch_get_main_queue(), ^{
 
@@ -695,7 +698,6 @@
     //load tagVC
     self.tagViewController.items = [NSArray arrayWithArray:self.items]; //give a copy to avoid problems writing
     self.tagViewController.filename = filename;
-    self.tagViewController.userDictionary = self.userDictionary;
     self.tagViewController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.tagViewController animated:YES];
 }

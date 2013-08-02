@@ -11,6 +11,11 @@
 #import "UIImage+Resize.h"
 
 
+// masks for flexible ajusting each views
+#define kUIViewAutoresizingFlexibleHeighWidth   \
+    UIViewAutoresizingFlexibleWidth           | \
+    UIViewAutoresizingFlexibleHeight
+
 @interface TagImageView()
 
 @property (nonatomic, strong) UIScrollView *zoomScrollView;
@@ -56,6 +61,13 @@
     //register for notifications if box is selected
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
     
+    // to adapt when rotating
+    self.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
+    self.zoomScrollView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
+    self.containerView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
+    self.imageView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
+    self.tagView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
+    
 }
 
 
@@ -95,7 +107,7 @@
 - (void) resetZoomView
 {
     [self.zoomScrollView setZoomScale:1.0 animated:NO];
-    [self.tagView setLineWidthForZoomFactor:1.0];
+    [self.tagView setUpViewForZoomScale:1.0];
 }
 
 
@@ -125,6 +137,18 @@
     return [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView]; 
 }
 
+- (void) reloadForRotation
+{
+    
+    [self.imageView setImage:self.image];
+    self.tagView.frame = [self getImageFrameFromImageView:self.imageView];
+    
+    //reset boxes to force them to reajust to the new frame
+    NSArray *boxesAux = self.tagView.boxes;
+    self.tagView.boxes = nil;
+    self.tagView.boxes = boxesAux;
+}
+
 #pragma mark -
 #pragma mark UIScrollViewDelegate
 
@@ -136,7 +160,7 @@
 
 - (void) scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
 {
-    [self.tagView setLineWidthForZoomFactor:scale];
+    [self.tagView setUpViewForZoomScale:scale];
 }
 
 

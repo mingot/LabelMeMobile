@@ -16,6 +16,9 @@
 
 #define NO_BOX_SELECTED -1
 #define kLineWidth 6
+#define kLabelWidth 130
+#define kLabelHeight 40
+#define kLabelFontSize 15
 
 
 #define kExteriorBox 0
@@ -38,8 +41,7 @@
 
 - (int) whereIs:(CGPoint) point;
 - (int) boxInterior:(int)i :(CGPoint)point;
-- (void) drawBox:(Box *)box context:(CGContextRef)context alpha:(CGFloat)alpha corners:(BOOL)hasCorners;
-
+- (void) drawBox:(Box *)box alpha:(CGFloat)alpha corners:(BOOL)hasCorners;
 
 @end
 
@@ -61,7 +63,8 @@
     _lineWidth = kLineWidth;
     
     //label initialization
-    self.label = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 130, 40)];
+    self.label = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, kLabelWidth, kLabelHeight)];
+    [self.label setFont:[UIFont systemFontOfSize:kLabelFontSize]];
     [self.label initialSetup];
     [self.label setDelegate:self];
     [self.label setReturnKeyType:UIReturnKeyDone];
@@ -114,9 +117,17 @@
 #pragma mark -
 #pragma mark Public Methods
 
-- (void) setLineWidthForZoomFactor:(float)factor;
+- (void) setUpViewForZoomScale:(float)factor
 {
+    
     _lineWidth = kLineWidth / factor;
+    
+    CGRect labelFrame = self.label.frame;
+    [self.label setFont:[UIFont systemFontOfSize:kLabelFontSize / factor]];
+    labelFrame.size.width = kLabelWidth / factor;
+    labelFrame.size.height = kLabelHeight / factor;
+    self.label.frame = labelFrame;
+    
     [self setNeedsDisplay];
 }
 
@@ -161,6 +172,16 @@
     [self setNeedsDisplay];
 }
 
+- (Box *) getSelectedBox
+{
+    Box *selectedBox;
+    
+    if(self.selectedBox != NO_BOX_SELECTED)
+        selectedBox = [self.boxes objectAtIndex:self.selectedBox];
+    
+    return selectedBox;
+}
+
 #pragma mark -
 #pragma mark Draw Rect
 
@@ -169,18 +190,13 @@
     if (self.boxes.count<1)
         return;
    
-    
-    
     for(int i=0; i<self.boxes.count; i++){
         
         Box *box = [self.boxes objectAtIndex:i];
         box.lineWidth = _lineWidth;
-        if(self.selectedBox == NO_BOX_SELECTED)
-            [self drawBox:box alpha:1 corners:false];
-        else if(self.selectedBox == i)
-            [self drawBox:box alpha:1 corners:true];
-        else
-            [self drawBox:box alpha:0.3 corners:false];
+        if(self.selectedBox == NO_BOX_SELECTED) [self drawBox:box alpha:1 corners:false];
+        else if(self.selectedBox == i) [self drawBox:box alpha:1 corners:true];
+        else [self drawBox:box alpha:0.3 corners:false];
                 
     }
 }
