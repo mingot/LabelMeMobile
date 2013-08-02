@@ -21,9 +21,7 @@
 
 
 @interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate>
-{
-    ServerConnection *sConnection;
-}
+
 
 //views
 @property (weak, nonatomic) IBOutlet TagImageView *tagImageView;
@@ -41,7 +39,7 @@
 @property (strong, nonatomic) NSString *filename;
 @property (strong, nonatomic) NSString *username;
 
-@property (strong, nonatomic) NSArray *paths;
+//@property (strong, nonatomic) NSArray *paths;
 @property (strong, nonatomic) NSArray *items;
 @property (strong, nonatomic) NSMutableDictionary *userDictionary;
 

@@ -22,6 +22,7 @@
 @interface TagViewController()
 {
     FilenameResourcesHandler *_filenameResourceHandler;
+    ServerConnection *sConnection;
 }
 
 @property (strong, nonatomic) UITableView *labelsView;
@@ -117,7 +118,7 @@
     [super viewDidLoad];
     
     //model
-    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
+//    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
     _filenameResourceHandler = [[FilenameResourcesHandler alloc] initForUsername:self.username andFilename:self.filename];
     
     
@@ -153,12 +154,8 @@
     int index = [self.items indexOfObject:self.filename];
     self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
 
-    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:self.filename];
-    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
-    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-    self.tagImageView.image = image;
-    self.tagImageView.tagView.boxes = boxes;
+    self.tagImageView.image = [_filenameResourceHandler getImage];;
+    self.tagImageView.tagView.boxes = [_filenameResourceHandler getBoxes];
     
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
@@ -485,25 +482,29 @@
 -(void) saveThumbnail
 {
     
-    UIImage *thumbnailImage = [self.tagImageView takeThumbnailImage];
+//    UIImage *thumbnailImage = [self.tagImageView takeThumbnailImage];
+//    
+//    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
+//    dispatch_sync(saveQueue, ^{
+//        NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
+//        [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil];
+//    });
+//    dispatch_release(saveQueue);
     
-    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-    dispatch_sync(saveQueue, ^{
-        NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
-        [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil];
-    });
-    dispatch_release(saveQueue);
+    [_filenameResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
 }
 
 -(void)saveDictionary
 {
 
-    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-    dispatch_sync(saveQueue, ^{
-        NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
-        [NSKeyedArchiver archiveRootObject:self.tagImageView.tagView.boxes toFile:pathObject];
-    });
-    dispatch_release(saveQueue);
+//    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
+//    dispatch_sync(saveQueue, ^{
+//        NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
+//        [NSKeyedArchiver archiveRootObject:self.tagImageView.tagView.boxes toFile:pathObject];
+//    });
+//    dispatch_release(saveQueue);
+    
+    [_filenameResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
 }
 
 
@@ -710,19 +711,13 @@
 
 -(void)photoSentCorrectly:(NSString *)filename
 {
-    if ([self.filename isEqualToString:filename]) {
-        for (int i=0; i<self.tagImageView.tagView.boxes.count ; i++)
-            [[self.tagImageView.tagView.boxes objectAtIndex:i] setSent:YES];
 
-        [self saveDictionary];
-        
-    }else{
-        NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
-        for (int i=0; i<objects.count; i++)
-            [[objects objectAtIndex:i] setSent:YES];
-        
-        [NSKeyedArchiver archiveRootObject:objects toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
-    }
+    // Modify the flag of the boxes
+    for (int i=0; i<self.tagImageView.tagView.boxes.count; i++)
+        [[self.tagImageView.tagView.boxes objectAtIndex:i] setSent:YES];
+    
+    [self saveDictionary];
+
     
     NSNumber *newdictnum = [[NSNumber alloc]initWithInt:0];
     
@@ -745,10 +740,12 @@
 {
     
     NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
-    if (objects != nil) {
-        for (int i=0; i<objects.count; i++)
-            [[objects objectAtIndex:i] setSent:NO];
-        [NSKeyedArchiver archiveRootObject:objects toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
+    
+    NSArray *boxes = [_filenameResourceHandler getBoxes];
+    if (boxes != nil) {
+        for (int i=0; i<boxes.count; i++)
+            [[boxes objectAtIndex:i] setSent:NO];
+        [self saveDictionary];
     }
     
     NSNumber *newdictnum = [[NSNumber alloc]initWithInt:-objects.count-1];

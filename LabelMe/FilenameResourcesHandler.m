@@ -14,12 +14,16 @@
 #define OBJECTS 2
 #define USER 3
 
+
 @interface FilenameResourcesHandler()
 {
     NSArray *_paths;
+    NSString *_username;
     NSString *_imagePath;
     NSString *_boxesPath;
     NSString *_thumbnailPath;
+    NSMutableDictionary *_userDictionary;
+    int _dictionaryValue;
 }
 
 @end
@@ -28,11 +32,16 @@
 @implementation FilenameResourcesHandler
 
 
+@synthesize boxesNotSent = _boxesNotSent;
+
 - (id) initForUsername:(NSString *)username andFilename:(NSString *) filename
 {
     if(self = [super init]){
         _paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:username]];
+        _userDictionary = [[NSMutableDictionary alloc]initWithContentsOfFile:[[_paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",username]];;
         self.filename = filename;
+        
+        _username = username;
     }
     return self;
 }
@@ -44,10 +53,10 @@
         _imagePath = [[_paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
         _boxesPath = [[_paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
         _thumbnailPath = [[_paths objectAtIndex:THUMB] stringByAppendingPathComponent:filename];
+        _dictionaryValue = [[_userDictionary objectForKey:filename] intValue];
+        _boxesNotSent = _dictionaryValue > -1 ? _dictionaryValue : abs(_dictionaryValue) - 1;
     }
 }
-
-
 
 - (NSArray *) getBoxes
 {
@@ -85,5 +94,31 @@
     
 }
 
+- (BOOL)imageNotSent
+{
+    return _dictionaryValue < 0;
+}
+
+- (int) boxesNotSent
+{
+    return _boxesNotSent;
+}
+
+- (void) setBoxesNotSent:(int)boxesNotSent
+{
+    if(_boxesNotSent != boxesNotSent)
+    {
+        _boxesNotSent = boxesNotSent;
+        
+        //update dictionary values
+        int dictValue;
+        if([self imageNotSent]) dictValue = - (1 + boxesNotSent);
+        else dictValue = boxesNotSent;
+        
+        //save it to a file
+        [_userDictionary setObject:[NSNumber numberWithInt:dictValue] forKey:_filename];
+        [_userDictionary writeToFile:[[_paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",_username] atomically:NO];
+    }
+}
 
 @end
