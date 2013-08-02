@@ -8,8 +8,6 @@
 
 #import "TagViewController.h"
 #import "Constants.h"
-#import "UIImage+Resize.h"
-#import <QuartzCore/QuartzCore.h>
 #import "GalleryViewController.h"
 #import "NSObject+Folders.h"
 #import "ServerConnection.h"
@@ -107,25 +105,9 @@
     
     //tagimageview
     self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
-    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:self.filename];
-    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
-    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-    self.tagImageView.image = image;
-    self.tagImageView.tagView.boxes = boxes;
     [self.view addSubview:self.tagImageView];
     
-    //register for notifications if box is selected
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
 
-//    //Scroll view
-//    [self.scrollView setBackgroundColor:[UIColor blackColor]];
-//	[self.scrollView setCanCancelContentTouches:NO];
-//	self.scrollView.indicatorStyle = UIScrollViewIndicatorStyleBlack;
-//	self.scrollView.clipsToBounds = YES;		
-//    self.scrollView.minimumZoomScale = 1.0;
-//    self.scrollView.maximumZoomScale = 10.0;
-//    self.scrollView.delegate = self;
 //    
 //    //labelsview (for the table showing the boxes in the image)
 //    [self.labelsView setBackgroundColor:[UIColor clearColor]];
@@ -159,24 +141,7 @@
 //    [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
 //    self.sendingView.delegate = self;
 //
-//    //model
-//    self.paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:self.username]];
-//    
-//    //annotation view
-//    self.tagImageView.tagView.delegate = self;
-//
-//    //Next and previous buttons
-//    self.nextButton.tag = 2;
-//    self.previousButton.tag = 1;
-//
-//    //subview hierarchy
-//    [self.scrollView setContentSize:self.scrollView.frame.size];
-//    [self.scrollView addSubview:self.composeView];
-//    [self.scrollView addSubview:self.tip];
-//    [self.scrollView addSubview:self.nextButton];
-//    [self.scrollView addSubview:self.previousButton];
-//    [self.scrollView addSubview:self.labelsView];
-//    [self.scrollView addSubview:self.sendingView];
+
     
 }
 
@@ -185,88 +150,62 @@
 {
 	[super viewWillAppear:animated];
     
+    //title
+    int index = [self.items indexOfObject:self.filename];
+    self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
+
+    NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:self.filename];
+    UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
+    NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
+    NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
+    self.tagImageView.image = image;
+    self.tagImageView.tagView.boxes = boxes;
+    
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
     
-//    //show buttons
-//    self.previousButton.hidden = NO;
-//    self.nextButton.hidden = NO;
+    //register for notifications if box is selected
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
     
-    //make some ajustments on the loaded boxes
-    [self loadWhenAppear];
-}
-
-- (void) loadWhenAppear
-{
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        
-//        int index = [self.items indexOfObject:self.filename];
-//        self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
-//        
-//        //check if boxes not saved on the server
-//        NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
-//        if (dictnum.intValue == 0) [self.sendButton setEnabled:NO];
-//        
-//        //load image
-//        NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:self.filename];
-//        UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-//        self.imageView.image = image;
-//        self.tagView.frame = [self getImageFrameFromImageView:self.imageView];
-//        
-//        //load boxes
-//        NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
-//        NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-//        [self.tagView.boxes setArray:boxes];
-//
-//        
+    //check if boxes not saved on the server
+    NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
+    if (dictnum.intValue == 0) [self.sendButton setEnabled:NO];
+    
+    keyboardVisible = NO;
+    
 ////        [self selectedAnObject:NO];
 ////        if (self.tagView.boxes.count > 0)
 ////            [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-////        
-////        //set the box dimensions for the current context
-////        for(Box* box in self.tagView.boxes)
-////            [box setBoxDimensionsForImageSize:self.tagView.frame.size];
-//        
-//        [self.tagView setNeedsDisplay];
-//        keyboardVisible = NO;
-//    
-//    });
+
 }
+
 
 - (void) viewWillDisappear:(BOOL)animated
 {
-//	[super viewWillDisappear:animated];
-//    
-//    [self loadWhenDisappear];
-//    
-//    if (!self.tagView.userInteractionEnabled){
-//        self.tagView.userInteractionEnabled = YES;
-//        self.scrollView.frame = CGRectMake(0 , 0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
-////        [self.label resignFirstResponder];
-//    }
-//    
-//    self.labelsView.hidden = YES;
-//    self.labelsButton.selected = NO;
-//    if (![self.sendingView isHidden]) self.sendingView.hidden = YES;
-//    [self.scrollView setZoomScale:1.0 animated:NO];
-//    [self.tagView setLineWidthForZoomFactor:1.0];
-//    [self.imageView setImage:nil];
-//    [self.tagView.boxes removeAllObjects];
-//    
-//    
-//    
-//    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-- (void) loadWhenDisappear
-{
+	[super viewWillDisappear:animated];
+    
     //save thumbnail and dictionary
     [self saveThumbnail];
     [self saveDictionary];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.delegate reloadTableForFilename:self.filename];
     });
+    
+//    if (!self.tagView.userInteractionEnabled){
+//        self.tagView.userInteractionEnabled = YES;
+//        self.scrollView.frame = CGRectMake(0 , 0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
+////        [self.label resignFirstResponder];
+//    }
+    
+//    self.labelsView.hidden = YES;
+//    self.labelsButton.selected = NO;
+//    if (![self.sendingView isHidden]) self.sendingView.hidden = YES;
+
+    
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
@@ -410,17 +349,6 @@
  
     if (![self.tip isHidden])[self.tip setHidden:YES];
     
-//    Box *box = [[Box alloc] initWithUpperLeft:CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width - 100)/(2*self.scrollView.zoomScale),
-//                                                      visibleRect.origin.y+(self.tagView.frame.size.height  - 100)/(2*self.scrollView.zoomScale))
-//                                   lowerRight:CGPointMake(visibleRect.origin.x+(self.tagView.frame.size.width  + 100)/(2*self.scrollView.zoomScale),visibleRect.origin.y+(self.tagView.frame.size.height  + 100)/(2*self.scrollView.zoomScale))
-//                                 forImageSize:self.tagView.frame.size];
-    
-//    NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.tagImageView.boxes];
-//    int num = boxes.count;
-//    [boxes addObject:box];
-//    self.tagImageView.boxes = boxes;
-//    self.tagImageView.tagView.selectedBox = num;
-    
     [self.tagImageView addNewBox];
 
     if (!self.labelsView.hidden) {
@@ -444,48 +372,43 @@
     [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
 }
 
-- (IBAction)hideKeyboardAction:(id)sender
+- (IBAction) hideKeyboardAction:(id)sender
 {
     [self.view endEditing:YES];
 }
 
--(IBAction)doneAction:(id)sender
+-(IBAction) doneAction:(id)sender
 {
-//    [self.scrollView setZoomScale:1.0 animated:NO];
-//    [self saveThumbnail];
-//    [self saveDictionary];
-//    [self.imageView setImage:nil];
-//    [self dismissViewControllerAnimated:NO completion:NULL];
+    NSLog(@"Leaving with %d boxes", self.tagImageView.tagView.boxes.count);
+    [self saveThumbnail];
+    [self saveDictionary];
+    [self dismissViewControllerAnimated:NO completion:NULL];
 }
 
 -(IBAction)sendAction:(id)sender
 {
-//    //save state
-//    [self saveDictionary];
-//    [self saveThumbnail];
-//    
-//    [self barButtonsEnabled:NO];
-//    
-//    //sending view
-//    [self.sendingView setHidden:NO];
-//    [self.sendingView.progressView setProgress:0];
-//    [self.sendingView.activityIndicator startAnimating];
-//    [self.scrollView setZoomScale:1.0 animated:NO];
-//    [self.tagView setLineWidthForZoomFactor:1.0];
-//    [self sendPhoto];
+    //save state
+    [self saveDictionary];
+    [self saveThumbnail];
+    [self barButtonsEnabled:NO];
+    
+    //sending view
+    [self.sendingView setHidden:NO];
+    [self.sendingView.progressView setProgress:0];
+    [self.sendingView.activityIndicator startAnimating];
+    [self.tagImageView resetZoomView];
+    [self sendPhoto];
 }
 
 
 
 -(IBAction)deleteAction:(id)sender
 {
-//    if((self.tagView.selectedBox != -1)&&(!keyboardVisible)){
-//        UIActionSheet *actionSheet = [[UIActionSheet alloc]  initWithTitle:@"" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Object" otherButtonTitles:nil, nil];
-//        actionSheet.actionSheetStyle = UIBarStyleBlackTranslucent;
-//        [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
-//    }
-    
-    [self.tagImageView removeSelectedBox];
+    if((self.tagImageView.tagView.selectedBox != -1)&&(!keyboardVisible)){
+        UIActionSheet *actionSheet = [[UIActionSheet alloc]  initWithTitle:@"" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Object" otherButtonTitles:nil, nil];
+        actionSheet.actionSheetStyle = UIBarStyleBlackTranslucent;
+        [actionSheet showFromBarButtonItem:self.deleteButton animated:YES];
+    }
 }
 
 -(IBAction)listAction:(id)sender
@@ -542,22 +465,22 @@
 - (IBAction)changeImageAction:(id)sender
 {
     
-    [self loadWhenDisappear];
-    
-    UIButton *button = (UIButton *)sender;
-    
-    //select next/previous image filename
-    int increase = 2*button.tag - 3;
-    int currentIndex = [self.items indexOfObject:self.filename];
-    int total = self.items.count;
-    int a = currentIndex + increase;
-    int nextIndex = (a >= 0) ? (a % total) : ((a % total) + total);
-    NSString *newFilename = (NSString *)[self.items objectAtIndex:nextIndex];
-    //NSLog(@"current index: %d, next index: %d, increase: %d, button.tag: %d",currentIndex, (currentIndex+increase)%self.items.count, increase, button.tag);
-    
-    //load new boxes and new image
-    self.filename = newFilename;
-    [self loadWhenAppear];
+//    [self loadWhenDisappear];
+//    
+//    UIButton *button = (UIButton *)sender;
+//    
+//    //select next/previous image filename
+//    int increase = 2*button.tag - 3;
+//    int currentIndex = [self.items indexOfObject:self.filename];
+//    int total = self.items.count;
+//    int a = currentIndex + increase;
+//    int nextIndex = (a >= 0) ? (a % total) : ((a % total) + total);
+//    NSString *newFilename = (NSString *)[self.items objectAtIndex:nextIndex];
+//    //NSLog(@"current index: %d, next index: %d, increase: %d, button.tag: %d",currentIndex, (currentIndex+increase)%self.items.count, increase, button.tag);
+//    
+//    //load new boxes and new image
+//    self.filename = newFilename;
+//    [self loadWhenAppear];
 }
 
 
@@ -566,47 +489,42 @@
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-//
-//    if (buttonIndex==0) {
-//        int num=[[self.tagView boxes] count];
-//
-//        if((num<1)||(self.tagView.selectedBox == -1))
-//            return;
-//
-//        NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
-//        if (dictnum.intValue < 0){
-//            if (![[[self.tagView boxes] objectAtIndex: self.tagView.selectedBox ] sent]) {
-//                NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
-//                [self.userDictionary removeObjectForKey:self.filename];
-//                [self.userDictionary setObject:newdictnum forKey:self.filename];
-//            }
-//           
-//        }
-//        else if(dictnum.intValue >= 0){
-//
-//            if (![[[self.tagView boxes] objectAtIndex:self.tagView.selectedBox ] sent]) {
-//                NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue-1];
-//
-//                [self.userDictionary removeObjectForKey:self.filename];
-//                [self.userDictionary setObject:newdictnum forKey:self.filename];
-//
-//            }else{
-//                NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
-//                
-//                [self.userDictionary removeObjectForKey:self.filename];
-//                [self.userDictionary setObject:newdictnum forKey:self.filename];
-//            }
-//        }
-//    
-//        [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
-//
-//        [self.tagView.boxes removeObjectAtIndex:self.tagView.selectedBox];
-//        [self.tagView setSelectedBox:-1];
-//        [self saveThumbnail];
-//        [self saveDictionary];
-//        [self.tagView setNeedsDisplay];
+
+    if (buttonIndex==0) {
+        int num=[[self.tagImageView.tagView boxes] count];
+
+        if((num<1)||(self.tagImageView.tagView.selectedBox == -1))
+            return;
+
+        NSNumber *dictnum  = [self.userDictionary objectForKey:self.filename];
+        if (dictnum.intValue < 0){
+            if (![[self.tagImageView.tagView.boxes objectAtIndex:self.tagImageView.tagView.selectedBox] sent]) {
+                NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue+1];
+                [self.userDictionary removeObjectForKey:self.filename];
+                [self.userDictionary setObject:newdictnum forKey:self.filename];
+            }
+           
+        }else if(dictnum.intValue >= 0){
+
+            if (![[self.tagImageView.tagView.boxes objectAtIndex:self.tagImageView.tagView.selectedBox] sent]) {
+                NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue - 1];
+                [self.userDictionary removeObjectForKey:self.filename];
+                [self.userDictionary setObject:newdictnum forKey:self.filename];
+
+            }else{
+                NSNumber *newdictnum = [[NSNumber alloc]initWithInt:dictnum.intValue + 1];
+                [self.userDictionary removeObjectForKey:self.filename];
+                [self.userDictionary setObject:newdictnum forKey:self.filename];
+            }
+        }
+    
+        [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
+        
+        [self.tagImageView removeSelectedBox];
+        [self saveThumbnail];
+        [self saveDictionary];
 //        [self selectedAnObject:NO];
-//    }
+    }
 }
 
 #pragma mark -
@@ -623,11 +541,12 @@
 
 -(void)sendPhoto
 {
-//    NSNumber *num = [self.userDictionary objectForKey:self.filename];
-//    CGPoint point = CGPointMake(self.imageView.image.size.width/self.tagView.frame.size.width, self.imageView.image.size.height/self.tagView.frame.size.height);
-//    
-//    if (num.intValue<0) [sConnection sendPhoto:self.imageView.image filename:self.filename path:[self.paths objectAtIndex:OBJECTS] withSize:point andAnnotation:self.tagView.boxes];
-//    else [sConnection updateAnnotationFrom:self.filename withSize:point :self.tagView.boxes];
+    NSNumber *num = [self.userDictionary objectForKey:self.filename];
+    CGPoint point = CGPointMake(self.tagImageView.image.size.width/self.tagImageView.tagView.frame.size.width, self.tagImageView.image.size.height/self.tagImageView.tagView.frame.size.height);
+    
+    NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.tagImageView.tagView.boxes];
+    if (num.intValue<0) [sConnection sendPhoto:self.tagImageView.image filename:self.filename path:[self.paths objectAtIndex:OBJECTS] withSize:point andAnnotation:boxes];
+    else [sConnection updateAnnotationFrom:self.filename withSize:point :boxes];
 }
 
 
@@ -636,44 +555,26 @@
 
 -(void) saveThumbnail
 {
-//    [self.tagView setSelectedBox:-1];
-//    [self.tagView setNeedsDisplay];
-//    
-//    UIGraphicsBeginImageContext(self.tagView.frame.size);
-//    [self.composeView.layer renderInContext:UIGraphicsGetCurrentContext()];
-//    UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
-//    UIGraphicsEndImageContext();
-//    CGImageRef imageRef = CGImageCreateWithImageInRect(viewImage.CGImage, self.tagView.frame);
-//    UIImage *thumbnailImage;
-//    
-//    int thumbnailSize = 300;
-//    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
-//    thumbnailImage  = [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
-//    
-//    //    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-//    //       thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
-//    //
-//    //    else thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
-//    
-//    CGImageRelease(imageRef);
-//    
-//    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-//    dispatch_sync(saveQueue, ^{
-//        NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
-//        [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil];
-//    });
-//    dispatch_release(saveQueue);
+    
+    UIImage *thumbnailImage = [self.tagImageView takeThumbnailImage];
+    
+    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
+    dispatch_sync(saveQueue, ^{
+        NSData *thumImage = UIImageJPEGRepresentation(thumbnailImage, 0.75);
+        [[NSFileManager defaultManager] createFileAtPath:[[self.paths objectAtIndex:THUMB] stringByAppendingPathComponent:self.filename] contents:thumImage attributes:nil];
+    });
+    dispatch_release(saveQueue);
 }
 
 -(void)saveDictionary
 {
 
-//    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-//    dispatch_sync(saveQueue, ^{
-//        NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
-//        [NSKeyedArchiver archiveRootObject:self.tagView.boxes toFile:pathObject];
-//    });
-//    dispatch_release(saveQueue);
+    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
+    dispatch_sync(saveQueue, ^{
+        NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:self.filename];
+        [NSKeyedArchiver archiveRootObject:self.tagImageView.tagView.boxes toFile:pathObject];
+    });
+    dispatch_release(saveQueue);
 }
 
 
@@ -878,35 +779,35 @@
 
 -(void)photoSentCorrectly:(NSString *)filename
 {
-//    if ([self.filename isEqualToString:filename]) {
-//        for (int i=0; i<[self.tagView.boxes count ]; i++)
-//            [[self.tagView.boxes objectAtIndex:i ] setSent:YES];
-//
-//        [self saveDictionary];
-//        
-//    }else{
-//        NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
-//        for (int i=0; i<objects.count; i++)
-//            [[objects objectAtIndex:i] setSent:YES];
-//        
-//        [NSKeyedArchiver archiveRootObject:objects toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
-//    }
-//    
-//    NSNumber *newdictnum = [[NSNumber alloc]initWithInt:0];
-//    
-//    [self.navigationItem setHidesBackButton:NO];
-//
-//        [self.sendingView setHidden:YES];
-//        [self.sendingView.progressView setProgress:0];
-//        [self.sendingView.activityIndicator stopAnimating];
-//    
-//    [self barButtonsEnabled:YES];
-//    [self.sendButton setEnabled:NO];
-//    [self.deleteButton setEnabled:NO];
-//
-//    [self.userDictionary removeObjectForKey:filename];
-//    [self.userDictionary setObject:newdictnum forKey:filename];
-//    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
+    if ([self.filename isEqualToString:filename]) {
+        for (int i=0; i<self.tagImageView.tagView.boxes.count ; i++)
+            [[self.tagImageView.tagView.boxes objectAtIndex:i] setSent:YES];
+
+        [self saveDictionary];
+        
+    }else{
+        NSMutableArray *objects = [NSKeyedUnarchiver unarchiveObjectWithFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
+        for (int i=0; i<objects.count; i++)
+            [[objects objectAtIndex:i] setSent:YES];
+        
+        [NSKeyedArchiver archiveRootObject:objects toFile:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename ]];
+    }
+    
+    NSNumber *newdictnum = [[NSNumber alloc]initWithInt:0];
+    
+    [self.navigationItem setHidesBackButton:NO];
+
+        [self.sendingView setHidden:YES];
+        [self.sendingView.progressView setProgress:0];
+        [self.sendingView.activityIndicator stopAnimating];
+    
+    [self barButtonsEnabled:YES];
+    [self.sendButton setEnabled:NO];
+    [self.deleteButton setEnabled:NO];
+
+    [self.userDictionary removeObjectForKey:filename];
+    [self.userDictionary setObject:newdictnum forKey:filename];
+    [self.userDictionary writeToFile:[[self.paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",self.username] atomically:NO];
 }
 
 -(void)photoNotOnServer:(NSString *)filename

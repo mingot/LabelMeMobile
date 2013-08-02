@@ -48,7 +48,7 @@
 
 // When loading, adjusts the box size to the iamgeSize provided. Used when
 // rotating the phone that the boxes need to reajust to the new image size.
-- (void) setBoxDimensionsForImageSize:(CGSize) size;
+- (void) setBoxDimensionsForFrameSize:(CGSize) size;
 
 
 

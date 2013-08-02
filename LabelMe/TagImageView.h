@@ -15,6 +15,11 @@
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, strong) TagView *tagView;
 
+// return to the initial state of zoom
+- (void) resetZoomView;
+
+- (UIImage *) takeThumbnailImage;
+
 - (void) addNewBox;
 - (void) removeSelectedBox;
 

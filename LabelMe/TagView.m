@@ -56,7 +56,6 @@
     move = NO;
     size = NO;
 
-    _selectedBox = NO_BOX_SELECTED;
     _lineWidth = kLineWidth;
     
     //label initialization
@@ -86,7 +85,6 @@
 
 -(void) setSelectedBox:(int) i
 {
-    NSLog(@"selected box: %d",i);
     _selectedBox = i;
     BOOL isBoxSelected = i != NO_BOX_SELECTED;
     if(isBoxSelected){
@@ -122,7 +120,7 @@
         self.selectedBox = NO_BOX_SELECTED;
         //ajust each box to the size of the TagViewFrame
         for(Box* box in _boxes)
-            [box setBoxDimensionsForImageSize:self.frame.size];
+            [box setBoxDimensionsForFrameSize:self.frame.size];
     }
     [self setNeedsDisplay];
 }
@@ -155,26 +153,26 @@
     if (self.boxes.count<1)
         return;
    
-    CGContextRef context = UIGraphicsGetCurrentContext();
+    
     
     for(int i=0; i<self.boxes.count; i++){
         
         Box *box = [self.boxes objectAtIndex:i];
         box.lineWidth = _lineWidth;
         if(self.selectedBox == NO_BOX_SELECTED)
-            [self drawBox:box context:context alpha:1 corners:false];
+            [self drawBox:box alpha:1 corners:false];
         else if(self.selectedBox == i)
-            [self drawBox:box context:context alpha:1 corners:true];
+            [self drawBox:box alpha:1 corners:true];
         else
-            [self drawBox:box context:context alpha:0.3 corners:false];
+            [self drawBox:box alpha:0.3 corners:false];
                 
     }
 }
 
 
--(void) drawBox:(Box *)box context:(CGContextRef)context alpha:(CGFloat)alpha corners:(BOOL)hasCorners
+-(void) drawBox:(Box *)box alpha:(CGFloat)alpha corners:(BOOL)hasCorners
 {
-    
+    CGContextRef context = UIGraphicsGetCurrentContext();
     CGPoint upperRight = CGPointMake([box lowerRight].x, [box upperLeft].y);
     CGPoint lowerLeft = CGPointMake([box upperLeft].x, [box lowerRight].y);
     

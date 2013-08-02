@@ -282,7 +282,7 @@
     return rectangle;
 }
 
-- (void) setBoxDimensionsForImageSize:(CGSize) size
+- (void) setBoxDimensionsForFrameSize:(CGSize) size
 {    
     self.upperLeft = CGPointMake(self.upperLeft.x*size.width*1.0/self.imageSize.width, self.upperLeft.y*size.height*1.0/self.imageSize.height);
     self.lowerRight = CGPointMake(self.lowerRight.x*size.width*1.0/self.imageSize.width, self.lowerRight.y*size.height*1.0/self.imageSize.height);

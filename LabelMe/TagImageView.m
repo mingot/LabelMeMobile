@@ -6,7 +6,9 @@
 //  Copyright (c) 2013 CSAIL. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import "TagImageView.h"
+#import "UIImage+Resize.h"
 
 
 @interface TagImageView()
@@ -93,6 +95,11 @@
 #pragma mark -
 #pragma mark Public methods
 
+- (void) resetZoomView
+{
+    [self.zoomScrollView setZoomScale:1.0 animated:NO];
+    [self.tagView setLineWidthForZoomFactor:1.0];
+}
 
 - (void) addNewBox
 {
@@ -101,15 +108,40 @@
     
     CGPoint newUpperLeft = CGPointMake(visibleRect.origin.x + 0.3*visibleRect.size.width, visibleRect.origin.y + 0.3*visibleRect.size.height);
     CGPoint newLowerRight = CGPointMake(visibleRect.origin.x + 0.7*visibleRect.size.width, visibleRect.origin.y + 0.7*visibleRect.size.height);
-    Box *newBox = [[Box alloc] initWithUpperLeft:newUpperLeft lowerRight:newLowerRight forImageSize:self.imageView.image.size];
+    Box *newBox = [[Box alloc] initWithUpperLeft:newUpperLeft lowerRight:newLowerRight forImageSize:self.tagView.frame.size];
     
     [self.tagView addBox:newBox];
-    
 }
 
 - (void) removeSelectedBox
 {
     [self.tagView deleteSelectedBox];
+}
+
+- (UIImage *) takeThumbnailImage
+{
+    [self resetZoomView];
+    [self.tagView setSelectedBox:-1];
+    
+    UIGraphicsBeginImageContext(self.tagView.frame.size);
+    [self.containerView.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *viewImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    CGImageRef imageRef = CGImageCreateWithImageInRect(viewImage.CGImage, self.tagView.frame);
+
+    
+    int thumbnailSize = 300;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) thumbnailSize = 128;
+    UIImage *thumbnailImage  = [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
+    
+    //    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+    //       thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
+    //
+    //    else thumbnailImage  = [[UIImage imageWithCGImage:image scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:300 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
+    
+    CGImageRelease(imageRef);
+    
+    return thumbnailImage;
 }
 
 #pragma mark -
