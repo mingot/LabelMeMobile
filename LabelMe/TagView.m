@@ -11,6 +11,7 @@
 #import "Constants.h"
 #import "UITextField+BoxLabeling.h"
 #import "NSString+checkValidity.h" //replacebyunderscore
+#import "KeyboardHandler.h"
 
 
 #define NO_BOX_SELECTED -1
@@ -31,6 +32,7 @@
     float _lineWidth;
     BOOL move;
     BOOL size;
+    KeyboardHandler *_keyboardHandler;
 }
 
 
@@ -65,6 +67,9 @@
                    action:@selector(labelFinish:)
          forControlEvents:UIControlEventEditingDidEndOnExit];
     [self addSubview:self.label];
+    
+    
+    _keyboardHandler = [[KeyboardHandler alloc] initWithView:self.label];
 }
 
 - (id) initWithCoder:(NSCoder *)aDecoder
@@ -220,8 +225,7 @@
             [currentBox moveBeginAtPoint:location];
             
         }else if(corner == kExteriorBox){
-
-            
+            [self endEditing:YES];
             self.selectedBox = NO_BOX_SELECTED;
             
         }else{

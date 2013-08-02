@@ -46,8 +46,7 @@
 
 - (id) initWithUpperLeft:(CGPoint)upper lowerRight:(CGPoint)lower forImageSize:(CGSize)imageSize
 {
-    self = [super init];
-    if (self) {
+    if (self = [super init]) {
         self.imageSize = imageSize;
         self.upperLeft = upper;
         self.lowerRight = lower;
