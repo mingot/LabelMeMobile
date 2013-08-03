@@ -98,7 +98,7 @@
     if (boxes.count != 0)
         self.tip.hidden = YES;
     
-    [self.view addSubview:self.tip];
+//    [self.view addSubview:self.tip];
 }
 
 - (void) initializeAndAddSendingView
@@ -109,7 +109,7 @@
     self.sendingView.textView.text = @"Uploading to the server...";
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     self.sendingView.delegate = self;
-    [self.view addSubview:self.sendingView];
+//    [self.view addSubview:self.sendingView];
 }
 
 #pragma mark -
@@ -125,8 +125,7 @@
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbarBg.png"] forBarMetrics:UIBarMetricsDefault];
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
     
-//    self.infiniteLoopView.dataSource = self;
-//    self.infiniteLoopView.delegate = self;
+    [self.infiniteLoopView initialize];
     
     [self initializeBottomToolbar];
     [self initializeAndAddTipView];
@@ -615,14 +614,11 @@
     //set the resource handler with the correct filename
     _filenameResourceHandler.filename = requestedFilename;
     
-    TagImageView *requestedTagImageView = [[TagImageView alloc] initWithFrame:self.tagImageView.frame];
-    requestedTagImageView.image = [_filenameResourceHandler getImage];;
-    requestedTagImageView.tagView.boxes = [_filenameResourceHandler getBoxes];
-    requestedTagImageView.tagView.delegate = self;
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[_filenameResourceHandler getImage]];
     
     _filenameResourceHandler.filename = self.filename;
     
-    return requestedTagImageView;
+    return imageView;
 }
 
 - (int) numberOfViews
@@ -632,14 +628,18 @@
 
 - (void) changedToView:(UIView *)currentView withIndex:(int)index
 {
-    NSString *currentFilename = [self.items objectAtIndex:index];
-    
-    //title
-    self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
-    
-    //set the resource handler with the correct filename
-    _filenameResourceHandler.filename = currentFilename;
-    self.tagImageView = (TagImageView *) currentView;
+//    NSString *currentFilename = [self.items objectAtIndex:index];
+//    
+//    //title
+//    self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
+//    
+//    //set the resource handler with the correct filename
+//    _filenameResourceHandler.filename = currentFilename;
+//    
+//    self.tagImageView = [[TagImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
+//    self.tagImageView.image = [_filenameResourceHandler getImage];
+//    self.tagImageView.tagView.boxes = [_filenameResourceHandler getBoxes];
+//    self.tagImageView.tagView.delegate = self;
 }
 
 #pragma mark -

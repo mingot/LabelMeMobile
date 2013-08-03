@@ -25,7 +25,7 @@
 
 
 //views
-@property (weak, nonatomic) IBOutlet TagImageView *tagImageView;
+@property (strong, nonatomic) TagImageView *tagImageView;
 @property (weak, nonatomic) IBOutlet InfiniteLoopView *infiniteLoopView;
 
 @property (strong, nonatomic) id<TagViewControllerDelegate> delegate;

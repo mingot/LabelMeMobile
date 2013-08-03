@@ -23,8 +23,12 @@
 
 @interface InfiniteLoopView : UIView <UIScrollViewDelegate>
 
-@property (nonatomic, strong) id <InfiniteLoopDataSoruce> dataSource;
-@property (nonatomic, strong) id <InfiniteLoopDelegate> delegate;
+@property (nonatomic, weak) IBOutlet id <InfiniteLoopDataSoruce> dataSource;
+@property (nonatomic, weak) IBOutlet id <InfiniteLoopDelegate> delegate;
 
+
+// Needs to be called after the delegate and data source have been hooked
+// |ViewDidLoad| is usually a good place for doing so
+- (void) initialize;
 
 @end
