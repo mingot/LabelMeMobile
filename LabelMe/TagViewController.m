@@ -125,6 +125,9 @@
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbarBg.png"] forBarMetrics:UIBarMetricsDefault];
     [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
     
+//    self.infiniteLoopView.dataSource = self;
+//    self.infiniteLoopView.delegate = self;
+    
     [self initializeBottomToolbar];
     [self initializeAndAddTipView];
     [self initializeAndAddSendingView];
@@ -141,14 +144,19 @@
 //    UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.scrollView.frame];
 //    [backgroundView setImage:globo];
 //    [self.labelsView setBackgroundView:backgroundView];
-    
-
 }
 
 - (void) viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
     
+    //solid color for the navigation bar
+    [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
+    
+    //register for notifications if box is selected
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
+    
+    //set the resource handler with the correct filename
     _filenameResourceHandler.filename = self.filename;
     
     //title
@@ -158,12 +166,6 @@
     self.tagImageView.image = [_filenameResourceHandler getImage];;
     self.tagImageView.tagView.boxes = [_filenameResourceHandler getBoxes];
     self.tagImageView.tagView.delegate = self;
-    
-    //solid color for the navigation bar
-    [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
-    
-    //register for notifications if box is selected
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
     
     //check if boxes not saved on the server
     if (_filenameResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
@@ -434,17 +436,6 @@
     [self.navigationItem setHidesBackButton:!value];
 }
 
--(void)sendPhoto
-{
-    CGPoint point = CGPointMake(self.tagImageView.image.size.width/self.tagImageView.tagView.frame.size.width, self.tagImageView.image.size.height/self.tagImageView.tagView.frame.size.height);
-    
-    NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.tagImageView.tagView.boxes];
-    NSString *boxesPath = [_filenameResourceHandler getBoxesPath];
-    if ([_filenameResourceHandler imageNotSent])
-        [sConnection sendPhoto:self.tagImageView.image filename:self.filename path:boxesPath withSize:point andAnnotation:boxes];
-    else [sConnection updateAnnotationFrom:self.filename withSize:point :boxes];
-}
-
 
 #pragma mark -
 #pragma mark Save State
@@ -615,6 +606,43 @@
 }
 
 #pragma mark -
+#pragma mark InfiniteLoopDelegate & InfiniteLoopDataSource
+
+- (UIView *) viewForIndex:(int)index
+{
+    NSString *requestedFilename = [self.items objectAtIndex:index];
+    
+    //set the resource handler with the correct filename
+    _filenameResourceHandler.filename = requestedFilename;
+    
+    TagImageView *requestedTagImageView = [[TagImageView alloc] initWithFrame:self.tagImageView.frame];
+    requestedTagImageView.image = [_filenameResourceHandler getImage];;
+    requestedTagImageView.tagView.boxes = [_filenameResourceHandler getBoxes];
+    requestedTagImageView.tagView.delegate = self;
+    
+    _filenameResourceHandler.filename = self.filename;
+    
+    return requestedTagImageView;
+}
+
+- (int) numberOfViews
+{
+    return self.items.count;
+}
+
+- (void) changedToView:(UIView *)currentView withIndex:(int)index
+{
+    NSString *currentFilename = [self.items objectAtIndex:index];
+    
+    //title
+    self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
+    
+    //set the resource handler with the correct filename
+    _filenameResourceHandler.filename = currentFilename;
+    self.tagImageView = (TagImageView *) currentView;
+}
+
+#pragma mark -
 #pragma mark Rotation
 
 - (void)willAnimateRotationToInterfaceOrientation: (UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
@@ -631,6 +659,7 @@
 
 #pragma mark -
 #pragma mark ServerConnectionDelegate Methods
+
 
 -(void)sendingProgress:(float)prog
 {
@@ -681,5 +710,20 @@
     
     [self sendAction:self.sendButton];
 }
+
+#pragma mark -
+#pragma mark Private methods
+
+-(void)sendPhoto
+{
+    CGPoint point = CGPointMake(self.tagImageView.image.size.width/self.tagImageView.tagView.frame.size.width, self.tagImageView.image.size.height/self.tagImageView.tagView.frame.size.height);
+    
+    NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.tagImageView.tagView.boxes];
+    NSString *boxesPath = [_filenameResourceHandler getBoxesPath];
+    if ([_filenameResourceHandler imageNotSent])
+        [sConnection sendPhoto:self.tagImageView.image filename:self.filename path:boxesPath withSize:point andAnnotation:boxes];
+    else [sConnection updateAnnotationFrom:self.filename withSize:point :boxes];
+}
+
 
 @end

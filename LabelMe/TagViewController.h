@@ -12,6 +12,7 @@
 #import "ServerConnection.h"
 #import "SendingView.h"
 #import "TagImageView.h"
+#import "InfiniteLoopView.h"
 
 @protocol TagViewControllerDelegate <NSObject>
 
@@ -20,11 +21,12 @@
 @end
 
 
-@interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate>
+@interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate, InfiniteLoopDataSoruce, InfiniteLoopDelegate>
 
 
 //views
 @property (weak, nonatomic) IBOutlet TagImageView *tagImageView;
+@property (weak, nonatomic) IBOutlet InfiniteLoopView *infiniteLoopView;
 
 @property (strong, nonatomic) id<TagViewControllerDelegate> delegate;
 
