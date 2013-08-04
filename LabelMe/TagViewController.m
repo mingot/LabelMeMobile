@@ -166,8 +166,6 @@
     //check if boxes not saved on the server
     if (_filenameResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
     
-    _viewsForScrollDictionary = nil;
-    
 ////        [self selectedAnObject:NO];
 ////        if (self.tagView.boxes.count > 0)
 ////            [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
@@ -181,6 +179,8 @@
     
     //save thumbnail and dictionary
     [self saveStateOnDisk];
+    
+    [_viewsForScrollDictionary removeAllObjects];
     
 //    if (!self.tagView.userInteractionEnabled){
 //        self.tagView.userInteractionEnabled = YES;
