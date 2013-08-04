@@ -27,6 +27,11 @@
 @property (strong, nonatomic) UIButton *labelsButton;
 @property (strong, nonatomic) SendingView *sendingView;
 
+
+// Save thumbnail and boxes
+// Notify the delegate to reload
+- (void) saveStateOnDisk;
+
 @end
 
 
@@ -116,14 +121,13 @@
 {
     [super viewDidLoad];
     
-    //model
+    //load the resources direction for the current filename
     _filenameResourceHandler = [[FilenameResourcesHandler alloc] initForUsername:self.username andFilename:self.filename];
     
-    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbarBg.png"] forBarMetrics:UIBarMetricsDefault];
-    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlackOpaque];
+    //solid color for the navigation bar
+    [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
     
-    [self.infiniteLoopView initialize];
-    
+    //load and setup other window views
     [self initializeBottomToolbar];
     [self initializeAndAddTipView];
     [self initializeAndAddSendingView];
@@ -146,31 +150,23 @@
 {
 	[super viewWillAppear:animated];
     
-    //solid color for the navigation bar
-    [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
-    
     //register for notifications if box is selected
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
     
     //set the resource handler with the correct filename
     _filenameResourceHandler.filename = self.filename;
     
-    
     //title
     int index = [self.items indexOfObject:self.filename];
-    self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
+    self.title = [NSString stringWithFormat:@"%d of %d", index+1, self.items.count];
 
-//    self.tagImageView = [[TagImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
-//    self.tagImageView.image = [_filenameResourceHandler getImage];;
-//    self.tagImageView.tagView.boxes = [_filenameResourceHandler getBoxes];
-//    self.tagImageView.tagView.delegate = self;
-//    [self.view addSubview:self.tagImageView];
-//    self.tagImageView.hidden = NO;
-    
-//    self.tagImageView.userInteractionEnabled = NO;
+    //scroll initialization
+    [self.infiniteLoopView initializeAtIndex:index];    
     
     //check if boxes not saved on the server
     if (_filenameResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
+    
+    _viewsForScrollDictionary = nil;
     
 ////        [self selectedAnObject:NO];
 ////        if (self.tagView.boxes.count > 0)
@@ -184,11 +180,7 @@
 	[super viewWillDisappear:animated];
     
     //save thumbnail and dictionary
-    [self saveThumbnail];
-    [self saveDictionary];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate reloadTableForFilename:self.filename];
-    });
+    [self saveStateOnDisk];
     
 //    if (!self.tagView.userInteractionEnabled){
 //        self.tagView.userInteractionEnabled = YES;
@@ -226,8 +218,7 @@
 -(IBAction)sendAction:(id)sender
 {
     //save state
-    [self saveDictionary];
-    [self saveThumbnail];
+    [self saveStateOnDisk];
     [self barButtonsEnabled:NO];
     
     //sending view
@@ -249,6 +240,7 @@
 -(IBAction)listAction:(id)sender
 {
     NSLog(@"Boxes to be send: %d", _filenameResourceHandler.boxesNotSent);
+    
 //    [self.labelsView reloadData];
 //    if (self.labelsView.hidden) {
 //        
@@ -307,9 +299,8 @@
         if(!boxWasSent) _filenameResourceHandler.boxesNotSent--;
         
         [self.tagImageView.tagView removeSelectedBox];
-        [self saveThumbnail];
-        [self saveDictionary];
-//        [self selectedAnObject:NO];
+        
+        [self saveStateOnDisk];
     }
 }
 
@@ -329,16 +320,14 @@
 #pragma mark -
 #pragma mark Save State
 
--(void) saveThumbnail
+- (void) saveStateOnDisk
 {
-    [_filenameResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
+//    NSLog(@"Saving image:%@", self.filename);
+//    [_filenameResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
+//    [_filenameResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
+//    
+//    [self.delegate reloadTable];
 }
-
--(void)saveDictionary
-{    
-    [_filenameResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
-}
-
 
 #pragma mark -
 #pragma mark TagViewDelegate Methods
@@ -351,8 +340,6 @@
         selectedBox.sent = NO;
         _filenameResourceHandler.boxesNotSent ++;
     }
-
-    [self saveDictionary];
 }
 
 
@@ -368,11 +355,11 @@
     [self.infiniteLoopView disableScrolling:isSelected.boolValue];
 
     
-    self.deleteButton.enabled = isSelected.boolValue;
-    Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
-    if(!selectedBox.sent) self.sendButton.enabled = YES;
-    self.sendButton.enabled = _filenameResourceHandler.boxesNotSent!=0 ?  YES : NO;
-    [self.labelsView reloadData];
+//    self.deleteButton.enabled = isSelected.boolValue;
+//    Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
+//    if(!selectedBox.sent) self.sendButton.enabled = YES;
+//    self.sendButton.enabled = _filenameResourceHandler.boxesNotSent!=0 ?  YES : NO;
+//    [self.labelsView reloadData];
 }
 
 
@@ -531,12 +518,20 @@
     return self.items.count;
 }
 
-- (void) changedToView:(UIView *)currentView withIndex:(int)index
+- (void) changedFromindex:(int) previousIndex toIndex:(int)currentIndex
 {
-    //title
-    self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
+    //save the previous state on disk
+//    NSLog(@"previous index: %d", previousIndex);
+    [self saveStateOnDisk];
     
-    self.tagImageView = [_viewsForScrollDictionary objectForKey:[NSNumber numberWithInt:index]];
+    //title
+    self.title = [NSString stringWithFormat:@"%d of %d", currentIndex + 1, self.items.count];
+    
+    self.filename = [self.items objectAtIndex:currentIndex];
+    _filenameResourceHandler.filename = self.filename;
+    
+    //hook current view with the delegate
+    self.tagImageView = [_viewsForScrollDictionary objectForKey:[NSNumber numberWithInt:currentIndex]];
     self.tagImageView.tagView.delegate = self;
     
     [self.view setNeedsDisplay];
@@ -581,8 +576,6 @@
     // Modify the flag of the boxes
     for (int i=0; i<self.tagImageView.tagView.boxes.count; i++)
         [[self.tagImageView.tagView.boxes objectAtIndex:i] setSent:YES];
-    
-    [self saveDictionary];
 
     [self.navigationItem setHidesBackButton:NO];
 
@@ -603,7 +596,6 @@
     if (boxes != nil) {
         for (int i=0; i<boxes.count; i++)
             [[boxes objectAtIndex:i] setSent:NO];
-        [self saveDictionary];
     }
     
     _filenameResourceHandler.boxesNotSent = boxes.count;

@@ -951,7 +951,7 @@
 #pragma mark -
 #pragma mark TagVC Delegate
 
-- (void) reloadTableForFilename:(NSString *) filename
+- (void) reloadTable
 {
     [self reloadGallery];
 //    [self updateModelForFilename:filename];

@@ -18,7 +18,7 @@
 
 @protocol TagViewControllerDelegate <NSObject>
 
-- (void) reloadTableForFilename:(NSString *)filename;
+- (void) reloadTable;
 
 @end
 
@@ -49,14 +49,12 @@
 
 
 
--(IBAction)addAction:(id)sender;
--(IBAction)deleteAction:(id)sender;
--(IBAction)sendAction:(id)sender;
--(IBAction)listAction:(id)sender;
+- (IBAction)addAction:(id)sender;
+- (IBAction)deleteAction:(id)sender;
+- (IBAction)sendAction:(id)sender;
+- (IBAction)listAction:(id)sender;
 
--(IBAction)hideTip:(id)sender;
+- (IBAction)hideTip:(id)sender;
 
--(void)saveThumbnail;
--(void)saveDictionary;
 
 @end

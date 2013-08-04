@@ -73,12 +73,12 @@
 
 - (void) saveThumbnail:(UIImage *)thumbnail
 {
-    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-    dispatch_sync(saveQueue, ^{
+//    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
+//    dispatch_sync(saveQueue, ^{
         NSData *thumImage = UIImageJPEGRepresentation(thumbnail, 0.75);
         [[NSFileManager defaultManager] createFileAtPath:_thumbnailPath contents:thumImage attributes:nil];
-    });
-    dispatch_release(saveQueue);
+//    });
+//    dispatch_release(saveQueue);
 }
 
 - (void) saveImage:(UIImage *)image
@@ -88,11 +88,11 @@
 
 - (void) saveBoxes:(NSArray *)boxes
 {
-    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-    dispatch_sync(saveQueue, ^{
+//    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
+//    dispatch_sync(saveQueue, ^{
         [NSKeyedArchiver archiveRootObject:boxes toFile:_boxesPath];
-    });
-    dispatch_release(saveQueue);
+//    });
+//    dispatch_release(saveQueue);
     
 }
 
