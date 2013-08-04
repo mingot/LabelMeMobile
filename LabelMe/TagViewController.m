@@ -322,11 +322,11 @@
 
 - (void) saveStateOnDisk
 {
-//    NSLog(@"Saving image:%@", self.filename);
-//    [_filenameResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
-//    [_filenameResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
-//    
-//    [self.delegate reloadTable];
+    NSLog(@"Saving image:%@", self.filename);
+    [_filenameResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
+    [_filenameResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
+    
+    [self.delegate reloadTable];
 }
 
 #pragma mark -
@@ -340,6 +340,8 @@
         selectedBox.sent = NO;
         _filenameResourceHandler.boxesNotSent ++;
     }
+    
+    [self saveStateOnDisk];
 }
 
 
@@ -519,11 +521,7 @@
 }
 
 - (void) changedFromindex:(int) previousIndex toIndex:(int)currentIndex
-{
-    //save the previous state on disk
-//    NSLog(@"previous index: %d", previousIndex);
-    [self saveStateOnDisk];
-    
+{    
     //title
     self.title = [NSString stringWithFormat:@"%d of %d", currentIndex + 1, self.items.count];
     
