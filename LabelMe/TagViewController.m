@@ -152,19 +152,10 @@
     
     //register for notifications if box is selected
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
-    
-    //set the resource handler with the correct filename
-    _filenameResourceHandler.filename = self.filename;
-    
-    //title
-    int index = [self.items indexOfObject:self.filename];
-    self.title = [NSString stringWithFormat:@"%d of %d", index+1, self.items.count];
 
     //scroll initialization
-    [self.infiniteLoopView initializeAtIndex:index];    
-    
-    //check if boxes not saved on the server
-    if (_filenameResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
+    int index = [self.items indexOfObject:self.filename];
+    [self.infiniteLoopView initializeAtIndex:index];
     
 ////        [self selectedAnObject:NO];
 ////        if (self.tagView.boxes.count > 0)
@@ -288,7 +279,6 @@
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-
     if (buttonIndex==0) {
         int num = self.tagImageView.tagView.boxes.count;
 
@@ -355,12 +345,11 @@
     NSNumber *isSelected = [notification object];
 
     [self.infiniteLoopView disableScrolling:isSelected.boolValue];
-
     
-//    self.deleteButton.enabled = isSelected.boolValue;
-//    Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
-//    if(!selectedBox.sent) self.sendButton.enabled = YES;
-//    self.sendButton.enabled = _filenameResourceHandler.boxesNotSent!=0 ?  YES : NO;
+    self.deleteButton.enabled = isSelected.boolValue;
+    Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
+    if(!selectedBox.sent) self.sendButton.enabled = YES;
+    self.sendButton.enabled = _filenameResourceHandler.boxesNotSent!=0 ?  YES : NO;
 //    [self.labelsView reloadData];
 }
 
@@ -520,7 +509,7 @@
     return self.items.count;
 }
 
-- (void) changedFromindex:(int) previousIndex toIndex:(int)currentIndex
+- (void) didShowViewForIndex:(int)currentIndex
 {    
     //title
     self.title = [NSString stringWithFormat:@"%d of %d", currentIndex + 1, self.items.count];
@@ -531,6 +520,10 @@
     //hook current view with the delegate
     self.tagImageView = [_viewsForScrollDictionary objectForKey:[NSNumber numberWithInt:currentIndex]];
     self.tagImageView.tagView.delegate = self;
+    
+    //check if boxes not saved on the server
+    [self.sendButton setEnabled:YES];
+    if (_filenameResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
     
     [self.view setNeedsDisplay];
 }

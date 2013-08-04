@@ -56,6 +56,9 @@
     [self loadPageWithId:module(initialIndex - 1,total) onPage:0];
     [self loadPageWithId:module(initialIndex, total) onPage:1];
     [self loadPageWithId:module(initialIndex + 1, total) onPage:2];
+    
+    // notify about the first view
+    [self.delegate didShowViewForIndex:initialIndex];
 }
 
 #pragma mark - 
@@ -65,7 +68,6 @@
 {
 
     int total = [self.dataSource numberOfViews];
-    int previousIndex = _currIndex;
 
     if(_scrollView.contentOffset.x > _scrollView.frame.size.width) {
 
@@ -92,7 +94,7 @@
     [_scrollView scrollRectToVisible:CGRectMake(320,0,320,460) animated:NO];
     
     //inform the delegate of the change
-    [self.delegate changedFromindex:previousIndex toIndex:_currIndex];
+    [self.delegate didShowViewForIndex:_currIndex];
 
 }
 
