@@ -12,9 +12,12 @@
 
 @protocol TagViewDelegate <NSObject>
 
+//NOTE: TagView uses NSNotificationCenter to notify when a box has been selected
+//view the setter for selectedbox
 
 // send when and object is: moved, resized or changed the label
 - (void)objectModified;
+
 
 @end
 
@@ -27,6 +30,7 @@
 @property (nonatomic, strong) NSArray* boxes;
 
 // Index of the selected box
+// In the setter, NSNotificationCenter is informed of the box selection
 @property int selectedBox;
 
 // Returns nil if no box selected

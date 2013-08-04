@@ -7,15 +7,11 @@
 //
 
 #import "TagViewController.h"
-#import "Constants.h"
-#import "GalleryViewController.h"
-#import "NSObject+Folders.h"
-#import "ServerConnection.h"
-#import "NSObject+ShowAlert.h"
-#import "NSString+checkValidity.h"
+#import "FilenameResourcesHandler.h"
 #import "LMUINavigationController.h"
 #import "UIButton+CustomViews.h"
-#import "FilenameResourcesHandler.h"
+#import "NSObject+ShowAlert.h"
+
 
 
 
@@ -23,14 +19,13 @@
 {
     FilenameResourcesHandler *_filenameResourceHandler;
     ServerConnection *sConnection;
+    NSMutableDictionary *_viewsForScrollDictionary;
 }
 
 @property (strong, nonatomic) UITableView *labelsView;
 @property (strong, nonatomic) UIButton *tip;
 @property (strong, nonatomic) UIButton *labelsButton;
 @property (strong, nonatomic) SendingView *sendingView;
-
-
 
 @end
 
@@ -47,6 +42,8 @@
         self.labelsView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
         sConnection = [[ServerConnection alloc] init];
         sConnection.delegate = self;
+        
+        _viewsForScrollDictionary = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -158,13 +155,19 @@
     //set the resource handler with the correct filename
     _filenameResourceHandler.filename = self.filename;
     
+    
     //title
     int index = [self.items indexOfObject:self.filename];
     self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
 
-    self.tagImageView.image = [_filenameResourceHandler getImage];;
-    self.tagImageView.tagView.boxes = [_filenameResourceHandler getBoxes];
-    self.tagImageView.tagView.delegate = self;
+//    self.tagImageView = [[TagImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
+//    self.tagImageView.image = [_filenameResourceHandler getImage];;
+//    self.tagImageView.tagView.boxes = [_filenameResourceHandler getBoxes];
+//    self.tagImageView.tagView.delegate = self;
+//    [self.view addSubview:self.tagImageView];
+//    self.tagImageView.hidden = NO;
+    
+//    self.tagImageView.userInteractionEnabled = NO;
     
     //check if boxes not saved on the server
     if (_filenameResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
@@ -199,97 +202,6 @@
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    NSLog(@"box selected:%d", self.tagImageView.tagView.selectedBox);
-}
-
-#pragma mark -
-#pragma mark UIScrollView delegate: Scrolling Images
-
-//- (void)loadScrollViewWithImageIndex:(int) index
-//{
-//    
-//    if(index >= self.items.count) return;
-//    
-//    NSString *filename = [self.items objectAtIndex:index];
-//
-//    //look for the view in the array. If it is not there, save it
-//    UIView *composeViewSelected = [self.composeViewsArray objectAtIndex:index];
-//    if ((NSNull *)composeViewSelected == [NSNull null]){
-//        
-//        //boxes
-//        NSString *boxesPath = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
-//        NSMutableArray *boxes = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:boxesPath]];
-//        
-//        //image
-//        NSString *imagePath = [[self.paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
-//        UIImage *image = [[UIImage alloc] initWithContentsOfFile:imagePath];
-//        
-//        //init views
-//        composeViewSelected = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height)];
-//        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.frame.size.width, self.scrollView.frame.size.height)];
-//        imageView.tag = 200;
-//        imageView.contentMode = UIViewContentModeScaleAspectFit;
-//        imageView.image = image;
-//        
-//        TagView *annotationView = [[TagView alloc] initWithFrame:[self getImageFrameFromImageView:imageView]];
-//        annotationView.tag = 100;
-//        [annotationView.objects setArray:boxes];
-//        annotationView.delegate = self;
-//        annotationView.filename = filename;
-//        for(Box* box in boxes){
-//            CGFloat frameWidth = annotationView.frame.size.width;
-//            CGFloat frameHeight = annotationView.frame.size.height;
-//            
-//            box.upperLeft = CGPointMake(box.upperLeft.x*frameWidth/box->RIGHTBOUND, box.upperLeft.y*frameHeight/box->LOWERBOUND);
-//            box.lowerRight = CGPointMake(box.lowerRight.x*frameWidth/box->RIGHTBOUND, box.lowerRight.y*frameHeight/box->LOWERBOUND);
-//            box->RIGHTBOUND = frameWidth;
-//            box->LOWERBOUND = frameHeight;
-//        }
-//        [composeViewSelected addSubview:imageView];
-//        [composeViewSelected addSubview:annotationView];
-//        [self.composeViewsArray setObject:composeViewSelected atIndexedSubscript:index];
-//    }
-//    
-//    //Add it to the scroll view (if it was not setted)
-//    if(composeViewSelected.superview == nil){
-//        // compose view to uiscrollview
-//        CGRect frame = self.scrollView.frame;
-//        frame.origin.x = (frame.size.width * index);
-//        frame.origin.y = 0;
-//        composeViewSelected.frame = frame;
-//        
-//        [self.scrollView addSubview:composeViewSelected];
-//    }
-//}
-
-//// at the end of scroll animation, reset the boolean used when scrolls originate from the UIPageControl
-//- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-//{
-//    
-//    // switch the indicator when more than 50% of the previous/next page is visible
-//    CGFloat pageWidth = CGRectGetWidth(self.scrollView.frame);
-//    self.currentScrollIndex = floor((self.scrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
-//    self.filename = [self.items objectAtIndex:self.currentScrollIndex];
-////    UIView *selectedComposeView = [self.composeViewsArray objectAtIndex:self.currentScrollIndex];
-////    TagView *annotationView = (TagView *)[selectedComposeView viewWithTag:100];
-////    UIImageView *imageView = (UIImageView *)[selectedComposeView viewWithTag:200];
-////    self.composeView = selectedComposeView;
-////    self.imageView = imageView;
-////    self.annotationView = annotationView;
-//    NSLog(@"decelerating on page %d with filename %@", self.currentScrollIndex, self.filename);
-//    
-//    
-//    // load the visible page and the page on either side of it (to avoid flashes when the user starts scrolling)
-//    [self loadScrollViewWithImageIndex:self.currentScrollIndex - 1];
-//    [self loadScrollViewWithImageIndex:self.currentScrollIndex];
-//    [self loadScrollViewWithImageIndex:self.currentScrollIndex + 1];
-//}
-
-
 
 #pragma mark -
 #pragma mark IBAction 
@@ -379,28 +291,6 @@
 }
 
 
-- (IBAction)changeImageAction:(id)sender
-{
-    
-//    [self loadWhenDisappear];
-//    
-//    UIButton *button = (UIButton *)sender;
-//    
-//    //select next/previous image filename
-//    int increase = 2*button.tag - 3;
-//    int currentIndex = [self.items indexOfObject:self.filename];
-//    int total = self.items.count;
-//    int a = currentIndex + increase;
-//    int nextIndex = (a >= 0) ? (a % total) : ((a % total) + total);
-//    NSString *newFilename = (NSString *)[self.items objectAtIndex:nextIndex];
-//    //NSLog(@"current index: %d, next index: %d, increase: %d, button.tag: %d",currentIndex, (currentIndex+increase)%self.items.count, increase, button.tag);
-//    
-//    //load new boxes and new image
-//    self.filename = newFilename;
-//    [self loadWhenAppear];
-}
-
-
 #pragma mark -
 #pragma mark ActionSheetDelegate Methods
 
@@ -474,6 +364,10 @@
     
     //TODO: just activate sending button if box was not previously sent
     NSNumber *isSelected = [notification object];
+
+    [self.infiniteLoopView disableScrolling:isSelected.boolValue];
+
+    
     self.deleteButton.enabled = isSelected.boolValue;
     Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
     if(!selectedBox.sent) self.sendButton.enabled = YES;
@@ -609,16 +503,27 @@
 
 - (UIView *) viewForIndex:(int)index
 {
-    NSString *requestedFilename = [self.items objectAtIndex:index];
+    TagImageView *requestedView = [_viewsForScrollDictionary objectForKey:[NSNumber numberWithInt:index]];
     
-    //set the resource handler with the correct filename
-    _filenameResourceHandler.filename = requestedFilename;
+    if(requestedView == nil){
+        
+        //set the resource handler with the correct filename
+        NSString *requestedFilename = [self.items objectAtIndex:index];
+        _filenameResourceHandler.filename = requestedFilename;
+        
+        //construct the view
+        requestedView = [[TagImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
+        requestedView.image = [_filenameResourceHandler getImage];
+        requestedView.tagView.boxes = [_filenameResourceHandler getBoxes];
+        
+        //restore the |_filenameResourceHandler|
+        _filenameResourceHandler.filename = self.filename;
+        
+        //store the view in the dictionary
+        [_viewsForScrollDictionary setObject:requestedView forKey:[NSNumber numberWithInt:index]];
+    }
     
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[_filenameResourceHandler getImage]];
-    
-    _filenameResourceHandler.filename = self.filename;
-    
-    return imageView;
+    return requestedView;
 }
 
 - (int) numberOfViews
@@ -628,18 +533,13 @@
 
 - (void) changedToView:(UIView *)currentView withIndex:(int)index
 {
-//    NSString *currentFilename = [self.items objectAtIndex:index];
-//    
-//    //title
-//    self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
-//    
-//    //set the resource handler with the correct filename
-//    _filenameResourceHandler.filename = currentFilename;
-//    
-//    self.tagImageView = [[TagImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
-//    self.tagImageView.image = [_filenameResourceHandler getImage];
-//    self.tagImageView.tagView.boxes = [_filenameResourceHandler getBoxes];
-//    self.tagImageView.tagView.delegate = self;
+    //title
+    self.title = [NSString stringWithFormat:@"%d of %d", index, self.items.count];
+    
+    self.tagImageView = [_viewsForScrollDictionary objectForKey:[NSNumber numberWithInt:index]];
+    self.tagImageView.tagView.delegate = self;
+    
+    [self.view setNeedsDisplay];
 }
 
 #pragma mark -

@@ -213,7 +213,6 @@
         //custom badge
         NSNumber *num = [self.userDictionary objectForKey:[indexes objectAtIndex:i]];
         [button addSubview:[self correctAccessoryWithBoxes:num forImgeSize:button.frame.size]];
-        NSLog(@"modifying badges! Num obtained: %@", num);
         
         [buttons addObject:button];
     }

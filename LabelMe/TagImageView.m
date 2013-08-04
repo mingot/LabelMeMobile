@@ -67,7 +67,7 @@
     self.containerView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
     self.imageView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
     self.tagView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
-    
+
 }
 
 

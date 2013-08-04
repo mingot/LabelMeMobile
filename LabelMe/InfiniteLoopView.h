@@ -17,6 +17,7 @@
 
 @protocol InfiniteLoopDelegate <NSObject>
 
+// Informed the delegate which is the view and index currently displaying
 - (void) changedToView:(UIView *)currentView withIndex:(int)index;
 
 @end
@@ -30,5 +31,15 @@
 // Needs to be called after the delegate and data source have been hooked
 // |ViewDidLoad| is usually a good place for doing so
 - (void) initialize;
+
+// Needed when a box is selected to diable scrolling
+- (void) disableScrolling:(BOOL) disable;
+
+@end
+
+
+@interface PallasadaView : UIView
+
+@property (strong, nonatomic) UIView *subView;
 
 @end

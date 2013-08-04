@@ -7,12 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "InfiniteLoopView.h"
+#import "TagImageView.h"
 #import "TagView.h"
 #import "Box.h"
 #import "ServerConnection.h"
 #import "SendingView.h"
-#import "TagImageView.h"
-#import "InfiniteLoopView.h"
+
+
 
 @protocol TagViewControllerDelegate <NSObject>
 
@@ -53,7 +55,6 @@
 -(IBAction)listAction:(id)sender;
 
 -(IBAction)hideTip:(id)sender;
--(IBAction)changeImageAction:(id)sender;
 
 -(void)saveThumbnail;
 -(void)saveDictionary;
