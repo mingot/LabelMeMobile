@@ -7,7 +7,18 @@
 //
 
 #import "TagImageView.h"
+#import "Classifier.h"
 
 @interface DetectorResourceHandler : NSObject
+
+
+- (id) initForUsername:(NSString *)username;
+- (NSArray *) getAvailanleObjectClasses;
+- (NSArray *) getImagesList;
+- (NSMutableArray *) loadDetectors;
+
+
+- (void) saveDetectors:(NSArray *) detectors;
+- (void) removeImageForDetector:(Classifier *) detector;
 
 @end

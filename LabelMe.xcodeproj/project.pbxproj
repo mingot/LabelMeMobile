@@ -77,7 +77,6 @@
 		A5DCC55A1628F5CB00AC9067 /* LabelMeAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A558D62916134E0C001DED8C /* LabelMeAppDelegate.m */; };
 		A5DCC55B1628F5CB00AC9067 /* SignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A558D63716134F79001DED8C /* SignInViewController.m */; };
 		A5DCC55C1628F5CB00AC9067 /* ServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A558D64316139280001DED8C /* ServerConnection.m */; };
-		A5DCC55D1628F5CB00AC9067 /* NSObject+ShowAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = A558D6461613A29C001DED8C /* NSObject+ShowAlert.m */; };
 		A5DCC55E1628F5CB00AC9067 /* NSString+checkValidity.m in Sources */ = {isa = PBXBuildFile; fileRef = A56464171614B88F007D444E /* NSString+checkValidity.m */; };
 		A5DCC55F1628F5CB00AC9067 /* CreateAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A564641B1614BA0D007D444E /* CreateAccountViewController.m */; };
 		A5DCC5601628F5CB00AC9067 /* GalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5CAAF4F16163A870095D703 /* GalleryViewController.m */; };
@@ -189,6 +188,7 @@
 		FC74F8E9174C1B49004701CC /* selectAllDisabled-1.png in Resources */ = {isa = PBXBuildFile; fileRef = FC74F8E5174C1B49004701CC /* selectAllDisabled-1.png */; };
 		FC74F8EA174C1B49004701CC /* selectAllEnabled-1.png in Resources */ = {isa = PBXBuildFile; fileRef = FC74F8E6174C1B49004701CC /* selectAllEnabled-1.png */; };
 		FC83599D17B094750035A833 /* DetectorResourceHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC83599C17B094750035A833 /* DetectorResourceHandler.m */; };
+		FC8359A017B134BF0035A833 /* UIViewController+ShowAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = FC83599F17B134BF0035A833 /* UIViewController+ShowAlert.m */; };
 		FC8E89B1173930340018876D /* UIImage+Border.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B0173930340018876D /* UIImage+Border.m */; };
 		FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B51739876D0018876D /* ModalSectionsTVC.m */; };
 		FC8E89B81739876D0018876D /* ModalSectionsTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */; };
@@ -317,8 +317,6 @@
 		A558D63816134F79001DED8C /* SignInViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SignInViewController_iPhone.xib; sourceTree = "<group>"; };
 		A558D6421613927F001DED8C /* ServerConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerConnection.h; sourceTree = "<group>"; };
 		A558D64316139280001DED8C /* ServerConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerConnection.m; sourceTree = "<group>"; };
-		A558D6451613A29C001DED8C /* NSObject+ShowAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+ShowAlert.h"; sourceTree = "<group>"; };
-		A558D6461613A29C001DED8C /* NSObject+ShowAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+ShowAlert.m"; sourceTree = "<group>"; };
 		A55A8447162CCFAA00C917DD /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		A55A8448162CCFAA00C917DD /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		A55A844E162CD34C00C917DD /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -472,6 +470,8 @@
 		FC74F8E6174C1B49004701CC /* selectAllEnabled-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "selectAllEnabled-1.png"; sourceTree = "<group>"; };
 		FC83599B17B094750035A833 /* DetectorResourceHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectorResourceHandler.h; sourceTree = "<group>"; };
 		FC83599C17B094750035A833 /* DetectorResourceHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectorResourceHandler.m; sourceTree = "<group>"; };
+		FC83599E17B134BF0035A833 /* UIViewController+ShowAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+ShowAlert.h"; sourceTree = "<group>"; };
+		FC83599F17B134BF0035A833 /* UIViewController+ShowAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+ShowAlert.m"; sourceTree = "<group>"; };
 		FC8E89AF173930340018876D /* UIImage+Border.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Border.h"; sourceTree = "<group>"; };
 		FC8E89B0173930340018876D /* UIImage+Border.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Border.m"; sourceTree = "<group>"; };
 		FC8E89B41739876D0018876D /* ModalSectionsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSectionsTVC.h; sourceTree = "<group>"; };
@@ -721,8 +721,8 @@
 				A510E0ED161B857400BC1B3A /* UITextField+BoxLabeling.m */,
 				A5480D5E16173525009F630D /* NSObject+Folders.h */,
 				A5480D5F16173525009F630D /* NSObject+Folders.m */,
-				A558D6451613A29C001DED8C /* NSObject+ShowAlert.h */,
-				A558D6461613A29C001DED8C /* NSObject+ShowAlert.m */,
+				FC83599E17B134BF0035A833 /* UIViewController+ShowAlert.h */,
+				FC83599F17B134BF0035A833 /* UIViewController+ShowAlert.m */,
 				A56464161614B88F007D444E /* NSString+checkValidity.h */,
 				A56464171614B88F007D444E /* NSString+checkValidity.m */,
 			);
@@ -1404,7 +1404,6 @@
 				A5DCC55A1628F5CB00AC9067 /* LabelMeAppDelegate.m in Sources */,
 				A5DCC55B1628F5CB00AC9067 /* SignInViewController.m in Sources */,
 				A5DCC55C1628F5CB00AC9067 /* ServerConnection.m in Sources */,
-				A5DCC55D1628F5CB00AC9067 /* NSObject+ShowAlert.m in Sources */,
 				A5DCC55E1628F5CB00AC9067 /* NSString+checkValidity.m in Sources */,
 				A5DCC55F1628F5CB00AC9067 /* CreateAccountViewController.m in Sources */,
 				A5DCC5601628F5CB00AC9067 /* GalleryViewController.m in Sources */,
@@ -1449,6 +1448,7 @@
 				FC447A9A17AC1412004AA88B /* FilenameResourcesHandler.m in Sources */,
 				FC447A9D17AC7571004AA88B /* InfiniteLoopView.m in Sources */,
 				FC83599D17B094750035A833 /* DetectorResourceHandler.m in Sources */,
+				FC8359A017B134BF0035A833 /* UIViewController+ShowAlert.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

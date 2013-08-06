@@ -10,7 +10,7 @@
 #import "FilenameResourcesHandler.h"
 #import "LMUINavigationController.h"
 #import "UIButton+CustomViews.h"
-#import "NSObject+ShowAlert.h"
+#import "UIViewController+ShowAlert.h"
 
 
 

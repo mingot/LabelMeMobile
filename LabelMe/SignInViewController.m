@@ -11,7 +11,7 @@
 #import "Reachability.h"
 
 #import "UIImage+Resize.h"
-#import "NSObject+ShowAlert.h"
+#import "UIViewController+ShowAlert.h"
 #import "NSObject+Folders.h"
 #import "NSString+checkValidity.h"
 

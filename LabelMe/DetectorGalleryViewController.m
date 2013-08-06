@@ -12,7 +12,7 @@
 
 #import "LMUINavigationController.h"
 #import "UIButton+CustomViews.h"
-#import "NSObject+ShowAlert.h"
+#import "UIViewController+ShowAlert.h"
 
 #define IMAGES 0
 #define THUMB 1
@@ -31,55 +31,6 @@
 @implementation DetectorGalleryViewController
 
 
-#pragma mark
-#pragma mark - Setters and Getters
-
-- (NSString *) userPath
-{
-    if(!_userPath){
-        NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-        _userPath = [[NSString alloc] initWithFormat:@"%@/%@",documentsDirectory,self.username];
-    }
-    
-    return _userPath;
-}
-
--(NSArray *) resourcesPaths
-{
-    if(!_resourcesPaths){
-        _resourcesPaths = [NSArray arrayWithObjects:
-                               [self.userPath stringByAppendingPathComponent:@"images"],
-                               [self.userPath stringByAppendingPathComponent:@"thumbnail"],
-                               [self.userPath stringByAppendingPathComponent:@"annotations"],
-                               [self.userPath stringByAppendingPathComponent:@"Detectors"],
-                               self.userPath, nil];
-    }
-    
-    return _resourcesPaths;
-}
-
-
--(NSArray *) availableObjectClasses
-{
-    if(!_availableObjectClasses){
-        NSMutableArray *list = [[NSMutableArray alloc] init];
-        
-        
-        NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.resourcesPaths objectAtIndex:THUMB]] error:NULL];
-        
-        for(NSString *imageName in imagesList){
-            NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
-            NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
-            for(Box *box in objects)
-                if([list indexOfObject:box.label] == NSNotFound && ![box.label isEqualToString:@""])
-                    [list addObject:box.label];
-        }
-        
-        _availableObjectClasses = [NSArray arrayWithArray:list];
-    }
-    
-    return _availableObjectClasses;
-}
 
 #pragma mark
 #pragma mark -  Initialization and lifecycle
@@ -149,6 +100,8 @@
 {
     self.title = @"Detectors"; //for back button
     
+    self.detectorResourceHandler = [[DetectorResourceHandler alloc] initForUsername:self.username];
+    
     self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
     self.selectedItems = [[NSMutableArray alloc] init];
     
@@ -156,13 +109,7 @@
     UIImage *barButtonItem = [[UIImage imageNamed:@"barItemButton.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 5, 0, 5)];
     [[UIBarButtonItem appearance] setBackgroundImage:barButtonItem forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
     
-    //load detectors and create directory if it does not exist
-    NSString *detectorsPath = [self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"];
-    self.detectors = [NSKeyedUnarchiver unarchiveObjectWithFile:detectorsPath];
-    if(!self.detectors) {
-        [[NSFileManager defaultManager] createDirectoryAtPath:[self.userPath stringByAppendingPathComponent:@"Detectors"] withIntermediateDirectories:YES attributes:nil error:nil];
-        self.detectors = [[NSMutableArray alloc] init];
-    }
+    self.detectors = [self.detectorResourceHandler loadDetectors];
     
     UIView *customView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 100)];
     self.tableView.tableFooterView = customView;
@@ -229,17 +176,11 @@
     self.executeButton.enabled = NO;
     
     //update classifier list in disk
-    //TODO: handle files apart
-    if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"]])
-        NSLog(@"Unable to save the classifiers");
+    [self.detectorResourceHandler saveDetectors:self.detectors];
     
     //delete images
-    for(Classifier *classifier in aux){
-        NSString *bigImagePath = [self.userPath stringByAppendingPathComponent:[NSString stringWithFormat:@"Detectors/%@_big.jpg", classifier.classifierID]];
-        NSString *thumbnailImagePath = [self.userPath stringByAppendingPathComponent:[NSString stringWithFormat:@"Detectors/%@_thumb.jpg", classifier.classifierID]];
-        [[NSFileManager defaultManager] removeItemAtPath:bigImagePath error:nil];
-        [[NSFileManager defaultManager] removeItemAtPath:thumbnailImagePath error:nil];
-    }
+    for(Classifier *classifier in aux)
+        [self.detectorResourceHandler removeImageForDetector:classifier];
     
     if(self.detectors.count==0) self.noImages.hidden = NO;
     
@@ -252,39 +193,32 @@
     _selectedRow = self.detectors.count;
     
     //check if there for no images or no labels to show error
-    self.availableObjectClasses = nil; //reload
-    NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[self.userPath stringByAppendingPathComponent:@"thumbnail"] error:NULL];
+    NSArray *availableObjectClasses = [self.detectorResourceHandler getAvailanleObjectClasses];
+    NSArray *imagesList = [self.detectorResourceHandler getImagesList];
     
     if(imagesList.count == 0){
-//        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
-//                                                             message:@"No images to learn from"
-//                                                            delegate:nil
-//                                                   cancelButtonTitle:@"OK"
-//                                                   otherButtonTitles:nil];
-//        [errorAlert show];
+
         [self errorWithTitle:@"Empty" andDescription:@"No images to learn from"];
-        return;
         
-    }else if(self.availableObjectClasses.count == 0){
-        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
-                                                             message:@"No labels found"
-                                                            delegate:nil
-                                                   cancelButtonTitle:@"OK"
-                                                   otherButtonTitles:nil];
-        [errorAlert show];
-        return;
+        
+    }else if(availableObjectClasses.count == 0){
+
+        [self errorWithTitle:@"Empty" andDescription:@"No labels found"];
+        
+        
+    }else{
+        Classifier *newDetector = [[Classifier alloc] init];
+        newDetector.name = @"New Detector";
+        newDetector.targetClasses = [NSArray arrayWithObject:@"Not Set"];
+        self.detectorController.availableObjectClasses = [availableObjectClasses sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+        self.detectorController.hidesBottomBarWhenPushed = YES;
+        self.detectorController.delegate = self;
+        self.detectorController.svmClassifier = newDetector;
+        self.detectorController.view = nil; //to reexecute viewDidLoad
+        //TODO: solve connection of user path
+//        self.detectorController.userPath = self.userPath;
+        [self.navigationController pushViewController:self.detectorController animated:YES];
     }
-        
-    Classifier *newDetector = [[Classifier alloc] init];
-    newDetector.name = @"New Detector";
-    newDetector.targetClasses = [NSArray arrayWithObject:@"Not Set"];
-    self.detectorController.availableObjectClasses = [self.availableObjectClasses sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-    self.detectorController.hidesBottomBarWhenPushed = YES;
-    self.detectorController.delegate = self;
-    self.detectorController.svmClassifier = newDetector;
-    self.detectorController.view = nil; //to reexecute viewDidLoad
-    self.detectorController.userPath = self.userPath;
-    [self.navigationController pushViewController:self.detectorController animated:YES];
     
     
 }
@@ -364,7 +298,8 @@
         self.detectorController.delegate = self;
         self.detectorController.svmClassifier = [reversedDetectors objectAtIndex:indexPath.row];
         self.detectorController.view = nil; //to reexecute viewDidLoad
-        self.detectorController.userPath = self.userPath;
+        //TODO: solve connection with detectorcontroller
+//        self.detectorController.userPath = self.userPath;
         [self.navigationController pushViewController:self.detectorController animated:YES];
     
     }else{
@@ -387,9 +322,7 @@
     if(_selectedRow < self.detectors.count) [self.detectors replaceObjectAtIndex:_selectedRow withObject:updatedDetector];
     else [self.detectors addObject:updatedDetector];
 
-    if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"]]){
-        NSLog(@"Unable to save the classifiers");
-    }
+    [self.detectorResourceHandler saveDetectors:self.detectors];
     
     [self.tableView reloadData];
     

@@ -7,7 +7,7 @@
 //
 
 #import "ServerConnection.h"
-#import "NSObject+ShowAlert.h"
+#import "UIViewController+ShowAlert.h"
 #import "Box.h"
 #import "NSObject+Folders.h"
 
@@ -653,5 +653,15 @@ static BOOL didSignIn = NO;
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 }
 
+
+- (void) errorWithTitle:(NSString *)title andDescription:(NSString *)description
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title
+                                                    message:description
+                                                   delegate:self
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil, nil];
+    [alert show];
+}
 
 @end

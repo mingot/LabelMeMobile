@@ -8,7 +8,7 @@
 
 #import "CreateAccountViewController.h"
 #import "NSString+checkValidity.h"
-#import "NSObject+ShowAlert.h"
+#import "UIViewController+ShowAlert.h"
 #import "NSObject+Folders.h"
 
 

@@ -17,7 +17,7 @@
 
 #import "UIImage+Resize.h"
 #import "UIImage+Border.h"
-#import "NSObject+ShowAlert.h"
+#import "UIViewController+ShowAlert.h"
 #import "NSObject+Folders.h"
 
 #import "LMUINavigationController.h"

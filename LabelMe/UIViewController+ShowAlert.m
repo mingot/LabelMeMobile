@@ -1,14 +1,14 @@
 //
-//  NSObject+ShowAlert.m
+//  UIViewController+ShowAlert.m
 //  LabelMe
 //
-//  Created by Dolores on 26/09/12.
-//  Copyright (c) 2012 CSAIL. All rights reserved.
+//  Created by Josep Marc Mingot Hidalgo on 06/08/13.
+//  Copyright (c) 2013 CSAIL. All rights reserved.
 //
 
-#import "NSObject+ShowAlert.h"
+#import "UIViewController+ShowAlert.h"
 
-@implementation NSObject (ShowAlert)
+@implementation UIViewController (ShowAlert)
 
 - (void) errorWithTitle:(NSString *)title andDescription:(NSString *)description
 {
@@ -19,5 +19,6 @@
                                           otherButtonTitles:nil, nil];
     [alert show];
 }
+
 
 @end

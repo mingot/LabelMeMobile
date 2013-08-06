@@ -11,6 +11,7 @@
 #import "ModalTVC.h"
 #import "ExecuteDetectorViewController.h"
 #import "Classifier.h"
+#import "DetectorResourceHandler.h"
 
 
 @interface DetectorGalleryViewController : UIViewController <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource,DetectorDescriptionViewControllerDelegate>
@@ -37,9 +38,7 @@
 
 //resources
 @property (strong, nonatomic) NSString *username;
-@property (strong, nonatomic) NSString *userPath;
-@property (strong, nonatomic) NSArray *resourcesPaths;
-@property (strong, nonatomic) NSArray *availableObjectClasses;
+@property (strong, nonatomic) DetectorResourceHandler *detectorResourceHandler;
 
 //top toolbar actions
 - (IBAction) edit:(id)sender;

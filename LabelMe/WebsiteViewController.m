@@ -8,7 +8,7 @@
 
 #import "WebsiteViewController.h"
 #import "Reachability.h"
-#import "NSObject+ShowAlert.h"
+#import "UIViewController+ShowAlert.h"
 
 
 
