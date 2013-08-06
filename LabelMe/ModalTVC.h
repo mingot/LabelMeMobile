@@ -42,6 +42,7 @@
 
 @property BOOL multipleChoice;
 @property BOOL showCancelButton;
+@property BOOL autodismiss;
 
 
 - (IBAction)doneAction:(id)sender;

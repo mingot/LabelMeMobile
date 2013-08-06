@@ -501,10 +501,10 @@
     NetworkStatus networkStatus = [networkReachability currentReachabilityStatus];
     BOOL wifiOnly = [self.userDictionary objectForKey:@"wifi"];
     if (networkStatus == NotReachable) {
-        [self errorWithTitle:@"Check your connection" andDescription:@"Sorry, no connection found."];
+        [self showAlertWithTitle:@"Check your connection" andDescription:@"Sorry, no connection found."];
         return;
     }else if(networkStatus != ReachableViaWiFi && wifiOnly){
-        [self errorWithTitle:@"Check your settings" andDescription:@"Sorry, wifi connection required."];
+        [self showAlertWithTitle:@"Check your settings" andDescription:@"Sorry, wifi connection required."];
         return;
     }
     
@@ -987,8 +987,8 @@
     }else{
         if (photosWithErrors >0) {
             if (photosWithErrors == 1)
-                [self errorWithTitle:@"An image could not be sent" andDescription:@"Please, try again."];
-            else [self errorWithTitle:[NSString stringWithFormat:@"%d images could not be sent.",photosWithErrors] andDescription:@"Please, try again."];
+                [self showAlertWithTitle:@"An image could not be sent" andDescription:@"Please, try again."];
+            else [self showAlertWithTitle:[NSString stringWithFormat:@"%d images could not be sent.",photosWithErrors] andDescription:@"Please, try again."];
         }
         [self.sendingView reset];
         [self.sendingView setHidden:YES];
@@ -1018,8 +1018,8 @@
         
     }else if (photosWithErrors > 0 ){
         if (photosWithErrors == 1)
-            [self errorWithTitle:@"An image could not be sent" andDescription:@"Please, try again."];
-        else [self errorWithTitle:[NSString stringWithFormat:@"%d images could not be sent.",photosWithErrors] andDescription:@"Please, try again."];
+            [self showAlertWithTitle:@"An image could not be sent" andDescription:@"Please, try again."];
+        else [self showAlertWithTitle:[NSString stringWithFormat:@"%d images could not be sent.",photosWithErrors] andDescription:@"Please, try again."];
         
         [self.sendingView reset];
         [self.sendingView setHidden:YES];

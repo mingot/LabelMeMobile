@@ -204,17 +204,17 @@
     _selectedRow = self.detectors.count;
     
     //check if there for no images or no labels to show error
-    NSArray *availableObjectClasses = [self.detectorResourceHandler getObjectClasses];
+    NSArray *availableObjectClasses = [self.detectorResourceHandler getObjectClassesNames];
     NSArray *availableTrainingImages = [self.detectorResourceHandler getTrainingImages];
     
     if(availableTrainingImages.count == 0){
 
-        [self errorWithTitle:@"Empty" andDescription:@"No images to learn from"];
+        [self showAlertWithTitle:@"Empty" andDescription:@"No images to learn from"];
         
         
     }else if(availableObjectClasses.count == 0){
 
-        [self errorWithTitle:@"Empty" andDescription:@"No labels found"];
+        [self showAlertWithTitle:@"Empty" andDescription:@"No labels found"];
         
         
     }else{
@@ -222,7 +222,6 @@
         newDetector.name = @"New Detector";
         newDetector.targetClasses = [NSArray arrayWithObject:@"Not Set"];
         self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
-        self.detectorController.availableObjectClasses = [availableObjectClasses sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
         self.detectorController.hidesBottomBarWhenPushed = YES;
         self.detectorController.delegate = self;
         self.detectorController.svmClassifier = newDetector;

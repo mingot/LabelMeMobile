@@ -78,8 +78,10 @@
         _detectorTargetClasses = [NSArray arrayWithArray:classes];
         
         //Present the modal for training images
-        [self configureModalForFirstTrainingImages];
-        [_viewController presentModalViewController:_modalTVC animated:YES];
+        [_modalTVC dismissViewControllerAnimated:YES completion:^{
+            [self configureModalForFirstTrainingImages];
+            [_viewController presentModalViewController:_modalTVC animated:YES];
+        }];
 
         
     }else if([identifier isEqualToString:@"images"]){
@@ -97,7 +99,10 @@
         }
         if(testImagesNames.count == 0) testImagesNames = traingImagesNames;
         
-        [self.delegate trainDetectorForClasses:_detectorTargetClasses andTrainingImages:traingImagesNames andTestImages:testImagesNames];
+        [self.delegate trainDetectorForClasses:_detectorTargetClasses
+                        andTrainingImagesNames:traingImagesNames
+                            andTestImagesNames:testImagesNames];
+        [_modalTVC dismissModalViewControllerAnimated:YES];
     }
 }
 
@@ -154,7 +159,7 @@
     for(NSString *imageName in availablePositiveImagesNames){
         
         //set the image
-        [imagesList addObject:[_detectorResourceHandler getImageWithImageName:imageName]];
+        [imagesList addObject:[_detectorResourceHandler getThumbnailImageWithImageName:imageName]];
         
         //set the selected images
         if(detector.imagesUsedTraining == nil || [detector.imagesUsedTraining indexOfObject:imageName]!= NSNotFound)

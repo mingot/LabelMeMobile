@@ -132,7 +132,7 @@
         NSArray *fields = [[NSArray alloc] initWithObjects:self.biologicalNameField.text,self.institutionField.text,self.usernameField.text,self.passwordField.text,self.emailField.text, nil];
         [serverConnection createAccountWithFields:fields];
         
-    }else [self errorWithTitle:@"" andDescription:@"Please, check the fields. Only letters and numbers allowed."];
+    }else [self showAlertWithTitle:@"" andDescription:@"Please, check the fields. Only letters and numbers allowed."];
 
     
 }
@@ -289,7 +289,7 @@
         [self.delegate signIn];
 
     }
-    else [self errorWithTitle:@"Unknown error" andDescription:@""];
+    else [self showAlertWithTitle:@"Unknown error" andDescription:@""];
 }
 
 -(void)createAccountError

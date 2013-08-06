@@ -554,7 +554,7 @@
 
 -(void)sendPhotoError
 {
-    [self errorWithTitle:@"This image could not be sent" andDescription:@"Please, try again."];
+    [self showAlertWithTitle:@"This image could not be sent" andDescription:@"Please, try again."];
     [self barButtonsEnabled:YES];
     [self.sendingView setHidden:YES];
     [self.sendingView.progressView setProgress:0];

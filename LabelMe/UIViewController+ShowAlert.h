@@ -10,6 +10,6 @@
 
 @interface UIViewController (ShowAlert)
 
-- (void) errorWithTitle:(NSString *)title andDescription: (NSString *)description;
+- (void) showAlertWithTitle:(NSString *)title andDescription: (NSString *)description;
 
 @end

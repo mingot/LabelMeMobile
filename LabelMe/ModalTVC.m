@@ -27,11 +27,8 @@
 @implementation ModalTVC
 
 
--(NSMutableArray *) selectedItems
-{
-    if(!_selectedItems) _selectedItems = [[NSMutableArray alloc] init];
-    return _selectedItems;
-}
+#pragma mark -
+#pragma mark Initialization
 
 - (void)viewDidLoad
 {
@@ -79,6 +76,23 @@
 //        self.subtitleLabel.hidden = YES;
 }
 
+#pragma mark -
+#pragma mark Getters and Setters
+
+- (NSMutableArray *) selectedItems
+{
+    if(!_selectedItems) _selectedItems = [[NSMutableArray alloc] init];
+    return _selectedItems;
+}
+
+- (void) setData:(NSArray *)data
+{
+    if(_data!=data){
+        _data = data;
+        [self.tableView reloadData];
+        [self.collectionView reloadData];
+    }
+}
 
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
@@ -169,12 +183,13 @@
 {    
     //send index of selected rows
     [self.delegate userSlection:[[NSArray alloc] initWithArray:self.selectedItems] for:self.modalID];
-    [self dismissModalViewControllerAnimated:YES];
+    if(self.autodismiss)[self dismissModalViewControllerAnimated:YES];
 }
 
-- (IBAction)cancelAction:(id)sender {
-    [self dismissModalViewControllerAnimated:YES];
+- (IBAction)cancelAction:(id)sender
+{
     [self.delegate selectionCancelled];
+    if(self.autodismiss)[self dismissModalViewControllerAnimated:YES];
 }
 
 

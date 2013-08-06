@@ -295,9 +295,9 @@
         ServerConnection *sconnecton = [[ServerConnection alloc]init];
         if ([[alertView textFieldAtIndex:0].text checkEmailFormat] ) {
             [sconnecton forgotPassword:[alertView textFieldAtIndex:0].text];
-            [self errorWithTitle:@"Forgot Password" andDescription:@"An email will be sent to you with your username and a new password."];
+            [self showAlertWithTitle:@"Forgot Password" andDescription:@"An email will be sent to you with your username and a new password."];
             
-        } else [self errorWithTitle:@"Email format is not valid" andDescription:@"Enter a valid email."];
+        } else [self showAlertWithTitle:@"Email format is not valid" andDescription:@"Enter a valid email."];
     }
 }
 
@@ -387,7 +387,7 @@
 {
     if (previousSession) [self signInComplete];
     else{
-        [self errorWithTitle:@"No internet connection" andDescription:@"The app could not connect."];
+        [self showAlertWithTitle:@"No internet connection" andDescription:@"The app could not connect."];
         [self.sendingView setHidden:YES];
         [self.sendingView.activityIndicator stopAnimating];
     }

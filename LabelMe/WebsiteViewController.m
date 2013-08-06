@@ -71,7 +71,7 @@
     Reachability *networkReachability = [Reachability reachabilityForInternetConnection];
     NetworkStatus networkStatus = [networkReachability currentReachabilityStatus];
     if  (networkStatus == NotReachable) {
-        [self errorWithTitle:@"No internet connection" andDescription:@"Please, check your connection."];
+        [self showAlertWithTitle:@"No internet connection" andDescription:@"Please, check your connection."];
         [self.activityIndicator setHidden:YES];
     }
 }

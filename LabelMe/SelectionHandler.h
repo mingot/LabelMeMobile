@@ -28,7 +28,8 @@
 
 // Inform about the selection made.
 // For a new detector is important to also set the target classes chosen
-- (void) trainDetectorForClasses:(NSArray *)classes andTrainingImages:(NSArray *) trainingImages andTestImages:(NSArray *)testImages; 
+- (void) trainDetectorForClasses:(NSArray *)classes
+          andTrainingImagesNames:(NSArray *)trainingImagesNames andTestImagesNames:(NSArray *)testImagesNames;
 
 // Request the current detector
 // Used to obtain the target classes and current training images

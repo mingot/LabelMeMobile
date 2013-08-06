@@ -71,7 +71,7 @@
                 [list addObject:box.label];
     }
     
-    return [NSArray arrayWithArray:list];
+    return [[NSArray arrayWithArray:list] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
     
 }
 
@@ -97,9 +97,20 @@
     return [NSArray arrayWithArray:list];
 }
 
-- (UIImage *) getImageWithImageName:(NSString *)imageName
+- (UIImage *) getThumbnailImageWithImageName:(NSString *)imageName
 {
     return [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[_resourcesPaths objectAtIndex:THUMB],imageName]];
+}
+
+- (UIImage *) getImageWithImageName:(NSString *) imageName
+{
+    return [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[_resourcesPaths objectAtIndex:IMAGES],imageName]];
+}
+
+- (NSArray *) getBoxesForImageName:(NSString *) imageName
+{
+    NSString *objectsPath = [(NSString *)[_resourcesPaths objectAtIndex:OBJECTS]  stringByAppendingPathComponent:imageName];
+    return [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:objectsPath]];
 }
 
 

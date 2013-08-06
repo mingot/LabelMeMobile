@@ -17,8 +17,11 @@
 - (NSArray *) getObjectClassesNames;
 - (NSArray *) getTrainingImages;
 - (NSArray *) getImageNamesContainingClasses:(NSArray *)targetClasses;
-- (int) getHogFromPreferences;
+- (UIImage *) getThumbnailImageWithImageName:(NSString *) imageName;
 - (UIImage *) getImageWithImageName:(NSString *) imageName;
+- (NSMutableArray *) getBoxesForImageName:(NSString *) imageName;
+- (int) getHogFromPreferences;
+
 
 - (NSMutableArray *) loadDetectors;
 

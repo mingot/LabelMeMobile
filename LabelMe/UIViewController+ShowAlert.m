@@ -10,7 +10,7 @@
 
 @implementation UIViewController (ShowAlert)
 
-- (void) errorWithTitle:(NSString *)title andDescription:(NSString *)description
+- (void) showAlertWithTitle:(NSString *)title andDescription:(NSString *)description
 {
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title
                                                     message:description

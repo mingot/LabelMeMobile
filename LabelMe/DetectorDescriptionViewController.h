@@ -14,6 +14,7 @@
 #import "SendingView.h"
 #import "Classifier.h"
 #import "DetectorResourceHandler.h"
+#import "SelectionHandler.h"
 
 @protocol DetectorDescriptionViewControllerDelegate <NSObject>
 
@@ -23,12 +24,12 @@
 
 
 
-@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate,ModalTVCDelegate, UIAlertViewDelegate, UITableViewDelegate,UITableViewDataSource, UITextFieldDelegate, ExecuteDetectorViewControllerDelegate>
+@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate,ModalTVCDelegate, UIAlertViewDelegate, UITableViewDelegate,UITableViewDataSource, UITextFieldDelegate, ExecuteDetectorViewControllerDelegate, SelectionHandlerDelegate>
 
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
-@property (strong, nonatomic) ModalTVC *modalTVC;
+//@property (strong, nonatomic) ModalTVC *modalTVC;
 @property (strong, nonatomic) SendingView *sendingView;
 
 //array with the properties to show in the description
@@ -53,10 +54,7 @@
 
 //useful information
 @property (strong, nonatomic) DetectorResourceHandler *detectorResourceHandler;
-//@property (strong, nonatomic) NSString *userPath;
-//@property (strong, nonatomic) NSArray *resourcesPaths;
-@property (strong, nonatomic) NSArray *availableObjectClasses;
-//@property (strong, nonatomic) NSArray *availablePositiveImagesNames;
+//@property (strong, nonatomic) NSArray *availableObjectClasses;
 @property (strong, nonatomic) NSMutableArray *selectedPositiveImageIndexes;
 @property (strong, nonatomic) NSMutableArray *selectedPostiveImageNames; //to save with the svm
 
