@@ -467,7 +467,6 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     int width = originalHog.numBlocksX;
     
     
-    
     //new hog
     HogFeature *scaledHog = [[HogFeature alloc] init];
     scaledHog.numBlocksX = newWidth;

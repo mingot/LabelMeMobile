@@ -10,6 +10,6 @@
 
 @interface NSObject (ShowAlert)
 
--(void)errorWithTitle: (NSString *)title andDescription: (NSString *)description;
+- (void) errorWithTitle:(NSString *)title andDescription: (NSString *)description;
 
 @end

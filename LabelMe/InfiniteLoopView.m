@@ -10,6 +10,8 @@
 
 #define module(a, b) (a >= 0) ? (a)%b : ((a)%(b) + b)
 #define kViewTag 10
+#define kWidth self.frame.size.width
+#define kHeight self.frame.size.height
 
 @interface InfiniteLoopView()
 {
@@ -31,16 +33,16 @@
 {
     _scrollView = [[UIScrollView alloc] initWithFrame:self.frame];
     _scrollView.pagingEnabled = YES;
-    _scrollView.contentSize = CGSizeMake(960, 460);
-    [_scrollView scrollRectToVisible:CGRectMake(320,0,320,460) animated:NO];
+    _scrollView.contentSize = CGSizeMake(3*kWidth, kHeight);
+    [_scrollView scrollRectToVisible:CGRectMake(kWidth,0,kWidth,kHeight) animated:NO];
     _scrollView.delegate = self;
     
     [self addSubview:_scrollView];
     
     // create placeholders for each of our documents
-    _pageOneView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
-    _pageTwoView = [[UIView alloc] initWithFrame:CGRectMake(320, 0, 320, 460)];
-    _pageThreeView = [[UIView alloc] initWithFrame:CGRectMake(640, 0, 320, 460)];
+    _pageOneView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kWidth, kHeight)];
+    _pageTwoView = [[UIView alloc] initWithFrame:CGRectMake(1*kWidth, 0, kWidth, kHeight)];
+    _pageThreeView = [[UIView alloc] initWithFrame:CGRectMake(2*kWidth, 0, kWidth, kHeight)];
     
     _pageOneView.backgroundColor = [UIColor blackColor];
     _pageTwoView.backgroundColor = [UIColor blackColor];
@@ -52,7 +54,6 @@
     
     // load all three pages into our scroll view
     int total = [self.dataSource numberOfViews];
-    NSLog(@"Requested index: %d, %d, %d", module(initialIndex - 1,total), module(initialIndex,total), module(initialIndex + 1,total));
     [self loadPageWithId:module(initialIndex - 1,total) onPage:0];
     [self loadPageWithId:module(initialIndex, total) onPage:1];
     [self loadPageWithId:module(initialIndex + 1, total) onPage:2];
@@ -91,7 +92,7 @@
     }
     
     // Reset offset back to middle page
-    [_scrollView scrollRectToVisible:CGRectMake(320,0,320,460) animated:NO];
+    [_scrollView scrollRectToVisible:CGRectMake(1*kWidth,0,kWidth,kHeight) animated:NO];
     
     //inform the delegate of the change
     [self.delegate didShowViewForIndex:_currIndex];
@@ -119,28 +120,23 @@
     
     
     // load data for page
+    UIView *viewToRemove;
     switch (page) {
 		case 0:
-        {
-            UIView *viewToRemove = [_pageOneView viewWithTag:kViewTag];
+            viewToRemove = [_pageOneView viewWithTag:kViewTag];
             [viewToRemove removeFromSuperview];
             [_pageOneView addSubview:view];
 			break;
-        }
 		case 1:
-        {
-            UIView *viewToRemove = [_pageTwoView viewWithTag:kViewTag];
+            viewToRemove = [_pageTwoView viewWithTag:kViewTag];
             [viewToRemove removeFromSuperview];
             [_pageTwoView addSubview:view];
 			break;
-        }
 		case 2:
-        {
-            UIView *viewToRemove = [_pageThreeView viewWithTag:kViewTag];
+            viewToRemove = [_pageThreeView viewWithTag:kViewTag];
             [viewToRemove removeFromSuperview];
             [_pageThreeView addSubview:view];
 			break;
-        }
 	}
     
     [self setNeedsDisplay];

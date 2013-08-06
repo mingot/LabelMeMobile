@@ -10,8 +10,13 @@
 
 @implementation NSObject (ShowAlert)
 
--(void)errorWithTitle: (NSString *)title andDescription: (NSString *)description{
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:description delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+- (void) errorWithTitle:(NSString *)title andDescription:(NSString *)description
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title
+                                                    message:description
+                                                   delegate:self
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil, nil];
     [alert show];
 }
 

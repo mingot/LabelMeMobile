@@ -29,15 +29,15 @@
 //view
 @property (weak, nonatomic) IBOutlet UILabel *noImages;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (nonatomic, strong) UIBarButtonItem *editButton;
-@property (nonatomic, strong) UIButton *executeDetectorsButton;
+@property (strong, nonatomic) UIBarButtonItem *editButton;
+@property (strong, nonatomic) UIButton *executeDetectorsButton;
 @property (strong, nonatomic) UIBarButtonItem *plusButton;
 @property (strong, nonatomic) UIBarButtonItem *deleteButton;
 @property (strong, nonatomic) UIBarButtonItem *executeButton;
 
 //resources
-@property (nonatomic, strong) NSString *username;
-@property (nonatomic, strong) NSString *userPath;
+@property (strong, nonatomic) NSString *username;
+@property (strong, nonatomic) NSString *userPath;
 @property (strong, nonatomic) NSArray *resourcesPaths;
 @property (strong, nonatomic) NSArray *availableObjectClasses;
 

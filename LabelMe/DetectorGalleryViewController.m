@@ -12,6 +12,7 @@
 
 #import "LMUINavigationController.h"
 #import "UIButton+CustomViews.h"
+#import "NSObject+ShowAlert.h"
 
 #define IMAGES 0
 #define THUMB 1
@@ -28,14 +29,6 @@
 
 
 @implementation DetectorGalleryViewController
-
-@synthesize detectors = _detectors;
-@synthesize tableView = _tableView;
-@synthesize detectorController = _detectorController;
-@synthesize username = _username;
-@synthesize resourcesPaths = _resourcesPaths;
-@synthesize availableObjectClasses = _availableObjectClasses;
-@synthesize userPath = _userPath;
 
 
 #pragma mark
@@ -102,9 +95,63 @@
 }
 
 
+- (void)initializeAndAddNoImagesView
+{
+    //noImages view
+    [self.noImages setBackgroundColor:[UIColor whiteColor]];
+    self.noImages.layer.masksToBounds = YES;
+    self.noImages.layer.cornerRadius = 10.0;
+    self.noImages.layer.shadowColor = [UIColor grayColor].CGColor;
+    self.noImages.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
+    self.noImages.shadowColor = [UIColor grayColor];
+    self.noImages.numberOfLines = 3;
+    self.noImages.shadowOffset = CGSizeMake(0.0, 1.0);
+    self.noImages.text = @"You do not have detectors, \nstart training a detector";
+    [self.noImages setTextAlignment:NSTextAlignmentCenter];
+    [self.noImages setUserInteractionEnabled:YES];
+    self.noImages.hidden = YES;
+    [self.view addSubview:self.noImages];
+}
+
+- (void)initializeToolbarButtons
+{
+    //toolbar edit buttons
+    self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStyleBordered target:self action:@selector(deleteAction:)];
+    [self.deleteButton setTintColor:[UIColor redColor]];
+    [self.deleteButton setWidth:self.view.frame.size.width/2 - 11];
+    [self.deleteButton setEnabled:NO];
+    self.executeButton = [[UIBarButtonItem alloc] initWithTitle:@"Execute" style:UIBarButtonItemStyleBordered target:self action:@selector(executeDetectorsAction:)];
+    [self.executeButton setWidth:self.view.frame.size.width/2 - 11];
+    [self.executeButton setEnabled:NO];
+    [self.navigationController.toolbar setBarStyle:UIBarStyleBlackTranslucent];
+}
+
+- (void)initializeNavigationBar
+{
+    //view controller specifications and top toolbar setting
+    UIImage *titleImage = [UIImage imageNamed:@"detectorsTitle.png"];
+    UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
+    titleView.image = titleImage;
+    [self.navigationItem setTitleView:titleView];
+    
+    //navigationBarButtons
+    self.editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(edit:)];
+    self.navigationItem.rightBarButtonItem = self.editButton;
+    self.plusButton =[[UIBarButtonItem alloc] initWithTitle:@"+" style:UIBarButtonItemStylePlain target:self action:@selector(addDetector:)];
+    [self.plusButton setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:20], UITextAttributeFont,nil] forState:UIControlStateNormal];
+    self.navigationItem.leftBarButtonItem = self.plusButton;
+    
+    //solid color for the navigation bar
+    [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
+}
+
 - (void)viewDidLoad
 {
     self.title = @"Detectors"; //for back button
+    
+    self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
+    self.selectedItems = [[NSMutableArray alloc] init];
+    
     
     UIImage *barButtonItem = [[UIImage imageNamed:@"barItemButton.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 5, 0, 5)];
     [[UIBarButtonItem appearance] setBackgroundImage:barButtonItem forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
@@ -120,58 +167,15 @@
     UIView *customView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 100)];
     self.tableView.tableFooterView = customView;
     
-    
-    //view controller specifications and top toolbar setting
-    UIImage *titleImage = [UIImage imageNamed:@"detectorsTitle.png"];
-    UIImageView *titleView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.frame.size.width - titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height)/2, 0, titleImage.size.width*self.navigationController.navigationBar.frame.size.height/titleImage.size.height, self.navigationController.navigationBar.frame.size.height)];
-    titleView.image = titleImage;
-    [self.navigationItem setTitleView:titleView];
-    
-    //previous buttons
-    //self.editButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton buttonBarWithTitle:@"Edit" target:self action:@selector(edit:)]];
-    //self.plusButton = [[UIBarButtonItem alloc] initWithCustomView:[UIButton plusBarButtonWithTarget:self action:@selector(addDetector:)]];
-    self.editButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(edit:)];
-    self.navigationItem.rightBarButtonItem = self.editButton;
-
-    self.plusButton =[[UIBarButtonItem alloc] initWithTitle:@"+" style:UIBarButtonItemStylePlain target:self action:@selector(addDetector:)];
-    [self.plusButton setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont boldSystemFontOfSize:20], UITextAttributeFont,nil] forState:UIControlStateNormal];
-    self.navigationItem.leftBarButtonItem = self.plusButton;
-    self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
-    
-    //toolbar edit buttons
-    self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStyleBordered target:self action:@selector(deleteAction:)];
-    [self.deleteButton setTintColor:[UIColor redColor]];
-    [self.deleteButton setWidth:self.view.frame.size.width/2 - 11];
-    [self.deleteButton setEnabled:NO];
-    self.executeButton = [[UIBarButtonItem alloc] initWithTitle:@"Execute" style:UIBarButtonItemStyleBordered target:self action:@selector(executeDetectorsAction:)];
-    [self.executeButton setWidth:self.view.frame.size.width/2 - 11];
-    [self.executeButton setEnabled:NO];
-    [self.navigationController.toolbar setBarStyle:UIBarStyleBlackTranslucent];
-    self.selectedItems = [[NSMutableArray alloc] init];
-    
-    //noImages view
-    [self.noImages setBackgroundColor:[UIColor whiteColor]];
-    self.noImages.layer.masksToBounds = YES;
-    self.noImages.layer.cornerRadius = 10.0;
-    self.noImages.layer.shadowColor = [UIColor grayColor].CGColor;
-    self.noImages.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
-    self.noImages.shadowColor = [UIColor grayColor];
-    self.noImages.numberOfLines = 3;
-    self.noImages.shadowOffset = CGSizeMake(0.0, 1.0);
-    self.noImages.text = @"You do not have detectors, \nstart training a detector";
-    [self.noImages setTextAlignment:NSTextAlignmentCenter];
-    [self.noImages setUserInteractionEnabled:YES];
-    self.noImages.hidden = YES;
-    [self.view addSubview:self.noImages];
+    [self initializeNavigationBar];
+    [self initializeToolbarButtons];
+    [self initializeAndAddNoImagesView];
     
     [super viewDidLoad];
 }
 
 -(void) viewWillAppear:(BOOL)animated
 {
-    //solid color for the navigation bar
-    [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
-    
     if(self.detectors.count==0) self.noImages.hidden = NO;
 }
 
@@ -186,6 +190,7 @@
     if(self.editing){
         [super setEditing:NO animated:NO];
         [self.tableView setEditing:NO animated:NO];
+        
         [button setTitle:@"Edit" forState:UIControlStateNormal];
         self.navigationItem.leftBarButtonItem = self.plusButton;
         
@@ -194,15 +199,16 @@
         
     }else{
         [super setEditing:YES animated:YES];
+        
         [button setTitle:@"Done" forState:UIControlStateNormal];
         self.navigationItem.leftBarButtonItem = nil;
         
         [self.navigationController setToolbarHidden:NO];
+        
         NSArray *toolbarItems = [[NSArray alloc] initWithObjects:self.executeButton,self.deleteButton, nil];
         [self.navigationController.toolbar setItems:toolbarItems];
-        
-
     }
+    
     [self.tableView reloadData];
 }
 
@@ -223,6 +229,7 @@
     self.executeButton.enabled = NO;
     
     //update classifier list in disk
+    //TODO: handle files apart
     if(![NSKeyedArchiver archiveRootObject:self.detectors toFile:[self.userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"]])
         NSLog(@"Unable to save the classifiers");
     
@@ -249,12 +256,13 @@
     NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[self.userPath stringByAppendingPathComponent:@"thumbnail"] error:NULL];
     
     if(imagesList.count == 0){
-        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
-                                                             message:@"No images to learn from"
-                                                            delegate:nil
-                                                   cancelButtonTitle:@"OK"
-                                                   otherButtonTitles:nil];
-        [errorAlert show];
+//        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Empty"
+//                                                             message:@"No images to learn from"
+//                                                            delegate:nil
+//                                                   cancelButtonTitle:@"OK"
+//                                                   otherButtonTitles:nil];
+//        [errorAlert show];
+        [self errorWithTitle:@"Empty" andDescription:@"No images to learn from"];
         return;
         
     }else if(self.availableObjectClasses.count == 0){

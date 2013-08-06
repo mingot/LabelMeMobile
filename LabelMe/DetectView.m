@@ -15,8 +15,6 @@ static inline double min(double x, double y) { return (x <= y ? x : y); }
 static inline double max(double x, double y) { return (x <= y ? y : x); }
 
 
-
-
 @implementation DetectView
 
 
