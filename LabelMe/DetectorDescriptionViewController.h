@@ -13,6 +13,7 @@
 #import "ModalTVC.h"
 #import "SendingView.h"
 #import "Classifier.h"
+#import "DetectorResourceHandler.h"
 
 @protocol DetectorDescriptionViewControllerDelegate <NSObject>
 
@@ -51,10 +52,11 @@
 @property (strong, nonatomic) UIBarButtonItem *undoButtonBar;
 
 //useful information
-@property (strong, nonatomic) NSString *userPath;
-@property (strong, nonatomic) NSArray *resourcesPaths;
+@property (strong, nonatomic) DetectorResourceHandler *detectorResourceHandler;
+//@property (strong, nonatomic) NSString *userPath;
+//@property (strong, nonatomic) NSArray *resourcesPaths;
 @property (strong, nonatomic) NSArray *availableObjectClasses;
-@property (strong, nonatomic) NSArray *availablePositiveImagesNames;
+//@property (strong, nonatomic) NSArray *availablePositiveImagesNames;
 @property (strong, nonatomic) NSMutableArray *selectedPositiveImageIndexes;
 @property (strong, nonatomic) NSMutableArray *selectedPostiveImageNames; //to save with the svm
 

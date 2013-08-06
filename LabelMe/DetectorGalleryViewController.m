@@ -14,12 +14,22 @@
 #import "UIButton+CustomViews.h"
 #import "UIViewController+ShowAlert.h"
 
-#define IMAGES 0
-#define THUMB 1
-#define OBJECTS 2
-#define DETECTORS 3
 
 @interface DetectorGalleryViewController()
+{
+    NSInteger _selectedRow;
+}
+
+//detecotrs
+@property (nonatomic, strong) NSMutableArray *detectors;
+@property (nonatomic, strong) NSMutableArray *selectedItems;
+
+//buttons
+@property (strong, nonatomic) UIBarButtonItem *editButton;
+@property (strong, nonatomic) UIButton *executeDetectorsButton;
+@property (strong, nonatomic) UIBarButtonItem *plusButton;
+@property (strong, nonatomic) UIBarButtonItem *deleteButton;
+@property (strong, nonatomic) UIBarButtonItem *executeButton;
 
 //reload delete and execute buttons whenever needed
 - (void) reloadToolbarButtons;
@@ -48,7 +58,6 @@
 
 - (void)initializeAndAddNoImagesView
 {
-    //noImages view
     [self.noImages setBackgroundColor:[UIColor whiteColor]];
     self.noImages.layer.masksToBounds = YES;
     self.noImages.layer.cornerRadius = 10.0;
@@ -66,6 +75,10 @@
 
 - (void)initializeToolbarButtons
 {
+    UIImage *barButtonItem = [[UIImage imageNamed:@"barItemButton.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 5, 0, 5)];
+    [[UIBarButtonItem appearance] setBackgroundImage:barButtonItem forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+    
+    
     //toolbar edit buttons
     self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:@"Delete" style:UIBarButtonItemStyleBordered target:self action:@selector(deleteAction:)];
     [self.deleteButton setTintColor:[UIColor redColor]];
@@ -96,24 +109,22 @@
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
 }
 
+- (void) initializeTableView
+{
+    UIView *customView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 100)];
+    self.tableView.tableFooterView = customView;
+}
+
 - (void)viewDidLoad
 {
     self.title = @"Detectors"; //for back button
     
     self.detectorResourceHandler = [[DetectorResourceHandler alloc] initForUsername:self.username];
     
-    self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
     self.selectedItems = [[NSMutableArray alloc] init];
-    
-    
-    UIImage *barButtonItem = [[UIImage imageNamed:@"barItemButton.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 5, 0, 5)];
-    [[UIBarButtonItem appearance] setBackgroundImage:barButtonItem forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
-    
     self.detectors = [self.detectorResourceHandler loadDetectors];
-    
-    UIView *customView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 100)];
-    self.tableView.tableFooterView = customView;
-    
+        
+    [self initializeTableView];
     [self initializeNavigationBar];
     [self initializeToolbarButtons];
     [self initializeAndAddNoImagesView];
@@ -193,10 +204,10 @@
     _selectedRow = self.detectors.count;
     
     //check if there for no images or no labels to show error
-    NSArray *availableObjectClasses = [self.detectorResourceHandler getAvailanleObjectClasses];
-    NSArray *imagesList = [self.detectorResourceHandler getImagesList];
+    NSArray *availableObjectClasses = [self.detectorResourceHandler getObjectClasses];
+    NSArray *availableTrainingImages = [self.detectorResourceHandler getTrainingImages];
     
-    if(imagesList.count == 0){
+    if(availableTrainingImages.count == 0){
 
         [self errorWithTitle:@"Empty" andDescription:@"No images to learn from"];
         
@@ -210,13 +221,13 @@
         Classifier *newDetector = [[Classifier alloc] init];
         newDetector.name = @"New Detector";
         newDetector.targetClasses = [NSArray arrayWithObject:@"Not Set"];
+        self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
         self.detectorController.availableObjectClasses = [availableObjectClasses sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
         self.detectorController.hidesBottomBarWhenPushed = YES;
         self.detectorController.delegate = self;
         self.detectorController.svmClassifier = newDetector;
         self.detectorController.view = nil; //to reexecute viewDidLoad
-        //TODO: solve connection of user path
-//        self.detectorController.userPath = self.userPath;
+        self.detectorController.detectorResourceHandler = self.detectorResourceHandler;
         [self.navigationController pushViewController:self.detectorController animated:YES];
     }
     
@@ -294,6 +305,7 @@
         NSArray* reversedDetectors = [[self.detectors reverseObjectEnumerator] allObjects];
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
         _selectedRow = self.detectors.count - indexPath.row - 1;
+        self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
         self.detectorController.hidesBottomBarWhenPushed = YES;
         self.detectorController.delegate = self;
         self.detectorController.svmClassifier = [reversedDetectors objectAtIndex:indexPath.row];
@@ -319,7 +331,8 @@
 - (void) updateClassifier:(Classifier *)updatedDetector
 {
     //add or update detector
-    if(_selectedRow < self.detectors.count) [self.detectors replaceObjectAtIndex:_selectedRow withObject:updatedDetector];
+    if(_selectedRow < self.detectors.count)
+        [self.detectors replaceObjectAtIndex:_selectedRow withObject:updatedDetector];
     else [self.detectors addObject:updatedDetector];
 
     [self.detectorResourceHandler saveDetectors:self.detectors];
@@ -335,7 +348,6 @@
 
 - (void) reloadToolbarButtons
 {
-    
     if(self.selectedItems.count == 0){
         [self.deleteButton setTitle:@"Delete"];
         [self.executeButton setTitle:@"Execute"];

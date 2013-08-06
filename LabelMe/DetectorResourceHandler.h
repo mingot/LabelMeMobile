@@ -13,12 +13,19 @@
 
 
 - (id) initForUsername:(NSString *)username;
-- (NSArray *) getAvailanleObjectClasses;
-- (NSArray *) getImagesList;
+
+- (NSArray *) getObjectClassesNames;
+- (NSArray *) getTrainingImages;
+- (NSArray *) getImageNamesContainingClasses:(NSArray *)targetClasses;
+- (int) getHogFromPreferences;
+- (UIImage *) getImageWithImageName:(NSString *) imageName;
+
 - (NSMutableArray *) loadDetectors;
 
-
 - (void) saveDetectors:(NSArray *) detectors;
+- (void) saveDetector:(Classifier *)detector withImage:(UIImage *)image;
 - (void) removeImageForDetector:(Classifier *) detector;
+
+
 
 @end

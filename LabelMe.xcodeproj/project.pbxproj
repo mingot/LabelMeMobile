@@ -189,6 +189,7 @@
 		FC74F8EA174C1B49004701CC /* selectAllEnabled-1.png in Resources */ = {isa = PBXBuildFile; fileRef = FC74F8E6174C1B49004701CC /* selectAllEnabled-1.png */; };
 		FC83599D17B094750035A833 /* DetectorResourceHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC83599C17B094750035A833 /* DetectorResourceHandler.m */; };
 		FC8359A017B134BF0035A833 /* UIViewController+ShowAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = FC83599F17B134BF0035A833 /* UIViewController+ShowAlert.m */; };
+		FC8359A317B17F4B0035A833 /* SelectionHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359A217B17F4B0035A833 /* SelectionHandler.m */; };
 		FC8E89B1173930340018876D /* UIImage+Border.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B0173930340018876D /* UIImage+Border.m */; };
 		FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B51739876D0018876D /* ModalSectionsTVC.m */; };
 		FC8E89B81739876D0018876D /* ModalSectionsTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */; };
@@ -472,6 +473,8 @@
 		FC83599C17B094750035A833 /* DetectorResourceHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectorResourceHandler.m; sourceTree = "<group>"; };
 		FC83599E17B134BF0035A833 /* UIViewController+ShowAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+ShowAlert.h"; sourceTree = "<group>"; };
 		FC83599F17B134BF0035A833 /* UIViewController+ShowAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+ShowAlert.m"; sourceTree = "<group>"; };
+		FC8359A117B17F4B0035A833 /* SelectionHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectionHandler.h; sourceTree = "<group>"; };
+		FC8359A217B17F4B0035A833 /* SelectionHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectionHandler.m; sourceTree = "<group>"; };
 		FC8E89AF173930340018876D /* UIImage+Border.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Border.h"; sourceTree = "<group>"; };
 		FC8E89B0173930340018876D /* UIImage+Border.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Border.m"; sourceTree = "<group>"; };
 		FC8E89B41739876D0018876D /* ModalSectionsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSectionsTVC.h; sourceTree = "<group>"; };
@@ -855,6 +858,8 @@
 				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
 				FC5C93A816FCFA8F00637B69 /* DetectorDescriptionViewController.h */,
 				FC5C93A916FCFA9000637B69 /* DetectorDescriptionViewController.m */,
+				FC8359A117B17F4B0035A833 /* SelectionHandler.h */,
+				FC8359A217B17F4B0035A833 /* SelectionHandler.m */,
 				FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */,
 				FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */,
 				FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */,
@@ -1449,6 +1454,7 @@
 				FC447A9D17AC7571004AA88B /* InfiniteLoopView.m in Sources */,
 				FC83599D17B094750035A833 /* DetectorResourceHandler.m in Sources */,
 				FC8359A017B134BF0035A833 /* UIViewController+ShowAlert.m in Sources */,
+				FC8359A317B17F4B0035A833 /* SelectionHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

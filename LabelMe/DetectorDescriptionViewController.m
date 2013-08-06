@@ -18,11 +18,12 @@
 #import "CustomUITableViewCell.h"
 
 
-#define IMAGES 0
-#define THUMB 1
-#define OBJECTS 2
-#define DETECTORS 3
-#define USER 4
+//#define IMAGES 0
+//#define THUMB 1
+//#define OBJECTS 2
+//#define DETECTORS 3
+//#define USER 4
+
 #define MAX_IMAGE_SIZE 300
 
 //self.firstTrainingState
@@ -67,27 +68,27 @@
 #pragma mark -
 #pragma mark Setters and Getters
 
--(NSArray *) availablePositiveImagesNames
-{
-    //get the images for the selected class (self.svmClassifier.targetClass)
-    if(!_availablePositiveImagesNames){
-        NSMutableArray *list = [[NSMutableArray alloc] init];
-        
-        NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.resourcesPaths objectAtIndex:THUMB]] error:NULL];
-        
-        for(NSString *imageName in imagesList){
-            NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
-            NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
-            for(Box *box in objects)
-                for(NSString *targetClass in self.svmClassifier.targetClasses)
-                    if([box.label isEqualToString:targetClass] && [list indexOfObject:imageName]==NSNotFound)
-                            [list addObject:imageName];
-        }
-        _availablePositiveImagesNames = [NSArray arrayWithArray:list];
-    }
-    
-    return _availablePositiveImagesNames;
-}
+//-(NSArray *) availablePositiveImagesNames
+//{
+//    //get the images for the selected class (self.svmClassifier.targetClass)
+//    if(!_availablePositiveImagesNames){
+//        NSMutableArray *list = [[NSMutableArray alloc] init];
+//        
+//        NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.resourcesPaths objectAtIndex:THUMB]] error:NULL];
+//        
+//        for(NSString *imageName in imagesList){
+//            NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
+//            NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
+//            for(Box *box in objects)
+//                for(NSString *targetClass in self.svmClassifier.targetClasses)
+//                    if([box.label isEqualToString:targetClass] && [list indexOfObject:imageName]==NSNotFound)
+//                            [list addObject:imageName];
+//        }
+//        _availablePositiveImagesNames = [NSArray arrayWithArray:list];
+//    }
+//    
+//    return _availablePositiveImagesNames;
+//}
 
 
 - (NSMutableArray *) classifierProperties
@@ -126,12 +127,14 @@
     self.firstTraingState = NOT_FIRST;
     self.title = self.svmClassifier.name;
     self.svmClassifier.delegate = self;
-    self.resourcesPaths = [NSArray arrayWithObjects:
-                           [self.userPath stringByAppendingPathComponent:@"images"],
-                           [self.userPath stringByAppendingPathComponent:@"thumbnail"],
-                           [self.userPath stringByAppendingPathComponent:@"annotations"],
-                           [self.userPath stringByAppendingPathComponent:@"Detectors"],
-                           self.userPath, nil];
+    
+//    self.resourcesPaths = [NSArray arrayWithObjects:
+//                           [self.userPath stringByAppendingPathComponent:@"images"],
+//                           [self.userPath stringByAppendingPathComponent:@"thumbnail"],
+//                           [self.userPath stringByAppendingPathComponent:@"annotations"],
+//                           [self.userPath stringByAppendingPathComponent:@"Detectors"],
+//                           self.userPath, nil];
+    
     self.scrollView.contentSize = self.showView.frame.size;
     
     //controllers
@@ -271,9 +274,12 @@
     self.modalTVC.doneButtonTitle = @"Train";
     self.modalTVC.modalID = @"images";
     self.modalTVC.multipleChoice = NO;
-    self.availablePositiveImagesNames = nil; //to reset
+    
+//    self.availablePositiveImagesNames = nil; //to reset
+    NSArray *availablePositiveImagesNames = [self.detectorResourceHandler getImageNamesContainingClasses:self.svmClassifier.targetClasses];
+    
     NSMutableArray *imagesList = [[NSMutableArray alloc] init];
-    for(NSString *imageName in self.availablePositiveImagesNames){
+    for(NSString *imageName in availablePositiveImagesNames){
         NSLog(@"imageName: %@", imageName);
         [imagesList addObject:[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.resourcesPaths objectAtIndex:THUMB],imageName]]];
         if(self.svmClassifier.imagesUsedTraining == nil || [self.svmClassifier.imagesUsedTraining indexOfObject:imageName]!= NSNotFound)
@@ -326,18 +332,9 @@
 
 - (IBAction)saveAction:(id)sender
 {
-    //save average image
-    NSString *pathDetectorsBig = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
-                                  [NSString stringWithFormat:@"%@_big.jpg",self.svmClassifier.classifierID]];
+    [self.detectorResourceHandler saveDetector:self.svmClassifier withImage:self.averageImage];
     self.detectorView.image = self.averageImage;
-    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsBig contents:UIImageJPEGRepresentation(self.averageImage, 1.0) attributes:nil];
-    self.svmClassifier.averageImagePath = pathDetectorsBig;
-    
-    //save average image thumbnail
-    NSString *pathDetectorsThumb = [[self.resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
-                                    [NSString stringWithFormat:@"%@_thumb.jpg",self.svmClassifier.classifierID]];
-    [[NSFileManager defaultManager] createFileAtPath:pathDetectorsThumb contents:UIImageJPEGRepresentation([self.averageImage thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
-    self.svmClassifier.averageImageThumbPath = pathDetectorsThumb;
+        
     self.svmClassifier.updateDate = [NSDate date];
     
     [self loadDetectorInfo];
@@ -648,8 +645,7 @@
     self.svmClassifier.imagesUsedTraining = [[NSMutableArray alloc] init];
     
     //setting hog dimensions based on user preferences
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[self.resourcesPaths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
-    int hog = [(NSNumber *)[dict objectForKey:@"hogdimension"] intValue];
+    int hog = [self.detectorResourceHandler getHogFromPreferences];
     self.svmClassifier.maxHog = hog;
     
     //training set construction
