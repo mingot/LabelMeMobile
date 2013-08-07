@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DetectView.h"
-#import "Classifier.h"
+#import "Detector.h"
 
 
 

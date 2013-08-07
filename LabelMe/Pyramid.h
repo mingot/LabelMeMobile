@@ -20,7 +20,7 @@
 @property int numPyramids;
 
 
-- (id) initWithClassifiers:(NSArray *) svmClassifiers forNumPyramids:(int) numPyramids;
+- (id) initWithDetectors:(NSArray *) detectors forNumPyramids:(int) numPyramids;
 
 
 //

@@ -191,6 +191,8 @@
 		FC8359A017B134BF0035A833 /* UIViewController+ShowAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = FC83599F17B134BF0035A833 /* UIViewController+ShowAlert.m */; };
 		FC8359A317B17F4B0035A833 /* SelectionHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359A217B17F4B0035A833 /* SelectionHandler.m */; };
 		FC8359A617B1CF380035A833 /* BoundingBox.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359A517B1CF380035A833 /* BoundingBox.m */; };
+		FC8359A917B1FDCE0035A833 /* UIImage+ImageAveraging.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359A817B1FDCE0035A833 /* UIImage+ImageAveraging.m */; };
+		FC8359AC17B201900035A833 /* SendingView+DetectorDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359AB17B201900035A833 /* SendingView+DetectorDescription.m */; };
 		FC8E89B1173930340018876D /* UIImage+Border.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B0173930340018876D /* UIImage+Border.m */; };
 		FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B51739876D0018876D /* ModalSectionsTVC.m */; };
 		FC8E89B81739876D0018876D /* ModalSectionsTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */; };
@@ -243,7 +245,7 @@
 		FCC9FAFC170F6CF4009B7FC6 /* TrainingSet.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */; };
 		FCE35A03172AD5AC00FFE98B /* image_not_found.png in Resources */ = {isa = PBXBuildFile; fileRef = FCE35A02172AD5AC00FFE98B /* image_not_found.png */; };
 		FCED895D17034CAF0027CBE1 /* DetectView.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED895C17034CAF0027CBE1 /* DetectView.m */; };
-		FCED896017034CCA0027CBE1 /* Classifier.mm in Sources */ = {isa = PBXBuildFile; fileRef = FCED895F17034CCA0027CBE1 /* Classifier.mm */; };
+		FCED896017034CCA0027CBE1 /* Detector.mm in Sources */ = {isa = PBXBuildFile; fileRef = FCED895F17034CCA0027CBE1 /* Detector.mm */; };
 		FCED896317034CD70027CBE1 /* ConvolutionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED896217034CD70027CBE1 /* ConvolutionHelper.m */; };
 		FCED896817034D350027CBE1 /* UIImage+HOG.m in Sources */ = {isa = PBXBuildFile; fileRef = FCED896717034D350027CBE1 /* UIImage+HOG.m */; };
 		FCED897017034F980027CBE1 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCED896F17034F980027CBE1 /* opencv2.framework */; };
@@ -478,6 +480,10 @@
 		FC8359A217B17F4B0035A833 /* SelectionHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectionHandler.m; sourceTree = "<group>"; };
 		FC8359A417B1CF380035A833 /* BoundingBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoundingBox.h; sourceTree = "<group>"; };
 		FC8359A517B1CF380035A833 /* BoundingBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoundingBox.m; sourceTree = "<group>"; };
+		FC8359A717B1FDCE0035A833 /* UIImage+ImageAveraging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageAveraging.h"; sourceTree = "<group>"; };
+		FC8359A817B1FDCE0035A833 /* UIImage+ImageAveraging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageAveraging.m"; sourceTree = "<group>"; };
+		FC8359AA17B2018F0035A833 /* SendingView+DetectorDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SendingView+DetectorDescription.h"; sourceTree = "<group>"; };
+		FC8359AB17B201900035A833 /* SendingView+DetectorDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SendingView+DetectorDescription.m"; sourceTree = "<group>"; };
 		FC8E89AF173930340018876D /* UIImage+Border.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Border.h"; sourceTree = "<group>"; };
 		FC8E89B0173930340018876D /* UIImage+Border.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Border.m"; sourceTree = "<group>"; };
 		FC8E89B41739876D0018876D /* ModalSectionsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSectionsTVC.h; sourceTree = "<group>"; };
@@ -542,8 +548,8 @@
 		FCE35A02172AD5AC00FFE98B /* image_not_found.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = image_not_found.png; sourceTree = "<group>"; };
 		FCED895B17034CAF0027CBE1 /* DetectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetectView.h; sourceTree = "<group>"; };
 		FCED895C17034CAF0027CBE1 /* DetectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetectView.m; sourceTree = "<group>"; };
-		FCED895E17034CCA0027CBE1 /* Classifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Classifier.h; sourceTree = "<group>"; };
-		FCED895F17034CCA0027CBE1 /* Classifier.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Classifier.mm; sourceTree = "<group>"; };
+		FCED895E17034CCA0027CBE1 /* Detector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Detector.h; sourceTree = "<group>"; };
+		FCED895F17034CCA0027CBE1 /* Detector.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Detector.mm; sourceTree = "<group>"; };
 		FCED896117034CD70027CBE1 /* ConvolutionHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConvolutionHelper.h; sourceTree = "<group>"; };
 		FCED896217034CD70027CBE1 /* ConvolutionHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConvolutionHelper.m; sourceTree = "<group>"; };
 		FCED896617034D350027CBE1 /* UIImage+HOG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+HOG.h"; sourceTree = "<group>"; };
@@ -604,6 +610,8 @@
 				FC8E89B0173930340018876D /* UIImage+Border.m */,
 				A5480D7D1617A364009F630D /* UIImage+RoundedCorner.h */,
 				A5480D7E1617A364009F630D /* UIImage+RoundedCorner.m */,
+				FC8359A717B1FDCE0035A833 /* UIImage+ImageAveraging.h */,
+				FC8359A817B1FDCE0035A833 /* UIImage+ImageAveraging.m */,
 			);
 			path = "UIImage-categories";
 			sourceTree = "<group>";
@@ -731,6 +739,8 @@
 				FC83599F17B134BF0035A833 /* UIViewController+ShowAlert.m */,
 				A56464161614B88F007D444E /* NSString+checkValidity.h */,
 				A56464171614B88F007D444E /* NSString+checkValidity.m */,
+				FC8359AA17B2018F0035A833 /* SendingView+DetectorDescription.h */,
+				FC8359AB17B201900035A833 /* SendingView+DetectorDescription.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -873,8 +883,8 @@
 				FCED896217034CD70027CBE1 /* ConvolutionHelper.m */,
 				FC8359A417B1CF380035A833 /* BoundingBox.h */,
 				FC8359A517B1CF380035A833 /* BoundingBox.m */,
-				FCED895E17034CCA0027CBE1 /* Classifier.h */,
-				FCED895F17034CCA0027CBE1 /* Classifier.mm */,
+				FCED895E17034CCA0027CBE1 /* Detector.h */,
+				FCED895F17034CCA0027CBE1 /* Detector.mm */,
 				FC74F8D1174A54FE004701CC /* Pyramid.h */,
 				FC74F8D2174A54FE004701CC /* Pyramid.m */,
 				FCC9FAFA170F6CF4009B7FC6 /* TrainingSet.h */,
@@ -1436,7 +1446,7 @@
 				FC5C93AB16FCFA9200637B69 /* DetectorDescriptionViewController.m in Sources */,
 				FC5C93B516FCFEAB00637B69 /* ExecuteDetectorViewController.m in Sources */,
 				FCED895D17034CAF0027CBE1 /* DetectView.m in Sources */,
-				FCED896017034CCA0027CBE1 /* Classifier.mm in Sources */,
+				FCED896017034CCA0027CBE1 /* Detector.mm in Sources */,
 				FCED896317034CD70027CBE1 /* ConvolutionHelper.m in Sources */,
 				FCED896817034D350027CBE1 /* UIImage+HOG.m in Sources */,
 				FCC9FAF4170CB66A009B7FC6 /* ModalTVC.m in Sources */,
@@ -1461,6 +1471,8 @@
 				FC8359A017B134BF0035A833 /* UIViewController+ShowAlert.m in Sources */,
 				FC8359A317B17F4B0035A833 /* SelectionHandler.m in Sources */,
 				FC8359A617B1CF380035A833 /* BoundingBox.m in Sources */,
+				FC8359A917B1FDCE0035A833 /* UIImage+ImageAveraging.m in Sources */,
+				FC8359AC17B201900035A833 /* SendingView+DetectorDescription.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

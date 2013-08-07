@@ -1,5 +1,5 @@
 //
-//  Classifier.m
+//  Detector.m
 //  DetectMe
 //
 //  Created by Josep Marc Mingot Hidalgo on 28/02/13.
@@ -10,7 +10,7 @@
 #include <opencv2/ml/ml.hpp>
 #include <stdlib.h>
 
-#import "Classifier.h"
+#import "Detector.h"
 #import "UIImage+HOG.h"
 #import "UIImage+Resize.h"
 #import "ConvolutionHelper.h"
@@ -25,7 +25,7 @@ using namespace cv;
 #define SCALES_PER_OCTAVE 10
 
 
-@interface Classifier ()
+@interface Detector ()
 {
     int numOfFeatures;
     int numSupportVectors;
@@ -49,7 +49,7 @@ using namespace cv;
 //Show just the histogram features for debugging purposes
 - (void) showOrientationHistogram;
 
-//make the convolution of the classifier with the image and return de detected bounding boxes
+//make the convolution of the detector with the image and return de detected bounding boxes
 - (NSArray *) getBoundingBoxesIn:(HogFeature *)imageHog forPyramid:(int)pyramidLevel forIndex:(int)imageHogIndex;
 
 //add a selected bounding box (its correspondent hog features) to the training buffer
@@ -61,7 +61,7 @@ using namespace cv;
 @end
 
 
-@implementation Classifier
+@implementation Detector
 
 
 @synthesize weightsP = _weightsP;
@@ -226,7 +226,7 @@ using namespace cv;
     if(iter == 0) return 2; //interrupted without training
 
     
-    //update information about the classifier
+    //update information about the detector
     self.numberSV = [NSNumber numberWithInt:numSupportVectors];
     self.timeLearning = [NSNumber numberWithDouble:-[start timeIntervalSinceNow]];
     
@@ -454,7 +454,7 @@ using namespace cv;
         self.weights = [aDecoder decodeObjectForKey:@"weights"];
         self.sizes = [aDecoder decodeObjectForKey:@"sizes"];
         self.name = [aDecoder decodeObjectForKey:@"name"];
-        self.classifierID = [aDecoder decodeObjectForKey:@"classifierID"];
+        self.detectorID = [aDecoder decodeObjectForKey:@"detectorID"];
         self.targetClasses = [aDecoder decodeObjectForKey:@"targetClasses"];
         self.numberSV = [aDecoder decodeObjectForKey:@"numberSV"];
         self.numberOfPositives = [aDecoder decodeObjectForKey:@"numberOfPositives"];
@@ -499,7 +499,7 @@ using namespace cv;
     [aCoder encodeObject:self.weights forKey:@"weights"];
     [aCoder encodeObject:self.sizes forKey:@"sizes"];
     [aCoder encodeObject:self.name forKey:@"name"];
-    [aCoder encodeObject:self.classifierID forKey:@"classifierID"];
+    [aCoder encodeObject:self.detectorID forKey:@"detectorID"];
     [aCoder encodeObject:self.targetClasses forKey:@"targetClasses"];
     [aCoder encodeObject:self.numberSV forKey:@"numberSV"];
     [aCoder encodeObject:self.numberOfPositives forKey:@"numberOfPositives"];

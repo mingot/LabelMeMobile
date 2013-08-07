@@ -38,7 +38,7 @@
 @implementation ExecuteDetectorViewController
 
 
-@synthesize svmClassifiers = _svmClassifiers;
+@synthesize detectors = _detectors;
 @synthesize numPyramids = _numPyramids;
 @synthesize maxDetectionScore = _maxDetectionScore;
 @synthesize captureSession = _captureSession;
@@ -64,9 +64,9 @@
 - (NSMutableArray *) initialDetectionThresholds
 {
     if(!_initialDetectionThresholds){
-        _initialDetectionThresholds = [[NSMutableArray alloc] initWithCapacity:self.svmClassifiers.count];
-        for(Classifier *svmClassifier in self.svmClassifiers)
-            [_initialDetectionThresholds addObject:svmClassifier.detectionThreshold];
+        _initialDetectionThresholds = [[NSMutableArray alloc] initWithCapacity:self.detectors.count];
+        for(Detector *detector in self.detectors)
+            [_initialDetectionThresholds addObject:detector.detectionThreshold];
     }
     return _initialDetectionThresholds;
 }
@@ -109,16 +109,16 @@
     
     //slider
     [self.detectionThresholdSliderButton addTarget:self action:@selector(sliderChangeAction:) forControlEvents:UIControlEventValueChanged];
-    if(self.svmClassifiers.count == 1){
-        Classifier *classifier = [self.svmClassifiers objectAtIndex:0];        
-        self.detectionThresholdSliderButton.value = classifier.detectionThreshold.floatValue;
+    if(self.detectors.count == 1){
+        Detector *detector = [self.detectors objectAtIndex:0];
+        self.detectionThresholdSliderButton.value = detector.detectionThreshold.floatValue;
     }
     
     //assign colors to each detector
-    NSMutableDictionary *colorsDictionary = [[NSMutableDictionary alloc] initWithCapacity:self.svmClassifiers.count];
+    NSMutableDictionary *colorsDictionary = [[NSMutableDictionary alloc] initWithCapacity:self.detectors.count];
     int i=0;
-    for(Classifier *classifier in self.svmClassifiers){
-        [colorsDictionary setObject:[self.colors objectAtIndex:i%self.colors.count] forKey:[classifier.targetClasses componentsJoinedByString:@"+"]];
+    for(Detector *detector in self.detectors){
+        [colorsDictionary setObject:[self.colors objectAtIndex:i%self.colors.count] forKey:[detector.targetClasses componentsJoinedByString:@"+"]];
         i++;
     }
     self.detectView.colorsDictionary = [NSDictionary dictionaryWithDictionary:colorsDictionary];
@@ -192,7 +192,7 @@
     self.prevLayer.frame = self.detectView.frame;
     
     //reset the pyramid with the new detectors
-    self.hogPyramid = [[Pyramid alloc] initWithClassifiers:self.svmClassifiers forNumPyramids:self.numPyramids];
+    self.hogPyramid = [[Pyramid alloc] initWithDetectors:self.detectors forNumPyramids:self.numPyramids];
     
     //Start the capture
     [self.captureSession startRunning];
@@ -206,8 +206,8 @@
     [super viewWillDisappear:animated];
     
     //update detection threshold it it is the only one
-    if(self.svmClassifiers.count == 1)
-        [self.delegate updateClassifier:(Classifier *)[self.svmClassifiers objectAtIndex:0]];
+    if(self.detectors.count == 1)
+        [self.delegate updateDetector:(Detector *)[self.detectors objectAtIndex:0]];
 }
 
 
@@ -273,10 +273,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         
         //single class detection
-        if(self.svmClassifiers.count == 1){
-            Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:0];
-            float detectionThreshold = -1 + 2*svmClassifier.detectionThreshold.floatValue;
-            [nmsArray addObject:[svmClassifier detect:image
+        if(self.detectors.count == 1){
+            Detector *detector = [self.detectors objectAtIndex:0];
+            float detectionThreshold = -1 + 2*detector.detectionThreshold.floatValue;
+            [nmsArray addObject:[detector detect:image
                                       minimumThreshold:detectionThreshold
                                               pyramids:self.numPyramids
                                               usingNms:YES
@@ -287,18 +287,18 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             
             [self.hogPyramid constructPyramidForImage:image withOrientation:[[UIDevice currentDevice] orientation]];
             
-            //each classifier run in parallel
-            __block NSArray *candidatesForClassifier;
-            dispatch_queue_t classifierQueue = dispatch_queue_create("classifierQueue", DISPATCH_QUEUE_CONCURRENT);
-            dispatch_apply(self.svmClassifiers.count, classifierQueue, ^(size_t i) {
-                Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:i];
-                float detectionThreshold = -1 + 2*svmClassifier.detectionThreshold.floatValue;
-                candidatesForClassifier = [svmClassifier detect:self.hogPyramid minimumThreshold:detectionThreshold usingNms:YES orientation:orientation];
+            //each detector run in parallel
+            __block NSArray *candidatesForDetector;
+            dispatch_queue_t detectorQueue = dispatch_queue_create("detectorQueue", DISPATCH_QUEUE_CONCURRENT);
+            dispatch_apply(self.detectors.count, detectorQueue, ^(size_t i) {
+                Detector *detector = [self.detectors objectAtIndex:i];
+                float detectionThreshold = -1 + 2*detector.detectionThreshold.floatValue;
+                candidatesForDetector = [detector detect:self.hogPyramid minimumThreshold:detectionThreshold usingNms:YES orientation:orientation];
                 dispatch_sync(dispatch_get_main_queue(), ^{
-                    [nmsArray addObject:candidatesForClassifier];
+                    [nmsArray addObject:candidatesForDetector];
                 });
             });
-            dispatch_release(classifierQueue);
+            dispatch_release(detectorQueue);
         }
         //**** END DETECTION ****
         
@@ -414,22 +414,22 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 {
     UISlider *slider = (UISlider *)sender;
     
-    //if only one classifier executing, update the detection threshold property
-    if(self.svmClassifiers.count == 1){
+    //if only one detector executing, update the detection threshold property
+    if(self.detectors.count == 1){
         
-        Classifier *classifier = [self.svmClassifiers objectAtIndex:0];
-        classifier.detectionThreshold = [NSNumber numberWithFloat:slider.value];
+        Detector *detector = [self.detectors objectAtIndex:0];
+        detector.detectionThreshold = [NSNumber numberWithFloat:slider.value];
         
     //if more than one, joinly increase/decrease detection threshold
     }else{
         if(((int)slider.value*100)%4==0){
-            for(int i=0; i<self.svmClassifiers.count; i++){
-                Classifier *svmClassifier = [self.svmClassifiers objectAtIndex:i];
+            for(int i=0; i<self.detectors.count; i++){
+                Detector *detector = [self.detectors objectAtIndex:i];
                 NSNumber *initialThreshold = [self.initialDetectionThresholds objectAtIndex:i];
                 float newThreshold = initialThreshold.floatValue + (slider.value - 0.5);
                 newThreshold = newThreshold >= 0 ? newThreshold : 0;
                 newThreshold = newThreshold <= 1 ? newThreshold : 1;
-                svmClassifier.detectionThreshold = [NSNumber numberWithFloat:newThreshold];
+                detector.detectionThreshold = [NSNumber numberWithFloat:newThreshold];
             }
         }
         

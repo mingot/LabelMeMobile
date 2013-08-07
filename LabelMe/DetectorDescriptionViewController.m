@@ -13,7 +13,9 @@
 
 #import "UIImage+Resize.h"
 #import "UIImage+HOG.h"
+#import "UIImage+ImageAveraging.h"
 #import "UIButton+CustomViews.h"
+#import "SendingView+DetectorDescription.h"
 #import "UIViewController+ShowAlert.h"
 
 #import "UITableView+TextFieldAdditions.h"
@@ -31,6 +33,7 @@
 @interface DetectorDescriptionViewController()
 {
     SelectionHandler *_selectionHandler;
+    BOOL *_isFirstTraining;
 }
 
 
@@ -62,28 +65,28 @@
 #pragma mark Setters and Getters
 
 
-- (NSMutableArray *) classifierProperties
+- (NSMutableArray *) detectorProperties
 {
-    if(!_classifierProperties && self.svmClassifier.weights != nil){
+    if(!_detectorProperties && self.detector.weights != nil){
         
         //nsdate treatment
         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
         [formatter setDateFormat:@"MM/dd/yyyy - HH:mm"];
         [formatter setTimeZone:[NSTimeZone localTimeZone]]; //time zone
         
-        _classifierProperties = [[NSMutableArray alloc] init];
-        [_classifierProperties addObject:[self dictionaryWithObject:self.svmClassifier.name forKey:@"Name"]];
-        [_classifierProperties addObject:[self dictionaryWithObject:[self.svmClassifier.targetClasses componentsJoinedByString:@", "] forKey:@"Class"]];
-        [_classifierProperties addObject:[self dictionaryWithObject:[formatter stringFromDate:self.svmClassifier.updateDate] forKey:@"Last Train"]];
-        [_classifierProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.imagesUsedTraining.count] forKey:@"Images"]];
+        _detectorProperties = [[NSMutableArray alloc] init];
+        [_detectorProperties addObject:[self dictionaryWithObject:self.detector.name forKey:@"Name"]];
+        [_detectorProperties addObject:[self dictionaryWithObject:[self.detector.targetClasses componentsJoinedByString:@", "] forKey:@"Class"]];
+        [_detectorProperties addObject:[self dictionaryWithObject:[formatter stringFromDate:self.detector.updateDate] forKey:@"Last Train"]];
+        [_detectorProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%d", self.detector.imagesUsedTraining.count] forKey:@"Images"]];
         
         //just shown on ipad
-        [_classifierProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.numberSV.intValue] forKey:@"Number SV"]];
-        [_classifierProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.numberOfPositives.intValue] forKey:@"Number Positives"]];
-        [_classifierProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"HOG Dimensions: %@ x %@",[self.svmClassifier.sizes objectAtIndex:0],[self.svmClassifier.sizes objectAtIndex:1] ] forKey:@"HOG dimensions"]];
-        [_classifierProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%.2f seconds", self.svmClassifier.timeLearning.floatValue] forKey:@"Time Learning"]];
+        [_detectorProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%d", self.detector.numberSV.intValue] forKey:@"Number SV"]];
+        [_detectorProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%d", self.detector.numberOfPositives.intValue] forKey:@"Number Positives"]];
+        [_detectorProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"HOG Dimensions: %@ x %@",[self.detector.sizes objectAtIndex:0],[self.detector.sizes objectAtIndex:1] ] forKey:@"HOG dimensions"]];
+        [_detectorProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%.2f seconds", self.detector.timeLearning.floatValue] forKey:@"Time Learning"]];
     }
-    return _classifierProperties;
+    return _detectorProperties;
 }
 
 
@@ -157,9 +160,9 @@
 {
     [super viewDidLoad];
     
-    self.title = self.svmClassifier.name;
+    self.title = self.detector.name;
     
-    self.svmClassifier.delegate = self;
+    self.detector.delegate = self;
     
     _selectionHandler = [[SelectionHandler alloc] initWithViewController:self andDetecorResourceHandler:self.detectorResourceHandler];
     _selectionHandler.delegate = self;
@@ -179,12 +182,13 @@
     [self initializeBottomToolbar];
     [self initializeSendingView];
     
-    //Check if the classifier exists.
-    if(self.svmClassifier.weights == nil){
-        NSLog(@"New classifier");
+    //Check if the detector exists.
+    if(self.detector.weights == nil){
+        NSLog(@"New detector");
+        _isFirstTraining = YES;
         [_selectionHandler addNewDetector];
         
-    }else NSLog(@"Loading classifier: %@", self.svmClassifier.name);
+    }else NSLog(@"Loading detector: %@", self.detector.name);
     
 }
 
@@ -214,7 +218,7 @@
 
 - (IBAction)executeAction:(id)sender
 {
-    self.executeController.svmClassifiers = [NSArray arrayWithObject:self.svmClassifier];
+    self.executeController.detectors = [NSArray arrayWithObject:self.detector];
     self.executeController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.executeController animated:NO];
 }
@@ -231,22 +235,7 @@
 - (IBAction)infoAction:(id)sender
 {
     self.navigationController.navigationBarHidden = YES;
-    self.sendingView.sendingViewID = @"info";
-    [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
-    self.sendingView.hidden = NO;
-    self.sendingView.cancelButton.hidden = NO;
-    self.sendingView.progressView.hidden = YES;
-    self.sendingView.activityIndicator.hidden = YES;
-    [self.sendingView clearScreen];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Detector %@", self.svmClassifier.name]];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images:%d", self.svmClassifier.imagesUsedTraining.count]];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of Support Vectors:%@", self.svmClassifier.numberSV]];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of positives %@", self.svmClassifier.numberOfPositives]];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"HOG Dimensions:%@ x %@",[self.svmClassifier.sizes objectAtIndex:0],[self.svmClassifier.sizes objectAtIndex:1] ]];
-    [self.sendingView showMessage:@"**** Results on the training set ****"];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Precision:%.1f",[(NSNumber *)[self.svmClassifier.precisionRecall objectAtIndex:0] floatValue]]];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Recall:%.1f", [(NSNumber *)[self.svmClassifier.precisionRecall objectAtIndex:1] floatValue]]];
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Time learning:%.1f", self.svmClassifier.timeLearning.floatValue]];
+    [self.sendingView initializeForInfoOfDetector:self.detector];
 }
 
 - (IBAction)undoAction:(id)sender
@@ -263,13 +252,13 @@
 
 - (IBAction)saveAction:(id)sender
 {
-    [self.detectorResourceHandler saveDetector:self.svmClassifier withImage:self.averageImage];
+    [self.detectorResourceHandler saveDetector:self.detector withImage:self.averageImage];
     self.detectorView.image = self.averageImage;
         
-    self.svmClassifier.updateDate = [NSDate date];
+    self.detector.updateDate = [NSDate date];
     
     [self loadDetectorInfo];
-    [self.delegate updateClassifier:self.svmClassifier];
+    [self.delegate updateDetector:self.detector];
 }
 
 #pragma mark -
@@ -279,7 +268,7 @@
 {
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     if ([title isEqualToString:@"Ok"]) {
-        self.svmClassifier = self.previousSvmClassifier;
+        self.detector = self.previousDetector;
         self.undoButtonBar.enabled = NO;
         [self saveAction:self];
     }
@@ -295,31 +284,21 @@
               andTestImagesNames:(NSArray *)testImagesNames
 {
     //TODO: check if correct
-    if(self.svmClassifier.targetClasses == nil){ //first time training
-        self.svmClassifier.targetClasses = classes;
-        NSString *className = [self.svmClassifier.targetClasses componentsJoinedByString:@"+"];
-        self.svmClassifier.name = [NSString stringWithFormat:@"%@-Detector",className];
-        self.svmClassifier.classifierID = [NSString stringWithFormat:@"%@%@",className,[self uuid]];
+    if(self.detector.targetClasses == nil){ //first time training
+        self.detector.targetClasses = classes;
+        NSString *className = [self.detector.targetClasses componentsJoinedByString:@"+"];
+        self.detector.name = [NSString stringWithFormat:@"%@-Detector",className];
+        self.detector.detectorID = [NSString stringWithFormat:@"%@%@",className,[self uuid]];
     }
     
     
-    //save the current classifier for undo purposes
-    self.previousSvmClassifier = [[Classifier alloc] init];
-    self.previousSvmClassifier = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.svmClassifier]]; //trick to copy the object
+    //save the current detector for undo purposes
+    self.previousDetector = [[Detector alloc] init];
+    self.previousDetector = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.detector]]; //trick to copy the object
     
-    //SENDING VIEW initialization
-    self.sendingView.progressView.hidden = NO;
-    [self.sendingView.progressView setProgress:0 animated:YES];
-    self.sendingView.hidden = NO;
+    [self.sendingView initializeForTraining];
     self.navigationController.navigationBarHidden = YES;
-    [self.sendingView.activityIndicator startAnimating];
-    self.sendingView.cancelButton.hidden = NO;
-    self.sendingView.sendingViewID = @"train";
-    [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-    [self.sendingView.cancelButton setTitle:@"Cancelling..." forState:UIControlStateDisabled];
-    [self.sendingView clearScreen];
-    
-    self.svmClassifier.trainCancelled = NO;
+    self.detector.trainCancelled = NO;
     
     //train in a different queue
     dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
@@ -331,11 +310,12 @@
         }
         
         dispatch_sync(dispatch_get_main_queue(), ^{
+            
             if(trainingState == SUCCESS){
                 [self updateProgress:1];
                 
                 //update view of the detector
-                if(self.previousSvmClassifier != nil) self.undoButtonBar.enabled = YES;
+                if(self.previousDetector != nil) self.undoButtonBar.enabled = YES;
                 [self saveAction:self];
                 [self loadDetectorInfo];
                 
@@ -344,37 +324,31 @@
             
                 [self showAlertWithTitle:@"Error Training" andDescription:@"Shape on training set not allowed.\n Make sure all the labels have a similar shape and that are not too big."];
                 
-//                if(self.isFirstTraining){
-//                    self.navigationController.navigationBarHidden = NO;
-//                    [self.navigationController popViewControllerAnimated:YES];
-//                }
+                if(_isFirstTraining){
+                    self.navigationController.navigationBarHidden = NO;
+                    [self.navigationController popViewControllerAnimated:YES];
+                }
                 
             }else if(trainingState == INTERRUPTED){
-                //if classifier not even trained with one iteration(cancelled before) then rescue previous classifer (undo)
-                self.svmClassifier = self.previousSvmClassifier;
+                //if detector not even trained with one iteration(cancelled before) then rescue previous classifer (undo)
+                self.detector = self.previousDetector;
                 self.undoButtonBar.enabled = NO;
-//                if(self.isFirstTraining){
-//                    self.navigationController.navigationBarHidden = NO;
-//                    [self.navigationController popViewControllerAnimated:YES];
-//                }
+                
+                if(_isFirstTraining){
+                    self.navigationController.navigationBarHidden = NO;
+                    [self.navigationController popViewControllerAnimated:YES];
+                }
             }
             
-            //stop sending view
-            [self.sendingView.activityIndicator stopAnimating];
-            [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
-            self.sendingView.sendingViewID = @"info";
-            self.sendingView.cancelButton.enabled = YES;
-            self.sendingView.cancelButton.hidden = NO;
+            [self.sendingView stopAfterTraining];            
         });
     });
 
 }
 
-
-
-- (Classifier *) currentDetector
+- (Detector *) currentDetector
 {
-    return self.svmClassifier;
+    return self.detector;
 }
 
 
@@ -387,14 +361,14 @@
         self.sendingView.hidden = YES;
         self.navigationController.navigationBarHidden = NO;
     }else if([self.sendingView.sendingViewID isEqualToString:@"train"]){
-        self.svmClassifier.trainCancelled = YES;
+        self.detector.trainCancelled = YES;
         self.sendingView.cancelButton.enabled = NO;
         self.sendingView.sendingViewID = @"info";
     }
 }
 
 #pragma mark -
-#pragma mark ClassifierDelegate
+#pragma mark detectorDelegate
 
 
 -(void) sendMessage:(NSString *)message
@@ -413,10 +387,10 @@
 #pragma mark -
 #pragma mark ExecuteDetectorViewCotrollerDelegate
 
-- (void) updateClassifier:(Classifier *)classifier
+- (void) updateDetector:(Detector *)detector
 {
-    //received when updating classifier threshold from execute controller
-    [self.delegate updateClassifier:classifier];
+    //received when updating detector threshold from execute controller
+    [self.delegate updateDetector:detector];
 }
 
 #pragma mark -
@@ -436,10 +410,10 @@
     int orientation = [[UIDevice currentDevice] orientation];
     BOOL isIpad = [[UIDevice currentDevice] userInterfaceIdiom]==UIUserInterfaceIdiomPad;
     
-//    if([[UIDevice currentDevice] userInterfaceIdiom]==UIUserInterfaceIdiomPad) return self.classifierProperties.count;
+//    if([[UIDevice currentDevice] userInterfaceIdiom]==UIUserInterfaceIdiomPad) return self.detectorProperties.count;
 //    else return 4;
     
-    if(isIpad && orientation == UIInterfaceOrientationPortrait) return self.classifierProperties.count;
+    if(isIpad && orientation == UIInterfaceOrientationPortrait) return self.detectorProperties.count;
     else if(isIpad) return 6;
     else if(!isIpad && orientation == UIInterfaceOrientationPortrait) return 4;
     else return 2;
@@ -448,7 +422,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSDictionary *property = [self.classifierProperties objectAtIndex:indexPath.row];
+    NSDictionary *property = [self.detectorProperties objectAtIndex:indexPath.row];
     NSString *propertyName = [[property allKeys] objectAtIndex:0];
 
     static NSString *kCellIdent = @"DetectorDescriptionTableCell";
@@ -531,17 +505,17 @@
 	NSIndexPath *indexPath = [self.descriptionTableView indexPathForFirstResponder];
 	UITableViewCell *cell = [self.descriptionTableView cellForRowAtIndexPath:indexPath];
     
-	if([cell.textLabel.text isEqualToString:@"Name"]) self.svmClassifier.name = text;
+	if([cell.textLabel.text isEqualToString:@"Name"]) self.detector.name = text;
     
 	return YES;
 }
 
 -(BOOL) textFieldShouldReturn:(UITextField *)textField
 {
-    [self.delegate updateClassifier:self.svmClassifier];
+    [self.delegate updateDetector:self.detector];
     [textField resignFirstResponder];
-    self.classifierProperties = nil;
-    self.title = self.svmClassifier.name;
+    self.detectorProperties = nil;
+    self.title = self.detector.name;
     [self.descriptionTableView reloadData];
 	return YES;
 }
@@ -553,32 +527,26 @@
 -(int) trainForImagesNames:(NSArray *)imagesNames
 {
     //initialization
-    self.svmClassifier.imagesUsedTraining = [[NSMutableArray alloc] init];
+    self.detector.imagesUsedTraining = [[NSMutableArray alloc] init];
     
     //setting hog dimensions based on user preferences
-    self.svmClassifier.maxHog = [self.detectorResourceHandler getHogFromPreferences];
+    self.detector.maxHog = [self.detectorResourceHandler getHogFromPreferences];
     
-    TrainingSet *trainingSet = [[TrainingSet alloc] initForDetector:self.svmClassifier
+    TrainingSet *trainingSet = [[TrainingSet alloc] initForDetector:self.detector
                                                      forImagesNames:imagesNames
                                                     withFileHandler:_detectorResourceHandler];
     
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
         
     //obtain the image average of the groundtruth images 
-    NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:trainingSet.boundingBoxes.count];
-    for(BoundingBox *cp in trainingSet.groundTruthBoundingBoxes){
-        UIImage *wholeImage = [trainingSet.images objectAtIndex:cp.imageIndex];
-        UIImage *croppedImage = [wholeImage croppedImage:[[cp increaseSizeByFactor:0.2] rectangleForImage:wholeImage]]; //
-        [listOfImages addObject:[croppedImage resizedImage:trainingSet.templateSize interpolationQuality:kCGInterpolationLow]];
-    }
-    self.averageImage = [self imageAveraging:listOfImages];
+    NSArray *listOfImages = [trainingSet getImagesOfBoundingBoxes];
+    self.averageImage = [UIImage imageAverageFromImages:listOfImages];
     self.detectorView.image = self.averageImage;
     
-
     //learn
     [self updateProgress:0.05];
     [self.sendingView showMessage:@"Training begins!"];
-    int successTraining = [self.svmClassifier train:trainingSet];
+    int successTraining = [self.detector train:trainingSet];
 
     return successTraining;
 }
@@ -587,13 +555,13 @@
 - (void) testForImagesNames: (NSArray *)imagesNames
 {
     //initialization
-    TrainingSet *testSet = [[TrainingSet alloc] initForDetector:self.svmClassifier
+    TrainingSet *testSet = [[TrainingSet alloc] initForDetector:self.detector
                                                  forImagesNames:imagesNames
                                                 withFileHandler:_detectorResourceHandler];
     
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the test set: %d",testSet.images.count]];
     [self.sendingView showMessage:@"Testing begins!"];
-    [self.svmClassifier testOnSet:testSet atThresHold:0.0];
+    [self.detector testOnSet:testSet atThresHold:0.0];
     [self.sendingView showMessage:@"Finished testing"];
 }
 
@@ -607,58 +575,13 @@
     return [result substringToIndex:8];
 }
 
--(UIImage *) imageAveraging:(NSArray *) images
-{    
-    CGImageRef imageRef = [(UIImage *)[images objectAtIndex:0] CGImage];
-    NSUInteger width = CGImageGetWidth(imageRef); //#pixels width
-    NSUInteger height = CGImageGetHeight(imageRef); //#pixels height
-    UInt8 *imageResult = (UInt8 *) calloc(height*width*4,sizeof(UInt8));
-    int bytesPerPixel = 4;
-    int bytesPerRow = bytesPerPixel * width;
-    int bitsPerComponent = 8;
-    
-    
-    for(UIImage *image in images){
-        
-        //obtain pixels per image
-        CGImageRef imageRef = image.CGImage;
-        UInt8 *imagePointer = (UInt8 *) calloc(height * width * 4, sizeof(UInt8)); //4 channels
-        CGContextRef contextImage = CGBitmapContextCreate(imagePointer, width, height, bitsPerComponent, bytesPerRow, CGColorSpaceCreateDeviceRGB(),kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-        CGContextDrawImage(contextImage, CGRectMake(0, 0, width, height), imageRef);
-        CGContextRelease(contextImage);
-        
-        //average
-        for(int i=0; i<height*width*4; i++)
-            imageResult[i] += imagePointer[i]*1.0/images.count;
-    }
-    
-    //enhancement: increase contrast by ajusting max and min to 255 and 0 respectively
-    int max=0, min=255;
-    for(int i=0; i<height*width*4; i++){
-        max = imageResult[i]>max ? imageResult[i]:max;
-        min = imageResult[i]<min ? imageResult[i]:min;
-    }
-    
-    for(int i=0; i<height*width*4; i++)
-        imageResult[i] = (imageResult[i]-min)*(255/(max-min));
-    
-    //construct final image
-    CGContextRef contextResult = CGBitmapContextCreate(imageResult, width, height, 8, 4*width,
-                                                 CGColorSpaceCreateDeviceRGB(),kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-    
-    CGImageRef imageResultRef = CGBitmapContextCreateImage(contextResult);
-    CGContextRelease(contextResult);
-    UIImage *image = [UIImage imageWithCGImage:imageResultRef scale:1.0 orientation:UIImageOrientationUp];
-    return image;
-}
-
 - (void) loadDetectorInfo
 {
     //images
-    self.detectorHogView.image = [UIImage hogImageFromFeatures:self.svmClassifier.weightsP withSize:self.svmClassifier.sizesP];
-    self.detectorView.image = [UIImage imageWithContentsOfFile:self.svmClassifier.averageImagePath];
+    self.detectorHogView.image = [UIImage hogImageFromFeatures:self.detector.weightsP withSize:self.detector.sizesP];
+    self.detectorView.image = [UIImage imageWithContentsOfFile:self.detector.averageImagePath];
     
-    self.classifierProperties = nil;
+    self.detectorProperties = nil;
     [self.descriptionTableView reloadData];
     [self.view setNeedsDisplay];
 }

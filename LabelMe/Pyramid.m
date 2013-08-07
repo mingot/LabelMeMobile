@@ -8,7 +8,7 @@
 
 #import "Pyramid.h"
 #import "UIImage+Resize.h"
-#import "Classifier.h"
+#import "Detector.h"
 
 
 #define SCALES_PER_OCTAVE 10
@@ -56,7 +56,7 @@
 }
 
 
-- (id) initWithClassifiers:(NSArray *)svmClassifiers forNumPyramids:(int)numPyramids
+- (id) initWithDetectors:(NSArray *)detectors forNumPyramids:(int)numPyramids
 {
     self = [super init];
     if(self){
@@ -64,9 +64,9 @@
         
         //compute average scale factor
         float average = 0;
-        for(Classifier *svmClassifier in svmClassifiers)
-            average = average + svmClassifier.scaleFactor.floatValue;
-        average = average/svmClassifiers.count;
+        for(Detector *detector in detectors)
+            average = average + detector.scaleFactor.floatValue;
+        average = average/detectors.count;
         self.scaleFactor = [NSNumber numberWithFloat:average];
     }
     

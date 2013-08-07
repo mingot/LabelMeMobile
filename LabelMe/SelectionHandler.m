@@ -55,7 +55,7 @@
 
 - (void) selectTrainingImages
 {
-    //set the current classifier clases
+    //set the current detector clases
     _detectorTargetClasses = [[self.delegate currentDetector] targetClasses];
     
     [self configureModalForTrainingImages];
@@ -158,7 +158,7 @@
     NSArray *availablePositiveImagesNames = [_detectorResourceHandler getImageNamesContainingClasses:_detectorTargetClasses];
     
     NSMutableArray *imagesList = [[NSMutableArray alloc] init];
-    Classifier *detector = [self.delegate currentDetector];
+    Detector *detector = [self.delegate currentDetector];
     for(NSString *imageName in availablePositiveImagesNames){
         
         //set the image

@@ -10,7 +10,7 @@
 #import "DetectorDescriptionViewController.h"
 #import "ModalTVC.h"
 #import "ExecuteDetectorViewController.h"
-#import "Classifier.h"
+#import "detector.h"
 #import "DetectorResourceHandler.h"
 
 

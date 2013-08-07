@@ -23,7 +23,7 @@
 @property CGPoint locationOnImageHog;
 @property (strong, nonatomic) NSString *targetClass; //target class of the bb.
 
-//index in for the classifier array of hog features of the pyramids
+//index in for the detector array of hog features of the pyramids
 @property int imageHogIndex;
 
 //initialization

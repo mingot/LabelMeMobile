@@ -132,31 +132,31 @@
 - (void) saveDetectors:(NSArray *) detectors
 {
     if(![NSKeyedArchiver archiveRootObject:detectors toFile:[_userPath stringByAppendingPathComponent:@"Detectors/detectors_list.pch"]])
-        NSLog(@"Unable to save the classifiers");
+        NSLog(@"Unable to save the detectors");
 }
 
-- (void) saveDetector:(Classifier *)detector withImage:(UIImage *)image
+- (void) saveDetector:(Detector *)detector withImage:(UIImage *)image
 {
     //save average image
     NSString *pathDetectorsBig = [[_resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
-                                  [NSString stringWithFormat:@"%@_big.jpg",detector.classifierID]];
+                                  [NSString stringWithFormat:@"%@_big.jpg",detector.detectorID]];
 
     [[NSFileManager defaultManager] createFileAtPath:pathDetectorsBig contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
     detector.averageImagePath = pathDetectorsBig;
     
     //save average image thumbnail
     NSString *pathDetectorsThumb = [[_resourcesPaths objectAtIndex:DETECTORS ] stringByAppendingPathComponent:
-                                    [NSString stringWithFormat:@"%@_thumb.jpg",detector.classifierID]];
+                                    [NSString stringWithFormat:@"%@_thumb.jpg",detector.detectorID]];
     
     [[NSFileManager defaultManager] createFileAtPath:pathDetectorsThumb contents:UIImageJPEGRepresentation([image thumbnailImage:128 transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationHigh], 1.0) attributes:nil];
     detector.averageImageThumbPath = pathDetectorsThumb;
 }
 
 
-- (void) removeImageForDetector:(Classifier *) detector
+- (void) removeImageForDetector:(Detector *) detector
 {
-    NSString *bigImagePath = [_userPath stringByAppendingPathComponent:[NSString stringWithFormat:@"Detectors/%@_big.jpg", detector.classifierID]];
-    NSString *thumbnailImagePath = [_userPath stringByAppendingPathComponent:[NSString stringWithFormat:@"Detectors/%@_thumb.jpg", detector.classifierID]];
+    NSString *bigImagePath = [_userPath stringByAppendingPathComponent:[NSString stringWithFormat:@"Detectors/%@_big.jpg", detector.detectorID]];
+    NSString *thumbnailImagePath = [_userPath stringByAppendingPathComponent:[NSString stringWithFormat:@"Detectors/%@_thumb.jpg", detector.detectorID]];
     [[NSFileManager defaultManager] removeItemAtPath:bigImagePath error:nil];
     [[NSFileManager defaultManager] removeItemAtPath:thumbnailImagePath error:nil];
 }

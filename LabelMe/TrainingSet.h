@@ -7,11 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Classifier.h"
+#import "Detector.h"
 #import "DetectorResourceHandler.h"
 
 
-@class Classifier;
+@class Detector;
 @class DetectorResourceHandler;
 
 @interface TrainingSet : NSObject
@@ -32,9 +32,13 @@
 //modify the actual ground truth bounding boxes to handle a special confilictive case in learning. That case was when images with rectangular ground truth bb combined horizontal anv vertical rectangles. This methods transforms all those rectangles in the circumscrite square containing them
 - (void) unifyGroundTruthBoundingBoxes;
 
-- (id) initForDetector:(Classifier *)detector
+
+- (id) initForDetector:(Detector *)detector
           forImagesNames:(NSArray *)imagesNames
          withFileHandler:(DetectorResourceHandler *)detectorResourceHandler;
 
+// Get the images result of cropping with the bounding boxes
+// Needed by when making the average image for the detector
+- (NSArray *) getImagesOfBoundingBoxes;
 
 @end

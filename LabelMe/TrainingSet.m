@@ -31,7 +31,71 @@
 @synthesize areaRatio = _areaRatio;
 
 
-#pragma mark 
+#pragma mark
+#pragma mark - Initialization
+
+- (void) initialize
+{
+    self.images = [[NSMutableArray alloc] init];
+    self.groundTruthBoundingBoxes = [[NSMutableArray alloc] init];
+    self.boundingBoxes = [[NSMutableArray alloc] init];
+}
+
+- (id) init
+{
+    if (self = [super init]) [self initialize];
+    
+    return self;
+}
+
+- (id) initForDetector:(Detector *)detector
+        forImagesNames:(NSArray *) imagesNames
+       withFileHandler:(DetectorResourceHandler *) detectorResourceHandler;
+{
+    
+    if(self = [super init]){
+    
+        [self initialize];
+        
+        //training set construction
+        for(NSString *imageName in imagesNames){
+            BOOL containedClass = NO;
+            
+            NSMutableArray *boxes = [detectorResourceHandler getBoxesForImageName:imageName];
+            
+            for(Box *box in boxes){
+                for(NSString *class in detector.targetClasses)
+                    if([box.label isEqualToString:class]){ //add bounding box
+                        containedClass = YES;
+                        BoundingBox *cp = [[BoundingBox alloc] init];
+                        cp.xmin = box.upperLeft.x/box.imageSize.width;
+                        cp.ymin = box.upperLeft.y/box.imageSize.height;
+                        cp.xmax = box.lowerRight.x/box.imageSize.width;
+                        cp.ymax = box.lowerRight.y/box.imageSize.height;
+                        cp.imageIndex = self.images.count;
+                        cp.label = 1;
+                        [self.groundTruthBoundingBoxes addObject:cp];
+                    }
+            }
+            if(containedClass){ //add image
+                UIImage *image = [detectorResourceHandler getImageWithImageName:imageName];
+                [self.images addObject:image];
+                [detector.imagesUsedTraining addObject:imageName];
+            }
+        }
+        
+        //Add abstract pictures to the training set to generate false positives when the bb is very big
+        //guess the relationship with the artists :)
+        [self.images addObject:[UIImage imageNamed:@"picaso.jpg"]];
+        [self.images addObject:[UIImage imageNamed:@"dali.jpg"]];
+        [self.images addObject:[UIImage imageNamed:@"miro.jpg"]];
+            
+    }
+    
+    return self;
+}
+
+#pragma mark
 #pragma mark - Setters and Getters
 
 -(void) setAreaRatio:(float)areaRatio
@@ -60,79 +124,48 @@
     return _templateSize;
 }
 
+#pragma mark -
+#pragma mark Public Methods
 
-#pragma mark
-#pragma mark - Initialization
-
-- (void) initialize
+- (void) unifyGroundTruthBoundingBoxes
 {
-    self.images = [[NSMutableArray alloc] init];
-    self.groundTruthBoundingBoxes = [[NSMutableArray alloc] init];
-    self.boundingBoxes = [[NSMutableArray alloc] init];
-}
-
-- (id) init
-{
-    if (self = [super init]) [self initialize];
+    //    NSMutableArray *newGroundTruthBB = [[NSMutableArray alloc] init];
     
-    return self;
-}
-
-- (id) initForDetector:(Classifier *)detector
-        forImagesNames:(NSArray *) imagesNames
-       withFileHandler:(DetectorResourceHandler *) detectorResourceHandler;
-{
-    
-    if(self = [super init]){
-    
-        [self initialize];
-        
-        //training set construction
-        for(NSString *imageName in imagesNames){
-            BOOL containedClass = NO;
-            
-            NSMutableArray *boxes = [detectorResourceHandler getBoxesForImageName:imageName];
-            NSLog(@"boxes: %@", boxes);
-            
-            for(Box *box in boxes){
-                for(NSString *class in detector.targetClasses)
-                    if([box.label isEqualToString:class]){ //add bounding box
-                        containedClass = YES;
-                        BoundingBox *cp = [[BoundingBox alloc] init];
-                        cp.xmin = box.upperLeft.x/box.imageSize.width;
-                        cp.ymin = box.upperLeft.y/box.imageSize.height;
-                        cp.xmax = box.lowerRight.x/box.imageSize.width;
-                        cp.ymax = box.lowerRight.y/box.imageSize.height;
-                        cp.imageIndex = self.images.count;
-                        cp.label = 1;
-                        if(cp==nil)
-                            NSLog(@"NIL FOUND!!");
-                        [self.groundTruthBoundingBoxes addObject:cp];
-                    }
-            }
-            if(containedClass){ //add image
-                UIImage *image = [detectorResourceHandler getImageWithImageName:imageName];
-                if(imageName==nil || image==nil)
-                    NSLog(@"NIL FOUND!!");
-                [self.images addObject:image];
-                [detector.imagesUsedTraining addObject:imageName];
-            }
-        }
-        
-        //Add abstract pictures to the training set to generate false positives when the bb is very big
-        //guess the relationship with the artists :)
-        [self.images addObject:[UIImage imageNamed:@"picaso.jpg"]];
-        [self.images addObject:[UIImage imageNamed:@"dali.jpg"]];
-        [self.images addObject:[UIImage imageNamed:@"miro.jpg"]];
-            
+    //get max width and max height of the gt bb
+    float maxWidth=0, maxHeight=0;
+    for(BoundingBox *groundTruthBB in self.groundTruthBoundingBoxes){
+        float width = groundTruthBB.xmax - groundTruthBB.xmin;
+        float height = groundTruthBB.ymax - groundTruthBB.ymin;
+        maxWidth = maxWidth > width ? maxWidth : width;
+        maxHeight = maxHeight > height ? maxHeight : height;
     }
     
-    return self;
+    //modify the actual bb
+    for(BoundingBox *groundTruthBB in self.groundTruthBoundingBoxes){
+        float xMidPoint = (groundTruthBB.xmax + groundTruthBB.xmin)/2;
+        float yMidPoint = (groundTruthBB.ymax + groundTruthBB.ymin)/2;
+        groundTruthBB.xmin = xMidPoint - maxWidth/2;
+        groundTruthBB.xmax = xMidPoint + maxWidth/2;
+        groundTruthBB.ymin = yMidPoint - maxHeight/2;
+        groundTruthBB.ymax = yMidPoint + maxHeight/2;
+    }
 }
 
 
-#pragma mark   
-#pragma mark - Private methods
+- (NSArray *) getImagesOfBoundingBoxes
+{
+    NSMutableArray *listOfImages = [[NSMutableArray alloc] initWithCapacity:self.boundingBoxes.count];
+    for(BoundingBox *cp in self.groundTruthBoundingBoxes){
+        UIImage *wholeImage = [self.images objectAtIndex:cp.imageIndex];
+        UIImage *croppedImage = [wholeImage croppedImage:[[cp increaseSizeByFactor:0.2] rectangleForImage:wholeImage]];
+        [listOfImages addObject:[croppedImage resizedImage:self.templateSize interpolationQuality:kCGInterpolationLow]];
+    }
+    
+    return [NSArray arrayWithArray:listOfImages];
+}
+
+#pragma mark -
+#pragma mark Private Methods
 
 -(void) setInternals
 {
@@ -155,31 +188,6 @@
     _templateSize = averageSize;
     
 }
-
-- (void) unifyGroundTruthBoundingBoxes
-{
-//    NSMutableArray *newGroundTruthBB = [[NSMutableArray alloc] init];
-    
-    //get max width and max height of the gt bb
-    float maxWidth=0, maxHeight=0;
-    for(BoundingBox *groundTruthBB in self.groundTruthBoundingBoxes){
-        float width = groundTruthBB.xmax - groundTruthBB.xmin;
-        float height = groundTruthBB.ymax - groundTruthBB.ymin;
-        maxWidth = maxWidth > width ? maxWidth : width;
-        maxHeight = maxHeight > height ? maxHeight : height;
-    }
-    
-    //modify the actual bb
-    for(BoundingBox *groundTruthBB in self.groundTruthBoundingBoxes){
-        float xMidPoint = (groundTruthBB.xmax + groundTruthBB.xmin)/2;
-        float yMidPoint = (groundTruthBB.ymax + groundTruthBB.ymin)/2;
-        groundTruthBB.xmin = xMidPoint - maxWidth/2;
-        groundTruthBB.xmax = xMidPoint + maxWidth/2;
-        groundTruthBB.ymin = yMidPoint - maxHeight/2;
-        groundTruthBB.ymax = yMidPoint + maxHeight/2;
-    }
-}
-
 
 
 @end

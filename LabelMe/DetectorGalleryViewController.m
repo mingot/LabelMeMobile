@@ -176,7 +176,7 @@
     //delete from the model
     NSMutableArray *aux = [[NSMutableArray alloc] init];
     for(NSNumber *index in self.selectedItems) [aux addObject:[self.detectors objectAtIndex:index.intValue]];
-    for(Classifier *classifier in aux) [self.detectors removeObject:classifier];
+    for(Detector *detector in aux) [self.detectors removeObject:detector];
     
     [self.selectedItems removeAllObjects];
     [self.tableView reloadData];
@@ -186,12 +186,12 @@
     [self.executeButton setTitle:@"Execute"];
     self.executeButton.enabled = NO;
     
-    //update classifier list in disk
+    //update detector list in disk
     [self.detectorResourceHandler saveDetectors:self.detectors];
     
     //delete images
-    for(Classifier *classifier in aux)
-        [self.detectorResourceHandler removeImageForDetector:classifier];
+    for(Detector *detector in aux)
+        [self.detectorResourceHandler removeImageForDetector:detector];
     
     if(self.detectors.count==0) self.noImages.hidden = NO;
     
@@ -218,12 +218,12 @@
         
         
     }else{
-        Classifier *newDetector = [[Classifier alloc] init];
+        Detector *newDetector = [[Detector alloc] init];
         newDetector.name = @"New Detector";
         self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
         self.detectorController.hidesBottomBarWhenPushed = YES;
         self.detectorController.delegate = self;
-        self.detectorController.svmClassifier = newDetector;
+        self.detectorController.detector = newDetector;
         self.detectorController.view = nil; //to reexecute viewDidLoad
         self.detectorController.detectorResourceHandler = self.detectorResourceHandler;
         [self.navigationController pushViewController:self.detectorController animated:YES];
@@ -240,7 +240,7 @@
         [selectedDetectors addObject:[self.detectors objectAtIndex:index.intValue]];
     
     self.executeDetectorVC = [[ExecuteDetectorViewController alloc] init];
-    self.executeDetectorVC.svmClassifiers = [NSArray arrayWithArray:selectedDetectors];
+    self.executeDetectorVC.detectors = [NSArray arrayWithArray:selectedDetectors];
     self.executeDetectorVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.executeDetectorVC animated:NO];
     
@@ -275,7 +275,7 @@
     else cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
     NSArray* reversedDetectors = [[self.detectors reverseObjectEnumerator] allObjects]; //reverse order to show newer first
-    Classifier *detector = [reversedDetectors objectAtIndex:indexPath.row];
+    Detector *detector = [reversedDetectors objectAtIndex:indexPath.row];
     cell.textLabel.text = detector.name;
     cell.detailTextLabel.numberOfLines = 2;
     cell.detailTextLabel.text = [NSString stringWithFormat:@"Class:%@ \nTraining Images: %d", [detector.targetClasses componentsJoinedByString:@", "], detector.imagesUsedTraining.count];
@@ -306,7 +306,7 @@
         self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
         self.detectorController.hidesBottomBarWhenPushed = YES;
         self.detectorController.delegate = self;
-        self.detectorController.svmClassifier = [reversedDetectors objectAtIndex:indexPath.row];
+        self.detectorController.detector = [reversedDetectors objectAtIndex:indexPath.row];
         self.detectorController.view = nil; //to reexecute viewDidLoad
         self.detectorController.detectorResourceHandler = self.detectorResourceHandler;
         
@@ -326,7 +326,7 @@
 #pragma mark
 #pragma mark - Detector Description Delegate
 
-- (void) updateClassifier:(Classifier *)updatedDetector
+- (void) updateDetector:(Detector *)updatedDetector
 {
     //add or update detector
     if(_selectedRow < self.detectors.count)

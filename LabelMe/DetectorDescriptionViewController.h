@@ -11,19 +11,19 @@
 #import "ExecuteDetectorViewController.h"
 #import "ShowTrainingSetViewController.h"
 #import "SendingView.h"
-#import "Classifier.h"
+#import "Detector.h"
 #import "DetectorResourceHandler.h"
 #import "SelectionHandler.h"
 
 @protocol DetectorDescriptionViewControllerDelegate <NSObject>
 
-- (void) updateClassifier:(Classifier *)updatedClassifier;
+- (void) updateDetector:(Detector *)updatedDetector;
 
 @end
 
 
 
-@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate, UIAlertViewDelegate, UITableViewDelegate,UITableViewDataSource, UITextFieldDelegate, ExecuteDetectorViewControllerDelegate, SelectionHandlerDelegate>
+@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,DetectorDelegate, UIAlertViewDelegate, UITableViewDelegate,UITableViewDataSource, UITextFieldDelegate, ExecuteDetectorViewControllerDelegate, SelectionHandlerDelegate>
 
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
 
@@ -31,9 +31,9 @@
 @property (strong, nonatomic) SendingView *sendingView;
 
 //array with the properties to show in the description
-@property (strong, nonatomic) NSMutableArray *classifierProperties;
-@property (strong, nonatomic) Classifier *svmClassifier;
-@property (strong, nonatomic) Classifier *previousSvmClassifier; //to undo
+@property (strong, nonatomic) NSMutableArray *detectorProperties;
+@property (strong, nonatomic) Detector *detector;
+@property (strong, nonatomic) Detector *previousDetector; //to undo
 
 //views
 @property (weak, nonatomic) IBOutlet UIImageView *detectorView;

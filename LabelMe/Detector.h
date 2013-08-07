@@ -1,5 +1,5 @@
 //
-//  Classifier.h
+//  Detector.h
 //  DetectMe
 //
 //  Created by Josep Marc Mingot Hidalgo on 28/02/13.
@@ -12,7 +12,7 @@
 
 @class TrainingSet;
 
-@protocol ClassifierDelegate <NSObject>
+@protocol DetectorDelegate <NSObject>
 
 //Send a message to the delegate (to output as a debug during the traingnin)
 - (void) sendMessage:(NSString *) message;
@@ -21,10 +21,10 @@
 @end
 
 
-@interface Classifier : NSObject <NSCoding>
+@interface Detector : NSObject <NSCoding>
 
 
-@property (strong, nonatomic) id<ClassifierDelegate> delegate;
+@property (strong, nonatomic) id<DetectorDelegate> delegate;
 
 @property int *sizesP;
 @property double *weightsP;
@@ -34,7 +34,7 @@
 //Encoding properties
 @property (strong, nonatomic) NSString *name;
 @property (strong, nonatomic) NSArray *targetClasses;
-@property (strong, nonatomic) NSString *classifierID;
+@property (strong, nonatomic) NSString *detectorID;
 @property (strong, nonatomic) NSMutableArray *weights;
 @property (strong, nonatomic) NSArray *sizes;
 @property (strong, nonatomic) NSNumber *numberSV;
@@ -51,13 +51,13 @@
 
 @property BOOL trainCancelled; //received from outside
 
-//Initialization of the classifier given the weight vectors of it
+//Initialization of the detector given the weight vectors of it
 - (id) initWithTemplateWeights:(double *)templateWeights;
 
 
 - (id) initWithCoder:(NSCoder *)aDecoder;
 
-//Train the classifier given an initial set formed by Images and ground truth bounding boxes containing positive examples. Returns 1 == success, 0 == fail
+//Train the detector given an initial set formed by Images and ground truth bounding boxes containing positive examples. Returns 1 == success, 0 == fail
 - (int) train:(TrainingSet *)trainingSet;
 
 //Detect object in the image and return array of convolution points for the indicated number of pyramids and detection threshold

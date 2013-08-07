@@ -7,9 +7,9 @@
 //
 
 #import "TagImageView.h"
-#import "Classifier.h"
+#import "Detector.h"
 
-@class Classifier;
+@class Detector;
 
 @interface DetectorResourceHandler : NSObject
 
@@ -28,8 +28,8 @@
 - (NSMutableArray *) loadDetectors;
 
 - (void) saveDetectors:(NSArray *) detectors;
-- (void) saveDetector:(Classifier *)detector withImage:(UIImage *)image;
-- (void) removeImageForDetector:(Classifier *) detector;
+- (void) saveDetector:(Detector *)detector withImage:(UIImage *)image;
+- (void) removeImageForDetector:(Detector *) detector;
 
 
 

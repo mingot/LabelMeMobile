@@ -8,14 +8,14 @@
 
 #import <Foundation/Foundation.h>
 #import "ModalTVC.h"
-#import "Classifier.h"
+#import "Detector.h"
 #import "DetectorResourceHandler.h"
 
 /*
  
  Class  Responsabilities:
  
- - Coordinate the show of modals for selecting the class and for
+ - Coordinate the visualization of modals for selecting the class and for
     selecting the training images
  - Inform the delegate (|DetectorDescriptionVC|) of the selections
  - Return to the |DetectorGalleryVC| in case of cancelling first training
@@ -33,7 +33,7 @@
 
 // Request the current detector
 // Used to obtain the target classes and current training images
-- (Classifier *) currentDetector;
+- (Detector *) currentDetector;
 
 @end
 

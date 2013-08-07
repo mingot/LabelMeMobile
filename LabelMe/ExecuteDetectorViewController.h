@@ -17,15 +17,15 @@
 
 #import "DetectView.h"
 #import "SettingsViewController.h"
-#import "Classifier.h"
+#import "Detector.h"
 #import "AYUIButton.h"
 #import "Pyramid.h"
 
 
 @protocol ExecuteDetectorViewControllerDelegate <NSObject>
 
-@optional //just for updating detectionthreshold when a single classifier is called
-- (void) updateClassifier:(Classifier *) classifier;
+@optional //just for updating detectionthreshold when a single detector is called
+- (void) updateDetector:(Detector *) detector;
 
 @end
 
@@ -40,7 +40,7 @@
 @property (nonatomic, strong) id<ExecuteDetectorViewControllerDelegate> delegate;
 
 //model properties
-@property (nonatomic,strong) NSArray *svmClassifiers;
+@property (nonatomic,strong) NSArray *detectors;
 @property int numPyramids;
 @property double maxDetectionScore;
 @property (nonatomic, strong) Pyramid *hogPyramid;

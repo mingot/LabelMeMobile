@@ -13,8 +13,8 @@
 #import <CoreMedia/CoreMedia.h>
 
 #import "ShowTrainingSetViewController.h"
-#import "Classifier.h"
 #import "DetectView.h"
+#import "Detector.h"
 
 
 @interface TrainDetectorViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
@@ -23,7 +23,7 @@
 @property (nonatomic, strong) AVCaptureSession *captureSession;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *prevLayer;
 
-@property (nonatomic, strong) Classifier *svmClassifier;
+@property (nonatomic, strong) Detector *detector;
 @property (nonatomic, strong) TrainingSet *trainingSet;
 
 @property (weak, nonatomic) IBOutlet DetectView *detectView;
