@@ -102,12 +102,15 @@
         [self.delegate trainDetectorForClasses:_detectorTargetClasses
                         andTrainingImagesNames:traingImagesNames
                             andTestImagesNames:testImagesNames];
+        
         [_modalTVC dismissModalViewControllerAnimated:YES];
     }
 }
 
 - (void) selectionCancelled
 {
+    [_modalTVC dismissModalViewControllerAnimated:YES];
+    
     if(![_modalSent isEqualToString:@"images"])
         [_viewController.navigationController popViewControllerAnimated:YES];
 }

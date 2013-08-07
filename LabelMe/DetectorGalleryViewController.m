@@ -220,7 +220,6 @@
     }else{
         Classifier *newDetector = [[Classifier alloc] init];
         newDetector.name = @"New Detector";
-        newDetector.targetClasses = [NSArray arrayWithObject:@"Not Set"];
         self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
         self.detectorController.hidesBottomBarWhenPushed = YES;
         self.detectorController.delegate = self;
@@ -309,8 +308,8 @@
         self.detectorController.delegate = self;
         self.detectorController.svmClassifier = [reversedDetectors objectAtIndex:indexPath.row];
         self.detectorController.view = nil; //to reexecute viewDidLoad
-        //TODO: solve connection with detectorcontroller
-//        self.detectorController.userPath = self.userPath;
+        self.detectorController.detectorResourceHandler = self.detectorResourceHandler;
+        
         [self.navigationController pushViewController:self.detectorController animated:YES];
     
     }else{

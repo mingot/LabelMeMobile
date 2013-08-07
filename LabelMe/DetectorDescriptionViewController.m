@@ -19,20 +19,7 @@
 #import "CustomUITableViewCell.h"
 
 
-
-
-//#define IMAGES 0
-//#define THUMB 1
-//#define OBJECTS 2
-//#define DETECTORS 3
-//#define USER 4
-
 #define MAX_IMAGE_SIZE 300
-
-//self.firstTrainingState
-#define NOT_FIRST 0
-#define INITIATED 1
-#define INTERRUPTED 2
 
 //training results
 #define SUCCESS 1
@@ -47,9 +34,6 @@
 
 
 @property (strong, nonatomic) UIImage *averageImage;
-@property int firstTraingState; //0: not first training, 1: first training initiated, 2: first training interrupted
-@property BOOL isFirstTraining;
-
 
 // wrapper to call the detector for training and testing
 -(int) trainForImagesNames:(NSArray *)imagesNames;
@@ -132,13 +116,13 @@
 {
     [super viewDidLoad];
     
-    self.firstTraingState = NOT_FIRST;
+
     self.title = self.svmClassifier.name;
     self.svmClassifier.delegate = self;
     
     
     _selectionHandler = [[SelectionHandler alloc] initWithViewController:self andDetecorResourceHandler:self.detectorResourceHandler];
-    
+    _selectionHandler.delegate = self;
     
 //    self.resourcesPaths = [NSArray arrayWithObjects:
 //                           [self.userPath stringByAppendingPathComponent:@"images"],
@@ -199,24 +183,10 @@
     //Check if the classifier exists.
     if(self.svmClassifier.weights == nil){
         NSLog(@"New classifier");
-//        self.isFirstTraining = YES;
-//        //show modal to select the target class
-//        self.modalTVC = [[ModalTVC alloc] init];
-//        self.modalTVC.showCancelButton = YES;
-//        self.modalTVC.delegate = self;
-//        self.modalTVC.modalTitle = @"New Detector";
-//        self.modalTVC.modalSubtitle = @"1 of 2: select class(es)";
-//        self.modalTVC.modalID = @"classes";
-//        self.modalTVC.multipleChoice = YES;
-//        self.modalTVC.data = self.availableObjectClasses;
-//        self.modalTVC.doneButtonTitle = @"Create";
-//        [self presentModalViewController:self.modalTVC animated:YES];
-//        self.firstTraingState = INITIATED;
         [_selectionHandler addNewDetector];
         
     }else{
         NSLog(@"Loading classifier: %@", self.svmClassifier.name);
-        self.isFirstTraining = NO;
     }
     
     
@@ -240,14 +210,6 @@
     
 }
 
-- (void) viewDidAppear:(BOOL)animated
-{
-    if(self.firstTraingState == INTERRUPTED) [self.navigationController popViewControllerAnimated:YES];
-    else if(self.firstTraingState == INITIATED){
-        [self trainAction:self];
-    }
-}
-
 
 -(void)viewWillDisappear:(BOOL)animated
 {
@@ -269,45 +231,11 @@
 }
 
 - (IBAction)trainAction:(id)sender
-{
-    
-//    //show modal to select training positives for the selected class
-//    self.modalTVC = [[ModalTVC alloc] init];
-//    self.modalTVC.delegate = self;
-//    if(self.firstTraingState == INITIATED){ //training for the first time
-//        self.modalTVC.modalTitle = @"New Detector";
-//        self.modalTVC.modalSubtitle = @"2 of 2: select training image(es)";
-//    }else{
-//        self.modalTVC.modalTitle = @"Train Detector";
-//        self.modalTVC.modalSubtitle = @"1 of 1: select training images";
-//        //storing the previous classifier using the nscoding for object copy
-//        self.previousSvmClassifier = [[Classifier alloc] init];
-//        self.previousSvmClassifier = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.svmClassifier]];
-//    }
-//    self.modalTVC.doneButtonTitle = @"Train";
-//    self.modalTVC.modalID = @"images";
-//    self.modalTVC.multipleChoice = NO;
-//    
-////    self.availablePositiveImagesNames = nil; //to reset
-//    NSArray *availablePositiveImagesNames = [self.detectorResourceHandler getImageNamesContainingClasses:self.svmClassifier.targetClasses];
-//    
-//    NSMutableArray *imagesList = [[NSMutableArray alloc] init];
-//    for(NSString *imageName in availablePositiveImagesNames){
-//        NSLog(@"imageName: %@", imageName);
-//        [imagesList addObject:[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/%@",[self.resourcesPaths objectAtIndex:THUMB],imageName]]];
-//        if(self.svmClassifier.imagesUsedTraining == nil || [self.svmClassifier.imagesUsedTraining indexOfObject:imageName]!= NSNotFound)
-//            [self.modalTVC.selectedItems addObject:[NSNumber numberWithInt:(imagesList.count-1)]];
-//    }
-//    self.modalTVC.showCancelButton = YES;
-//    self.modalTVC.data = imagesList;
-//    [self.modalTVC.view setNeedsDisplay];
-//    [self presentModalViewController:self.modalTVC animated:YES];
-
+{    
     [_selectionHandler selectTrainingImages];
     
-    //let's wait for the modalTVCDelegate answer to begin the training
+    //let's wait for the SelectionHandlerDelegate answer to begin the training
 }
-
 
 
 
@@ -355,14 +283,27 @@
     [self.delegate updateClassifier:self.svmClassifier];
 }
 
+#pragma mark -
+#pragma mark UIAlertViewDelegate
+
+-(void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    if ([title isEqualToString:@"Ok"]) {
+        self.svmClassifier = self.previousSvmClassifier;
+        self.undoButtonBar.enabled = NO;
+        [self saveAction:self];
+    }
+}
+
 
 #pragma mark -
 #pragma mark SelectionHandlerDelegate
 
 
 - (void) trainDetectorForClasses:(NSArray *)classes
-               andTrainingImages:(NSArray *)trainingImagesNames
-                   andTestImages:(NSArray *)testImagesNames
+          andTrainingImagesNames:(NSArray *)trainingImagesNames
+              andTestImagesNames:(NSArray *)testImagesNames
 {
     //TODO: check if correct
     if(self.svmClassifier.targetClasses == nil){ //first time training
@@ -372,6 +313,10 @@
         self.svmClassifier.classifierID = [NSString stringWithFormat:@"%@%@",className,[self uuid]];
     }
     
+    
+    //save the current classifier for undo purposes
+    self.previousSvmClassifier = [[Classifier alloc] init];
+    self.previousSvmClassifier = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.svmClassifier]]; //trick to copy the object
     
     //SENDING VIEW initialization
     self.sendingView.progressView.hidden = NO;
@@ -384,6 +329,7 @@
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [self.sendingView.cancelButton setTitle:@"Cancelling..." forState:UIControlStateDisabled];
     [self.sendingView clearScreen];
+    
     self.svmClassifier.trainCancelled = NO;
     
     //train in a different queue
@@ -409,19 +355,19 @@
             
                 [self showAlertWithTitle:@"Error Training" andDescription:@"Shape on training set not allowed.\n Make sure all the labels have a similar shape and that are not too big."];
                 
-                if(self.isFirstTraining){
-                    self.navigationController.navigationBarHidden = NO;
-                    [self.navigationController popViewControllerAnimated:YES];
-                }
+//                if(self.isFirstTraining){
+//                    self.navigationController.navigationBarHidden = NO;
+//                    [self.navigationController popViewControllerAnimated:YES];
+//                }
                 
             }else if(trainingState == INTERRUPTED){
                 //if classifier not even trained with one iteration(cancelled before) then rescue previous classifer (undo)
                 self.svmClassifier = self.previousSvmClassifier;
                 self.undoButtonBar.enabled = NO;
-                if(self.isFirstTraining){
-                    self.navigationController.navigationBarHidden = NO;
-                    [self.navigationController popViewControllerAnimated:YES];
-                }
+//                if(self.isFirstTraining){
+//                    self.navigationController.navigationBarHidden = NO;
+//                    [self.navigationController popViewControllerAnimated:YES];
+//                }
             }
             
             //stop sending view
@@ -440,22 +386,6 @@
 - (Classifier *) currentDetector
 {
     return self.svmClassifier;
-}
-
-
-
-#pragma mark -
-#pragma mark UIAlertViewDelegate
-
--(void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
-    if ([title isEqualToString:@"Ok"]) {
-        self.svmClassifier = self.previousSvmClassifier;
-        self.undoButtonBar.enabled = NO;
-        [self saveAction:self];
-        [self loadDetectorInfo];
-    }
 }
 
 
@@ -492,108 +422,6 @@
 
 
 #pragma mark -
-#pragma mark ModalTVCDelegate
-
-//- (void) userSlection:(NSArray *)selectedItems for:(NSString *)identifier;
-//{
-//    if([identifier isEqualToString:@"classes"]){
-//        NSMutableArray *classes = [[NSMutableArray alloc] init];
-//        for(NSNumber *sel in selectedItems)
-//            [classes addObject:[self.availableObjectClasses objectAtIndex:sel.intValue]];
-//        self.svmClassifier.targetClasses = [NSArray arrayWithArray:classes];
-//        NSString *className = [self.svmClassifier.targetClasses componentsJoinedByString:@"+"];
-//        self.svmClassifier.name = [NSString stringWithFormat:@"%@-Detector",className];
-//        self.svmClassifier.classifierID = [NSString stringWithFormat:@"%@%@",className,[self uuid]];
-//        
-//    }else if([identifier isEqualToString:@"images"]){
-//        
-//        //not first training any more
-//        self.firstTraingState = NOT_FIRST;
-//        
-//        //split train and test
-//        NSMutableArray *traingImagesNames = [[NSMutableArray alloc] init];
-//        NSMutableArray *testImagesNames = [[NSMutableArray alloc]init];
-//        for(int i=0;i<self.availablePositiveImagesNames.count;i++){
-//            NSUInteger index = [selectedItems indexOfObject:[NSNumber numberWithInt:i]];
-//            if(index != NSNotFound) [traingImagesNames addObject:[self.availablePositiveImagesNames objectAtIndex:i]];
-//            else [testImagesNames addObject:[self.availablePositiveImagesNames objectAtIndex:i]];
-//        }
-//        if(testImagesNames.count == 0) testImagesNames = traingImagesNames;
-//        
-//        //SENDING VIEW initialization
-//        self.sendingView.progressView.hidden = NO;
-//        [self.sendingView.progressView setProgress:0 animated:YES];
-//        self.sendingView.hidden = NO;
-//        self.navigationController.navigationBarHidden = YES;
-//        [self.sendingView.activityIndicator startAnimating];
-//        self.sendingView.cancelButton.hidden = NO;
-//        self.sendingView.sendingViewID = @"train";
-//        [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-//        [self.sendingView.cancelButton setTitle:@"Cancelling..." forState:UIControlStateDisabled];
-//        [self.sendingView clearScreen];
-//        self.svmClassifier.trainCancelled = NO;
-//        
-//        //train in a different queue
-//        dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
-//        dispatch_async(myQueue, ^{
-//            __block int trainingState = [self trainForImagesNames:traingImagesNames];
-//            if (trainingState == SUCCESS) {
-//                [self.sendingView showMessage:@"Finished training"];
-//                [self testForImagesNames:testImagesNames];
-//            }
-//                
-//            dispatch_sync(dispatch_get_main_queue(), ^{
-//                if(trainingState == SUCCESS){
-//                    [self updateProgress:1];
-//                    
-//                    //update view of the detector
-//                    if(self.previousSvmClassifier != nil) self.undoButtonBar.enabled = YES;
-//                    [self saveAction:self];
-//                    [self loadDetectorInfo];
-//                    
-//                }else if(trainingState == FAIL){
-//                    [self.sendingView showMessage:@"Error training"];
-//                    
-//                    UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error Training"
-//                                                                         message:@"Shape on training set not allowed.\n Make sure all the labels have a similar shape and that are not too big."
-//                                                                        delegate:nil
-//                                                               cancelButtonTitle:@"OK"
-//                                                               otherButtonTitles:nil];
-//                    [errorAlert show];
-//                    
-//                    if(self.isFirstTraining){
-//                        self.navigationController.navigationBarHidden = NO;
-//                        [self.navigationController popViewControllerAnimated:YES];
-//                    }
-//                    
-//                }else if(trainingState == INTERRUPTED){
-//                    //if classifier not even trained with one iteration(cancelled before) then rescue previous classifer (undo)
-//                    self.svmClassifier = self.previousSvmClassifier;
-//                    self.undoButtonBar.enabled = NO;
-//                    if(self.isFirstTraining){
-//                        self.navigationController.navigationBarHidden = NO;
-//                        [self.navigationController popViewControllerAnimated:YES];
-//                    }
-//                }
-//                    
-//                //stop sending view
-//                [self.sendingView.activityIndicator stopAnimating];
-//                [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
-//                self.sendingView.sendingViewID = @"info";
-//                self.sendingView.cancelButton.enabled = YES;
-//                self.sendingView.cancelButton.hidden = NO;
-//            });
-//        });
-//    }
-//}
-//
-//- (void) selectionCancelled
-//{
-//    if(self.firstTraingState != NOT_FIRST) self.firstTraingState = INTERRUPTED;
-//}
-
-
-#pragma mark -
 #pragma mark ExecuteDetectorViewCotrollerDelegate
 
 - (void) updateClassifier:(Classifier *)classifier
@@ -610,8 +438,6 @@
     NSLog(@"Memory warning received!!!");
     [super didReceiveMemoryWarning];
 }
-
-
 
 #pragma mark -
 #pragma mark Table View
@@ -647,7 +473,7 @@
         cell.textField.returnKeyType = UIReturnKeyDone;
         cell.textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
         cell.textField.autocorrectionType = UITextAutocorrectionTypeNo;
-        if (!self.isFirstTraining) cell.textField.text = [property objectForKey:propertyName];
+//        if (!self.isFirstTraining) cell.textField.text = [property objectForKey:propertyName];
     }else{
         cell.detailTextLabel.text = [property objectForKey:propertyName];
         cell.detailTextLabel.backgroundColor = [UIColor clearColor];
@@ -661,10 +487,7 @@
     
     return cell;
     
-    
-    
 }
-
 
 
 -(void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -727,7 +550,6 @@
 -(BOOL) textFieldShouldReturn:(UITextField *)textField
 {
     [self.delegate updateClassifier:self.svmClassifier];
-    self.isFirstTraining = NO;
     [textField resignFirstResponder];
     self.classifierProperties = nil;
     self.title = self.svmClassifier.name;

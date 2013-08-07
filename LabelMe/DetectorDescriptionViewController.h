@@ -29,7 +29,6 @@
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
 
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
-//@property (strong, nonatomic) ModalTVC *modalTVC;
 @property (strong, nonatomic) SendingView *sendingView;
 
 //array with the properties to show in the description
