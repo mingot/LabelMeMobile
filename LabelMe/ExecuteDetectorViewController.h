@@ -7,14 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AVFoundation/AVFoundation.h>
-#import <CoreGraphics/CoreGraphics.h>
-#import <CoreVideo/CoreVideo.h>
-#import <CoreMedia/CoreMedia.h>
 #import <CoreLocation/CoreLocation.h>
-#import <CoreMotion/CoreMotion.h>
 
-
+#import "CameraVideoViewController.h"
 #import "DetectView.h"
 #import "SettingsViewController.h"
 #import "Detector.h"
@@ -30,7 +25,7 @@
 @end
 
 
-@interface ExecuteDetectorViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface ExecuteDetectorViewController : CameraVideoViewController <CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate>
 
 
 @property (nonatomic, strong) id<ExecuteDetectorViewControllerDelegate> delegate;
@@ -56,13 +51,6 @@
 - (IBAction)cancelAction:(id)sender;
 - (IBAction)switchCameras:(id)sender;
 - (IBAction)switchValueDidChange:(UISwitch *)sw;
-
-//tests
-@property (weak, nonatomic) IBOutlet UIImageView *imageView;
-- (IBAction)takePictureAction:(id)sender;
-@property BOOL takePicture;
-
-
 
 
 @end

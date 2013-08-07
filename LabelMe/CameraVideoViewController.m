@@ -10,13 +10,9 @@
 
 @interface CameraVideoViewController ()
 {
-    @private
-      BOOL _isUsingFrontCamera;
-      AVCaptureSession *_captureSession;
-      AVCaptureVideoDataOutput *_captureOutput;
-    
-    @protected
-      AVCaptureVideoPreviewLayer *_prevLayer;
+    BOOL _isUsingFrontCamera;
+    AVCaptureSession *_captureSession;
+    AVCaptureVideoDataOutput *_captureOutput;
 }
 
 
@@ -32,6 +28,7 @@
     
     // ********  CAMERA CAPUTRE  ********
     //Capture input specifications
+    
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput
 										  deviceInputWithDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo]
 										  error:nil];
@@ -62,7 +59,7 @@
     // Previous layer to show the video image
 	_prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:_captureSession];
 	_prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-	[self.view.layer addSublayer: _prevLayer];
+//	[self.view.layer addSublayer: _prevLayer];
     
     // Add subviews in front of  the prevLayer
 //    self.detectView.prevLayer = self.prevLayer;
@@ -75,6 +72,7 @@
 //    self.prevLayer.frame = self.detectView.frame;
     
     //Start the capture
+    NSLog(@"Starting the caputre");
     [_captureSession startRunning];
     
 }
@@ -138,20 +136,22 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         CGContextRelease(newContext);
         CGColorSpaceRelease(colorSpace);
         
-        UIImage *image = [UIImage imageWithCGImage:imageRef];
+        [self processImage:imageRef];
         
-        [self processImage:image];
+        //We unlock the  image buffer
+        CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+        CGImageRelease(imageRef);
         
     }
 }
 
-#pragma mark -
-#pragma mark Private methods
 
-- (void) processImage:(UIImage *) image;
+
+- (void) processImage:(CGImageRef) imageRef
 {
-    
+    NSLog(@"Process Image in the parent must be overriden!");
 }
+
 
 
 @end

@@ -22,7 +22,6 @@
  - Add and delete detecotrs
  - Choose and execute multiple detectors at the same time
  
- 
  */
 
 @interface DetectorGalleryViewController : UIViewController <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource,DetectorDescriptionViewControllerDelegate>

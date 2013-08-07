@@ -884,16 +884,7 @@
 				FC83599C17B094750035A833 /* DetectorResourceHandler.m */,
 				FCED895B17034CAF0027CBE1 /* DetectView.h */,
 				FCED895C17034CAF0027CBE1 /* DetectView.m */,
-				FCED896117034CD70027CBE1 /* ConvolutionHelper.h */,
-				FCED896217034CD70027CBE1 /* ConvolutionHelper.m */,
-				FCED895E17034CCA0027CBE1 /* Detector.h */,
-				FCED895F17034CCA0027CBE1 /* Detector.mm */,
-				FC74F8D1174A54FE004701CC /* Pyramid.h */,
-				FC74F8D2174A54FE004701CC /* Pyramid.m */,
-				FCC9FAFA170F6CF4009B7FC6 /* TrainingSet.h */,
-				FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */,
-				FC8359A417B1CF380035A833 /* BoundingBox.h */,
-				FC8359A517B1CF380035A833 /* BoundingBox.m */,
+				FC8359B017B2FAD60035A833 /* Detector Brain */,
 			);
 			name = Detector;
 			sourceTree = "<group>";
@@ -915,6 +906,23 @@
 				FC74F8E4174C1B49004701CC /* selectAllDisabled@2x.png */,
 			);
 			name = Buttons;
+			sourceTree = "<group>";
+		};
+		FC8359B017B2FAD60035A833 /* Detector Brain */ = {
+			isa = PBXGroup;
+			children = (
+				FCED896117034CD70027CBE1 /* ConvolutionHelper.h */,
+				FCED896217034CD70027CBE1 /* ConvolutionHelper.m */,
+				FCED895E17034CCA0027CBE1 /* Detector.h */,
+				FCED895F17034CCA0027CBE1 /* Detector.mm */,
+				FC74F8D1174A54FE004701CC /* Pyramid.h */,
+				FC74F8D2174A54FE004701CC /* Pyramid.m */,
+				FCC9FAFA170F6CF4009B7FC6 /* TrainingSet.h */,
+				FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */,
+				FC8359A417B1CF380035A833 /* BoundingBox.h */,
+				FC8359A517B1CF380035A833 /* BoundingBox.m */,
+			);
+			name = "Detector Brain";
 			sourceTree = "<group>";
 		};
 		FC9F947E173AE34B0004598C /* Sign in */ = {

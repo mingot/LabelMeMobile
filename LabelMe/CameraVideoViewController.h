@@ -11,6 +11,13 @@
 
 @interface CameraVideoViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
 
+{
+    @protected
+      AVCaptureVideoPreviewLayer *_prevLayer;
+}
+
 - (IBAction)switchCameras:(id)sender;
+
+- (void) processImage:(CGImageRef) imageRef;
 
 @end
