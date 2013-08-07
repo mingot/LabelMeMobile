@@ -7,7 +7,7 @@
 //
 
 #import "TagViewController.h"
-#import "FilenameResourcesHandler.h"
+#import "LabelsResourcesHandler.h"
 #import "LMUINavigationController.h"
 #import "UIButton+CustomViews.h"
 #import "UIViewController+ShowAlert.h"
@@ -17,11 +17,10 @@
 
 @interface TagViewController()
 {
-    FilenameResourcesHandler *_filenameResourceHandler;
     ServerConnection *sConnection;
     NSMutableDictionary *_viewsForScrollDictionary;
 }
-
+@property (strong, nonatomic) LabelsResourcesHandler *labelsResourceHandler;
 @property (strong, nonatomic) UITableView *labelsView;
 @property (strong, nonatomic) UIButton *tip;
 @property (strong, nonatomic) UIButton *labelsButton;
@@ -96,7 +95,7 @@
     [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
     
     //TODO: Check also if there are other images
-    NSArray *boxes = [_filenameResourceHandler getBoxes];
+    NSArray *boxes = [self.labelsResourceHandler getBoxes];
     if (boxes.count != 0)
         self.tip.hidden = YES;
     
@@ -122,7 +121,7 @@
     [super viewDidLoad];
     
     //load the resources direction for the current filename
-    _filenameResourceHandler = [[FilenameResourcesHandler alloc] initForUsername:self.username andFilename:self.filename];
+    self.labelsResourceHandler = [[LabelsResourcesHandler alloc] initForUsername:self.username andFilename:self.filename];
     
     //solid color for the navigation bar
     [self.navigationController.navigationBar setBackgroundImage:[LMUINavigationController drawImageWithSolidColor:[UIColor redColor]] forBarMetrics:UIBarMetricsDefault];
@@ -202,7 +201,7 @@
     }
 
     //Update the number of boxes to be send
-    _filenameResourceHandler.boxesNotSent++;
+    self.labelsResourceHandler.boxesNotSent++;
 }
 
 
@@ -230,7 +229,7 @@
 
 -(IBAction)listAction:(id)sender
 {
-    NSLog(@"Boxes to be send: %d", _filenameResourceHandler.boxesNotSent);
+    NSLog(@"Boxes to be send: %d", self.labelsResourceHandler.boxesNotSent);
     
 //    [self.labelsView reloadData];
 //    if (self.labelsView.hidden) {
@@ -286,7 +285,7 @@
             return;
 
         BOOL boxWasSent = [[self.tagImageView.tagView.boxes objectAtIndex:self.tagImageView.tagView.selectedBox] sent];
-        if(!boxWasSent) _filenameResourceHandler.boxesNotSent--;
+        if(!boxWasSent) self.labelsResourceHandler.boxesNotSent--;
         
         [self.tagImageView.tagView removeSelectedBox];
         
@@ -313,8 +312,8 @@
 - (void) saveStateOnDisk
 {
     NSLog(@"Saving image:%@", self.filename);
-    [_filenameResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
-    [_filenameResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
+    [self.labelsResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
+    [self.labelsResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
     
     [self.delegate reloadTable];
 }
@@ -328,7 +327,7 @@
     Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
     if(selectedBox && selectedBox.sent){
         selectedBox.sent = NO;
-        _filenameResourceHandler.boxesNotSent ++;
+        self.labelsResourceHandler.boxesNotSent ++;
     }
     
     [self saveStateOnDisk];
@@ -349,7 +348,7 @@
     self.deleteButton.enabled = isSelected.boolValue;
     Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
     if(!selectedBox.sent) self.sendButton.enabled = YES;
-    self.sendButton.enabled = _filenameResourceHandler.boxesNotSent!=0 ?  YES : NO;
+    self.sendButton.enabled = self.labelsResourceHandler.boxesNotSent!=0 ?  YES : NO;
 //    [self.labelsView reloadData];
 }
 
@@ -487,15 +486,15 @@
         
         //set the resource handler with the correct filename
         NSString *requestedFilename = [self.items objectAtIndex:index];
-        _filenameResourceHandler.filename = requestedFilename;
+        self.labelsResourceHandler.filename = requestedFilename;
         
         //construct the view
         requestedView = [[TagImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
-        requestedView.image = [_filenameResourceHandler getImage];
-        requestedView.tagView.boxes = [_filenameResourceHandler getBoxes];
+        requestedView.image = [self.labelsResourceHandler getImage];
+        requestedView.tagView.boxes = [self.labelsResourceHandler getBoxes];
         
-        //restore the |_filenameResourceHandler|
-        _filenameResourceHandler.filename = self.filename;
+        //restore the |self.labelsResourceHandler|
+        self.labelsResourceHandler.filename = self.filename;
         
         //store the view in the dictionary
         [_viewsForScrollDictionary setObject:requestedView forKey:[NSNumber numberWithInt:index]];
@@ -515,7 +514,7 @@
     self.title = [NSString stringWithFormat:@"%d of %d", currentIndex + 1, self.items.count];
     
     self.filename = [self.items objectAtIndex:currentIndex];
-    _filenameResourceHandler.filename = self.filename;
+    self.labelsResourceHandler.filename = self.filename;
     
     //hook current view with the delegate
     self.tagImageView = [_viewsForScrollDictionary objectForKey:[NSNumber numberWithInt:currentIndex]];
@@ -523,7 +522,7 @@
     
     //check if boxes not saved on the server
     [self.sendButton setEnabled:YES];
-    if (_filenameResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
+    if (self.labelsResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
     
     [self.view setNeedsDisplay];
 }
@@ -578,18 +577,18 @@
     [self.sendButton setEnabled:NO];
     [self.deleteButton setEnabled:NO];
     
-    _filenameResourceHandler.boxesNotSent = 0;
+    self.labelsResourceHandler.boxesNotSent = 0;
 }
 
 -(void)photoNotOnServer:(NSString *)filename
 {
-    NSArray *boxes = [_filenameResourceHandler getBoxes];
+    NSArray *boxes = [self.labelsResourceHandler getBoxes];
     if (boxes != nil) {
         for (int i=0; i<boxes.count; i++)
             [[boxes objectAtIndex:i] setSent:NO];
     }
     
-    _filenameResourceHandler.boxesNotSent = boxes.count;
+    self.labelsResourceHandler.boxesNotSent = boxes.count;
     
     [self sendAction:self.sendButton];
 }
@@ -602,8 +601,8 @@
     CGPoint point = CGPointMake(self.tagImageView.image.size.width/self.tagImageView.tagView.frame.size.width, self.tagImageView.image.size.height/self.tagImageView.tagView.frame.size.height);
     
     NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.tagImageView.tagView.boxes];
-    NSString *boxesPath = [_filenameResourceHandler getBoxesPath];
-    if ([_filenameResourceHandler imageNotSent])
+    NSString *boxesPath = [self.labelsResourceHandler getBoxesPath];
+    if ([self.labelsResourceHandler imageNotSent])
         [sConnection sendPhoto:self.tagImageView.image filename:self.filename path:boxesPath withSize:point andAnnotation:boxes];
     else [sConnection updateAnnotationFrom:self.filename withSize:point :boxes];
 }

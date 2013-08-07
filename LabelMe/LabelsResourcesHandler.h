@@ -11,7 +11,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface FilenameResourcesHandler : NSObject
+@interface LabelsResourcesHandler : NSObject
 
 @property (nonatomic, strong) NSString *filename;
 @property int boxesNotSent;

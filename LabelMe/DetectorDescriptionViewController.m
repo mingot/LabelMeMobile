@@ -32,12 +32,29 @@
 
 @interface DetectorDescriptionViewController()
 {
-    SelectionHandler *_selectionHandler;
     BOOL *_isFirstTraining;
 }
 
-
+@property (strong, nonatomic) SelectionHandler *selectionHandler;
+@property (strong, nonatomic) UIBarButtonItem *editButton;
+@property (strong, nonatomic) SendingView *sendingView;
 @property (strong, nonatomic) UIImage *averageImage;
+@property (strong, nonatomic) Detector *previousDetector; //to undo
+
+@property (strong, nonatomic) UIBarButtonItem *executeButtonBar;
+@property (strong, nonatomic) UIBarButtonItem *trainButtonBar;
+@property (strong, nonatomic) UIBarButtonItem *infoButtonBar;
+@property (strong, nonatomic) UIBarButtonItem *undoButtonBar;
+
+//array with the properties to show in the description
+@property (strong, nonatomic) NSMutableArray *detectorProperties;
+
+
+- (IBAction)executeAction:(id)sender;
+- (IBAction)trainAction:(id)sender;
+- (IBAction)infoAction:(id)sender;
+- (IBAction)undoAction:(id)sender;
+- (IBAction)saveAction:(id)sender;
 
 // wrapper to call the detector for training and testing
 -(int) trainForImagesNames:(NSArray *)imagesNames;
@@ -45,9 +62,6 @@
 
 //generate a unique id
 - (NSString *)uuid;
-
-// average per pixel image
--(UIImage *) imageAveraging:(NSArray *) images;
 
 //reload the detector images (average and hog) and show info, about the current detector in memory
 - (void) loadDetectorInfo;
@@ -146,7 +160,7 @@
     self.detectorHogView.layer.shadowOffset = CGSizeMake(-1,-1);
 }
 
-- (void)initializeSendingView
+- (void)initializeAndAddSendingView
 {
     //sending view, responsible for the waiting view
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];//self.tabBarController.view.frame];
@@ -164,10 +178,10 @@
     
     self.detector.delegate = self;
     
-    _selectionHandler = [[SelectionHandler alloc] initWithViewController:self andDetecorResourceHandler:self.detectorResourceHandler];
-    _selectionHandler.delegate = self;
+    self.selectionHandler = [[SelectionHandler alloc] initWithViewController:self andDetecorResourceHandler:self.detectorResourceHandler];
+    self.selectionHandler.delegate = self;
     
-    self.scrollView.contentSize = self.showView.frame.size;
+    self.scrollView.contentSize = self.containerView.frame.size;
     
     //controllers
     self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
@@ -180,13 +194,14 @@
     
     [self initializeImageViews];
     [self initializeBottomToolbar];
-    [self initializeSendingView];
+    [self initializeAndAddSendingView];
     
     //Check if the detector exists.
-    if(self.detector.weights == nil){
+    if(self.detector == nil){
         NSLog(@"New detector");
+        self.detector = [[Detector alloc] init];
         _isFirstTraining = YES;
-        [_selectionHandler addNewDetector];
+        [self.selectionHandler addNewDetector];
         
     }else NSLog(@"Loading detector: %@", self.detector.name);
     
@@ -225,7 +240,7 @@
 
 - (IBAction)trainAction:(id)sender
 {    
-    [_selectionHandler selectTrainingImages];
+    [self.selectionHandler selectTrainingImages];
     
     //let's wait for the SelectionHandlerDelegate answer to begin the training
 }
@@ -283,8 +298,9 @@
           andTrainingImagesNames:(NSArray *)trainingImagesNames
               andTestImagesNames:(NSArray *)testImagesNames
 {
-    //TODO: check if correct
-    if(self.detector.targetClasses == nil){ //first time training
+    
+    //first time training specify name of the detector
+    if(self.detector.targetClasses == nil){
         self.detector.targetClasses = classes;
         NSString *className = [self.detector.targetClasses componentsJoinedByString:@"+"];
         self.detector.name = [NSString stringWithFormat:@"%@-Detector",className];
@@ -368,7 +384,7 @@
 }
 
 #pragma mark -
-#pragma mark detectorDelegate
+#pragma mark DetectorDelegate
 
 
 -(void) sendMessage:(NSString *)message
@@ -394,16 +410,7 @@
 }
 
 #pragma mark -
-#pragma mark Memory Management
-
--(void) didReceiveMemoryWarning
-{
-    NSLog(@"Memory warning received!!!");
-    [super didReceiveMemoryWarning];
-}
-
-#pragma mark -
-#pragma mark Table View
+#pragma mark Table View Delegate and Datasource
 
 - (NSInteger)tableView:(UITableView *)tableView  numberOfRowsInSection:(NSInteger)section
 {
@@ -466,6 +473,41 @@
 }
 
 #pragma mark -
+#pragma mark UITextFieldDelegate
+
+-(BOOL) textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+	NSString *text = [[textField text] stringByReplacingCharactersInRange:range withString:string];
+	NSIndexPath *indexPath = [self.descriptionTableView indexPathForFirstResponder];
+	UITableViewCell *cell = [self.descriptionTableView cellForRowAtIndexPath:indexPath];
+    
+	if([cell.textLabel.text isEqualToString:@"Name"]) self.detector.name = text;
+    
+	return YES;
+}
+
+-(BOOL) textFieldShouldReturn:(UITextField *)textField
+{
+    [self.delegate updateDetector:self.detector];
+    [textField resignFirstResponder];
+    self.detectorProperties = nil;
+    self.title = self.detector.name;
+    [self.descriptionTableView reloadData];
+	return YES;
+}
+
+
+#pragma mark -
+#pragma mark Memory Management
+
+-(void) didReceiveMemoryWarning
+{
+    NSLog(@"Memory warning received!!!");
+    [super didReceiveMemoryWarning];
+}
+
+
+#pragma mark -
 #pragma mark Keyboard Events
 
 -(void)keyboardDidShow:(NSNotification *)notif
@@ -494,30 +536,6 @@
 {
     self.scrollView.scrollEnabled = NO;
     self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, self.scrollView.frame.size.width, self.view.frame.size.height);
-}
-
-#pragma mark - 
-#pragma mark UITextFieldDelegate
-
--(BOOL) textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
-{
-	NSString *text = [[textField text] stringByReplacingCharactersInRange:range withString:string];
-	NSIndexPath *indexPath = [self.descriptionTableView indexPathForFirstResponder];
-	UITableViewCell *cell = [self.descriptionTableView cellForRowAtIndexPath:indexPath];
-    
-	if([cell.textLabel.text isEqualToString:@"Name"]) self.detector.name = text;
-    
-	return YES;
-}
-
--(BOOL) textFieldShouldReturn:(UITextField *)textField
-{
-    [self.delegate updateDetector:self.detector];
-    [textField resignFirstResponder];
-    self.detectorProperties = nil;
-    self.title = self.detector.name;
-    [self.descriptionTableView reloadData];
-	return YES;
 }
 
 #pragma mark -
@@ -589,8 +607,8 @@
 - (void)viewDidUnload {
     [self setDescriptionTableView:nil];
     [self setScrollView:nil];
-    [self setShowView:nil];
-    [self setShowView:nil];
+    [self setContainerView:nil];
+    [self setContainerView:nil];
     [super viewDidUnload];
 }
 @end

@@ -15,6 +15,7 @@
 #import "DetectorResourceHandler.h"
 #import "SelectionHandler.h"
 
+
 @protocol DetectorDescriptionViewControllerDelegate <NSObject>
 
 - (void) updateDetector:(Detector *)updatedDetector;
@@ -22,45 +23,39 @@
 @end
 
 
+/*
+ 
+ Class  Responsabilities:
+ 
+ - Manage actions of the bottom bar:
+ - Call ExecuteDetectorVC
+ - Train the detector
+ - Undo to last train
+ - Show info about the detector
+ - Show and handle the introduction of data in the table view
+ - Show/Hide keyboard and move view to not hide text input area
+ 
+ 
+ */
 
 @interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,DetectorDelegate, UIAlertViewDelegate, UITableViewDelegate,UITableViewDataSource, UITextFieldDelegate, ExecuteDetectorViewControllerDelegate, SelectionHandlerDelegate>
 
+
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
-
+@property (strong, atomic) DetectorResourceHandler *detectorResourceHandler;
 @property (strong, nonatomic) ExecuteDetectorViewController *executeController;
-@property (strong, nonatomic) SendingView *sendingView;
-
-//array with the properties to show in the description
-@property (strong, nonatomic) NSMutableArray *detectorProperties;
 @property (strong, nonatomic) Detector *detector;
-@property (strong, nonatomic) Detector *previousDetector; //to undo
 
 //views
 @property (weak, nonatomic) IBOutlet UIImageView *detectorView;
 @property (weak, nonatomic) IBOutlet UIImageView *detectorHogView;
-@property (strong, nonatomic) UIBarButtonItem *editButton;
 @property (weak, nonatomic) IBOutlet UITableView *descriptionTableView;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView; //for hide/show keyboard
-@property (weak, nonatomic) IBOutlet UIView *showView;
+@property (weak, nonatomic) IBOutlet UIView *containerView; //container for hide/show keyboard
 
 //bottom toolbar
 @property (weak, nonatomic) IBOutlet UIToolbar *bottomToolbar;
-@property (strong, nonatomic) UIBarButtonItem *executeButtonBar;
-@property (strong, nonatomic) UIBarButtonItem *trainButtonBar;
-@property (strong, nonatomic) UIBarButtonItem *infoButtonBar;
-@property (strong, nonatomic) UIBarButtonItem *undoButtonBar;
 
-//useful information
-@property (strong, atomic) DetectorResourceHandler *detectorResourceHandler;
-@property (strong, nonatomic) NSMutableArray *selectedPositiveImageIndexes;
-@property (strong, nonatomic) NSMutableArray *selectedPostiveImageNames; //to save with the svm
-
-
-- (IBAction)executeAction:(id)sender;
-- (IBAction)trainAction:(id)sender;
-- (IBAction)infoAction:(id)sender;
-- (IBAction)undoAction:(id)sender;
-- (IBAction)saveAction:(id)sender;
 
 
 @end

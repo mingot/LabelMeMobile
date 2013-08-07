@@ -14,6 +14,17 @@
 #import "DetectorResourceHandler.h"
 
 
+/*
+ 
+ Class  Responsabilities:
+ 
+ - Present the current detectors and connect with the DetectorDescriptionVC
+ - Add and delete detecotrs
+ - Choose and execute multiple detectors at the same time
+ 
+ 
+ */
+
 @interface DetectorGalleryViewController : UIViewController <UINavigationControllerDelegate,UITableViewDelegate,UITableViewDataSource,DetectorDescriptionViewControllerDelegate>
 
 //controllers connections
@@ -27,11 +38,6 @@
 //resources
 @property (strong, nonatomic) NSString *username;
 @property (strong, nonatomic) DetectorResourceHandler *detectorResourceHandler;
-
-//top toolbar actions
-- (IBAction) edit:(id)sender;
-- (IBAction) addDetector:(id)sender;
-- (IBAction) executeDetectorsAction:(id)sender;
 
 @end
 

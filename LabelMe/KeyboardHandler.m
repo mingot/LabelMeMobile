@@ -16,6 +16,7 @@
     UIView *_movingView;
     BOOL _moved;
     int _difference;
+    
 }
 
 @end
@@ -23,38 +24,30 @@
 
 @implementation KeyboardHandler
 
--(id) initWithView:(UIView *)movingView
+#pragma mark -
+#pragma mark Initialization
+
+- (id)initWithView:(UIView *)movingView
 {
     if (self = [super init]) {
         _movingView = movingView;
         
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(keyboardWillShow:)
-                                                     name:UIKeyboardWillShowNotification
-                                                   object:nil];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(keyboardWillHide:)
-                                                     name:UIKeyboardWillHideNotification
-                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     }
     return self;
 }
 
 
--(void)dealloc
+- (void)dealloc
 {
     // unregister for keyboard notifications while not visible.
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIKeyboardWillShowNotification
-                                                  object:nil];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIKeyboardWillHideNotification
-                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
+#pragma mark -
+#pragma mark Moving view
 
 -(void)keyboardWillShow:(NSNotification *)notification
 {
@@ -94,48 +87,11 @@
     [UIView commitAnimations];
 }
 
+
+
+
 @end
 
 
-// GENERAL CASE when we have a UIScrollView
 
-//- (void) keyboardDidShow:(NSNotification *)notif
-//{
-//    self.tagView.userInteractionEnabled = NO;
-//    [self.scrollView setScrollEnabled:YES];
-//    [self.labelsView setHidden:YES];
-//    [self.labelsButton setSelected:NO];
-//	if (keyboardVisible) return;
-//
-//	// Get the origin of the keyboard when it finishes animating
-//	NSDictionary *info = [notif userInfo];
-//	NSValue *aValue = [info objectForKey:UIKeyboardFrameEndUserInfoKey];
-//
-//	// Get the top of the keyboard in view's coordinate system.
-//	// We need to set the bottom of the scrollview to line up with it
-//
-//	CGRect keyboardRect = [aValue CGRectValue];
-//    keyboardRect = [self.view convertRect:keyboardRect fromView:nil];
-//	CGFloat keyboardTop = keyboardRect.origin.y;
-//    CGRect viewFrame = self.scrollView.frame;
-//	viewFrame.size.height = keyboardTop;
-//
-//	self.scrollView.frame = viewFrame;
-//
-////    [self.scrollView scrollRectToVisible:self.label.frame animated:YES];
-//	keyboardVisible = YES;
-//}
-//
-//- (void) keyboardDidHide:(NSNotification *)notif
-//{
-//    [self.scrollView setScrollEnabled:NO];
-//
-//	if (!keyboardVisible)
-//		return;
-//
-//    self.scrollView.frame = CGRectMake(0,0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
-//
-//	keyboardVisible = NO;
-//    self.tagView.userInteractionEnabled=YES;
-//}
 

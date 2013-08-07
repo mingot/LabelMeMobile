@@ -22,8 +22,6 @@
 
 - (id) initWithDetectors:(NSArray *) detectors forNumPyramids:(int) numPyramids;
 
-
-//
 - (void) constructPyramidForImage:(UIImage *)image withOrientation:(int)orientation;
 
 

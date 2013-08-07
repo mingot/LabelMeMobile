@@ -161,7 +161,7 @@
 		FC447A8C17A99FC6004AA88B /* LabelMeLogicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A8B17A99FC6004AA88B /* LabelMeLogicTests.m */; };
 		FC447A9417A9E30C004AA88B /* TagImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A9317A9E30B004AA88B /* TagImageView.m */; };
 		FC447A9717AB4F2E004AA88B /* KeyboardHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A9617AB4F2E004AA88B /* KeyboardHandler.m */; };
-		FC447A9A17AC1412004AA88B /* FilenameResourcesHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A9917AC1411004AA88B /* FilenameResourcesHandler.m */; };
+		FC447A9A17AC1412004AA88B /* LabelsResourcesHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A9917AC1411004AA88B /* LabelsResourcesHandler.m */; };
 		FC447A9D17AC7571004AA88B /* InfiniteLoopView.m in Sources */ = {isa = PBXBuildFile; fileRef = FC447A9C17AC7571004AA88B /* InfiniteLoopView.m */; };
 		FC4B0A2C172EC0C200A099A0 /* switch_camera.png in Resources */ = {isa = PBXBuildFile; fileRef = FC4B0A2B172EC0C200A099A0 /* switch_camera.png */; };
 		FC4C5E1D174D63D100D26331 /* UIImage+Rotation.m in Sources */ = {isa = PBXBuildFile; fileRef = FC4C5E1C174D63D100D26331 /* UIImage+Rotation.m */; };
@@ -193,6 +193,7 @@
 		FC8359A617B1CF380035A833 /* BoundingBox.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359A517B1CF380035A833 /* BoundingBox.m */; };
 		FC8359A917B1FDCE0035A833 /* UIImage+ImageAveraging.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359A817B1FDCE0035A833 /* UIImage+ImageAveraging.m */; };
 		FC8359AC17B201900035A833 /* SendingView+DetectorDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359AB17B201900035A833 /* SendingView+DetectorDescription.m */; };
+		FC8359AF17B2C40D0035A833 /* CameraVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359AE17B2C40C0035A833 /* CameraVideoViewController.m */; };
 		FC8E89B1173930340018876D /* UIImage+Border.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B0173930340018876D /* UIImage+Border.m */; };
 		FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B51739876D0018876D /* ModalSectionsTVC.m */; };
 		FC8E89B81739876D0018876D /* ModalSectionsTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */; };
@@ -437,8 +438,8 @@
 		FC447A9317A9E30B004AA88B /* TagImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagImageView.m; sourceTree = "<group>"; };
 		FC447A9517AB4F2D004AA88B /* KeyboardHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyboardHandler.h; sourceTree = "<group>"; };
 		FC447A9617AB4F2E004AA88B /* KeyboardHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyboardHandler.m; sourceTree = "<group>"; };
-		FC447A9817AC1411004AA88B /* FilenameResourcesHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilenameResourcesHandler.h; sourceTree = "<group>"; };
-		FC447A9917AC1411004AA88B /* FilenameResourcesHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilenameResourcesHandler.m; sourceTree = "<group>"; };
+		FC447A9817AC1411004AA88B /* LabelsResourcesHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelsResourcesHandler.h; sourceTree = "<group>"; };
+		FC447A9917AC1411004AA88B /* LabelsResourcesHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabelsResourcesHandler.m; sourceTree = "<group>"; };
 		FC447A9B17AC7570004AA88B /* InfiniteLoopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InfiniteLoopView.h; sourceTree = "<group>"; };
 		FC447A9C17AC7571004AA88B /* InfiniteLoopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InfiniteLoopView.m; sourceTree = "<group>"; };
 		FC4B0A2B172EC0C200A099A0 /* switch_camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switch_camera.png; sourceTree = "<group>"; };
@@ -484,6 +485,8 @@
 		FC8359A817B1FDCE0035A833 /* UIImage+ImageAveraging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageAveraging.m"; sourceTree = "<group>"; };
 		FC8359AA17B2018F0035A833 /* SendingView+DetectorDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SendingView+DetectorDescription.h"; sourceTree = "<group>"; };
 		FC8359AB17B201900035A833 /* SendingView+DetectorDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SendingView+DetectorDescription.m"; sourceTree = "<group>"; };
+		FC8359AD17B2C40C0035A833 /* CameraVideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraVideoViewController.h; sourceTree = "<group>"; };
+		FC8359AE17B2C40C0035A833 /* CameraVideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraVideoViewController.m; sourceTree = "<group>"; };
 		FC8E89AF173930340018876D /* UIImage+Border.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Border.h"; sourceTree = "<group>"; };
 		FC8E89B0173930340018876D /* UIImage+Border.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Border.m"; sourceTree = "<group>"; };
 		FC8E89B41739876D0018876D /* ModalSectionsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSectionsTVC.h; sourceTree = "<group>"; };
@@ -864,8 +867,8 @@
 		FC5C93B716FD014200637B69 /* Detector */ = {
 			isa = PBXGroup;
 			children = (
-				FC83599B17B094750035A833 /* DetectorResourceHandler.h */,
-				FC83599C17B094750035A833 /* DetectorResourceHandler.m */,
+				FC8359AD17B2C40C0035A833 /* CameraVideoViewController.h */,
+				FC8359AE17B2C40C0035A833 /* CameraVideoViewController.m */,
 				FC5C93A316FCE39F00637B69 /* DetectorGalleryViewController.h */,
 				FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */,
 				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
@@ -877,18 +880,20 @@
 				FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */,
 				FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */,
 				FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */,
+				FC83599B17B094750035A833 /* DetectorResourceHandler.h */,
+				FC83599C17B094750035A833 /* DetectorResourceHandler.m */,
 				FCED895B17034CAF0027CBE1 /* DetectView.h */,
 				FCED895C17034CAF0027CBE1 /* DetectView.m */,
 				FCED896117034CD70027CBE1 /* ConvolutionHelper.h */,
 				FCED896217034CD70027CBE1 /* ConvolutionHelper.m */,
-				FC8359A417B1CF380035A833 /* BoundingBox.h */,
-				FC8359A517B1CF380035A833 /* BoundingBox.m */,
 				FCED895E17034CCA0027CBE1 /* Detector.h */,
 				FCED895F17034CCA0027CBE1 /* Detector.mm */,
 				FC74F8D1174A54FE004701CC /* Pyramid.h */,
 				FC74F8D2174A54FE004701CC /* Pyramid.m */,
 				FCC9FAFA170F6CF4009B7FC6 /* TrainingSet.h */,
 				FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */,
+				FC8359A417B1CF380035A833 /* BoundingBox.h */,
+				FC8359A517B1CF380035A833 /* BoundingBox.m */,
 			);
 			name = Detector;
 			sourceTree = "<group>";
@@ -934,8 +939,8 @@
 		FC9F947F173AE3910004598C /* Image Gallery */ = {
 			isa = PBXGroup;
 			children = (
-				FC447A9817AC1411004AA88B /* FilenameResourcesHandler.h */,
-				FC447A9917AC1411004AA88B /* FilenameResourcesHandler.m */,
+				FC447A9817AC1411004AA88B /* LabelsResourcesHandler.h */,
+				FC447A9917AC1411004AA88B /* LabelsResourcesHandler.m */,
 				A5CAAF4E16163A870095D703 /* GalleryViewController.h */,
 				A5CAAF4F16163A870095D703 /* GalleryViewController.m */,
 				A5CAAF5016163A870095D703 /* GalleryViewController_iPhone.xib */,
@@ -1465,7 +1470,7 @@
 				FCB97DC0175FDBC2007B5AEE /* CustomUITableViewCell.m in Sources */,
 				FC447A9417A9E30C004AA88B /* TagImageView.m in Sources */,
 				FC447A9717AB4F2E004AA88B /* KeyboardHandler.m in Sources */,
-				FC447A9A17AC1412004AA88B /* FilenameResourcesHandler.m in Sources */,
+				FC447A9A17AC1412004AA88B /* LabelsResourcesHandler.m in Sources */,
 				FC447A9D17AC7571004AA88B /* InfiniteLoopView.m in Sources */,
 				FC83599D17B094750035A833 /* DetectorResourceHandler.m in Sources */,
 				FC8359A017B134BF0035A833 /* UIViewController+ShowAlert.m in Sources */,
@@ -1473,6 +1478,7 @@
 				FC8359A617B1CF380035A833 /* BoundingBox.m in Sources */,
 				FC8359A917B1FDCE0035A833 /* UIImage+ImageAveraging.m in Sources */,
 				FC8359AC17B201900035A833 /* SendingView+DetectorDescription.m in Sources */,
+				FC8359AF17B2C40D0035A833 /* CameraVideoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

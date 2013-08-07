@@ -46,7 +46,10 @@
 // VC needed to push the modalsVC
 - (id)initWithViewController:(UIViewController *)viewController andDetecorResourceHandler:(DetectorResourceHandler *) detectorResourceHandler;
 
+// Show modalTVC with (1st) classes to select and (2nd) images to select for training set
 - (void) addNewDetector;
+
+// Show modalTVC for selecting the images for the training set
 - (void) selectTrainingImages;
 
 

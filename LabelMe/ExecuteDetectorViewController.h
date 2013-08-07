@@ -31,24 +31,13 @@
 
 
 @interface ExecuteDetectorViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate>
-{
-    //settings
-    int numMax;
-    BOOL isUsingFrontFacingCamera;
-}
+
 
 @property (nonatomic, strong) id<ExecuteDetectorViewControllerDelegate> delegate;
 
 //model properties
 @property (nonatomic,strong) NSArray *detectors;
-@property int numPyramids;
-@property double maxDetectionScore;
-@property (nonatomic, strong) Pyramid *hogPyramid;
 
-//AVCapture
-@property (nonatomic, strong) AVCaptureSession *captureSession;
-@property (nonatomic, strong) AVCaptureVideoPreviewLayer *prevLayer;
-@property (nonatomic, strong) AVCaptureVideoDataOutput *captureOutput;
 
 //self views
 @property (nonatomic, weak) IBOutlet UIImageView *HOGimageView;
@@ -59,14 +48,10 @@
 @property (weak, nonatomic) IBOutlet AYUIButton *switchButton;
 @property (weak, nonatomic) IBOutlet UITableView *settingsTableView;
 
-
 //info label
 @property (weak, nonatomic) IBOutlet UILabel *infoLabel;
 
 
-
-//settings view
-@property (weak, nonatomic) IBOutlet UIView *settingsView;
 - (IBAction)showSettingsAction:(id)sender;
 - (IBAction)cancelAction:(id)sender;
 - (IBAction)switchCameras:(id)sender;

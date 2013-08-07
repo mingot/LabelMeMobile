@@ -31,6 +31,12 @@
 @property (strong, nonatomic) UIBarButtonItem *deleteButton;
 @property (strong, nonatomic) UIBarButtonItem *executeButton;
 
+
+//top toolbar actions
+- (IBAction) edit:(id)sender;
+- (IBAction) addDetector:(id)sender;
+- (IBAction) executeDetectorsAction:(id)sender;
+
 //reload delete and execute buttons whenever needed
 - (void) reloadToolbarButtons;
 
@@ -207,29 +213,9 @@
     NSArray *availableObjectClasses = [self.detectorResourceHandler getObjectClassesNames];
     NSArray *availableTrainingImages = [self.detectorResourceHandler getTrainingImages];
     
-    if(availableTrainingImages.count == 0){
-
-        [self showAlertWithTitle:@"Empty" andDescription:@"No images to learn from"];
-        
-        
-    }else if(availableObjectClasses.count == 0){
-
-        [self showAlertWithTitle:@"Empty" andDescription:@"No labels found"];
-        
-        
-    }else{
-        Detector *newDetector = [[Detector alloc] init];
-        newDetector.name = @"New Detector";
-        self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
-        self.detectorController.hidesBottomBarWhenPushed = YES;
-        self.detectorController.delegate = self;
-        self.detectorController.detector = newDetector;
-        self.detectorController.view = nil; //to reexecute viewDidLoad
-        self.detectorController.detectorResourceHandler = self.detectorResourceHandler;
-        [self.navigationController pushViewController:self.detectorController animated:YES];
-    }
-    
-    
+    if(availableTrainingImages.count == 0) [self showAlertWithTitle:@"Empty" andDescription:@"No images to learn from"];
+    else if(availableObjectClasses.count == 0) [self showAlertWithTitle:@"Empty" andDescription:@"No labels found"];
+    else [self callDetectorDescriptionControllerWithDetctor:nil];
 }
 
 - (IBAction)executeDetectorsAction:(id)sender
@@ -303,14 +289,8 @@
         NSArray* reversedDetectors = [[self.detectors reverseObjectEnumerator] allObjects];
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
         _selectedRow = self.detectors.count - indexPath.row - 1;
-        self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
-        self.detectorController.hidesBottomBarWhenPushed = YES;
-        self.detectorController.delegate = self;
-        self.detectorController.detector = [reversedDetectors objectAtIndex:indexPath.row];
-        self.detectorController.view = nil; //to reexecute viewDidLoad
-        self.detectorController.detectorResourceHandler = self.detectorResourceHandler;
-        
-        [self.navigationController pushViewController:self.detectorController animated:YES];
+        Detector *detector = [reversedDetectors objectAtIndex:indexPath.row];
+        [self callDetectorDescriptionControllerWithDetctor:detector];
     
     }else{
         NSNumber *index = [NSNumber numberWithInt:self.detectors.count - indexPath.row - 1]; //index according to reversed order
@@ -356,6 +336,18 @@
     self.deleteButton.enabled = self.selectedItems.count > 0 ? YES:NO;
     self.executeButton.enabled = self.selectedItems.count > 0 ? YES:NO;
 
+}
+
+- (void) callDetectorDescriptionControllerWithDetctor:(Detector *)detector
+{
+    self.detectorController = [[DetectorDescriptionViewController alloc] initWithNibName:@"DetectorDescriptionViewController" bundle:nil];
+    self.detectorController.hidesBottomBarWhenPushed = YES;
+    self.detectorController.delegate = self;
+    self.detectorController.detector = detector;
+//    self.detectorController.view = nil; //to reexecute viewDidLoad
+    self.detectorController.detectorResourceHandler = self.detectorResourceHandler;
+    
+    [self.navigationController pushViewController:self.detectorController animated:YES];
 }
 
 @end

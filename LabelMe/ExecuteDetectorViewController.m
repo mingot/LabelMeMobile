@@ -16,16 +16,26 @@
 
 @interface ExecuteDetectorViewController()
 {
-    float fpsToShow;
-    int num;
+    float _fpsToShow;
+    int _num;
+    int _numMax;
+    BOOL _isUsingFrontCamera;
+    
+    int _numPyramids;
+    double _maxDetectionScore;
+    
+    //states to show
+    BOOL _score;
+    BOOL _fps;
+    BOOL _scale;
+    BOOL _hog;
+    
+    AVCaptureSession *_captureSession;
+    AVCaptureVideoPreviewLayer *_prevLayer;
+    AVCaptureVideoDataOutput *_captureOutput;
 }
 
-//states to show
-@property BOOL score;
-@property BOOL fps;
-@property BOOL scale;
-@property BOOL hog;
-
+@property (nonatomic, strong) Pyramid *hogPyramid;
 @property (strong, nonatomic) NSArray *settingsStrings;
 @property (strong, nonatomic) NSMutableArray *initialDetectionThresholds; //initial threshold for mutliclass threshold sweeping
 @property (strong, nonatomic) NSArray *colors; //static array of colors to assign to multiple detectors
@@ -36,18 +46,6 @@
 
 
 @implementation ExecuteDetectorViewController
-
-
-@synthesize detectors = _detectors;
-@synthesize numPyramids = _numPyramids;
-@synthesize maxDetectionScore = _maxDetectionScore;
-@synthesize captureSession = _captureSession;
-@synthesize prevLayer = _prevLayer;
-@synthesize HOGimageView = _HOGimageView;
-@synthesize detectView = _detectView;
-@synthesize detectionThresholdSliderButton = _detectionThresholdSliderButton;
-
-
 
 
 #pragma mark -
@@ -102,9 +100,9 @@
     self.infoLabel.numberOfLines = 0;
     
     
-    isUsingFrontFacingCamera = NO;
-    fpsToShow = 0.0;
-    num = 0;
+    _isUsingFrontCamera = NO;
+    _fpsToShow = 0.0;
+    _num = 0;
     self.title = @"Detector";
     
     //slider
@@ -137,9 +135,9 @@
     
     
     //Initialization of model properties
-    numMax = 1;
-    self.numPyramids = 15;
-    self.maxDetectionScore = -0.9;
+    _numMax = 1;
+    _numPyramids = 15;
+    _maxDetectionScore = -0.9;
     
     // ********  CAMERA CAPUTRE  ********
     //Capture input specifications
@@ -148,12 +146,12 @@
 										  error:nil];
     
     //Capture output specifications
-	self.captureOutput = [[AVCaptureVideoDataOutput alloc] init];
-	self.captureOutput.alwaysDiscardsLateVideoFrames = YES;
+	_captureOutput = [[AVCaptureVideoDataOutput alloc] init];
+	_captureOutput.alwaysDiscardsLateVideoFrames = YES;
 	
     // Output queue setting (for receiving captures from AVCaptureSession delegate)
 	dispatch_queue_t queue = dispatch_queue_create("cameraQueue", NULL);
-	[self.captureOutput setSampleBufferDelegate:self queue:queue];
+	[_captureOutput setSampleBufferDelegate:self queue:queue];
 	dispatch_release(queue);
     
     // Set the video output to store frame in BGRA (It is supposed to be faster)
@@ -161,22 +159,22 @@
                                    dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA],
                                    kCVPixelBufferPixelFormatTypeKey,
                                    nil];
-	[self.captureOutput setVideoSettings:videoSettings];
+	[_captureOutput setVideoSettings:videoSettings];
     
     
     //Capture session definition
-	self.captureSession = [[AVCaptureSession alloc] init];
-	[self.captureSession addInput:captureInput];
-	[self.captureSession addOutput:self.captureOutput];
-    [self.captureSession setSessionPreset:AVCaptureSessionPresetMedium];
+	_captureSession = [[AVCaptureSession alloc] init];
+	[_captureSession addInput:captureInput];
+	[_captureSession addOutput:_captureOutput];
+    [_captureSession setSessionPreset:AVCaptureSessionPresetMedium];
     
     // Previous layer to show the video image
-	self.prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
-	self.prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-	[self.view.layer addSublayer: self.prevLayer];
+	_prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:_captureSession];
+	_prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+	[self.view.layer addSublayer: _prevLayer];
     
     // Add subviews in front of  the prevLayer
-    self.detectView.prevLayer = self.prevLayer;
+    self.detectView.prevLayer = _prevLayer;
     [self.view addSubview:self.HOGimageView];
     [self.view addSubview:self.detectView];
 }
@@ -189,13 +187,13 @@
 - (void) viewDidAppear:(BOOL)animated
 {
     //set the frame here after all the navigation tabs have been uploaded and we have the definite frame size
-    self.prevLayer.frame = self.detectView.frame;
+    _prevLayer.frame = self.detectView.frame;
     
     //reset the pyramid with the new detectors
-    self.hogPyramid = [[Pyramid alloc] initWithDetectors:self.detectors forNumPyramids:self.numPyramids];
+    self.hogPyramid = [[Pyramid alloc] initWithDetectors:self.detectors forNumPyramids:_numPyramids];
     
     //Start the capture
-    [self.captureSession startRunning];
+    [_captureSession startRunning];
     
     //Fix Orientation
     [self adaptToPhoneOrientation:[[UIDevice currentDevice] orientation]];
@@ -213,7 +211,7 @@
 
 -(void)viewDidDisappear:(BOOL)animated
 {
-    [self.captureSession stopRunning];
+    [_captureSession stopRunning];
     [self.detectView reset];
 }
 
@@ -278,7 +276,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             float detectionThreshold = -1 + 2*detector.detectionThreshold.floatValue;
             [nmsArray addObject:[detector detect:image
                                       minimumThreshold:detectionThreshold
-                                              pyramids:self.numPyramids
+                                              pyramids:_numPyramids
                                               usingNms:YES
                                      deviceOrientation:orientation
                                     learningImageIndex:0]];
@@ -314,7 +312,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         float scoreFloat = -1;        
         
         //Put the HOG picture on screen
-        if (self.hog){
+        if (_hog){
             UIImage *image = [ [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight] scaleImageTo:230/480.0] convertToHogImage];
             [self.HOGimageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:YES];
         }
@@ -324,12 +322,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         CGImageRelease(imageRef);
         
         //update label with the current FPS
-        fpsToShow = (fpsToShow*num + -1.0/[start timeIntervalSinceNow])/(num+1);
-        num++;
+        _fpsToShow = (_fpsToShow*_num + -1.0/[start timeIntervalSinceNow])/(_num+1);
+        _num++;
         NSMutableString *screenLabelText = [[NSMutableString alloc] initWithString:@""];
-        if(self.score) [screenLabelText appendString:[NSString stringWithFormat:@"score:%.2f\n", scoreFloat]];
-        if(self.fps) [screenLabelText appendString: [NSString stringWithFormat:@"FPS: %.1f\n",-1.0/[start timeIntervalSinceNow]]];
-        if(self.scale) [screenLabelText appendString: [NSString stringWithFormat:@"scale: %d\n",level]];
+        if(_score) [screenLabelText appendString:[NSString stringWithFormat:@"score:%.2f\n", scoreFloat]];
+        if(_fps) [screenLabelText appendString: [NSString stringWithFormat:@"FPS: %.1f\n",-1.0/[start timeIntervalSinceNow]]];
+        if(_scale) [screenLabelText appendString: [NSString stringWithFormat:@"scale: %d\n",level]];
         [self.infoLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithString:screenLabelText] waitUntilDone:YES];
 //        dispatch_sync(dispatch_get_main_queue(), ^{
 //            self.infoLabel.text = screenLabelText;
@@ -383,12 +381,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 -(void) setNumMaximums:(BOOL) value
 {
-    numMax = value ? 10 : 1;
+    _numMax = value ? 10 : 1;
 }
 
 - (void) setNumPyramidsFromDelegate: (double) value
 {
-    self.numPyramids = (int) value;
+    _numPyramids = (int) value;
 }
 
 #pragma mark -
@@ -447,35 +445,34 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 - (IBAction)switchCameras:(id)sender
 
 {
-    AVCaptureDevicePosition desiredPosition = isUsingFrontFacingCamera ? AVCaptureDevicePositionBack : AVCaptureDevicePositionFront;
+    AVCaptureDevicePosition desiredPosition = _isUsingFrontCamera ? AVCaptureDevicePositionBack : AVCaptureDevicePositionFront;
     
     for (AVCaptureDevice *d in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
         if ([d position] == desiredPosition) {
-            [[self.prevLayer session] beginConfiguration];
+            [[_prevLayer session] beginConfiguration];
             AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:d error:nil];
-            for (AVCaptureInput *oldInput in [[self.prevLayer session] inputs])
-                [[self.prevLayer session] removeInput:oldInput];
+            for (AVCaptureInput *oldInput in [[_prevLayer session] inputs])
+                [[_prevLayer session] removeInput:oldInput];
             
-            [[self.prevLayer session] addInput:input];
-            [[self.prevLayer session] commitConfiguration];
+            [[_prevLayer session] addInput:input];
+            [[_prevLayer session] commitConfiguration];
             break;
         }
     }
-    isUsingFrontFacingCamera = !isUsingFrontFacingCamera;
-    self.detectView.frontCamera = isUsingFrontFacingCamera;
+    _isUsingFrontCamera = !_isUsingFrontCamera;
+    self.detectView.frontCamera = _isUsingFrontCamera;
 }
 
 - (IBAction)switchValueDidChange:(UISwitch *)sw
 {
-    
     NSString *label = [self.settingsStrings objectAtIndex:sw.tag];
     if([label isEqualToString:@"HOG"]){
-        self.hog = sw.on;
-        if(!self.hog) {self.HOGimageView.image = nil; self.HOGimageView.hidden = YES;}
+        _hog = sw.on;
+        if(!_hog) {self.HOGimageView.image = nil; self.HOGimageView.hidden = YES;}
         else self.HOGimageView.hidden = NO;}
-    else if([label isEqualToString:@"FPS"]){ self.fps = sw.on;}
-    else if([label isEqualToString:@"Scale"]){ self.scale = sw.on;}
-    else if([label isEqualToString:@"Score"]){ self.score = sw.on;}
+    else if([label isEqualToString:@"FPS"]){ _fps = sw.on;}
+    else if([label isEqualToString:@"Scale"]){ _scale = sw.on;}
+    else if([label isEqualToString:@"Score"]){ _score = sw.on;}
 }
 
 
@@ -526,8 +523,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 - (void) adaptToPhoneOrientation:(UIDeviceOrientation) orientation
 {
     [CATransaction begin];
-    self.prevLayer.orientation = orientation;
-    self.prevLayer.frame = self.view.frame;
+    _prevLayer.orientation = orientation;
+    _prevLayer.frame = self.view.frame;
     [CATransaction commit];
 }
 
@@ -545,5 +542,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 {
     self.takePicture = YES;
 }
+
 @end
 

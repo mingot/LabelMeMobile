@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 CSAIL. All rights reserved.
 //
 
-#import "FilenameResourcesHandler.h"
+#import "LabelsResourcesHandler.h"
 #import "NSObject+Folders.h"
 
 #define IMAGES 0
@@ -15,7 +15,7 @@
 #define USER 3
 
 
-@interface FilenameResourcesHandler()
+@interface LabelsResourcesHandler()
 {
     NSArray *_paths;
     NSString *_username;
@@ -29,7 +29,7 @@
 @end
 
 
-@implementation FilenameResourcesHandler
+@implementation LabelsResourcesHandler
 
 
 @synthesize boxesNotSent = _boxesNotSent;
