@@ -61,28 +61,6 @@
 #pragma mark -
 #pragma mark Setters and Getters
 
-//-(NSArray *) availablePositiveImagesNames
-//{
-//    //get the images for the selected class (self.svmClassifier.targetClass)
-//    if(!_availablePositiveImagesNames){
-//        NSMutableArray *list = [[NSMutableArray alloc] init];
-//        
-//        NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[self.resourcesPaths objectAtIndex:THUMB]] error:NULL];
-//        
-//        for(NSString *imageName in imagesList){
-//            NSString *path = [[self.resourcesPaths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
-//            NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
-//            for(Box *box in objects)
-//                for(NSString *targetClass in self.svmClassifier.targetClasses)
-//                    if([box.label isEqualToString:targetClass] && [list indexOfObject:imageName]==NSNotFound)
-//                            [list addObject:imageName];
-//        }
-//        _availablePositiveImagesNames = [NSArray arrayWithArray:list];
-//    }
-//    
-//    return _availablePositiveImagesNames;
-//}
-
 
 - (NSMutableArray *) classifierProperties
 {
@@ -94,72 +72,38 @@
         [formatter setTimeZone:[NSTimeZone localTimeZone]]; //time zone
         
         _classifierProperties = [[NSMutableArray alloc] init];
-        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:self.svmClassifier.name forKey:@"Name"]];
-        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[self.svmClassifier.targetClasses componentsJoinedByString:@", "] forKey:@"Class"]];
-        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[formatter stringFromDate:self.svmClassifier.updateDate] forKey:@"Last Train"]];
-        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.imagesUsedTraining.count] forKey:@"Images"]];
+        [_classifierProperties addObject:[self dictionaryWithObject:self.svmClassifier.name forKey:@"Name"]];
+        [_classifierProperties addObject:[self dictionaryWithObject:[self.svmClassifier.targetClasses componentsJoinedByString:@", "] forKey:@"Class"]];
+        [_classifierProperties addObject:[self dictionaryWithObject:[formatter stringFromDate:self.svmClassifier.updateDate] forKey:@"Last Train"]];
+        [_classifierProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.imagesUsedTraining.count] forKey:@"Images"]];
         
         //just shown on ipad
-        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.numberSV.intValue] forKey:@"Number SV"]];
-        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.numberOfPositives.intValue] forKey:@"Number Positives"]];
-        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"HOG Dimensions: %@ x %@",[self.svmClassifier.sizes objectAtIndex:0],[self.svmClassifier.sizes objectAtIndex:1] ] forKey:@"HOG dimensions"]];
-        [_classifierProperties addObject:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%.2f seconds", self.svmClassifier.timeLearning.floatValue] forKey:@"Time Learning"]];
+        [_classifierProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.numberSV.intValue] forKey:@"Number SV"]];
+        [_classifierProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%d", self.svmClassifier.numberOfPositives.intValue] forKey:@"Number Positives"]];
+        [_classifierProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"HOG Dimensions: %@ x %@",[self.svmClassifier.sizes objectAtIndex:0],[self.svmClassifier.sizes objectAtIndex:1] ] forKey:@"HOG dimensions"]];
+        [_classifierProperties addObject:[self dictionaryWithObject:[NSString stringWithFormat:@"%.2f seconds", self.svmClassifier.timeLearning.floatValue] forKey:@"Time Learning"]];
     }
     return _classifierProperties;
 }
 
 
+- (NSDictionary *) dictionaryWithObject:(id)value forKey:(NSString *)key
+{
+    // be cautious about each value introduced in the dictionary
+    if(value==nil) value = @"";
+    
+    return [NSDictionary dictionaryWithObject:value forKey:key];
+}
+
 
 #pragma mark -
-#pragma mark Life cycle
+#pragma mark Life Cycle and Initialization
 
-- (void)viewDidLoad
+- (void)initializeBottomToolbar
 {
-    [super viewDidLoad];
-    
-
-    self.title = self.svmClassifier.name;
-    self.svmClassifier.delegate = self;
-    
-    
-    _selectionHandler = [[SelectionHandler alloc] initWithViewController:self andDetecorResourceHandler:self.detectorResourceHandler];
-    _selectionHandler.delegate = self;
-    
-//    self.resourcesPaths = [NSArray arrayWithObjects:
-//                           [self.userPath stringByAppendingPathComponent:@"images"],
-//                           [self.userPath stringByAppendingPathComponent:@"thumbnail"],
-//                           [self.userPath stringByAppendingPathComponent:@"annotations"],
-//                           [self.userPath stringByAppendingPathComponent:@"Detectors"],
-//                           self.userPath, nil];
-    
-    self.scrollView.contentSize = self.showView.frame.size;
-    
-    //controllers
-    self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
-    self.executeController.delegate = self;
-    
-    //image views
-    self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
-    self.detectorView.clipsToBounds = YES;
-    self.detectorView.layer.shadowColor = [UIColor colorWithRed:.3 green:.3 blue:.3 alpha:1].CGColor;
-    self.detectorView.layer.shadowOpacity = 1;
-    self.detectorView.layer.shadowRadius = 5;
-    self.detectorView.layer.shadowOffset = CGSizeMake(-1,-1);
-    self.detectorHogView.contentMode = UIViewContentModeScaleAspectFit;
-    self.detectorHogView.clipsToBounds = YES;
-    self.detectorHogView.layer.shadowColor = [UIColor colorWithRed:.3 green:.3 blue:.3 alpha:1].CGColor;
-    self.detectorHogView.layer.shadowOpacity = 1;
-    self.detectorHogView.layer.shadowRadius = 5;
-    self.detectorHogView.layer.shadowOffset = CGSizeMake(-1,-1);
-    
-    //bottom toolbar
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
     
-    //description table view
-    self.descriptionTableView.layer.cornerRadius = 10;
-    self.descriptionTableView.backgroundColor = [UIColor clearColor];
-    
-    //bottombar
+    //buttons
     UIButton *executeButtonView = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bottomToolbar.frame.size.height,  self.bottomToolbar.frame.size.height)];
     [executeButtonView setImage:[UIImage imageNamed:@"executeIcon.png"] forState:UIControlStateNormal];
     [executeButtonView addTarget:self action:@selector(executeAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -180,23 +124,67 @@
     [self.bottomToolbar setItems:[NSArray arrayWithObjects:flexibleSpace,self.executeButtonBar,flexibleSpace,self.trainButtonBar, flexibleSpace, self.infoButtonBar,flexibleSpace,self.undoButtonBar,flexibleSpace,nil]];
     
     self.undoButtonBar.enabled = NO;
+}
 
-    //Check if the classifier exists.
-    if(self.svmClassifier.weights == nil){
-        NSLog(@"New classifier");
-        [_selectionHandler addNewDetector];
-        
-    }else{
-        NSLog(@"Loading classifier: %@", self.svmClassifier.name);
-    }
-    
-    
+- (void)initializeImageViews
+{
+    //image views
+    self.detectorView.contentMode = UIViewContentModeScaleAspectFit;
+    self.detectorView.clipsToBounds = YES;
+    self.detectorView.layer.shadowColor = [UIColor colorWithRed:.3 green:.3 blue:.3 alpha:1].CGColor;
+    self.detectorView.layer.shadowOpacity = 1;
+    self.detectorView.layer.shadowRadius = 5;
+    self.detectorView.layer.shadowOffset = CGSizeMake(-1,-1);
+    self.detectorHogView.contentMode = UIViewContentModeScaleAspectFit;
+    self.detectorHogView.clipsToBounds = YES;
+    self.detectorHogView.layer.shadowColor = [UIColor colorWithRed:.3 green:.3 blue:.3 alpha:1].CGColor;
+    self.detectorHogView.layer.shadowOpacity = 1;
+    self.detectorHogView.layer.shadowRadius = 5;
+    self.detectorHogView.layer.shadowOffset = CGSizeMake(-1,-1);
+}
+
+- (void)initializeSendingView
+{
     //sending view, responsible for the waiting view
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];//self.tabBarController.view.frame];
     [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
     self.sendingView.delegate = self;
     self.sendingView.hidden = YES;
     [self.view addSubview:self.sendingView];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    self.title = self.svmClassifier.name;
+    
+    self.svmClassifier.delegate = self;
+    
+    _selectionHandler = [[SelectionHandler alloc] initWithViewController:self andDetecorResourceHandler:self.detectorResourceHandler];
+    _selectionHandler.delegate = self;
+    
+    self.scrollView.contentSize = self.showView.frame.size;
+    
+    //controllers
+    self.executeController = [[ExecuteDetectorViewController alloc] initWithNibName:@"ExecuteDetectorViewController" bundle:nil];
+    self.executeController.delegate = self;
+    
+    
+    //description table view
+    self.descriptionTableView.layer.cornerRadius = 10;
+    self.descriptionTableView.backgroundColor = [UIColor clearColor];
+    
+    [self initializeImageViews];
+    [self initializeBottomToolbar];
+    [self initializeSendingView];
+    
+    //Check if the classifier exists.
+    if(self.svmClassifier.weights == nil){
+        NSLog(@"New classifier");
+        [_selectionHandler addNewDetector];
+        
+    }else NSLog(@"Loading classifier: %@", self.svmClassifier.name);
     
 }
 
@@ -565,44 +553,14 @@
 -(int) trainForImagesNames:(NSArray *)imagesNames
 {
     //initialization
-    TrainingSet *trainingSet = [[TrainingSet alloc] init];
     self.svmClassifier.imagesUsedTraining = [[NSMutableArray alloc] init];
     
     //setting hog dimensions based on user preferences
     self.svmClassifier.maxHog = [self.detectorResourceHandler getHogFromPreferences];
     
-    //training set construction
-    for(NSString *imageName in imagesNames){
-        BOOL containedClass = NO;
-        
-        NSMutableArray *boxes = [_detectorResourceHandler getBoxesForImageName:imageName];
-        
-        for(Box *box in boxes){
-            for(NSString *class in self.svmClassifier.targetClasses)
-                if([box.label isEqualToString:class]){ //add bounding box
-                    containedClass = YES;
-                    BoundingBox *cp = [[BoundingBox alloc] init];
-                    cp.xmin = box.upperLeft.x/box.imageSize.width;
-                    cp.ymin = box.upperLeft.y/box.imageSize.height;
-                    cp.xmax = box.lowerRight.x/box.imageSize.width;
-                    cp.ymax = box.lowerRight.y/box.imageSize.height;
-                    cp.imageIndex = trainingSet.images.count;
-                    cp.label = 1;
-                    [trainingSet.groundTruthBoundingBoxes addObject:cp];
-                }
-        }
-        if(containedClass){ //add image
-            UIImage *image = [_detectorResourceHandler getImageWithImageName:imageName];
-            [trainingSet.images addObject:image];
-            [self.svmClassifier.imagesUsedTraining addObject:imageName];
-        }
-    }
-    
-    //Add abstract pictures to the training set to generate false positives when the bb is very big
-    //guess the relationship with the artists :)
-    [trainingSet.images addObject:[UIImage imageNamed:@"picaso.jpg"]];
-    [trainingSet.images addObject:[UIImage imageNamed:@"dali.jpg"]];
-    [trainingSet.images addObject:[UIImage imageNamed:@"miro.jpg"]];
+    TrainingSet *trainingSet = [[TrainingSet alloc] initForDetector:self.svmClassifier
+                                                     forImagesNames:imagesNames
+                                                    withFileHandler:_detectorResourceHandler];
     
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
         
@@ -626,36 +584,13 @@
 }
 
 
-- (void) testForImagesNames: (NSArray *) imagesNames
+- (void) testForImagesNames: (NSArray *)imagesNames
 {
     //initialization
-    TrainingSet *testSet = [[TrainingSet alloc] init];
+    TrainingSet *testSet = [[TrainingSet alloc] initForDetector:self.svmClassifier
+                                                 forImagesNames:imagesNames
+                                                withFileHandler:_detectorResourceHandler];
     
-    //training set construction
-    for(NSString *imageName in imagesNames){
-        BOOL containedClass = NO;
-
-        NSMutableArray *objects = [_detectorResourceHandler getBoxesForImageName:imageName];
-        
-        for(Box *box in objects){
-            for(NSString *class in self.svmClassifier.targetClasses)
-                if([box.label isEqualToString:class]){ //add bounding box
-                    containedClass = YES;
-                    BoundingBox *cp = [[BoundingBox alloc] init];
-                    cp.xmin = box.upperLeft.x/box.imageSize.width;
-                    cp.ymin = box.upperLeft.y/box.imageSize.height;
-                    cp.xmax = box.lowerRight.x/box.imageSize.width;
-                    cp.ymax = box.lowerRight.y/box.imageSize.height;
-                    cp.imageIndex = testSet.images.count;
-                    cp.label = 1;
-                    [testSet.groundTruthBoundingBoxes addObject:cp];
-                }
-        }
-        if(containedClass){ //add image
-            UIImage *image = [_detectorResourceHandler getImageWithImageName:imageName];
-            [testSet.images addObject:image];
-        }
-    }
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the test set: %d",testSet.images.count]];
     [self.sendingView showMessage:@"Testing begins!"];
     [self.svmClassifier testOnSet:testSet atThresHold:0.0];

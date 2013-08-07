@@ -26,11 +26,7 @@
 
 @implementation TrainingSet
 
-@synthesize images = _images;
-@synthesize groundTruthBoundingBoxes = _groundTruthBoundingBoxes;
-@synthesize boundingBoxes = _boundingBoxes;
-@synthesize imageFeatures = _imageFeatures;
-@synthesize labels = _labels;
+
 @synthesize templateSize = _templateSize;
 @synthesize areaRatio = _areaRatio;
 
@@ -68,14 +64,69 @@
 #pragma mark
 #pragma mark - Initialization
 
--(id) init
+- (void) initialize
 {
-    self = [super init];
-    if (self) {
-        self.images = [[NSMutableArray alloc] init];
-        self.groundTruthBoundingBoxes = [[NSMutableArray alloc] init];
-        self.boundingBoxes = [[NSMutableArray alloc] init];
+    self.images = [[NSMutableArray alloc] init];
+    self.groundTruthBoundingBoxes = [[NSMutableArray alloc] init];
+    self.boundingBoxes = [[NSMutableArray alloc] init];
+}
+
+- (id) init
+{
+    if (self = [super init]) [self initialize];
+    
+    return self;
+}
+
+- (id) initForDetector:(Classifier *)detector
+        forImagesNames:(NSArray *) imagesNames
+       withFileHandler:(DetectorResourceHandler *) detectorResourceHandler;
+{
+    
+    if(self = [super init]){
+    
+        [self initialize];
+        
+        //training set construction
+        for(NSString *imageName in imagesNames){
+            BOOL containedClass = NO;
+            
+            NSMutableArray *boxes = [detectorResourceHandler getBoxesForImageName:imageName];
+            NSLog(@"boxes: %@", boxes);
+            
+            for(Box *box in boxes){
+                for(NSString *class in detector.targetClasses)
+                    if([box.label isEqualToString:class]){ //add bounding box
+                        containedClass = YES;
+                        BoundingBox *cp = [[BoundingBox alloc] init];
+                        cp.xmin = box.upperLeft.x/box.imageSize.width;
+                        cp.ymin = box.upperLeft.y/box.imageSize.height;
+                        cp.xmax = box.lowerRight.x/box.imageSize.width;
+                        cp.ymax = box.lowerRight.y/box.imageSize.height;
+                        cp.imageIndex = self.images.count;
+                        cp.label = 1;
+                        if(cp==nil)
+                            NSLog(@"NIL FOUND!!");
+                        [self.groundTruthBoundingBoxes addObject:cp];
+                    }
+            }
+            if(containedClass){ //add image
+                UIImage *image = [detectorResourceHandler getImageWithImageName:imageName];
+                if(imageName==nil || image==nil)
+                    NSLog(@"NIL FOUND!!");
+                [self.images addObject:image];
+                [detector.imagesUsedTraining addObject:imageName];
+            }
+        }
+        
+        //Add abstract pictures to the training set to generate false positives when the bb is very big
+        //guess the relationship with the artists :)
+        [self.images addObject:[UIImage imageNamed:@"picaso.jpg"]];
+        [self.images addObject:[UIImage imageNamed:@"dali.jpg"]];
+        [self.images addObject:[UIImage imageNamed:@"miro.jpg"]];
+            
     }
+    
     return self;
 }
 

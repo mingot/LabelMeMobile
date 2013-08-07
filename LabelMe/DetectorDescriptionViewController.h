@@ -10,7 +10,6 @@
 #import "TrainDetectorViewController.h"
 #import "ExecuteDetectorViewController.h"
 #import "ShowTrainingSetViewController.h"
-#import "ModalTVC.h"
 #import "SendingView.h"
 #import "Classifier.h"
 #import "DetectorResourceHandler.h"
@@ -24,7 +23,7 @@
 
 
 
-@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate,ModalTVCDelegate, UIAlertViewDelegate, UITableViewDelegate,UITableViewDataSource, UITextFieldDelegate, ExecuteDetectorViewControllerDelegate, SelectionHandlerDelegate>
+@interface DetectorDescriptionViewController : UIViewController <SendingViewDelegate,ClassifierDelegate, UIAlertViewDelegate, UITableViewDelegate,UITableViewDataSource, UITextFieldDelegate, ExecuteDetectorViewControllerDelegate, SelectionHandlerDelegate>
 
 @property (strong, nonatomic) id <DetectorDescriptionViewControllerDelegate> delegate;
 
@@ -52,8 +51,7 @@
 @property (strong, nonatomic) UIBarButtonItem *undoButtonBar;
 
 //useful information
-@property (strong, nonatomic) DetectorResourceHandler *detectorResourceHandler;
-//@property (strong, nonatomic) NSArray *availableObjectClasses;
+@property (strong, atomic) DetectorResourceHandler *detectorResourceHandler;
 @property (strong, nonatomic) NSMutableArray *selectedPositiveImageIndexes;
 @property (strong, nonatomic) NSMutableArray *selectedPostiveImageNames; //to save with the svm
 

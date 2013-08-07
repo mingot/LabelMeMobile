@@ -9,6 +9,8 @@
 #import "TagImageView.h"
 #import "Classifier.h"
 
+@class Classifier;
+
 @interface DetectorResourceHandler : NSObject
 
 

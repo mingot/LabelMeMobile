@@ -10,7 +10,7 @@
 #import "TrainingSet.h"
 #import "Pyramid.h"
 
-
+@class TrainingSet;
 
 @protocol ClassifierDelegate <NSObject>
 
