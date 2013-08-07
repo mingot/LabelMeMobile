@@ -9,6 +9,7 @@
 #import "DetectorDescriptionViewController.h"
 #import "Box.h"
 #import "ConvolutionHelper.h"
+#import "BoundingBox.h"
 
 #import "UIImage+Resize.h"
 #import "UIImage+HOG.h"
@@ -568,16 +569,15 @@
     self.svmClassifier.imagesUsedTraining = [[NSMutableArray alloc] init];
     
     //setting hog dimensions based on user preferences
-    int hog = [self.detectorResourceHandler getHogFromPreferences];
-    self.svmClassifier.maxHog = hog;
+    self.svmClassifier.maxHog = [self.detectorResourceHandler getHogFromPreferences];
     
     //training set construction
     for(NSString *imageName in imagesNames){
         BOOL containedClass = NO;
         
-        NSMutableArray *objects = [_detectorResourceHandler getBoxesForImageName:imageName];
+        NSMutableArray *boxes = [_detectorResourceHandler getBoxesForImageName:imageName];
         
-        for(Box *box in objects){
+        for(Box *box in boxes){
             for(NSString *class in self.svmClassifier.targetClasses)
                 if([box.label isEqualToString:class]){ //add bounding box
                     containedClass = YES;

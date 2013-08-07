@@ -14,6 +14,7 @@
 #import "UIImage+HOG.h"
 #import "UIImage+Resize.h"
 #import "ConvolutionHelper.h"
+#import "BoundingBox.h"
 
 using namespace cv;
 

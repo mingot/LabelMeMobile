@@ -7,7 +7,7 @@
 //
 
 #import "DetectView.h"
-#import "ConvolutionHelper.h"
+#import "BoundingBox.h"
 #import "math.h"
 
 

@@ -190,6 +190,7 @@
 		FC83599D17B094750035A833 /* DetectorResourceHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC83599C17B094750035A833 /* DetectorResourceHandler.m */; };
 		FC8359A017B134BF0035A833 /* UIViewController+ShowAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = FC83599F17B134BF0035A833 /* UIViewController+ShowAlert.m */; };
 		FC8359A317B17F4B0035A833 /* SelectionHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359A217B17F4B0035A833 /* SelectionHandler.m */; };
+		FC8359A617B1CF380035A833 /* BoundingBox.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359A517B1CF380035A833 /* BoundingBox.m */; };
 		FC8E89B1173930340018876D /* UIImage+Border.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B0173930340018876D /* UIImage+Border.m */; };
 		FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B51739876D0018876D /* ModalSectionsTVC.m */; };
 		FC8E89B81739876D0018876D /* ModalSectionsTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */; };
@@ -475,6 +476,8 @@
 		FC83599F17B134BF0035A833 /* UIViewController+ShowAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+ShowAlert.m"; sourceTree = "<group>"; };
 		FC8359A117B17F4B0035A833 /* SelectionHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectionHandler.h; sourceTree = "<group>"; };
 		FC8359A217B17F4B0035A833 /* SelectionHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectionHandler.m; sourceTree = "<group>"; };
+		FC8359A417B1CF380035A833 /* BoundingBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoundingBox.h; sourceTree = "<group>"; };
+		FC8359A517B1CF380035A833 /* BoundingBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoundingBox.m; sourceTree = "<group>"; };
 		FC8E89AF173930340018876D /* UIImage+Border.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Border.h"; sourceTree = "<group>"; };
 		FC8E89B0173930340018876D /* UIImage+Border.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Border.m"; sourceTree = "<group>"; };
 		FC8E89B41739876D0018876D /* ModalSectionsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSectionsTVC.h; sourceTree = "<group>"; };
@@ -868,6 +871,8 @@
 				FCED895C17034CAF0027CBE1 /* DetectView.m */,
 				FCED896117034CD70027CBE1 /* ConvolutionHelper.h */,
 				FCED896217034CD70027CBE1 /* ConvolutionHelper.m */,
+				FC8359A417B1CF380035A833 /* BoundingBox.h */,
+				FC8359A517B1CF380035A833 /* BoundingBox.m */,
 				FCED895E17034CCA0027CBE1 /* Classifier.h */,
 				FCED895F17034CCA0027CBE1 /* Classifier.mm */,
 				FC74F8D1174A54FE004701CC /* Pyramid.h */,
@@ -1455,6 +1460,7 @@
 				FC83599D17B094750035A833 /* DetectorResourceHandler.m in Sources */,
 				FC8359A017B134BF0035A833 /* UIViewController+ShowAlert.m in Sources */,
 				FC8359A317B17F4B0035A833 /* SelectionHandler.m in Sources */,
+				FC8359A617B1CF380035A833 /* BoundingBox.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

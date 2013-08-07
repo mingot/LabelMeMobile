@@ -9,7 +9,7 @@
 #import "TrainingSet.h"
 #import "UIImage+HOG.h"
 #import "UIImage+Resize.h"
-#import "ConvolutionHelper.h"
+#import "BoundingBox.h"
 
 #define TEMPLATE_SCALE_FACTOR 0.1 //resize template to obtain a reasonable number of blocks for the hog features
 
