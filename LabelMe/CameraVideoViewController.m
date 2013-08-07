@@ -26,9 +26,6 @@
     [super viewDidLoad];
 
     
-    // ********  CAMERA CAPUTRE  ********
-    //Capture input specifications
-    
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput
 										  deviceInputWithDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo]
 										  error:nil];
@@ -59,17 +56,17 @@
     // Previous layer to show the video image
 	_prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:_captureSession];
 	_prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-//	[self.view.layer addSublayer: _prevLayer];
+
     
     // Add subviews in front of  the prevLayer
-//    self.detectView.prevLayer = self.prevLayer;
-    
+    // [self.view.layer addSublayer: _prevLayer];
+    // self.detectView.prevLayer = self.prevLayer;
 }
 
 - (void) viewDidAppear:(BOOL)animated
 {
     //set the frame here after all the navigation tabs have been uploaded and we have the definite frame size
-//    self.prevLayer.frame = self.detectView.frame;
+    // self.prevLayer.frame = self.detectView.frame;
     
     //Start the capture
     NSLog(@"Starting the caputre");

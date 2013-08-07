@@ -431,7 +431,6 @@
 		FC447A8017A99FC6004AA88B /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		FC447A8617A99FC6004AA88B /* LabelMeLogicTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "LabelMeLogicTests-Info.plist"; sourceTree = "<group>"; };
 		FC447A8817A99FC6004AA88B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		FC447A8A17A99FC6004AA88B /* LabelMeLogicTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LabelMeLogicTests.h; sourceTree = "<group>"; };
 		FC447A8B17A99FC6004AA88B /* LabelMeLogicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LabelMeLogicTests.m; sourceTree = "<group>"; };
 		FC447A8D17A99FC6004AA88B /* LabelMeLogicTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LabelMeLogicTests-Prefix.pch"; sourceTree = "<group>"; };
 		FC447A9217A9E30B004AA88B /* TagImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagImageView.h; sourceTree = "<group>"; };
@@ -838,7 +837,6 @@
 		FC447A8417A99FC6004AA88B /* LabelMeLogicTests */ = {
 			isa = PBXGroup;
 			children = (
-				FC447A8A17A99FC6004AA88B /* LabelMeLogicTests.h */,
 				FC447A8B17A99FC6004AA88B /* LabelMeLogicTests.m */,
 				FC447A8517A99FC6004AA88B /* Supporting Files */,
 			);
