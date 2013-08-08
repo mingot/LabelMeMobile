@@ -23,6 +23,11 @@
     NSString *_boxesPath;
     NSString *_thumbnailPath;
     NSMutableDictionary *_userDictionary;
+    
+    // 0: Image sent, 0 boxes to be sent
+    // n: Image sent, n boxes to be sent
+    // -n: Image not sent, (n-1) boxes to be sent
+    // e.g.: -1: Image not sent, 0 boxes to be sent
     int _dictionaryValue;
 }
 
@@ -33,6 +38,12 @@
 
 
 @synthesize boxesNotSent = _boxesNotSent;
+@synthesize isImageSent = _isImageSent;
+
+
+
+#pragma mark -
+#pragma mark Initialization
 
 - (id) initForUsername:(NSString *)username andFilename:(NSString *) filename
 {
@@ -54,11 +65,56 @@
         _imagePath = [[_paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
         _boxesPath = [[_paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
         _thumbnailPath = [[_paths objectAtIndex:THUMB] stringByAppendingPathComponent:filename];
-        _dictionaryValue = [[_userDictionary objectForKey:filename] intValue];
-        _boxesNotSent = _dictionaryValue > -1 ? _dictionaryValue : abs(_dictionaryValue) - 1;
         
+        _dictionaryValue = [[_userDictionary objectForKey:_filename] intValue];
+        _isImageSent = _dictionaryValue > -1;
+        _boxesNotSent = _isImageSent ? _dictionaryValue : abs(_dictionaryValue) - 1;
     }
 }
+
+
+#pragma mark -
+#pragma mark Getters and Setters
+
+- (int) boxesNotSent
+{
+    return _boxesNotSent;
+}
+
+- (void) setBoxesNotSent:(int)boxesNotSent
+{
+    
+    _boxesNotSent = boxesNotSent;
+    
+    //update dictionary values
+    if(!self.isImageSent) _dictionaryValue = - (1 + boxesNotSent);
+    else _dictionaryValue = boxesNotSent;
+    
+    //save it to a file
+    [_userDictionary setObject:[NSNumber numberWithInt:_dictionaryValue] forKey:_filename];
+    [_userDictionary writeToFile:[[_paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",_username] atomically:NO];
+}
+
+- (BOOL) isImageSent
+{
+    return _isImageSent;
+}
+
+- (void) setIsImageSent:(BOOL)isImageSent;
+{
+    if (isImageSent) {
+        _isImageSent = YES;
+        _dictionaryValue = 0;
+        _boxesNotSent = 0;
+        
+        //save it to a file
+        [_userDictionary setObject:[NSNumber numberWithInt:_dictionaryValue] forKey:_filename];
+        [_userDictionary writeToFile:[[_paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",_username] atomically:NO];
+    }
+}
+
+#pragma mark -
+#pragma mark Public Methods
 
 - (NSArray *) getBoxes
 {
@@ -70,15 +126,15 @@
     return [[UIImage alloc] initWithContentsOfFile:_imagePath];
 }
 
+- (NSString *) getBoxesPath
+{
+    return [_paths objectAtIndex:OBJECTS];
+}
 
 - (void) saveThumbnail:(UIImage *)thumbnail
 {
-//    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-//    dispatch_sync(saveQueue, ^{
-        NSData *thumImage = UIImageJPEGRepresentation(thumbnail, 0.75);
-        [[NSFileManager defaultManager] createFileAtPath:_thumbnailPath contents:thumImage attributes:nil];
-//    });
-//    dispatch_release(saveQueue);
+    NSData *thumImage = UIImageJPEGRepresentation(thumbnail, 0.75);
+    [[NSFileManager defaultManager] createFileAtPath:_thumbnailPath contents:thumImage attributes:nil];
 }
 
 - (void) saveImage:(UIImage *)image
@@ -88,45 +144,8 @@
 
 - (void) saveBoxes:(NSArray *)boxes
 {
-//    dispatch_queue_t saveQueue = dispatch_queue_create("saveQueue", NULL);
-//    dispatch_sync(saveQueue, ^{
-        [NSKeyedArchiver archiveRootObject:boxes toFile:_boxesPath];
-//    });
-//    dispatch_release(saveQueue);
-    
-}
 
-- (BOOL)imageNotSent
-{
-    return _dictionaryValue < 0;
-}
-
-- (int) boxesNotSent
-{
-    return _boxesNotSent;
-}
-
-- (void) setBoxesNotSent:(int)boxesNotSent
-{
-    if(_boxesNotSent != boxesNotSent)
-    {
-        _boxesNotSent = boxesNotSent;
-        
-        //update dictionary values
-        if([self imageNotSent]) _dictionaryValue = - (1 + boxesNotSent);
-        else _dictionaryValue = boxesNotSent;
-        
-        if(boxesNotSent == 0) _dictionaryValue = 0;
-        
-        //save it to a file
-        [_userDictionary setObject:[NSNumber numberWithInt:_dictionaryValue] forKey:_filename];
-        [_userDictionary writeToFile:[[_paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",_username] atomically:NO];
-    }
-}
-
-- (NSString *) getBoxesPath
-{
-    return [_paths objectAtIndex:OBJECTS];
+    [NSKeyedArchiver archiveRootObject:boxes toFile:_boxesPath];
 }
 
 @end

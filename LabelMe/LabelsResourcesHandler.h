@@ -15,6 +15,7 @@
 
 @property (nonatomic, strong) NSString *filename;
 @property int boxesNotSent;
+@property BOOL isImageSent;
 
 
 - (id) initForUsername:(NSString *)username andFilename:(NSString *) filename;
@@ -27,9 +28,8 @@
 - (void) saveImage:(UIImage *)image;
 - (void) saveBoxes:(NSArray *)boxes;
 
-- (BOOL) imageNotSent;
-
 //TODO: not to be used
 - (NSString *) getBoxesPath;
+
 
 @end

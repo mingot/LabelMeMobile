@@ -232,6 +232,9 @@
 -(IBAction)listAction:(id)sender
 {
     NSLog(@"Boxes to be send: %d", self.labelsResourceHandler.boxesNotSent);
+    if (!_labelsResourceHandler.isImageSent) {
+        NSLog(@"Image not sent");
+    }else NSLog(@"Image sent");
     
 //    [self.labelsView reloadData];
 //    if (self.labelsView.hidden) {
@@ -562,7 +565,7 @@
     [self.sendButton setEnabled:NO];
     [self.deleteButton setEnabled:NO];
     
-    self.labelsResourceHandler.boxesNotSent = 0;
+    self.labelsResourceHandler.isImageSent = YES;
 }
 
 -(void)photoNotOnServer:(NSString *)filename
@@ -596,7 +599,7 @@
     
     NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.tagImageView.tagView.boxes];
     NSString *boxesPath = [self.labelsResourceHandler getBoxesPath];
-    if ([self.labelsResourceHandler imageNotSent])
+    if (!self.labelsResourceHandler.isImageSent)
         [_serverConnection sendPhoto:self.tagImageView.image filename:self.filename path:boxesPath withSize:point andAnnotation:boxes];
     else [_serverConnection updateAnnotationFrom:self.filename withSize:point :boxes];
 }

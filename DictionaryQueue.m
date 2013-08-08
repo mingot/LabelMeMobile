@@ -46,7 +46,7 @@
     return [_dictionary objectForKey:key];
 }
 
--(void) empty
+-(void) removeAllObjects
 {
     [_dictionary removeAllObjects];
     [_array removeAllObjects];
