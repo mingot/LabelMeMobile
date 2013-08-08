@@ -24,7 +24,7 @@
 
 /*
  
- Class  Responsabilities:
+ Class  Responsibilities:
  
  - Create an infinite loop of views
  - Request the data source which is the UIView for a given index

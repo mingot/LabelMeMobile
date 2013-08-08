@@ -117,6 +117,8 @@
 - (void) disableScrolling:(BOOL) disable
 {    
     _scrollView.scrollEnabled = !disable;
+    if(disable) NSLog(@"Scroll disabled");
+    else NSLog(@"Scroll enabled");
 }
 
 
@@ -131,7 +133,6 @@
         [_viewsQueue enqueueObject:view forKey:[NSNumber numberWithInt:index]];
     }
     
-//    UIView *view = [self.dataSource viewForIndex:index];
     view.frame = _pageOneView.frame;
     view.tag = kViewTag;
     

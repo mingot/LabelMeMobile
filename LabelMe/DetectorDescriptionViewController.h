@@ -25,7 +25,7 @@
 
 /*
  
- Class  Responsabilities:
+ Class  Responsibilities:
  
  - Manage actions of the bottom bar:
  - Call ExecuteDetectorVC

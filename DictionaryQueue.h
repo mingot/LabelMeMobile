@@ -12,7 +12,7 @@
 
 /*
  
- Class  Responsabilities:
+ Class  Responsibilities:
  
  - Provides a dictionary with queue capabilities to limit the number of entries
  

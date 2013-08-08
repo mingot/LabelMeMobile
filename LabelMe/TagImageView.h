@@ -10,25 +10,33 @@
 #import "TagView.h"
 #import "Box.h"
 
-// Provides Image and TagView with zooming capabilities
+
+
+@protocol TagImageViewDelegate <NSObject>
+
+- (void) scrollDidEndZoomingAtScale:(float) scale;
+
+@end
 
 
 /*
  
- Class  Responsabilities:
+ Class  Responsibilities:
  
  - Provide Image and TagView of zooming capabilities
  - Show image
  - Inform TagView when a zoom has been made to adapt to it
  - Give a thumbanail of the current visible area.
+ - Inform the delegate when a zoom has been done 
+    (used in the delegate to disable page scrolling while zoom in).
  
  
  */
-
 @interface TagImageView : UIView <UIScrollViewDelegate>
 
-@property (nonatomic, strong) UIImage *image;
-@property (nonatomic, strong) TagView *tagView;
+@property (strong, nonatomic) UIImage *image;
+@property (strong, nonatomic) TagView *tagView;
+@property (strong, nonatomic) id<TagImageViewDelegate> delegate;
 
 // Return to the initial state of zoom
 - (void) resetZoomView;

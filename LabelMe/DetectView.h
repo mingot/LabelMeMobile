@@ -1,4 +1,4 @@
-                                                                                                                                                                                  //
+//
 //  DetectView.h
 //  ImageG
 //

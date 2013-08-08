@@ -13,7 +13,7 @@
 
 /*
  
- Class  Responsabilities:
+ Class  Responsibilities:
  
  - Coordinate the visualization of modals for selecting the class and for
     selecting the training images

@@ -142,7 +142,15 @@
 
 - (CGRect) getVisibleRect
 {
-    return [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView];
+    if(self.zoomScrollView.zoomScale==1){
+        
+        //correct the origin to 0 because this will be used inside tagview
+        CGRect visibleRectOnTagView = self.tagView.frame;
+        visibleRectOnTagView.origin.x = 0.0;
+        visibleRectOnTagView.origin.y = 0.0;
+        return visibleRectOnTagView;
+    
+    }else return [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView];
 }
 
 - (void) reloadForRotation
@@ -168,7 +176,9 @@
 
 - (void) scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
 {
+    NSLog(@"sending info");
     [self.tagView setUpViewForZoomScale:scale];
+    [self.delegate scrollDidEndZoomingAtScale:scale];
 }
 
 
@@ -194,16 +204,6 @@
     CGRect imageFrame = CGRectMake(floorf(0.5f*(CGRectGetWidth(iv.bounds)-scaledImageSize.width)), floorf(0.5f*(CGRectGetHeight(iv.bounds)-scaledImageSize.height)), scaledImageSize.width, scaledImageSize.height);
     
     return imageFrame;
-}
-
-- (void) saveStateBeforePicture
-{
-    CGRect visibleRect = [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView];
-}
-
-- (void) RestoreStateAfterPicture
-{
-    
 }
 
 @end

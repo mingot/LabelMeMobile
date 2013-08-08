@@ -16,7 +16,7 @@
 
 /*
  
- Class  Responsabilities:
+ Class  Responsibilities:
  
  - Present the current detectors and connect with the DetectorDescriptionVC
  - Add and delete detecotrs

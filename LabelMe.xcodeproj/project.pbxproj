@@ -868,8 +868,6 @@
 		FC5C93B716FD014200637B69 /* Detector */ = {
 			isa = PBXGroup;
 			children = (
-				FC8359AD17B2C40C0035A833 /* CameraVideoViewController.h */,
-				FC8359AE17B2C40C0035A833 /* CameraVideoViewController.m */,
 				FC5C93A316FCE39F00637B69 /* DetectorGalleryViewController.h */,
 				FC5C93A416FCE3A000637B69 /* DetectorGalleryViewController.m */,
 				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
@@ -878,6 +876,8 @@
 				FC8359A117B17F4B0035A833 /* SelectionHandler.h */,
 				FC8359A217B17F4B0035A833 /* SelectionHandler.m */,
 				FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */,
+				FC8359AD17B2C40C0035A833 /* CameraVideoViewController.h */,
+				FC8359AE17B2C40C0035A833 /* CameraVideoViewController.m */,
 				FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */,
 				FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */,
 				FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */,

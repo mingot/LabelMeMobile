@@ -9,7 +9,7 @@
 
 /*
  
- Class  Responsabilities:
+ Class  Responsibilities:
  
  - Moves the given view up if it was hidden by the keyboard
 

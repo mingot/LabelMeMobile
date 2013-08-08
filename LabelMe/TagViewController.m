@@ -17,6 +17,9 @@
 @interface TagViewController()
 {
     ServerConnection *sConnection;
+    
+    BOOL *_isBoxSelected;
+    BOOL *_isZoomIn;
 
 }
 @property (strong, nonatomic) LabelsResourcesHandler *labelsResourceHandler;
@@ -339,7 +342,8 @@
     //TODO: just activate sending button if box was not previously sent
     NSNumber *isSelected = [notification object];
 
-    [self.infiniteLoopView disableScrolling:isSelected.boolValue];
+    _isBoxSelected = isSelected.boolValue;
+    [self updateScrollPersmission];
     
     self.deleteButton.enabled = isSelected.boolValue;
     Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
@@ -507,13 +511,25 @@
     
     //hook current view with the delegate
     self.tagImageView = (TagImageView *)view;
+    self.tagImageView.delegate = self;
     self.tagImageView.tagView.delegate = self;
+    
     
     //check if boxes not saved on the server
     [self.sendButton setEnabled:YES];
     if (self.labelsResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
     
     [self.view setNeedsDisplay];
+}
+
+
+#pragma mark -
+#pragma mark TagImageViewDelegate
+
+- (void) scrollDidEndZoomingAtScale:(float) scale
+{
+    _isZoomIn = scale!=1 ? YES:NO;
+    [self updateScrollPersmission];
 }
 
 #pragma mark -
@@ -594,6 +610,13 @@
     if ([self.labelsResourceHandler imageNotSent])
         [sConnection sendPhoto:self.tagImageView.image filename:self.filename path:boxesPath withSize:point andAnnotation:boxes];
     else [sConnection updateAnnotationFrom:self.filename withSize:point :boxes];
+}
+
+- (void) updateScrollPersmission
+{
+    // Just enable the scroll of pages in the infinite loop if: (1) no box selected and (2) not zoom in
+    if(!_isBoxSelected && !_isZoomIn) [self.infiniteLoopView disableScrolling:NO];
+    else [self.infiniteLoopView disableScrolling:YES];
 }
 
 

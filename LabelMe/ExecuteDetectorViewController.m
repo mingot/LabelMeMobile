@@ -186,7 +186,8 @@
 - (NSArray *) detectedBoxesForImage:(UIImage *)image withOrientation:(UIDeviceOrientation *)orientation
 {
     NSMutableArray *nmsArray = [[NSMutableArray alloc] init];
-    //single class detection
+    
+     //single class detection
     if(self.detectors.count == 1){
         Detector *detector = [self.detectors objectAtIndex:0];
         float detectionThreshold = -1 + 2*detector.detectionThreshold.floatValue;
@@ -196,7 +197,7 @@
                                     usingNms:YES
                            deviceOrientation:orientation
                           learningImageIndex:0]];
-        //Multiclass detection
+    //Multiclass detection
     }else{
         
         [self.hogPyramid constructPyramidForImage:image withOrientation:[[UIDevice currentDevice] orientation]];

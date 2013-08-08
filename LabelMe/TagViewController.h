@@ -26,7 +26,7 @@
 
 /*
  
- Class  Responsabilities:
+ Class  Responsibilities:
  
  - Loading images and boxes from HD
  - Handle actions from bottom menu bar: new label, delete label, send label, show labels
@@ -35,7 +35,7 @@
  
  */
 
-@interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate, InfiniteLoopDataSoruce, InfiniteLoopDelegate>
+@interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate, InfiniteLoopDataSoruce, InfiniteLoopDelegate, TagImageViewDelegate>
 
 
 //views
