@@ -492,6 +492,7 @@
     self.tagImageView = (TagImageView *)view;
     self.tagImageView.delegate = self;
     self.tagImageView.tagView.delegate = self;
+    [self.tagImageView reloadForRotation];
     
     
     //check if boxes not saved on the server

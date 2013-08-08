@@ -24,5 +24,6 @@
 - (id) initWithCapcity:(int) capacity;
 - (void) enqueueObject:(id)object forKey:(id) key;
 - (id) objectForKey:(id) key;
+- (void) removeAllObjects;
 
 @end

@@ -14,6 +14,10 @@
 #define kQueueDictionaryCapacity 10 //views to store in the internal dictionary
 #define kWidth self.frame.size.width
 #define kHeight self.frame.size.height
+// masks for flexible ajusting each views
+#define kUIViewAutoresizingFlexibleHeighWidth   \ 
+    UIViewAutoresizingFlexibleWidth           | \
+    UIViewAutoresizingFlexibleHeight
 
 @interface InfiniteLoopView()
 {
@@ -58,6 +62,12 @@
     [_scrollView addSubview:_pageTwoView];
     [_scrollView addSubview:_pageThreeView];
     
+    _scrollView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
+    _pageTwoView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
+    _pageOneView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
+    _pageThreeView.autoresizingMask = kUIViewAutoresizingFlexibleHeighWidth;
+    
+    
     // load all three pages into our scroll view
     int total = [self.dataSource numberOfViews];
     [self loadPageWithId:module(initialIndex - 1,total) onPage:0];
@@ -69,7 +79,14 @@
 
     UIView *currentView = [_pageTwoView viewWithTag:kViewTag];
     [self.delegate didShowView:currentView forIndex:_currIndex];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(deviceOrientationDidChange:) name: UIDeviceOrientationDidChangeNotification object: nil];
 
+}
+
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - 
@@ -156,6 +173,18 @@
 	}
     
     [self setNeedsDisplay];
+}
+
+#pragma mark -
+#pragma mark UIView Rotation
+
+- (void)deviceOrientationDidChange:(NSNotification *)notification
+{
+    _scrollView.contentSize = CGSizeMake(3*kWidth, kHeight);
+    _pageOneView.frame = CGRectMake(0*kWidth, 0, kWidth, kHeight);
+    _pageTwoView.frame = CGRectMake(1*kWidth, 0, kWidth, kHeight);
+    _pageThreeView.frame = CGRectMake(2*kWidth, 0, kWidth, kHeight);
+    [_scrollView scrollRectToVisible:CGRectMake(1*kWidth,0,kWidth,kHeight) animated:NO];
 }
 
 @end

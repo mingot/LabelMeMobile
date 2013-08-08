@@ -46,4 +46,10 @@
     return [_dictionary objectForKey:key];
 }
 
+-(void) empty
+{
+    [_dictionary removeAllObjects];
+    [_array removeAllObjects];
+}
+
 @end
