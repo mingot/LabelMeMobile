@@ -158,6 +158,7 @@
     
     [self.imageView setImage:self.image];
     self.tagView.frame = [self getImageFrameFromImageView:self.imageView];
+    [self.tagView setUpViewForZoomScale:_zoomScrollView.zoomScale];
     
     //reset boxes to force them to reajust to the new frame
     NSArray *boxesAux = self.tagView.boxes;

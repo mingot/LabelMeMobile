@@ -28,13 +28,17 @@
 #define kLowerRight 4
 #define kInteriorBox 5
 
+#define kUIViewAutoresizingFlexibleHeighWidth   \
+UIViewAutoresizingFlexibleWidth           | \
+UIViewAutoresizingFlexibleHeight
+
 
 
 @interface TagView()
 {
     float _lineWidth;
-    BOOL move;
-    BOOL size;
+    BOOL _touchIsMoving;
+    BOOL _touchIsResizing;
     KeyboardHandler *_keyboardHandler;
 }
 
@@ -53,16 +57,8 @@
 #pragma mark -
 #pragma mark Initialization
 
-- (void) initialize
+- (void)initializeAndAddLabelView
 {
-    [self setBackgroundColor:[UIColor clearColor]];
-    
-    move = NO;
-    size = NO;
-
-    _lineWidth = kLineWidth;
-    
-    //label initialization
     self.label = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, kLabelWidth, kLabelHeight)];
     [self.label setFont:[UIFont systemFontOfSize:kLabelFontSize]];
     [self.label initialSetup];
@@ -73,8 +69,21 @@
          forControlEvents:UIControlEventEditingDidEndOnExit];
     [self addSubview:self.label];
     
-    
+    //keyboardHandler to help when the keyboard ocludes the view
     _keyboardHandler = [[KeyboardHandler alloc] initWithView:self.label];
+    //    _keyboardHandler = [[KeyboardHandler alloc] initWithDataSource:self];
+}
+
+- (void) initialize
+{
+    [self setBackgroundColor:[UIColor clearColor]];
+    
+    _touchIsMoving = NO;
+    _touchIsResizing = NO;
+
+    _lineWidth = kLineWidth;
+    
+    [self initializeAndAddLabelView];
 }
 
 - (id) initWithCoder:(NSCoder *)aDecoder
@@ -99,7 +108,7 @@
     BOOL isBoxSelected = i != NO_BOX_SELECTED;
     if(isBoxSelected){
         Box *currentBox = [self.boxes objectAtIndex:_selectedBox];
-        [self.label fitForBox:currentBox insideViewFrame:self.frame andScale:1.0];
+        [self.label fitForBox:currentBox];
         self.label.text = currentBox.label;
     }
     
@@ -116,6 +125,7 @@
 
 #pragma mark -
 #pragma mark Public Methods
+
 
 - (void) setUpViewForZoomScale:(float)factor
 {
@@ -156,8 +166,6 @@
 {
     CGPoint newUpperLeft = CGPointMake(visibleRect.origin.x + 0.3*visibleRect.size.width, visibleRect.origin.y + 0.3*visibleRect.size.height);
     CGPoint newLowerRight = CGPointMake(visibleRect.origin.x + 0.7*visibleRect.size.width, visibleRect.origin.y + 0.7*visibleRect.size.height);
-    NSLog(@"Adding box in visible rect: %@", NSStringFromCGRect(visibleRect));
-    NSLog(@"With points UPLEFT:%@ and LOWRIGHT:%@", NSStringFromCGPoint(newUpperLeft), NSStringFromCGPoint(newLowerRight));
     
     Box *newBox = [[Box alloc] initWithUpperLeft:newUpperLeft lowerRight:newLowerRight forImageSize:self.frame.size];
     
@@ -251,7 +259,7 @@
         int corner = [currentBox touchAtPoint:location];
         
         if(corner == kInteriorBox){
-            move = YES;
+            _touchIsMoving = YES;
             [currentBox moveBeginAtPoint:location];
             
         }else if(corner == kExteriorBox){
@@ -259,7 +267,7 @@
             self.selectedBox = NO_BOX_SELECTED;
             
         }else{
-            size = YES;
+            _touchIsResizing = YES;
             [currentBox resizeBeginAtPoint:location];
         }
         
@@ -270,20 +278,16 @@
         
         if (self.selectedBox != NO_BOX_SELECTED) {
 
-            
             Box *currentBox = [self.boxes objectAtIndex:self.selectedBox];
             currentBox.imageSize = self.frame.size;
             
             self.label.text = currentBox.label;
-            [self.label fitForBox:currentBox insideViewFrame:self.frame andScale:1];
+            [self.label fitForBox:currentBox];
             
-            move = NO;
-            size = NO;
-            
-        }else{
-            size = NO;
-            move = NO;
         }
+        
+        _touchIsResizing = NO;
+        _touchIsMoving = NO;
     }
 }
 
@@ -295,8 +299,8 @@
     
     if(self.selectedBox != NO_BOX_SELECTED){
         Box *currentBox = [self.boxes objectAtIndex:self.selectedBox];
-        if (move) [currentBox moveToPoint:location];
-        else if (size) [currentBox resizeToPoint:location];
+        if (_touchIsMoving) [currentBox moveToPoint:location];
+        else if (_touchIsResizing) [currentBox resizeToPoint:location];
     }
     
     [self setNeedsDisplay];
@@ -305,17 +309,17 @@
 -(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
 
-    if ((move) || (size)) [self.delegate objectModified];
+    if ((_touchIsMoving) || (_touchIsResizing)) [self.delegate objectModified];
     
     if (self.selectedBox != NO_BOX_SELECTED) {
         Box *currentBox =  [self.boxes objectAtIndex: self.selectedBox];
         
-        [self.label fitForBox:currentBox insideViewFrame:self.frame andScale:1];
+        [self.label fitForBox:currentBox];
         self.label.hidden = NO;
     }
     
-    move = NO;
-    size = NO;
+    _touchIsMoving = NO;
+    _touchIsResizing = NO;
 
     [self setNeedsDisplay];
 }
@@ -407,6 +411,7 @@
     
     return [NSString stringWithFormat:@"%@-%@-%@ -%@",day,month,year,time];
 }
+
 
 
 

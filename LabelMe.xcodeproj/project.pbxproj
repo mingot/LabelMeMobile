@@ -972,11 +972,11 @@
 		FC9F947F173AE3910004598C /* Image Gallery */ = {
 			isa = PBXGroup;
 			children = (
-				FC447A9817AC1411004AA88B /* LabelsResourcesHandler.h */,
-				FC447A9917AC1411004AA88B /* LabelsResourcesHandler.m */,
 				A5CAAF4E16163A870095D703 /* GalleryViewController.h */,
 				A5CAAF4F16163A870095D703 /* GalleryViewController.m */,
 				A5CAAF5016163A870095D703 /* GalleryViewController_iPhone.xib */,
+				FC447A9817AC1411004AA88B /* LabelsResourcesHandler.h */,
+				FC447A9917AC1411004AA88B /* LabelsResourcesHandler.m */,
 				A52C36761617C99400FEF74D /* TagViewController.h */,
 				A52C36771617C99400FEF74D /* TagViewController.m */,
 				A5480D6F16179557009F630D /* TagViewController_iPhone.xib */,
@@ -984,10 +984,10 @@
 				FC447A9C17AC7571004AA88B /* InfiniteLoopView.m */,
 				FC447A9217A9E30B004AA88B /* TagImageView.h */,
 				FC447A9317A9E30B004AA88B /* TagImageView.m */,
-				FC447A9517AB4F2D004AA88B /* KeyboardHandler.h */,
-				FC447A9617AB4F2E004AA88B /* KeyboardHandler.m */,
 				A5480D721617969A009F630D /* TagView.h */,
 				A5480D731617969A009F630D /* TagView.m */,
+				FC447A9517AB4F2D004AA88B /* KeyboardHandler.h */,
+				FC447A9617AB4F2E004AA88B /* KeyboardHandler.m */,
 				A5480D7516179D8E009F630D /* Box.h */,
 				A5480D7616179D8E009F630D /* Box.m */,
 			);

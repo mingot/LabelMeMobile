@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "Box.h"
+#import "KeyboardHandler.h"
 
 
 @protocol TagViewDelegate <NSObject>

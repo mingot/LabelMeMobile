@@ -15,7 +15,7 @@
 #define kWidth self.frame.size.width
 #define kHeight self.frame.size.height
 // masks for flexible ajusting each views
-#define kUIViewAutoresizingFlexibleHeighWidth   \ 
+#define kUIViewAutoresizingFlexibleHeighWidth   \
     UIViewAutoresizingFlexibleWidth           | \
     UIViewAutoresizingFlexibleHeight
 

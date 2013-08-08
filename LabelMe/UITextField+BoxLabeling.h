@@ -13,6 +13,6 @@
 
 - (void) initialSetup;
 
-- (void) fitForBox:(Box *)box insideViewFrame:(CGRect)viewFrame andScale:(float)scale;
+- (void) fitForBox:(Box *)box;
 
 @end

@@ -7,6 +7,8 @@
 //
  
 
+
+
 /*
  
  Class  Responsibilities:
@@ -16,12 +18,12 @@
  
  */
 
-
 #import <Foundation/Foundation.h>
 
 @interface KeyboardHandler : NSObject
 
 - (id)initWithView:(UIView *)movingView;
+
 
 
 @end

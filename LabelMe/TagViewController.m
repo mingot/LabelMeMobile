@@ -583,7 +583,6 @@
 
 - (void) saveStateOnDisk
 {
-    NSLog(@"Saving image:%@", self.filename);
     [self.labelsResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
     [self.labelsResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
     
