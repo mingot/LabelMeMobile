@@ -40,6 +40,7 @@
         [_array removeObjectAtIndex:0];
         [_dictionary removeObjectForKey:keyToRemove];
     }
+    NSLog(@"%@", _dictionary);
 }
 
 - (id) objectForKey:(id)key
