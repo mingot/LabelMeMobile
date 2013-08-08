@@ -119,6 +119,9 @@
 - (UIImage *) takeThumbnailImage
 {
     [self resetZoomView];
+    
+    //save current selectedbox to restore after the image has been taken
+    int previousSelectedBox = self.tagView.selectedBox;
     [self.tagView setSelectedBox:-1];
     
     UIGraphicsBeginImageContext(self.tagView.frame.size);
@@ -133,6 +136,8 @@
     UIImage *thumbnailImage  = [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:viewImage.imageOrientation] thumbnailImage:thumbnailSize transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
     
     CGImageRelease(imageRef);
+    
+    self.tagView.selectedBox = previousSelectedBox;
     
     return thumbnailImage;
 }
