@@ -137,11 +137,6 @@
     [[NSFileManager defaultManager] createFileAtPath:_thumbnailPath contents:thumImage attributes:nil];
 }
 
-- (void) saveImage:(UIImage *)image
-{
-    
-}
-
 - (void) saveBoxes:(NSArray *)boxes
 {
 

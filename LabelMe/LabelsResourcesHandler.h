@@ -22,10 +22,8 @@
 
 - (NSArray *) getBoxes;
 - (UIImage *) getImage;
-//- (UIImage *) getThumbnail;
 
 - (void) saveThumbnail:(UIImage *)thumbnail;
-- (void) saveImage:(UIImage *)image;
 - (void) saveBoxes:(NSArray *)boxes;
 
 //TODO: not to be used

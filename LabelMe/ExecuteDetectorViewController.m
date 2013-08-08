@@ -26,7 +26,6 @@
     BOOL _scale;
     BOOL _hog;
     
-    const NSArray *_detectorColors;
     const NSArray *_settingsStrings;
 }
 
@@ -61,13 +60,6 @@
 
 - (void) initializeConstants
 {
-    _detectorColors = [NSArray arrayWithObjects:
-                       [UIColor colorWithRed:217/255.0 green:58/255.0 blue:62/255.0 alpha:.6],
-                       [UIColor colorWithRed:75/255.0 green:53/255.0 blue:151/255.0 alpha:.6],
-                       [UIColor colorWithRed:219/255.0 green:190/255.0 blue:59/255.0 alpha:.6],
-                       [UIColor colorWithRed:54/255.0 green:177/255.0 blue:48/255.0 alpha:.6],
-                       nil];
-    
     _settingsStrings = [[NSArray alloc] initWithObjects:@"Scale",@"FPS",@"Score",@"HOG", nil];
     
     _fpsToShow = 0.0;
@@ -81,19 +73,6 @@
 - (BOOL) shouldAutorotate
 {
     return NO;
-}
-
-
-- (void)initializeDetectorsWithColors
-{
-    //assign colors to each detector
-    NSMutableDictionary *colorsDictionary = [[NSMutableDictionary alloc] initWithCapacity:self.detectors.count];
-    int i=0;
-    for(Detector *detector in self.detectors){
-        [colorsDictionary setObject:[_detectorColors objectAtIndex:i%_detectorColors.count] forKey:[detector.targetClasses componentsJoinedByString:@"+"]];
-        i++;
-    }
-    self.detectView.colorsDictionary = [NSDictionary dictionaryWithDictionary:colorsDictionary];
 }
 
 - (void)initializeSettingsTableView
@@ -122,6 +101,15 @@
     }
 }
 
+- (void)initializeDetectView
+{
+    NSMutableArray *labels = [[NSMutableArray alloc] initWithCapacity:self.detectors.count];
+    for(Detector *detector in self.detectors)
+        [labels addObject:[detector.targetClasses componentsJoinedByString:@"+"]];
+    
+    [self.detectView initializeInTheLayer:_prevLayer forObjectLabels:labels];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -129,16 +117,15 @@
     
     [self initializeConstants];
     [self initializeSlider];
-    [self initializeDetectorsWithColors];
     [self initializeSettingsTableView];
     [self initializeButtons];
+    [self initializeDetectView];
     
     self.infoLabel.lineBreakMode = UILineBreakModeWordWrap;
     self.infoLabel.numberOfLines = 0;
     
     // Add subviews in front of  the prevLayer
     [self.view.layer addSublayer: _prevLayer];
-    self.detectView.prevLayer = _prevLayer;
     [self.view addSubview:self.HOGimageView];
     [self.view addSubview:self.detectView];
     
@@ -176,7 +163,7 @@
 -(void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    [self.detectView reset];
+    [self.detectView drawBoxes:nil]; //reset view
 }
 
 
@@ -219,15 +206,6 @@
     return [NSArray arrayWithArray:nmsArray];
 }
 
-- (void)displayOnTheViewTheDetectedBoxes:(NSArray *)detectedBoxes
-{
-    // set boundaries of the detection and redraw
-    self.detectView.cameraOrientation = [[UIDevice currentDevice] orientation];
-    //        if([(NSMutableArray *)[nmsArray objectAtIndex:0] count]>0)NSLog(@"boxes:%@", [nmsArray objectAtIndex:0]);
-    self.detectView.cornersArray = detectedBoxes;
-    [self.detectView performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
-}
-
 //override from parent
 - (void) processImage:(CGImageRef) imageRef
 {
@@ -245,7 +223,7 @@
     NSArray *detectedBoxes = [self detectedBoxesForImage:image withOrientation:orientation];
     
     //DISPLAY BOXES
-    [self displayOnTheViewTheDetectedBoxes:detectedBoxes];
+    [self.detectView drawBoxes:detectedBoxes];
     
     // Update the navigation controller title with some information about the detection
     int level = -1;
@@ -298,6 +276,7 @@
 
 - (IBAction)switchCameras:(id)sender
 {
+    [self.detectView switchCameras];
     [super switchCameras:sender];
 }
 

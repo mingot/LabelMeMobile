@@ -3,6 +3,7 @@
 //  ImageG
 //
 //  Created by Dolores Blanco Almazán on 12/06/12.
+//  Updated by Josep Marc Mingot.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -15,8 +16,19 @@ static inline double min(double x, double y) { return (x <= y ? x : y); }
 static inline double max(double x, double y) { return (x <= y ? y : x); }
 
 
-@implementation DetectView
+@interface DetectView()
+{
+    NSArray *_boxes;
+    AVCaptureVideoPreviewLayer *_prevLayer;
+    NSDictionary *_colorsDictionary;
+    BOOL *_isFrontCamera;
+}
 
+@end
+
+
+
+@implementation DetectView
 
 
 - (void)drawRect:(CGRect)rect
@@ -24,7 +36,7 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
     
     //for each group of corners generated (by nmsarray)
     int j=0;
-    for(NSArray *corners in self.cornersArray){
+    for(NSArray *corners in _boxes){
         
         
         if (corners.count==0) continue; //skip if no bb for this class
@@ -48,7 +60,7 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
             CGRect box = CGRectMake(x, y, w, h);
             
             CGContextSetLineWidth(context, 4);
-            UIColor *color = [self.colorsDictionary objectForKey:p.targetClass];
+            UIColor *color = [_colorsDictionary objectForKey:p.targetClass];
             CGContextSetStrokeColorWithColor(context, color.CGColor);
             j++;
             CGContextStrokeRect(context, box);
@@ -58,7 +70,7 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
             CGFloat textBoxHeight = 20;
             
             //handle distinct orientations
-            if(self.frontCamera){
+            if(_isFrontCamera){
                 x = x + w;
                 w = abs(w);
             }
@@ -72,13 +84,52 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
     }
 }
 
+#pragma mark -
+#pragma mark Public Methods
+
+- (void) initializeInTheLayer:(AVCaptureVideoPreviewLayer *)prevLayer forObjectLabels:(NSArray *)labels
+{
+    _prevLayer = prevLayer;
+    _isFrontCamera = NO;
+    
+    //construct the dictionary to associate each class to a color.
+    NSArray *detectorColors = [NSArray arrayWithObjects:
+                               [UIColor colorWithRed:217/255.0 green:58/255.0 blue:62/255.0 alpha:.6],
+                               [UIColor colorWithRed:75/255.0 green:53/255.0 blue:151/255.0 alpha:.6],
+                               [UIColor colorWithRed:219/255.0 green:190/255.0 blue:59/255.0 alpha:.6],
+                               [UIColor colorWithRed:54/255.0 green:177/255.0 blue:48/255.0 alpha:.6],
+                               nil];
+    NSMutableDictionary *colorsDictionary = [[NSMutableDictionary alloc] initWithCapacity:labels.count];
+    int i=0;
+    for(NSString *label in labels){
+        [colorsDictionary setObject:[detectorColors objectAtIndex:i%detectorColors.count] forKey:label];
+        i++;
+    }
+    _colorsDictionary = [NSDictionary dictionaryWithDictionary:colorsDictionary];
+    
+}
+
+- (void) drawBoxes:(NSArray *)boxes
+{
+    _boxes = boxes;
+    //usually invoked from different threads, so needs to be called from the main thread
+    [self performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
+}
+
+- (void) switchCameras
+{
+    _isFrontCamera = !_isFrontCamera;
+}
+
+#pragma mark -
+#pragma mark Private Methods
 
 - (BoundingBox *) convertBoundingBoxForDetectView:(BoundingBox *) cp
 {
     BoundingBox *newCP = [[BoundingBox alloc] initWithBoundingBox:cp];
     
-    CGPoint upperLeft = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(cp.ymin, 1 - cp.xmin)];
-    CGPoint lowerRight = [self.prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(cp.ymax, 1 - cp.xmax)];
+    CGPoint upperLeft = [_prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(cp.ymin, 1 - cp.xmin)];
+    CGPoint lowerRight = [_prevLayer pointForCaptureDevicePointOfInterest:CGPointMake(cp.ymax, 1 - cp.xmax)];
     
     newCP.xmin = upperLeft.x;
     newCP.ymin = upperLeft.y;
@@ -89,9 +140,6 @@ static inline double max(double x, double y) { return (x <= y ? y : x); }
 }
 
 
-- (void)reset
-{
-    self.cornersArray = nil;
-}
+
 
 @end

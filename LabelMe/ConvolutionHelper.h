@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "DetectView.h"
 #import "Detector.h"
 
 

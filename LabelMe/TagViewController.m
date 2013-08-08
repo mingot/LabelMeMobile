@@ -2,7 +2,8 @@
 //  AnnotationToolViewController.m
 //  AnnotationTool
 //
-//  Created by Dolores Blanco Almazán and Josep Marc Mingot on 31/03/12.
+//  Created by Dolores Blanco Almazán on 31/03/12.
+//  Updated by Josep Marc Mingot.
 //  Copyright 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -98,10 +99,13 @@
     [self.tip addSubview:tiplabel];
     [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
     
-    //TODO: Check also if there are other images
-    NSArray *boxes = [self.labelsResourceHandler getBoxes];
-    if (boxes.count != 0)
+    //Show only the first time the program loads
+    if (![@"1" isEqualToString:[[NSUserDefaults standardUserDefaults]
+                                objectForKey:@"Avalue"]]) {
+        [[NSUserDefaults standardUserDefaults] setValue:@"1" forKey:@"Avalue"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
         self.tip.hidden = YES;
+    }
     
     [self.view addSubview:self.tip];
 }
@@ -321,7 +325,6 @@
 -(void)isBoxSelected:(NSNotification *) notification
 {
     
-    //TODO: just activate sending button if box was not previously sent
     NSNumber *isSelected = [notification object];
 
     _isBoxSelected = isSelected.boolValue;

@@ -60,14 +60,10 @@
     
     // Add subviews in front of  the prevLayer
     // [self.view.layer addSublayer: _prevLayer];
-    // self.detectView.prevLayer = self.prevLayer;
 }
 
 - (void) viewDidAppear:(BOOL)animated
-{
-    //set the frame here after all the navigation tabs have been uploaded and we have the definite frame size
-    // self.prevLayer.frame = self.detectView.frame;
-    
+{    
     //Start the capture
     NSLog(@"Starting the caputre");
     [_captureSession startRunning];

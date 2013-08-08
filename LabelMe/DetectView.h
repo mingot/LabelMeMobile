@@ -3,29 +3,32 @@
 //  ImageG
 //
 //  Created by Dolores Blanco Almazán on 12/06/12.
+//  Updated by Josep Marc Mingot.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
+/*
+ 
+ Class  Responsibilities:
+ 
+ - Draw the boxes output of the detection
+ - Match the coordinate system with the one in the prevLayer
+ - Assign colors to each detector
+ 
+ */
+
+
 @interface DetectView : UIView
 
-// Array of arrays. Subarrays contanin bb for each different class.
-@property (nonatomic,strong) NSArray *cornersArray;
-
 // To transform a point from the device reference to prevLayer reference
-@property (nonatomic, strong) AVCaptureVideoPreviewLayer *prevLayer;
+- (void) initializeInTheLayer:(AVCaptureVideoPreviewLayer *)prevLayer forObjectLabels:(NSArray *)labels;
 
-//targetclass -> UIColor
-@property (nonatomic, strong) NSDictionary *colorsDictionary;
+- (void) drawBoxes:(NSArray *)boxes;
 
-//Camera specifics to help place the boxes
-@property int cameraOrientation;
-@property BOOL frontCamera;
-
-- (void)reset;
-
+- (void) switchCameras;
 
 @end
 
