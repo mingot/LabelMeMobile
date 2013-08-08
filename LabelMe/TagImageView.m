@@ -150,7 +150,7 @@
         visibleRectOnTagView.origin.y = 0.0;
         return visibleRectOnTagView;
     
-    }else return [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView];
+    }else return [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.tagView];
 }
 
 - (void) reloadForRotation
@@ -176,7 +176,6 @@
 
 - (void) scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
 {
-    NSLog(@"sending info");
     [self.tagView setUpViewForZoomScale:scale];
     [self.delegate scrollDidEndZoomingAtScale:scale];
 }

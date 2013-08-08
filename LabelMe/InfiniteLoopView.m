@@ -117,8 +117,6 @@
 - (void) disableScrolling:(BOOL) disable
 {    
     _scrollView.scrollEnabled = !disable;
-    if(disable) NSLog(@"Scroll disabled");
-    else NSLog(@"Scroll enabled");
 }
 
 

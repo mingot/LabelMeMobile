@@ -16,12 +16,12 @@
 
 @interface TagViewController()
 {
-    ServerConnection *sConnection;
+    ServerConnection *_serverConnection;
     
     BOOL *_isBoxSelected;
     BOOL *_isZoomIn;
-
 }
+
 @property (strong, nonatomic) LabelsResourcesHandler *labelsResourceHandler;
 @property (strong, nonatomic) UITableView *labelsView;
 @property (strong, nonatomic) UIButton *tip;
@@ -32,6 +32,9 @@
 // Save thumbnail and boxes
 // Notify the delegate to reload
 - (void) saveStateOnDisk;
+
+// Just enable the scroll of pages in the infinite loop if: (1) no box selected and (2) not zoom in
+- (void) updateScrollPersmission;
 
 @end
 
@@ -46,8 +49,8 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.labelsView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
-        sConnection = [[ServerConnection alloc] init];
-        sConnection.delegate = self;
+        _serverConnection = [[ServerConnection alloc] init];
+        _serverConnection.delegate = self;
         
     }
     return self;
@@ -292,30 +295,6 @@
     }
 }
 
-#pragma mark -
-#pragma mark Buttons Management
-
--(void)barButtonsEnabled:(BOOL)value
-{
-    [self.addButton setEnabled:value];
-    [self.sendButton setEnabled:value];
-    [self.labelsButton setEnabled:value];
-    [self.deleteButton setEnabled:value];
-    [self.navigationItem setHidesBackButton:!value];
-}
-
-
-#pragma mark -
-#pragma mark Save State
-
-- (void) saveStateOnDisk
-{
-    NSLog(@"Saving image:%@", self.filename);
-    [self.labelsResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
-    [self.labelsResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
-    
-    [self.delegate reloadTable];
-}
 
 #pragma mark -
 #pragma mark TagViewDelegate Methods
@@ -466,7 +445,7 @@
 
 -(void)cancel
 {
-    [sConnection cancelRequestFor:0];
+    [_serverConnection cancelRequestFor:0];
     [self.navigationItem setHidesBackButton:NO];
     [self.sendingView setHidden:YES];
     [self.sendingView.progressView setProgress:0];
@@ -601,6 +580,16 @@
 #pragma mark -
 #pragma mark Private methods
 
+- (void) saveStateOnDisk
+{
+    NSLog(@"Saving image:%@", self.filename);
+    [self.labelsResourceHandler saveThumbnail:[self.tagImageView takeThumbnailImage]];
+    [self.labelsResourceHandler saveBoxes:self.tagImageView.tagView.boxes];
+    
+    [self.delegate reloadTable];
+}
+
+
 -(void)sendPhoto
 {
     CGPoint point = CGPointMake(self.tagImageView.image.size.width/self.tagImageView.tagView.frame.size.width, self.tagImageView.image.size.height/self.tagImageView.tagView.frame.size.height);
@@ -608,15 +597,23 @@
     NSMutableArray *boxes = [NSMutableArray arrayWithArray:self.tagImageView.tagView.boxes];
     NSString *boxesPath = [self.labelsResourceHandler getBoxesPath];
     if ([self.labelsResourceHandler imageNotSent])
-        [sConnection sendPhoto:self.tagImageView.image filename:self.filename path:boxesPath withSize:point andAnnotation:boxes];
-    else [sConnection updateAnnotationFrom:self.filename withSize:point :boxes];
+        [_serverConnection sendPhoto:self.tagImageView.image filename:self.filename path:boxesPath withSize:point andAnnotation:boxes];
+    else [_serverConnection updateAnnotationFrom:self.filename withSize:point :boxes];
 }
 
 - (void) updateScrollPersmission
 {
-    // Just enable the scroll of pages in the infinite loop if: (1) no box selected and (2) not zoom in
     if(!_isBoxSelected && !_isZoomIn) [self.infiniteLoopView disableScrolling:NO];
     else [self.infiniteLoopView disableScrolling:YES];
+}
+
+-(void)barButtonsEnabled:(BOOL)value
+{
+    [self.addButton setEnabled:value];
+    [self.sendButton setEnabled:value];
+    [self.labelsButton setEnabled:value];
+    [self.deleteButton setEnabled:value];
+    [self.navigationItem setHidesBackButton:!value];
 }
 
 

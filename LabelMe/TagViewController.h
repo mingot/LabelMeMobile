@@ -32,6 +32,7 @@
  - Handle actions from bottom menu bar: new label, delete label, send label, show labels
  - Show a usage tip the first time the app runs
  - When a box has been modified, save state
+ - Manage permissions of when the page scrolling is enabled in InfiniteLoopView
  
  */
 
