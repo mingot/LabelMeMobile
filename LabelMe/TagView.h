@@ -2,7 +2,7 @@
 //  TagView.h
 //  LabelMe_work
 //
-//  Created by David Way on 4/4/12.
+//  Created by David Way and Josep Marc Mingot on 4/4/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 

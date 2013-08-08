@@ -2,7 +2,7 @@
 //  AnnotationToolViewController.m
 //  AnnotationTool
 //
-//  Created by Dolores Blanco Almazán on 31/03/12.
+//  Created by Dolores Blanco Almazán and Josep Marc Mingot on 31/03/12.
 //  Copyright 2012 __MyCompanyName__. All rights reserved.
 //
 
@@ -103,7 +103,7 @@
     if (boxes.count != 0)
         self.tip.hidden = YES;
     
-//    [self.view addSubview:self.tip];
+    [self.view addSubview:self.tip];
 }
 
 - (void) initializeAndAddSendingView
@@ -114,7 +114,7 @@
     self.sendingView.textView.text = @"Uploading to the server...";
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     self.sendingView.delegate = self;
-//    [self.view addSubview:self.sendingView];
+    [self.view addSubview:self.sendingView];
 }
 
 #pragma mark -

@@ -2,7 +2,7 @@
 //  GalleryViewController.m
 //  LabelMe
 //
-//  Created by Dolores on 28/09/12.
+//  Created by Dolores and Josep Marc Mingot on 28/09/12.
 //  Copyright (c) 2012 CSAIL. All rights reserved.
 //
 
