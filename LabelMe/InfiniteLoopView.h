@@ -22,6 +22,17 @@
 
 @end
 
+/*
+ 
+ Class  Responsabilities:
+ 
+ - Create an infinite loop of views
+ - Request the data source which is the UIView for a given index
+ - Inform the delagate of the current view
+ - Mantain a buffer of views for optimization
+ 
+ */
+
 @interface InfiniteLoopView : UIView <UIScrollViewDelegate>
 
 @property (nonatomic, weak) IBOutlet id <InfiniteLoopDataSoruce> dataSource;

@@ -480,16 +480,16 @@
 
 - (UIView *) viewForIndex:(int)index
 {
-    TagImageView *requestedView = [_viewsForScrollDictionary objectForKey:[NSNumber numberWithInt:index]];
+//    TagImageView *requestedView = [_viewsForScrollDictionary objectForKey:[NSNumber numberWithInt:index]];
     
-    if(requestedView == nil){
-        
+//    if(requestedView == nil){
+    
         //set the resource handler with the correct filename
         NSString *requestedFilename = [self.items objectAtIndex:index];
         self.labelsResourceHandler.filename = requestedFilename;
         
         //construct the view
-        requestedView = [[TagImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
+        TagImageView *requestedView = [[TagImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
         requestedView.image = [self.labelsResourceHandler getImage];
         requestedView.tagView.boxes = [self.labelsResourceHandler getBoxes];
         
@@ -497,8 +497,8 @@
         self.labelsResourceHandler.filename = self.filename;
         
         //store the view in the dictionary
-        [_viewsForScrollDictionary setObject:requestedView forKey:[NSNumber numberWithInt:index]];
-    }
+//        [_viewsForScrollDictionary setObject:requestedView forKey:[NSNumber numberWithInt:index]];
+//    }
     
     return requestedView;
 }

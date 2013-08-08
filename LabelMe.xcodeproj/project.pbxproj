@@ -194,6 +194,7 @@
 		FC8359A917B1FDCE0035A833 /* UIImage+ImageAveraging.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359A817B1FDCE0035A833 /* UIImage+ImageAveraging.m */; };
 		FC8359AC17B201900035A833 /* SendingView+DetectorDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359AB17B201900035A833 /* SendingView+DetectorDescription.m */; };
 		FC8359AF17B2C40D0035A833 /* CameraVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359AE17B2C40C0035A833 /* CameraVideoViewController.m */; };
+		FC8359B617B323530035A833 /* DictionaryQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8359B517B323530035A833 /* DictionaryQueue.m */; };
 		FC8E89B1173930340018876D /* UIImage+Border.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B0173930340018876D /* UIImage+Border.m */; };
 		FC8E89B71739876D0018876D /* ModalSectionsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8E89B51739876D0018876D /* ModalSectionsTVC.m */; };
 		FC8E89B81739876D0018876D /* ModalSectionsTVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */; };
@@ -486,6 +487,8 @@
 		FC8359AB17B201900035A833 /* SendingView+DetectorDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SendingView+DetectorDescription.m"; sourceTree = "<group>"; };
 		FC8359AD17B2C40C0035A833 /* CameraVideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraVideoViewController.h; sourceTree = "<group>"; };
 		FC8359AE17B2C40C0035A833 /* CameraVideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CameraVideoViewController.m; sourceTree = "<group>"; };
+		FC8359B417B323520035A833 /* DictionaryQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DictionaryQueue.h; path = ../DictionaryQueue.h; sourceTree = "<group>"; };
+		FC8359B517B323530035A833 /* DictionaryQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DictionaryQueue.m; path = ../DictionaryQueue.m; sourceTree = "<group>"; };
 		FC8E89AF173930340018876D /* UIImage+Border.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Border.h"; sourceTree = "<group>"; };
 		FC8E89B0173930340018876D /* UIImage+Border.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Border.m"; sourceTree = "<group>"; };
 		FC8E89B41739876D0018876D /* ModalSectionsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSectionsTVC.h; sourceTree = "<group>"; };
@@ -669,7 +672,7 @@
 				FC9F947F173AE3910004598C /* Image Gallery */,
 				FC9F9480173AE3DD0004598C /* Camera */,
 				FC5C93B716FD014200637B69 /* Detector */,
-				FC9F9481173AE4340004598C /* Additional View Controllers */,
+				FC8359B717B32A110035A833 /* Aditional */,
 				A558D64C1613A365001DED8C /* Categories */,
 				A558D64116138D37001DED8C /* Media */,
 				A558D62016134E0C001DED8C /* Supporting Files */,
@@ -923,6 +926,30 @@
 			name = "Detector Brain";
 			sourceTree = "<group>";
 		};
+		FC8359B717B32A110035A833 /* Aditional */ = {
+			isa = PBXGroup;
+			children = (
+				FC8359B917B32A470035A833 /* Aditional Views */,
+				FC8359B417B323520035A833 /* DictionaryQueue.h */,
+				FC8359B517B323530035A833 /* DictionaryQueue.m */,
+				FC9F9481173AE4340004598C /* Additional View Controllers */,
+			);
+			name = Aditional;
+			sourceTree = "<group>";
+		};
+		FC8359B917B32A470035A833 /* Aditional Views */ = {
+			isa = PBXGroup;
+			children = (
+				FCB97DB9175F9485007B5AEE /* ImageCell.h */,
+				FCB97DBA175F9485007B5AEE /* ImageCell.m */,
+				FCB97DBC175F9BE9007B5AEE /* ImageCell.xib */,
+				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
+				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
+				FCB97DB7175F7BC8007B5AEE /* sendingView.xib */,
+			);
+			name = "Aditional Views";
+			sourceTree = "<group>";
+		};
 		FC9F947E173AE34B0004598C /* Sign in */ = {
 			isa = PBXGroup;
 			children = (
@@ -980,15 +1007,9 @@
 		FC9F9481173AE4340004598C /* Additional View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				A5BE1EC416443E6500FE54B5 /* SendingView.h */,
-				A5BE1EC516443E6500FE54B5 /* SendingView.m */,
-				FCB97DB7175F7BC8007B5AEE /* sendingView.xib */,
 				FCC9FAF1170CB669009B7FC6 /* ModalTVC.h */,
 				FCC9FAF2170CB669009B7FC6 /* ModalTVC.m */,
 				FCC9FAF3170CB66A009B7FC6 /* ModalTVC.xib */,
-				FCB97DB9175F9485007B5AEE /* ImageCell.h */,
-				FCB97DBA175F9485007B5AEE /* ImageCell.m */,
-				FCB97DBC175F9BE9007B5AEE /* ImageCell.xib */,
 				FC8E89B41739876D0018876D /* ModalSectionsTVC.h */,
 				FC8E89B51739876D0018876D /* ModalSectionsTVC.m */,
 				FC8E89B61739876D0018876D /* ModalSectionsTVC.xib */,
@@ -1485,6 +1506,7 @@
 				FC8359A917B1FDCE0035A833 /* UIImage+ImageAveraging.m in Sources */,
 				FC8359AC17B201900035A833 /* SendingView+DetectorDescription.m in Sources */,
 				FC8359AF17B2C40D0035A833 /* CameraVideoViewController.m in Sources */,
+				FC8359B617B323530035A833 /* DictionaryQueue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

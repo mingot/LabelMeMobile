@@ -23,6 +23,18 @@
 @end
 
 
+
+/*
+ 
+ Class  Responsabilities:
+ 
+ - Loading images and boxes from HD
+ - Handle actions from bottom menu bar: new label, delete label, send label, show labels
+ - Show a usage tip the first time the app runs
+ - When a box has been modified, save state
+ 
+ */
+
 @interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate, InfiniteLoopDataSoruce, InfiniteLoopDelegate>
 
 

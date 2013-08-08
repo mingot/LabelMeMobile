@@ -7,9 +7,11 @@
 //
 
 #import "InfiniteLoopView.h"
+#import "DictionaryQueue.h"
 
 #define module(a, b) (a >= 0) ? (a)%b : ((a)%(b) + b)
 #define kViewTag 10
+#define kQueueDictionaryCapacity 10 //views to store in the internal dictionary
 #define kWidth self.frame.size.width
 #define kHeight self.frame.size.height
 
@@ -22,6 +24,7 @@
     int _currIndex;
     int _prevIndex;
     int _nextIndex;
+    DictionaryQueue *_viewsQueue; //enqueue views to not continuosly ask the data source
 }
 
 @end
@@ -31,6 +34,9 @@
 
 - (void) initializeAtIndex:(int) initialIndex;
 {
+    
+    _viewsQueue = [[DictionaryQueue alloc] initWithCapcity:kQueueDictionaryCapacity];
+    
     _scrollView = [[UIScrollView alloc] initWithFrame:self.frame];
     _scrollView.pagingEnabled = YES;
     _scrollView.contentSize = CGSizeMake(3*kWidth, kHeight);
@@ -114,7 +120,12 @@
 
 - (void)loadPageWithId:(int)index onPage:(int)page
 {
-	UIView *view = [self.dataSource viewForIndex:index];
+	UIView *view = [_viewsQueue objectForKey:[NSNumber numberWithInt:index]];
+    if(view == nil){
+        view = [self.dataSource viewForIndex:index];
+        [_viewsQueue enqueueObject:view forKey:[NSNumber numberWithInt:index]];
+    }
+    
     view.frame = _pageOneView.frame;
     view.tag = kViewTag;
     
