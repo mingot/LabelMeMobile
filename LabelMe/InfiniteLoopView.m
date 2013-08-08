@@ -64,7 +64,6 @@
     [self loadPageWithId:module(initialIndex, total) onPage:1];
     [self loadPageWithId:module(initialIndex + 1, total) onPage:2];
     _currIndex = initialIndex;
-    NSLog(@"Going to load: %d, %d, %d",module(initialIndex - 1,total),module(initialIndex,total),module(initialIndex + 1,total) );
     
     // notify about the first view
 

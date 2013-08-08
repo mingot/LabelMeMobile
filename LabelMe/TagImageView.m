@@ -118,8 +118,6 @@
 
 - (UIImage *) takeThumbnailImage
 {
-    [self resetZoomView];
-    
     //save current selectedbox to restore after the image has been taken
     int previousSelectedBox = self.tagView.selectedBox;
     [self.tagView setSelectedBox:-1];
@@ -144,7 +142,7 @@
 
 - (CGRect) getVisibleRect
 {
-    return [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView]; 
+    return [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView];
 }
 
 - (void) reloadForRotation
@@ -196,6 +194,16 @@
     CGRect imageFrame = CGRectMake(floorf(0.5f*(CGRectGetWidth(iv.bounds)-scaledImageSize.width)), floorf(0.5f*(CGRectGetHeight(iv.bounds)-scaledImageSize.height)), scaledImageSize.width, scaledImageSize.height);
     
     return imageFrame;
+}
+
+- (void) saveStateBeforePicture
+{
+    CGRect visibleRect = [self.zoomScrollView convertRect:self.zoomScrollView.bounds toView:self.containerView];
+}
+
+- (void) RestoreStateAfterPicture
+{
+    
 }
 
 @end

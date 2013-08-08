@@ -12,6 +12,19 @@
 
 // Provides Image and TagView with zooming capabilities
 
+
+/*
+ 
+ Class  Responsabilities:
+ 
+ - Provide Image and TagView of zooming capabilities
+ - Show image
+ - Inform TagView when a zoom has been made to adapt to it
+ - Give a thumbanail of the current visible area.
+ 
+ 
+ */
+
 @interface TagImageView : UIView <UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIImage *image;
