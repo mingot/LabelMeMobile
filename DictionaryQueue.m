@@ -14,7 +14,6 @@
     NSMutableArray *_array;
     int _capacity;
 }
-
 @end
 
 
@@ -40,7 +39,6 @@
         [_array removeObjectAtIndex:0];
         [_dictionary removeObjectForKey:keyToRemove];
     }
-    NSLog(@"%@", _dictionary);
 }
 
 - (id) objectForKey:(id)key

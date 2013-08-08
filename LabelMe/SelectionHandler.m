@@ -136,10 +136,9 @@
 }
 
 - (void) configureModalForFirstTrainingImages
-{
-    _modalSent = @"imagesFirstTime";
-    
+{    
     [self configureModalForTrainingImages];
+    _modalSent = @"imagesFirstTime";
     _modalTVC.modalTitle = @"New Detector";
     _modalTVC.modalSubtitle = @"2 of 2: select training image(es)";
 }
