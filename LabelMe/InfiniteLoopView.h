@@ -18,7 +18,7 @@
 @protocol InfiniteLoopDelegate <NSObject>
 
 // Inform the delegate about the change of views in the scroll 
-- (void) didShowViewForIndex:(int)currentIndex;
+- (void) didShowView:(UIView *)view forIndex:(int)currentIndex;
 
 @end
 

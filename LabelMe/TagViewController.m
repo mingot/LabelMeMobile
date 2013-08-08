@@ -14,11 +14,10 @@
 
 
 
-
 @interface TagViewController()
 {
     ServerConnection *sConnection;
-    NSMutableDictionary *_viewsForScrollDictionary;
+
 }
 @property (strong, nonatomic) LabelsResourcesHandler *labelsResourceHandler;
 @property (strong, nonatomic) UITableView *labelsView;
@@ -47,7 +46,6 @@
         sConnection = [[ServerConnection alloc] init];
         sConnection.delegate = self;
         
-        _viewsForScrollDictionary = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -169,8 +167,6 @@
     
     //save thumbnail and dictionary
     [self saveStateOnDisk];
-    
-    [_viewsForScrollDictionary removeAllObjects];
     
 //    if (!self.tagView.userInteractionEnabled){
 //        self.tagView.userInteractionEnabled = YES;
@@ -480,25 +476,18 @@
 
 - (UIView *) viewForIndex:(int)index
 {
-//    TagImageView *requestedView = [_viewsForScrollDictionary objectForKey:[NSNumber numberWithInt:index]];
     
-//    if(requestedView == nil){
+    //set the resource handler with the correct filename
+    NSString *requestedFilename = [self.items objectAtIndex:index];
+    self.labelsResourceHandler.filename = requestedFilename;
     
-        //set the resource handler with the correct filename
-        NSString *requestedFilename = [self.items objectAtIndex:index];
-        self.labelsResourceHandler.filename = requestedFilename;
-        
-        //construct the view
-        TagImageView *requestedView = [[TagImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
-        requestedView.image = [self.labelsResourceHandler getImage];
-        requestedView.tagView.boxes = [self.labelsResourceHandler getBoxes];
-        
-        //restore the |self.labelsResourceHandler|
-        self.labelsResourceHandler.filename = self.filename;
-        
-        //store the view in the dictionary
-//        [_viewsForScrollDictionary setObject:requestedView forKey:[NSNumber numberWithInt:index]];
-//    }
+    //construct the view
+    TagImageView *requestedView = [[TagImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
+    requestedView.image = [self.labelsResourceHandler getImage];
+    requestedView.tagView.boxes = [self.labelsResourceHandler getBoxes];
+    
+    //restore the |self.labelsResourceHandler|
+    self.labelsResourceHandler.filename = self.filename;
     
     return requestedView;
 }
@@ -508,7 +497,7 @@
     return self.items.count;
 }
 
-- (void) didShowViewForIndex:(int)currentIndex
+- (void) didShowView:(UIView *)view forIndex:(int)currentIndex;
 {    
     //title
     self.title = [NSString stringWithFormat:@"%d of %d", currentIndex + 1, self.items.count];
@@ -517,7 +506,7 @@
     self.labelsResourceHandler.filename = self.filename;
     
     //hook current view with the delegate
-    self.tagImageView = [_viewsForScrollDictionary objectForKey:[NSNumber numberWithInt:currentIndex]];
+    self.tagImageView = (TagImageView *)view;
     self.tagImageView.tagView.delegate = self;
     
     //check if boxes not saved on the server

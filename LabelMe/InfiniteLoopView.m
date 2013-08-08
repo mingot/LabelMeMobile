@@ -65,7 +65,9 @@
     [self loadPageWithId:module(initialIndex + 1, total) onPage:2];
     
     // notify about the first view
-    [self.delegate didShowViewForIndex:initialIndex];
+    UIView *currentView = [_pageTwoView viewWithTag:kViewTag];
+    [self.delegate didShowView:currentView forIndex:initialIndex];
+
 }
 
 #pragma mark - 
@@ -101,7 +103,8 @@
     [_scrollView scrollRectToVisible:CGRectMake(1*kWidth,0,kWidth,kHeight) animated:NO];
     
     //inform the delegate of the change
-    [self.delegate didShowViewForIndex:_currIndex];
+    UIView *currentView = [_pageTwoView viewWithTag:kViewTag];
+    [self.delegate didShowView:currentView forIndex:_currIndex];
 
 }
 
@@ -126,6 +129,7 @@
         [_viewsQueue enqueueObject:view forKey:[NSNumber numberWithInt:index]];
     }
     
+//    UIView *view = [self.dataSource viewForIndex:index];
     view.frame = _pageOneView.frame;
     view.tag = kViewTag;
     
