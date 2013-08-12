@@ -26,7 +26,6 @@
 
 @property (strong, nonatomic) id<DetectorDelegate> delegate;
 
-
 //Encoding properties
 @property (strong, nonatomic) NSString *name;
 @property (strong, nonatomic) NSArray *targetClasses;

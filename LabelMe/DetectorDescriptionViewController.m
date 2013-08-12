@@ -197,14 +197,14 @@
     [self initializeAndAddSendingView];
     
     //Check if the detector exists.
-    if(self.detector == nil){
-        NSLog(@"New detector");
+    if(self.detector == nil){ //new detector
         self.detector = [[Detector alloc] init];
         self.detector.delegate = self;
         _isFirstTraining = YES;
-        [self.selectionHandler addNewDetector];
         
-    }else NSLog(@"Loading detector: %@", self.detector.name);
+        //ask the selection handler to manage the class and training images selection
+        [self.selectionHandler addNewDetector];
+    }
     
 }
 
@@ -319,8 +319,8 @@
     dispatch_queue_t training_queue = dispatch_queue_create("training_queue", 0);
     dispatch_async(training_queue, ^{
         __block int trainingState = [self trainForImagesNames:trainingImagesNames];
+        
         if (trainingState == SUCCESS) {
-            [self.sendingView showMessage:@"Finished training"];
             [self testForImagesNames:testImagesNames];
         }
         

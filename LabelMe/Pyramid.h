@@ -9,6 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "UIImage+HOG.h"
 
+/*
+ 
+ Class  Responsibilities:
+ 
+ - Constructs a pyramid of HogG Features for a given image
+ 
+ 
+ */
 @interface Pyramid : NSObject
 
 //indexes of the pyramids to calculate according to each detector. If a detector detects the object in a specified pyramid level, on the next iteration it will only be computing some levels up and down. Avoid having to calculate all the levels if not necessary.

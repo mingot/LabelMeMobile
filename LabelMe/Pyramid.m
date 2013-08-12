@@ -27,14 +27,37 @@
 
 @synthesize hogFeatures = _hogFeatures;
 
+
+
 #pragma mark -
 #pragma mark Initialization
+
+
+- (id) initWithDetectors:(NSArray *)detectors forNumPyramids:(int)numPyramids
+{
+    self = [super init];
+    if(self){
+        self.numPyramids = numPyramids;
+        
+        //compute average scale factor
+        float average = 0;
+        for(Detector *detector in detectors)
+            average = average + detector.scaleFactor.floatValue;
+        average = average/detectors.count;
+        self.scaleFactor = [NSNumber numberWithFloat:average];
+    }
+    
+    return self;
+}
+
+#pragma mark -
+#pragma mark Getters and Setters
 
 - (NSMutableArray *) hogFeatures
 {
     if(!_hogFeatures){
         _hogFeatures = [[NSMutableArray alloc] initWithCapacity:self.numPyramids];
-        for(int i=0;i<self.numPyramids;i++) [_hogFeatures addObject:[NSNumber numberWithInt:0]]; //null initialization;
+        for(int i=0;i<self.numPyramids;i++) [_hogFeatures addObject:@0]; //null initialization;
     }
     return _hogFeatures;
 }
@@ -56,25 +79,8 @@
 }
 
 
-- (id) initWithDetectors:(NSArray *)detectors forNumPyramids:(int)numPyramids
-{
-    self = [super init];
-    if(self){
-        self.numPyramids = numPyramids;
-        
-        //compute average scale factor
-        float average = 0;
-        for(Detector *detector in detectors)
-            average = average + detector.scaleFactor.floatValue;
-        average = average/detectors.count;
-        self.scaleFactor = [NSNumber numberWithFloat:average];
-    }
-    
-    return self;
-}
-
 #pragma mark -
-#pragma mark Pyramid constructor
+#pragma mark Public Methods
 
 
 - (void) constructPyramidForImage:(UIImage *)image withOrientation:(int)orientation
@@ -89,20 +95,13 @@
     double scale = pow(2, 1.0/SCALES_PER_OCTAVE);
     UIImage *scaledImage = [image scaleImageTo:initialScale/pow(scale,0)]; //TODO: optimize to start to the first true index
     
-    __block HogFeature *imageHog;
-    dispatch_queue_t pyramidConstructionQueue = dispatch_queue_create("pyramidConstructionQueue", DISPATCH_QUEUE_CONCURRENT);
-    dispatch_apply(self.numPyramids, pyramidConstructionQueue, ^(size_t i) {
+    for(int i=0; i<self.numPyramids; i++){
         if([self.levelsToCalculate containsObject:[NSNumber numberWithInt:i]]){
             float scaleLevel = pow(1.0/scale, i);
-            imageHog = [[scaledImage scaleImageTo:scaleLevel] obtainHogFeatures];
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                if([self.hogFeatures isKindOfClass:[NSMutableArray class]])
-                    [self.hogFeatures setObject:imageHog atIndexedSubscript:i];
-                else{NSLog(@"Error en pyramid construction, obtained class:%@", [self.hogFeatures class]);}
-            });
+            HogFeature *imageHog = [[scaledImage scaleImageTo:scaleLevel] obtainHogFeatures];
+            [self.hogFeatures setObject:imageHog atIndexedSubscript:i];
         }
-    });
-    dispatch_release(pyramidConstructionQueue);
+    }
 
     //reset indexes to look into
     [self.levelsToCalculate removeAllObjects];

@@ -45,10 +45,6 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
 
 @implementation HogFeature
 
-@synthesize numBlocksX = _numBlocksX;
-@synthesize numBlocksY = _numBlocksY;
-@synthesize numFeaturesPerBlock = _numFeaturesPerBlock;
-@synthesize totalNumberOfFeatures = _totalNumberOfFeatures;
 @synthesize features = _features;
 @synthesize dimensionOfHogFeatures = _dimensionOfHogFeatures;
 
@@ -74,7 +70,6 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
 {
     free(self.features);
     free(self.dimensionOfHogFeatures);
-//    NSLog(@"HOG Deallocation!");
 }
 
 @end

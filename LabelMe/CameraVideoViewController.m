@@ -56,7 +56,6 @@
     // Previous layer to show the video image
 	_prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:_captureSession];
 	_prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-
     
     // Add subviews in front of  the prevLayer
     // [self.view.layer addSublayer: _prevLayer];
@@ -65,7 +64,6 @@
 - (void) viewDidAppear:(BOOL)animated
 {    
     //Start the capture
-    NSLog(@"Starting the caputre");
     [_captureSession startRunning];
     
 }

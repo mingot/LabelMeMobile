@@ -225,16 +225,15 @@
     //DISPLAY BOXES
     [self.detectView drawBoxes:detectedBoxes];
     
-    // Update the navigation controller title with some information about the detection
-    int level = -1;
-    float scoreFloat = -1;
-    
     //Put the HOG picture on screen
     if (_hog){
         UIImage *image = [ [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight] scaleImageTo:230/480.0] convertToHogImage];
         [self.HOGimageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:YES];
     }
     
+    // Update the navigation controller title with some information about the detection
+    int level = -1;
+    float scoreFloat = -1;
 
     //update label with the current FPS
     _fpsToShow = (_fpsToShow*_num + -1.0/[start timeIntervalSinceNow])/(_num+1);

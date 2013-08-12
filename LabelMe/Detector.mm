@@ -58,19 +58,19 @@ using namespace cv;
 }
 
 
-//Show just the histogram features for debugging purposes
+// Show just the histogram features for debugging purposes
 - (void) showOrientationHistogram;
 
-//make the convolution of the detector with the image and return de detected bounding boxes
+// Make the convolution of the detector with the image and return de detected bounding boxes
 - (NSArray *) getBoundingBoxesIn:(HogFeature *)imageHog forPyramid:(int)pyramidLevel forIndex:(int)imageHogIndex;
 
-//add a selected bounding box (its correspondent hog features) to the training buffer
+// Add a selected bounding box (its correspondent hog features) to the training buffer
 - (void) addExample:(BoundingBox *)p to:(TrainingSet *)trainingSet;
 
+// Calculate difference of weight wihtin an iteration to find that difference
 - (double) computeDifferenceWithLastWeights:(double *) weightsPLast;
 
-
-//Print unoriented hog features for debugging purposes
+// Print unoriented hog features for debugging purposes
 - (void) printListHogFeatures:(float *) listOfHogFeaturesFloat;
 
 @end
