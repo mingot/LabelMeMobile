@@ -69,9 +69,28 @@ UIViewAutoresizingFlexibleHeight
          forControlEvents:UIControlEventEditingDidEndOnExit];
     [self addSubview:self.label];
     
+    
+    //add suggestion toolbar
+    //buttons settings
+    UIBarButtonItem *a = [[UIBarButtonItem alloc]initWithTitle:@"Suggestion1" style:UIBarButtonItemStyleBordered target:self action:@selector(prova:)];
+    UIBarButtonItem *b = [[UIBarButtonItem alloc]initWithTitle:@"Suggestion2" style:UIBarButtonItemStyleBordered target:self action:@selector(prova:)];
+    UIBarButtonItem *c = [[UIBarButtonItem alloc]initWithTitle:@"Suggestion3" style:UIBarButtonItemStyleDone target:self action:@selector(prova:)];
+
+    
+    UIToolbar *keyboardToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 44)];
+    keyboardToolbar.barStyle = UIBarStyleBlackOpaque;
+    keyboardToolbar.items = [NSArray arrayWithObjects:a,b, c,nil];
+    self.label.inputAccessoryView = keyboardToolbar;
+    
     //keyboardHandler to help when the keyboard ocludes the view
-    _keyboardHandler = [[KeyboardHandler alloc] initWithView:self.label];
+    _keyboardHandler = [[KeyboardHandler alloc] initWithTextField:self.label];
     //    _keyboardHandler = [[KeyboardHandler alloc] initWithDataSource:self];
+}
+
+- (IBAction)prova:(id)sender
+{
+    UIBarButtonItem *b = (UIBarButtonItem *) sender;
+    NSLog(@"prova with title:%@", b.title);
 }
 
 - (void) initialize
@@ -191,6 +210,11 @@ UIViewAutoresizingFlexibleHeight
         selectedBox = [self.boxes objectAtIndex:self.selectedBox];
     
     return selectedBox;
+}
+
+- (void) setDataSourceForKeyboardSuggestions:(id<KeyboardHandlerDataSource>)dataSource
+{
+    _keyboardHandler.dataSource = dataSource;
 }
 
 #pragma mark -

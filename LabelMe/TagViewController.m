@@ -21,6 +21,8 @@
     
     BOOL *_isBoxSelected;
     BOOL *_isZoomIn;
+    
+    NSMutableSet *_recentLabels; //buffer with the recent labels for keyboard word suggestion
 }
 
 @property (strong, nonatomic) LabelsResourcesHandler *labelsResourceHandler;
@@ -52,6 +54,8 @@
         self.labelsView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
         _serverConnection = [[ServerConnection alloc] init];
         _serverConnection.delegate = self;
+        
+        _recentLabels = [[NSMutableSet alloc] init];
         
     }
     return self;
@@ -311,6 +315,7 @@
 {
     // if the box was sent, update 
     Box *selectedBox = [self.tagImageView.tagView getSelectedBox];
+    [_recentLabels addObject:selectedBox.label];
     if(selectedBox && selectedBox.sent){
         selectedBox.sent = NO;
         self.labelsResourceHandler.boxesNotSent ++;
@@ -500,6 +505,7 @@
     self.tagImageView.delegate = self;
     self.tagImageView.tagView.delegate = self;
     [self.tagImageView reloadForRotation];
+    [self.tagImageView.tagView setDataSourceForKeyboardSuggestions:self]; //for label suggestion on the keyboard
     
     
     //check if boxes not saved on the server
@@ -507,6 +513,15 @@
     if (self.labelsResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
     
     [self.view setNeedsDisplay];
+}
+
+#pragma mark -
+#pragma mark KeyboardHandlerDataSource
+
+- (NSArray *) arrayOfWords
+{
+    //returns the list of the recent labels buffered in this session
+    return _recentLabels.allObjects;
 }
 
 

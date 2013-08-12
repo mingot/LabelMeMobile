@@ -8,12 +8,19 @@
  
 
 
+@protocol KeyboardHandlerDataSource <NSObject>
+
+- (NSArray *) arrayOfWords;
+
+@end
+
 
 /*
  
  Class  Responsibilities:
  
- - Moves the given view up if it was hidden by the keyboard
+ - Moves the given UITextField view up if it was hidden by the keyboard
+ - Suggests words acorring to the data soruce
 
  
  */
@@ -22,8 +29,9 @@
 
 @interface KeyboardHandler : NSObject
 
-- (id)initWithView:(UIView *)movingView;
+@property (strong, nonatomic) id<KeyboardHandlerDataSource> dataSource;
 
+- (id)initWithTextField:(UITextField *)textField;
 
 
 @end

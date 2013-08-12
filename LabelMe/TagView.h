@@ -55,5 +55,8 @@
 // If anyboxselected, it removes it
 - (void) removeSelectedBox;
 
+// Set the data source responsible for providing the list of words with the suggestions
+- (void) setDataSourceForKeyboardSuggestions:(id<KeyboardHandlerDataSource>)dataSource;
+
 
 @end

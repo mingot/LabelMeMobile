@@ -48,11 +48,8 @@
     return self;
 }
 
-- (void)viewDidLoad
+- (void)initializeKeyboardToolbar
 {
-    [super viewDidLoad];
-    
-   
     //buttons settings
     UIBarButtonItem *nextButton = [[UIBarButtonItem alloc]initWithTitle:@"Next" style:UIBarButtonItemStyleBordered target:self action:@selector(nextFieldAction:)];
     UIBarButtonItem *previousButton = [[UIBarButtonItem alloc]initWithTitle:@"Previous" style:UIBarButtonItemStyleBordered target:self action:@selector(previousAction:)];
@@ -62,10 +59,18 @@
     UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleDone target:self action:@selector(cancelAction:)];
     doneButton.enabled = NO;
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-
+    
     self.keyboardToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
     self.keyboardToolbar.barStyle = UIBarStyleBlackOpaque;
     self.keyboardToolbar.items = [NSArray arrayWithObjects:previousButton,nextButton,flexibleSpace,cancelButton, doneButton,nil];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+   
+    [self initializeKeyboardToolbar];
     
     //textfields
     self.usernameField.inputAccessoryView = self.keyboardToolbar;

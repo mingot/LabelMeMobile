@@ -14,6 +14,7 @@
 #import "Box.h"
 #import "ServerConnection.h"
 #import "SendingView.h"
+#import "KeyboardHandler.h"
 
 
 
@@ -37,7 +38,7 @@
  
  */
 
-@interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate, InfiniteLoopDataSoruce, InfiniteLoopDelegate, TagImageViewDelegate>
+@interface TagViewController : UIViewController <UIActionSheetDelegate, TagViewDelegate, ServerConnectionDelegate,UITableViewDataSource,UITableViewDelegate,SendingViewDelegate, InfiniteLoopDataSoruce, InfiniteLoopDelegate, TagImageViewDelegate,KeyboardHandlerDataSource>
 
 
 //views
