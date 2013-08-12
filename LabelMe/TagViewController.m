@@ -4,7 +4,7 @@
 //
 //  Created by Dolores Blanco Almazán on 31/03/12.
 //  Updated by Josep Marc Mingot.
-//  Copyright 2012 __MyCompanyName__. All rights reserved.
+//  Copyright 2012 CSAIL. All rights reserved.
 //
 
 #import "TagViewController.h"

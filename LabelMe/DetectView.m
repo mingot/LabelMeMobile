@@ -4,7 +4,7 @@
 //
 //  Created by Dolores Blanco Almazán on 12/06/12.
 //  Updated by Josep Marc Mingot.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 CSAIL. All rights reserved.
 //
 
 #import "DetectView.h"

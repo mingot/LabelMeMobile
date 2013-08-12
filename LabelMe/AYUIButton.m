@@ -2,7 +2,7 @@
 //  AYUIButton.m
 //
 //  Created by Andy Yanok on 5/5/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 CSAIL. All rights reserved.
 //
 
 #import "AYUIButton.h"

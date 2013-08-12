@@ -200,6 +200,7 @@
     if(self.detector == nil){
         NSLog(@"New detector");
         self.detector = [[Detector alloc] init];
+        self.detector.delegate = self;
         _isFirstTraining = YES;
         [self.selectionHandler addNewDetector];
         
@@ -267,10 +268,9 @@
 
 - (IBAction)saveAction:(id)sender
 {
+    self.detector.updateDate = [NSDate date];
     [self.detectorResourceHandler saveDetector:self.detector withImage:self.averageImage];
     self.detectorView.image = self.averageImage;
-        
-    self.detector.updateDate = [NSDate date];
     
     [self loadDetectorInfo];
     [self.delegate updateDetector:self.detector];
@@ -306,7 +306,6 @@
         self.detector.name = [NSString stringWithFormat:@"%@-Detector",className];
         self.detector.detectorID = [NSString stringWithFormat:@"%@%@",className,[self uuid]];
     }
-    
     
     //save the current detector for undo purposes
     self.previousDetector = [[Detector alloc] init];
@@ -443,7 +442,7 @@
         cell.textField.returnKeyType = UIReturnKeyDone;
         cell.textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
         cell.textField.autocorrectionType = UITextAutocorrectionTypeNo;
-//        if (!self.isFirstTraining) cell.textField.text = [property objectForKey:propertyName];
+        if (!_isFirstTraining) cell.textField.text = [property objectForKey:propertyName];
     }else{
         cell.detailTextLabel.text = [property objectForKey:propertyName];
         cell.detailTextLabel.backgroundColor = [UIColor clearColor];
