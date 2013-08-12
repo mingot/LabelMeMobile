@@ -72,5 +72,9 @@
 
 - (void) cancelTraining;
 
+// get the hog image of the weights obtained
+- (UIImage *) getHogImageOfTheWeights;
+
+
 
 @end

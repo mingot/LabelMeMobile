@@ -601,7 +601,7 @@
 - (void) loadDetectorInfo
 {
     //images
-//    self.detectorHogView.image = [UIImage hogImageFromFeatures:self.detector.weightsP withSize:self.detector.sizesP];
+    self.detectorHogView.image = [self.detector getHogImageOfTheWeights];
     self.detectorView.image = [UIImage imageWithContentsOfFile:self.detector.averageImagePath];
     
     self.detectorProperties = nil;

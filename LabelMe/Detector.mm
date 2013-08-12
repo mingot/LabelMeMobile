@@ -483,6 +483,11 @@ using namespace cv;
 }
 
 
+- (UIImage *) getHogImageOfTheWeights
+{
+    return [UIImage hogImageFromFeatures:_weightsP withSize:_sizesP];
+}
+
 
 #pragma mark -
 #pragma mark Private methods
