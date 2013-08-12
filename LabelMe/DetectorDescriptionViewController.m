@@ -316,8 +316,8 @@
 
     
     //train in a different queue
-    dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
-    dispatch_async(myQueue, ^{
+    dispatch_queue_t training_queue = dispatch_queue_create("training_queue", 0);
+    dispatch_async(training_queue, ^{
         __block int trainingState = [self trainForImagesNames:trainingImagesNames];
         if (trainingState == SUCCESS) {
             [self.sendingView showMessage:@"Finished training"];
@@ -358,6 +358,7 @@
             [self.sendingView stopAfterTraining];            
         });
     });
+    dispatch_release(training_queue);
 
 }
 
@@ -593,6 +594,7 @@
     CFStringRef uuidStringRef = CFUUIDCreateString(NULL, uuidRef);
     CFRelease(uuidRef);
     NSString *result = (__bridge NSString *) uuidStringRef;
+    CFRelease(uuidStringRef);
     return [result substringToIndex:8];
 }
 

@@ -45,11 +45,11 @@
 @property (strong, nonatomic) NSNumber *detectionThreshold;
 
 
-
 - (id) initWithCoder:(NSCoder *)aDecoder;
 
 // Train the detector given an initial set formed by Images and ground truth bounding boxes containing positive examples.
-// Returns 1 == success, 0 == fail, 2==interrupted
+// Uses MaxHOG as an initial value for HoG dimensions. Common value is 8.
+// Returns 0:fail, 1:success, 2:interrupted
 - (int) trainOnSet:(TrainingSet *)trainingSet forMaxHOG:(int)maxHog;
 
 //Given a set with ground truth bounding boxes, returns the metric spesified.

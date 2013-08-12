@@ -23,6 +23,7 @@ using namespace cv;
 #define STOP_CRITERIA 0.05 
 #define MAX_IMAGE_SIZE 300.0
 #define SCALES_PER_OCTAVE 10
+#define MAX_TRAINING_ITERATIONS 10
 
 //training results
 #define SUCCESS 1
@@ -31,8 +32,8 @@ using namespace cv;
 
 @interface Detector ()
 {
-    int *_sizesP;
-    double *_weightsP;
+    int *_sizesP; //Array with the dimensions of the features: hog_width x hog_height x features_per_hog_bin
+    double *_weightsP; //Array with the weights obtained in each dimension
     
     int _numOfFeatures;
     int _numSupportVectors;
@@ -45,14 +46,15 @@ using namespace cv;
     int _iniPyramid;
     int _finPyramid;
     
-    //store the weights of the last iteration for convergence
-    double *_weightsPLast;
-    
     //detector buffer (when training)
     NSMutableArray *_receivedImageIndex;
     NSMutableArray *_imagesHogPyramid;
     
-    BOOL _isTrainCancelled; 
+    BOOL _isTrainCancelled;
+    
+    float *_trainingImageLabels; //Array containg the labels for the training set
+    float *_trainingImageFeatures; //Matrix containing the features for each image of the training set
+    int _numberOfTrainingExamples; //Counter of the total number of training images
 }
 
 
@@ -63,15 +65,107 @@ using namespace cv;
 - (NSArray *) getBoundingBoxesIn:(HogFeature *)imageHog forPyramid:(int)pyramidLevel forIndex:(int)imageHogIndex;
 
 //add a selected bounding box (its correspondent hog features) to the training buffer
--(void) addExample:(BoundingBox *)p to:(TrainingSet *)trainingSet;
+- (void) addExample:(BoundingBox *)p to:(TrainingSet *)trainingSet;
 
--(double) computeDifferenceOfWeights;
+- (double) computeDifferenceWithLastWeights:(double *) weightsPLast;
+
+
+//Print unoriented hog features for debugging purposes
+- (void) printListHogFeatures:(float *) listOfHogFeaturesFloat;
 
 @end
 
 
 @implementation Detector
 
+
+#pragma mark -
+#pragma mark Initialization & Encoding
+
+- (id) init
+{
+    if (self = [super init]) {
+        //dummy initialization to be replaced during the training
+        _sizesP = (int *) malloc(3*sizeof(int));
+        _weightsP = (double *) malloc(sizeof(double));
+    }
+    
+    return self;
+}
+
+-(id) initWithCoder:(NSCoder *)aDecoder
+{
+    if (self = [super init]) {
+        self.weights = [aDecoder decodeObjectForKey:@"weights"];
+        self.sizes = [aDecoder decodeObjectForKey:@"sizes"];
+        self.name = [aDecoder decodeObjectForKey:@"name"];
+        self.detectorID = [aDecoder decodeObjectForKey:@"detectorID"];
+        self.targetClasses = [aDecoder decodeObjectForKey:@"targetClasses"];
+        self.numberSV = [aDecoder decodeObjectForKey:@"numberSV"];
+        self.numberOfPositives = [aDecoder decodeObjectForKey:@"numberOfPositives"];
+        self.precisionRecall = [aDecoder decodeObjectForKey:@"precisionRecall"];
+        self.timeLearning = [aDecoder decodeObjectForKey:@"timeLearning"];
+        self.imagesUsedTraining = [aDecoder decodeObjectForKey:@"imagesUsedTraining"];
+        self.averageImagePath = [aDecoder decodeObjectForKey:@"averageImagePath"];
+        self.averageImageThumbPath = [aDecoder decodeObjectForKey:@"averageImageThumbPath"];
+        self.updateDate = [aDecoder decodeObjectForKey:@"updateDate"];
+        self.scaleFactor = [aDecoder decodeObjectForKey:@"scaleFactor"];
+        self.detectionThreshold = [aDecoder decodeObjectForKey:@"detectionThreshold"];
+        
+        free(_sizesP);
+        _sizesP = (int *) malloc(3*sizeof(int));
+        _sizesP[0] = [(NSNumber *) [self.sizes objectAtIndex:0] intValue];
+        _sizesP[1] = [(NSNumber *) [self.sizes objectAtIndex:1] intValue];
+        _sizesP[2] = [(NSNumber *) [self.sizes objectAtIndex:2] intValue];
+        
+        int numberOfWeights = _sizesP[0]*_sizesP[1]*_sizesP[2] + 1; //+1 for the bias
+        
+        free(_weightsP);
+        _weightsP = (double *) malloc(numberOfWeights*sizeof(double));
+        for(int i=0; i<numberOfWeights; i++)
+            _weightsP[i] = [(NSNumber *) [self.weights objectAtIndex:i] doubleValue];
+    }
+    
+    return self;
+}
+
+- (void) encodeWithCoder:(NSCoder *)aCoder
+{
+    self.sizes = [[NSArray alloc] initWithObjects:
+                  [NSNumber numberWithInt:_sizesP[0]],
+                  [NSNumber numberWithInt:_sizesP[1]],
+                  [NSNumber numberWithInt:_sizesP[2]], nil];
+    
+    int numberOfSvmWeights = _sizesP[0]*_sizesP[1]*_sizesP[2] + 1; //+1 for the bias
+    
+    self.weights = [[NSMutableArray alloc] initWithCapacity:numberOfSvmWeights];
+    for(int i=0; i<numberOfSvmWeights; i++)
+        [self.weights addObject:[NSNumber numberWithDouble:_weightsP[i]]];
+    
+    
+    [aCoder encodeObject:self.weights forKey:@"weights"];
+    [aCoder encodeObject:self.sizes forKey:@"sizes"];
+    [aCoder encodeObject:self.name forKey:@"name"];
+    [aCoder encodeObject:self.detectorID forKey:@"detectorID"];
+    [aCoder encodeObject:self.targetClasses forKey:@"targetClasses"];
+    [aCoder encodeObject:self.numberSV forKey:@"numberSV"];
+    [aCoder encodeObject:self.numberOfPositives forKey:@"numberOfPositives"];
+    [aCoder encodeObject:self.precisionRecall forKey:@"precisionRecall"];
+    [aCoder encodeObject:self.timeLearning forKey:@"timeLearning"];
+    [aCoder encodeObject:self.imagesUsedTraining forKey:@"imagesUsedTraining"];
+    [aCoder encodeObject:self.averageImagePath forKey:@"averageImagePath"];
+    [aCoder encodeObject:self.averageImageThumbPath forKey:@"averageImageThumbPath"];
+    [aCoder encodeObject:self.updateDate forKey:@"updateDate"];
+    [aCoder encodeObject:self.scaleFactor forKey:@"scaleFactor"];
+    [aCoder encodeObject:self.detectionThreshold forKey:@"detectionThreshold"];
+    
+}
+
+- (void) dealloc
+{
+    free(_sizesP);
+    free(_weightsP);
+}
 
 
 #pragma mark -
@@ -87,44 +181,10 @@ using namespace cv;
 #pragma mark -
 #pragma mark Public Methods
 
-
-- (id) init
-{
-    if (self = [super init]) {
-        
-        //dummy initialization to be replaced during the training
-        _sizesP = (int *) malloc(3*sizeof(int));
-        _sizesP[0] = 1;
-        _sizesP[1] = 1;
-        _sizesP[2] = 1;
-        
-        _weightsP = (double *) malloc(sizeof(double));
-        _weightsP[0] = 0;
-    }
-    
-    return self;
-}
-
-
-- (void) printListHogFeatures:(float *) listOfHogFeaturesFloat
-{
-    //Print unoriented hog features for debugging purposes
-    for(int y=0; y<_sizesP[0]; y++){
-        for(int x=0; x<_sizesP[1]; x++){
-            for(int f = 18; f<27; f++){
-                printf("%f ", listOfHogFeaturesFloat[y + x*7 + f*7*5]);
-//                if(f==17 || f==26) printf("  |  ");
-            }
-            printf("\n");
-        }
-        printf("\n*************************************************************************\n");
-    }
-}
-
 - (int) trainOnSet:(TrainingSet *)trainingSet forMaxHOG:(int)maxHog;
 {
-    NSDate *start = [NSDate date]; //to compute the learning time.
-    free(_weightsP);
+    NSDate *start = [NSDate date]; //to compute the training time.
+
     _isLearning = YES;
     
     //array initialization
@@ -156,27 +216,28 @@ using namespace cv;
     
     //define buffer sizes
     //TODO: max size for the buffers
-    trainingSet.imageFeatures = (float *) malloc(MAX_NUMBER_EXAMPLES*_numOfFeatures*sizeof(float));
-    trainingSet.labels = (float *) malloc(MAX_NUMBER_EXAMPLES*sizeof(float));
+    _trainingImageFeatures = (float *) malloc(MAX_NUMBER_EXAMPLES*_numOfFeatures*sizeof(float));
+    _trainingImageLabels = (float *) malloc(MAX_NUMBER_EXAMPLES*sizeof(float));
     
     //convergence loop
-    _weightsP = (double *) calloc((_numOfFeatures+1),sizeof(double));
-    for(int i=0; i<_numOfFeatures+1;i++) _weightsP[i] = 1;
-    _weightsPLast = (double *) calloc((_numOfFeatures+1),sizeof(double));
+    free(_weightsP);
+    _weightsP = (double *) calloc((_numOfFeatures + 1),sizeof(double));
+    for(int i=0; i<_numOfFeatures+1; i++) _weightsP[i] = 1;
+    double *weightsPLast = (double *) calloc((_numOfFeatures + 1),sizeof(double));
     _diff = 1;
     int iter = 0;
     _numSupportVectors=0;
     BOOL firstTimeError = YES;
     
-    while(_diff > STOP_CRITERIA && iter<10 && !_isTrainCancelled){
+    while(_diff > STOP_CRITERIA && iter<MAX_TRAINING_ITERATIONS && !_isTrainCancelled){
 
         [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter]];
         
         //Get Bounding Boxes from detection
         [self getBoundingBoxesForTrainingSet:trainingSet];
         
-        //The first time that not enough positive or negative bb have been generated, try to unify all the sizes of the bounding boxes. This solve the problem in most of the cases. However if still not solved, through an error saying not possible training done due to the ground truth bouning boxes shape.
-        if(self.numberOfPositives.intValue < 2 || self.numberOfPositives.intValue == trainingSet.numberOfTrainingExamples){
+        //The first time that not enough positive or negative bb have been generated, try to unify all the sizes of the bounding boxes. This solve the problem in most of the cases at the cost of losing accuracy. However if still not solved, give an error saying not possible training done due to the ground truth bouning boxes shape.
+        if(self.numberOfPositives.intValue < 2 || self.numberOfPositives.intValue == _numberOfTrainingExamples){
             if(firstTimeError){
                 [trainingSet unifyGroundTruthBoundingBoxes];
                 firstTimeError = NO;
@@ -185,9 +246,9 @@ using namespace cv;
         }
         
         //Train the SVM, update weights and store support vectors and labels
-        [self trainSVMAndGetWeights:trainingSet];
+        [self trainSVMAndGetWeights];
         
-        _diff = [self computeDifferenceOfWeights];
+        _diff = [self computeDifferenceWithLastWeights:weightsPLast];
         iter++;
         if(iter!=1) [self.delegate updateProgress:STOP_CRITERIA/_diff];
     }
@@ -206,9 +267,9 @@ using namespace cv;
     _isLearning = NO;
     _imagesHogPyramid = nil;
     _receivedImageIndex = nil;
-    free(_weightsPLast);
-    free(trainingSet.imageFeatures);
-    free(trainingSet.labels);
+    free(weightsPLast);
+    free(_trainingImageFeatures);
+    free(_trainingImageLabels);
     return SUCCESS; 
 }
 
@@ -421,74 +482,6 @@ using namespace cv;
     _isTrainCancelled = YES;
 }
 
-#pragma mark -
-#pragma mark Encoding
-
--(id) initWithCoder:(NSCoder *)aDecoder
-{
-    if (self = [super init]) {
-        self.weights = [aDecoder decodeObjectForKey:@"weights"];
-        self.sizes = [aDecoder decodeObjectForKey:@"sizes"];
-        self.name = [aDecoder decodeObjectForKey:@"name"];
-        self.detectorID = [aDecoder decodeObjectForKey:@"detectorID"];
-        self.targetClasses = [aDecoder decodeObjectForKey:@"targetClasses"];
-        self.numberSV = [aDecoder decodeObjectForKey:@"numberSV"];
-        self.numberOfPositives = [aDecoder decodeObjectForKey:@"numberOfPositives"];
-        self.precisionRecall = [aDecoder decodeObjectForKey:@"precisionRecall"];
-        self.timeLearning = [aDecoder decodeObjectForKey:@"timeLearning"];
-        self.imagesUsedTraining = [aDecoder decodeObjectForKey:@"imagesUsedTraining"];
-        self.averageImagePath = [aDecoder decodeObjectForKey:@"averageImagePath"];
-        self.averageImageThumbPath = [aDecoder decodeObjectForKey:@"averageImageThumbPath"];
-        self.updateDate = [aDecoder decodeObjectForKey:@"updateDate"];
-        self.scaleFactor = [aDecoder decodeObjectForKey:@"scaleFactor"];
-        self.detectionThreshold = [aDecoder decodeObjectForKey:@"detectionThreshold"];
-        
-        _sizesP = (int *) malloc(3*sizeof(int));
-        _sizesP[0] = [(NSNumber *) [self.sizes objectAtIndex:0] intValue];
-        _sizesP[1] = [(NSNumber *) [self.sizes objectAtIndex:1] intValue];
-        _sizesP[2] = [(NSNumber *) [self.sizes objectAtIndex:2] intValue];
-        
-        int numberOfSvmWeights = _sizesP[0]*_sizesP[1]*_sizesP[2] + 1; //+1 for the bias
-        
-        _weightsP = (double *) malloc(numberOfSvmWeights*sizeof(double));
-        for(int i=0; i<numberOfSvmWeights; i++)
-            _weightsP[i] = [(NSNumber *) [self.weights objectAtIndex:i] doubleValue];
-    }
-    
-    return self;
-}
-
-- (void) encodeWithCoder:(NSCoder *)aCoder
-{
-    self.sizes = [[NSArray alloc] initWithObjects:
-                    [NSNumber numberWithInt:_sizesP[0]],
-                    [NSNumber numberWithInt:_sizesP[1]],
-                    [NSNumber numberWithInt:_sizesP[2]], nil];
-    
-    int numberOfSvmWeights = _sizesP[0]*_sizesP[1]*_sizesP[2] + 1; //+1 for the bias
-    
-    self.weights = [[NSMutableArray alloc] initWithCapacity:numberOfSvmWeights];
-    for(int i=0; i<numberOfSvmWeights; i++)
-        [self.weights addObject:[NSNumber numberWithDouble:_weightsP[i]]];
-    
-    
-    [aCoder encodeObject:self.weights forKey:@"weights"];
-    [aCoder encodeObject:self.sizes forKey:@"sizes"];
-    [aCoder encodeObject:self.name forKey:@"name"];
-    [aCoder encodeObject:self.detectorID forKey:@"detectorID"];
-    [aCoder encodeObject:self.targetClasses forKey:@"targetClasses"];
-    [aCoder encodeObject:self.numberSV forKey:@"numberSV"];
-    [aCoder encodeObject:self.numberOfPositives forKey:@"numberOfPositives"];
-    [aCoder encodeObject:self.precisionRecall forKey:@"precisionRecall"];
-    [aCoder encodeObject:self.timeLearning forKey:@"timeLearning"];
-    [aCoder encodeObject:self.imagesUsedTraining forKey:@"imagesUsedTraining"];
-    [aCoder encodeObject:self.averageImagePath forKey:@"averageImagePath"];
-    [aCoder encodeObject:self.averageImageThumbPath forKey:@"averageImageThumbPath"];
-    [aCoder encodeObject:self.updateDate forKey:@"updateDate"];
-    [aCoder encodeObject:self.scaleFactor forKey:@"scaleFactor"];
-    [aCoder encodeObject:self.detectionThreshold forKey:@"detectionThreshold"];
-    
-}
 
 
 #pragma mark -
@@ -574,11 +567,11 @@ using namespace cv;
 
 -(void) addExample:(BoundingBox *)p to:(TrainingSet *)trainingSet
 {
-    int index = trainingSet.numberOfTrainingExamples;
+    int index = _numberOfTrainingExamples;
     HogFeature *imageHog = [_imagesHogPyramid objectAtIndex:p.imageHogIndex];
     
     //label
-    trainingSet.labels[index] = p.label;
+    _trainingImageLabels[index] = p.label;
     
     //features
     int boundingBoxPosition = p.locationOnImageHog.y + p.locationOnImageHog.x*imageHog.numBlocksY;
@@ -587,11 +580,11 @@ using namespace cv;
             for(int j=0; j<_sizesP[0]; j++){
                 int sweeping1 = j + i*_sizesP[0] + f*_sizesP[0]*_sizesP[1];
                 int sweeping2 = j + i*imageHog.numBlocksY + f*imageHog.numBlocksX*imageHog.numBlocksY;
-                trainingSet.imageFeatures[index*_numOfFeatures + sweeping1] = (float) imageHog.features[boundingBoxPosition + sweeping2];
+                _trainingImageFeatures[index*_numOfFeatures + sweeping1] = (float) imageHog.features[boundingBoxPosition + sweeping2];
             }
 
     
-    trainingSet.numberOfTrainingExamples++;
+    _numberOfTrainingExamples++;
 }
 
 
@@ -599,7 +592,7 @@ using namespace cv;
 - (void) getBoundingBoxesForTrainingSet:(TrainingSet *)trainingSet
 {
     __block int positives = 0;
-    trainingSet.numberOfTrainingExamples = _numSupportVectors;
+    _numberOfTrainingExamples = _numSupportVectors;
     
     //concurrent adding examples for the different images
     dispatch_queue_t trainingQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -627,7 +620,7 @@ using namespace cv;
                         if (overlapArea > 0.8 && overlapArea<1){
                             newBB.label = 1;
                             isNegative = NO;
-                            if(trainingSet.numberOfTrainingExamples+1 < MAX_NUMBER_EXAMPLES){
+                            if(_numberOfTrainingExamples+1 < MAX_NUMBER_EXAMPLES){
                                 dispatch_sync(dispatch_get_main_queue(), ^{
                                     [self addExample:newBB to:trainingSet];
                                     positives++;
@@ -652,13 +645,13 @@ using namespace cv;
     self.numberOfPositives = [NSNumber numberWithInt:positives];
 }
 
--(void) trainSVMAndGetWeights:(TrainingSet *)trainingSet
+-(void) trainSVMAndGetWeights
 {
-    [self.delegate sendMessage:[NSString stringWithFormat:@"Number of Training Examples: %d", trainingSet.numberOfTrainingExamples]];
+    [self.delegate sendMessage:[NSString stringWithFormat:@"Number of Training Examples: %d", _numberOfTrainingExamples]];
     int positives=0;
     
-    Mat labelsMat(trainingSet.numberOfTrainingExamples,1,CV_32FC1, trainingSet.labels);
-    Mat trainingDataMat(trainingSet.numberOfTrainingExamples, _numOfFeatures, CV_32FC1, trainingSet.imageFeatures);
+    Mat labelsMat(_numberOfTrainingExamples,1,CV_32FC1, _trainingImageLabels);
+    Mat trainingDataMat(_numberOfTrainingExamples, _numOfFeatures, CV_32FC1, _trainingImageFeatures);
     //std::cout << trainingDataMat << std::endl; //output learning matrix
     
     // Set up SVM's parameters
@@ -672,9 +665,9 @@ using namespace cv;
     
     //update weights and store the support vectors
     _numSupportVectors = SVM.get_support_vector_count();
-    trainingSet.numberOfTrainingExamples = _numSupportVectors;
+    _numberOfTrainingExamples = _numSupportVectors;
     const CvSVMDecisionFunc *dec = SVM.decision_func;
-    for(int i=0; i<_numOfFeatures+1;i++) _weightsP[i] = 0.0;
+    for(int i=0; i<_numOfFeatures+1; i++) _weightsP[i] = 0.0;
     
     NSLog(@"Num of support vectors: %d\n", _numSupportVectors);
     
@@ -687,17 +680,17 @@ using namespace cv;
         
         // Get the current label of the supportvector
         Mat supportVectorMat(_numOfFeatures,1,CV_32FC1, sv_aux);
-        trainingSet.labels[i] = SVM.predict(supportVectorMat);
-        if(trainingSet.labels[i]==1) positives++;
+        _trainingImageLabels[i] = SVM.predict(supportVectorMat);
+        if(_trainingImageLabels[i]==1) positives++;
         free(sv_aux);
-        NSLog(@"label: %f   alpha: %f \n", trainingSet.labels[i], alpha);
+        NSLog(@"label: %f   alpha: %f \n", _trainingImageLabels[i], alpha);
         
         for(int j=0;j<_numOfFeatures;j++){
             // add to get the svm weights
             _weightsP[j] -= (double) alpha * supportVector[j];
             
             //store the support vector as the first features
-            trainingSet.imageFeatures[i*_numOfFeatures + j] = supportVector[j];
+            _trainingImageFeatures[i*_numOfFeatures + j] = supportVector[j];
         }
     }
     _weightsP[_numOfFeatures] = - (double) dec[0].rho; // The sign of the bias and rho have opposed signs.
@@ -705,28 +698,43 @@ using namespace cv;
     [self.delegate sendMessage:[NSString stringWithFormat:@"bias: %f", _weightsP[_numOfFeatures]]];
 }
 
--(double) computeDifferenceOfWeights
+-(double) computeDifferenceWithLastWeights:(double *) weightsPLast
 {
     _diff=0.0;
     
     double norm=0, normLast=0;
     for(int i=0; i<_sizesP[0]*_sizesP[1]*_sizesP[2] + 1; i++){
         norm += _weightsP[i]*_weightsP[i];
-        normLast += _weightsPLast[i]*_weightsPLast[i];
+        normLast += weightsPLast[i]*weightsPLast[i];
     }
     norm = sqrt(norm);
     normLast = normLast!=0 ? sqrt(normLast):1;
     
 
     for(int i=0; i<_sizesP[0]*_sizesP[1]*_sizesP[2] + 1; i++){
-        _diff += (_weightsP[i]/norm - _weightsPLast[i]/normLast)*(_weightsP[i]/norm - _weightsPLast[i]/normLast);
-        _weightsPLast[i] = _weightsP[i];
+        _diff += (_weightsP[i]/norm - weightsPLast[i]/normLast)*(_weightsP[i]/norm - weightsPLast[i]/normLast);
+        weightsPLast[i] = _weightsP[i];
     }
     
     [self.delegate sendMessage:[NSString stringWithFormat:@"norms: %f, %f", norm, normLast]];
     [self.delegate sendMessage:[NSString stringWithFormat:@"difference: %f", sqrt(_diff)]];
     
     return sqrt(_diff);
+}
+
+- (void) printListHogFeatures:(float *) listOfHogFeaturesFloat
+{
+    //Print unoriented hog features for debugging purposes
+    for(int y=0; y<_sizesP[0]; y++){
+        for(int x=0; x<_sizesP[1]; x++){
+            for(int f = 18; f<27; f++){
+                printf("%f ", listOfHogFeaturesFloat[y + x*7 + f*7*5]);
+                //                if(f==17 || f==26) printf("  |  ");
+            }
+            printf("\n");
+        }
+        printf("\n*************************************************************************\n");
+    }
 }
 
 @end

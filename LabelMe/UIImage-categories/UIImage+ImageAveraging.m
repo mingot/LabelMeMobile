@@ -33,6 +33,7 @@
         //average
         for(int i=0; i<height*width*4; i++)
             imageResult[i] += imagePointer[i]*1.0/images.count;
+        free(imagePointer);
     }
     
     //enhancement: increase contrast by ajusting max and min to 255 and 0 respectively
@@ -51,6 +52,9 @@
     
     CGImageRef imageResultRef = CGBitmapContextCreateImage(contextResult);
     CGContextRelease(contextResult);
+    free(imageResult);
+    
+    
     UIImage *image = [UIImage imageWithCGImage:imageResultRef scale:1.0 orientation:UIImageOrientationUp];
     return image;
 }
