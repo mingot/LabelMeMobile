@@ -549,22 +549,28 @@
     //setting hog dimensions based on user preferences
     self.detector.maxHog = [self.detectorResourceHandler getHogFromPreferences];
     
-    TrainingSet *trainingSet = [[TrainingSet alloc] initForDetector:self.detector
-                                                     forImagesNames:imagesNames
-                                                    withFileHandler:_detectorResourceHandler];
+    //constructs the training set of the images
+    TrainingSet *trainingSet = [[TrainingSet alloc] initForTargetClasses:self.detector.targetClasses
+                                                          forImagesNames:imagesNames
+                                                         withFileHandler:_detectorResourceHandler];
     
-    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d",trainingSet.images.count]];
+    //save it associated to a detector
+    self.detector.imagesUsedTraining = [NSMutableArray arrayWithArray:trainingSet.imagesNames];
+    
+    //3 additional images (3 abstract art) added apart.
+    [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the training set: %d + 3",trainingSet.images.count-3]];
         
     //obtain the image average of the groundtruth images 
     NSArray *listOfImages = [trainingSet getImagesOfBoundingBoxes];
     self.averageImage = [UIImage imageAverageFromImages:listOfImages];
     self.detectorView.image = self.averageImage;
     
-    //learn
+    //train
     [self updateProgress:0.05];
     [self.sendingView showMessage:@"Training begins!"];
     int successTraining = [self.detector train:trainingSet];
-
+    [self.sendingView showMessage:@"Finished training"];
+    
     return successTraining;
 }
 
@@ -572,9 +578,9 @@
 - (void) testForImagesNames: (NSArray *)imagesNames
 {
     //initialization
-    TrainingSet *testSet = [[TrainingSet alloc] initForDetector:self.detector
-                                                 forImagesNames:imagesNames
-                                                withFileHandler:_detectorResourceHandler];
+    TrainingSet *testSet = [[TrainingSet alloc] initForTargetClasses:self.detector.targetClasses
+                                                      forImagesNames:imagesNames
+                                                     withFileHandler:_detectorResourceHandler];
     
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the test set: %d",testSet.images.count]];
     [self.sendingView showMessage:@"Testing begins!"];

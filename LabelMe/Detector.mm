@@ -24,6 +24,10 @@ using namespace cv;
 #define MAX_IMAGE_SIZE 300.0
 #define SCALES_PER_OCTAVE 10
 
+//training results
+#define SUCCESS 1
+#define INTERRUPTED 2 //and not trained
+#define FAIL 0
 
 @interface Detector ()
 {
@@ -210,7 +214,7 @@ using namespace cv;
                 [trainingSet unifyGroundTruthBoundingBoxes];
                 firstTimeError = NO;
                 continue;
-            }else return 0;
+            }else return FAIL;
         }
         
         //Train the SVM, update weights and store support vectors and labels
@@ -223,7 +227,7 @@ using namespace cv;
     
     
     if(self.trainCancelled) [self.delegate sendMessage:@"\n TRAINING INTERRUPTED \n"];
-    if(iter == 0) return 2; //interrupted without training
+    if(iter == 0) return INTERRUPTED; 
 
     
     //update information about the detector
@@ -238,7 +242,7 @@ using namespace cv;
     free(self.weightsPLast);
     free(trainingSet.imageFeatures);
     free(trainingSet.labels);
-    return 1; //success
+    return SUCCESS; 
 }
 
 
@@ -413,16 +417,16 @@ using namespace cv;
 }
 
 
-- (void) testOnSet:(TrainingSet *)set atThresHold:(float)detectionThreshold
+- (void) testOnSet:(TrainingSet *)testSet atThresHold:(float)detectionThreshold
 {
     
     self.isLearning = YES;
     //TODO: not multiimage
     NSLog(@"Detection threshold: %f", detectionThreshold);
     int tp=0, fp=0, fn=0;// tn=0;
-    for(BoundingBox *groundTruthBoundingBox in set.groundTruthBoundingBoxes){
+    for(BoundingBox *groundTruthBoundingBox in testSet.groundTruthBoundingBoxes){
         bool found = NO;
-        UIImage *selectedImage = [set.images objectAtIndex:groundTruthBoundingBox.imageIndex];
+        UIImage *selectedImage = [testSet.images objectAtIndex:groundTruthBoundingBox.imageIndex];
         NSArray *detectedBoundingBoxes = [self detect:selectedImage minimumThreshold:detectionThreshold pyramids:10 usingNms:YES deviceOrientation:UIImageOrientationUp learningImageIndex:groundTruthBoundingBox.imageIndex];
         NSLog(@"For image %d generated %d detecting boxes", groundTruthBoundingBox.imageIndex, detectedBoundingBoxes.count);
         for(BoundingBox *detectedBoundingBox in detectedBoundingBoxes)

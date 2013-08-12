@@ -39,6 +39,7 @@
     self.images = [[NSMutableArray alloc] init];
     self.groundTruthBoundingBoxes = [[NSMutableArray alloc] init];
     self.boundingBoxes = [[NSMutableArray alloc] init];
+    self.imagesNames = [[NSMutableArray alloc] init];
 }
 
 - (id) init
@@ -48,9 +49,9 @@
     return self;
 }
 
-- (id) initForDetector:(Detector *)detector
-        forImagesNames:(NSArray *) imagesNames
-       withFileHandler:(DetectorResourceHandler *) detectorResourceHandler;
+- (id) initForTargetClasses:(NSArray *)targetClasses
+             forImagesNames:(NSArray *) imagesNames
+            withFileHandler:(DetectorResourceHandler *) detectorResourceHandler;
 {
     
     if(self = [super init]){
@@ -64,7 +65,7 @@
             NSMutableArray *boxes = [detectorResourceHandler getBoxesForImageName:imageName];
             
             for(Box *box in boxes){
-                for(NSString *class in detector.targetClasses)
+                for(NSString *class in targetClasses)
                     if([box.label isEqualToString:class]){ //add bounding box
                         containedClass = YES;
                         BoundingBox *cp = [[BoundingBox alloc] init];
@@ -80,12 +81,12 @@
             if(containedClass){ //add image
                 UIImage *image = [detectorResourceHandler getImageWithImageName:imageName];
                 [self.images addObject:image];
-                [detector.imagesUsedTraining addObject:imageName];
+                [self.imagesNames addObject:imageName];
             }
         }
         
-        //Add abstract pictures to the training set to generate false positives when the bb is very big
-        //guess the relationship with the artists :)
+        //Add abstract pictures to the training set to generate false positives when the bb is very big.
+        //guess the relationship with the artists...
         [self.images addObject:[UIImage imageNamed:@"picaso.jpg"]];
         [self.images addObject:[UIImage imageNamed:@"dali.jpg"]];
         [self.images addObject:[UIImage imageNamed:@"miro.jpg"]];
