@@ -49,10 +49,9 @@
 {
     if(self = [super init]){
         _paths = [[NSArray alloc] initWithArray:[self newArrayWithFolders:username]];
-        _userDictionary = [[NSMutableDictionary alloc]initWithContentsOfFile:[[_paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",username]];;
-        self.filename = filename;
-        
         _username = username;
+        
+        self.filename = filename;
     }
     return self;
 }
@@ -62,6 +61,7 @@
 {
     if(filename!=_filename){
         _filename = filename;
+        _userDictionary = [[NSMutableDictionary alloc]initWithContentsOfFile:[[_paths objectAtIndex:USER] stringByAppendingFormat:@"/%@.plist",_username]];
         _imagePath = [[_paths objectAtIndex:IMAGES] stringByAppendingPathComponent:filename];
         _boxesPath = [[_paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:filename];
         _thumbnailPath = [[_paths objectAtIndex:THUMB] stringByAppendingPathComponent:filename];
