@@ -21,7 +21,6 @@
 #define kLabelHeight 40
 #define kLabelFontSize 15
 
-
 #define kExteriorBox 0
 #define kUpperLeft 1
 #define kUpperRight 2

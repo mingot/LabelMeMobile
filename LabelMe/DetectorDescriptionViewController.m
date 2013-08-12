@@ -313,7 +313,7 @@
     
     [self.sendingView initializeForTraining];
     self.navigationController.navigationBarHidden = YES;
-    self.detector.trainCancelled = NO;
+
     
     //train in a different queue
     dispatch_queue_t myQueue = dispatch_queue_create("learning_queue", 0);
@@ -376,7 +376,7 @@
         self.sendingView.hidden = YES;
         self.navigationController.navigationBarHidden = NO;
     }else if([self.sendingView.sendingViewID isEqualToString:@"train"]){
-        self.detector.trainCancelled = YES;
+        [self.detector cancelTraining];
         self.sendingView.cancelButton.enabled = NO;
         self.sendingView.sendingViewID = @"info";
     }
@@ -546,9 +546,6 @@
     //initialization
     self.detector.imagesUsedTraining = [[NSMutableArray alloc] init];
     
-    //setting hog dimensions based on user preferences
-    self.detector.maxHog = [self.detectorResourceHandler getHogFromPreferences];
-    
     //constructs the training set of the images
     TrainingSet *trainingSet = [[TrainingSet alloc] initForTargetClasses:self.detector.targetClasses
                                                           forImagesNames:imagesNames
@@ -568,7 +565,8 @@
     //train
     [self updateProgress:0.05];
     [self.sendingView showMessage:@"Training begins!"];
-    int successTraining = [self.detector train:trainingSet];
+    int successTraining = [self.detector trainOnSet:trainingSet
+                                          forMaxHOG:[self.detectorResourceHandler getHogFromPreferences]];
     [self.sendingView showMessage:@"Finished training"];
     
     return successTraining;
@@ -601,7 +599,7 @@
 - (void) loadDetectorInfo
 {
     //images
-    self.detectorHogView.image = [UIImage hogImageFromFeatures:self.detector.weightsP withSize:self.detector.sizesP];
+//    self.detectorHogView.image = [UIImage hogImageFromFeatures:self.detector.weightsP withSize:self.detector.sizesP];
     self.detectorView.image = [UIImage imageWithContentsOfFile:self.detector.averageImagePath];
     
     self.detectorProperties = nil;

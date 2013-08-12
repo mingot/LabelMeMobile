@@ -26,10 +26,6 @@
 
 @property (strong, nonatomic) id<DetectorDelegate> delegate;
 
-@property int *sizesP;
-@property double *weightsP;
-@property NSMutableArray *imageListAux;
-@property int maxHog; //hog readed from user preferences;
 
 //Encoding properties
 @property (strong, nonatomic) NSString *name;
@@ -49,16 +45,16 @@
 @property (strong, nonatomic) NSNumber *detectionThreshold;
 
 
-@property BOOL trainCancelled; //received from outside
-
-//Initialization of the detector given the weight vectors of it
-- (id) initWithTemplateWeights:(double *)templateWeights;
-
 
 - (id) initWithCoder:(NSCoder *)aDecoder;
 
-//Train the detector given an initial set formed by Images and ground truth bounding boxes containing positive examples. Returns 1 == success, 0 == fail
-- (int) train:(TrainingSet *)trainingSet;
+// Train the detector given an initial set formed by Images and ground truth bounding boxes containing positive examples.
+// Returns 1 == success, 0 == fail, 2==interrupted
+- (int) trainOnSet:(TrainingSet *)trainingSet forMaxHOG:(int)maxHog;
+
+//Given a set with ground truth bounding boxes, returns the metric spesified.
+- (void) testOnSet:(TrainingSet *)set atThresHold:(float)detectionThreshold;
+
 
 //Detect object in the image and return array of convolution points for the indicated number of pyramids and detection threshold
 - (NSArray *) detect:(UIImage *) image
@@ -74,8 +70,8 @@
             usingNms:(BOOL)useNms
          orientation:(int)orientation;
 
-//Given a set with ground truth bounding boxes, returns the metric spesified.
-- (void) testOnSet:(TrainingSet *)set atThresHold:(float)detectionThreshold;
+
+- (void) cancelTraining;
 
 
 @end
