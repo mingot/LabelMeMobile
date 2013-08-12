@@ -100,11 +100,12 @@
     [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
     
     //Show only the first time the program loads
+    self.tip.hidden = YES;
     if (![@"1" isEqualToString:[[NSUserDefaults standardUserDefaults]
                                 objectForKey:@"Avalue"]]) {
         [[NSUserDefaults standardUserDefaults] setValue:@"1" forKey:@"Avalue"];
         [[NSUserDefaults standardUserDefaults] synchronize];
-        self.tip.hidden = YES;
+        self.tip.hidden = NO;
     }
     
     [self.view addSubview:self.tip];
