@@ -86,8 +86,8 @@ using namespace cv;
 {
     if (self = [super init]) {
         //dummy initialization to be replaced during the training
-        _sizesP = (int *) malloc(3*sizeof(int));
-        _weightsP = (double *) malloc(sizeof(double));
+        _sizesP = (int *) malloc(3*sizeof(int)); _sizesP[0] = 1; _sizesP[1] = 1; _sizesP[2] = 1;
+        _weightsP = (double *) malloc(sizeof(double)); _weightsP[0] = 0;
     }
     
     return self;
@@ -231,7 +231,7 @@ using namespace cv;
     
     while(_diff > STOP_CRITERIA && iter<MAX_TRAINING_ITERATIONS && !_isTrainCancelled){
 
-        [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d ******", iter]];
+        [self.delegate sendMessage:[NSString stringWithFormat:@"\n******* Iteration %d *******", iter]];
         
         //Get Bounding Boxes from detection
         [self getBoundingBoxesForTrainingSet:trainingSet];
@@ -254,8 +254,12 @@ using namespace cv;
     }
     
     
-    if(_isTrainCancelled) [self.delegate sendMessage:@"\n TRAINING INTERRUPTED \n"];
-    if(iter == 0) return INTERRUPTED; 
+    if(_isTrainCancelled){
+        [self.delegate sendMessage:@"\n TRAINING INTERRUPTED \n"];
+        return INTERRUPTED;
+    }
+//    if(iter == 0) return INTERRUPTED;
+
 
     
     //update information about the detector

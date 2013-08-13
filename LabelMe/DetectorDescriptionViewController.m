@@ -163,7 +163,7 @@
 - (void)initializeAndAddSendingView
 {
     //sending view, responsible for the waiting view
-    self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];//self.tabBarController.view.frame];
+    self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     [self.sendingView.cancelButton setTitle:@"Done" forState:UIControlStateNormal];
     self.sendingView.delegate = self;
     self.sendingView.hidden = YES;
@@ -211,7 +211,7 @@
 -(void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self loadDetectorInfo];
+    if (!_isFirstTraining) [self loadDetectorInfo];
     
     // Register keyboard events
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
@@ -299,17 +299,19 @@
               andTestImagesNames:(NSArray *)testImagesNames
 {
     
-    //first time training specify name of the detector
-    if(self.detector.targetClasses == nil){
+    
+    if(_isFirstTraining){//first time training specify name of the detector
         self.detector.targetClasses = classes;
         NSString *className = [self.detector.targetClasses componentsJoinedByString:@"+"];
         self.detector.name = [NSString stringWithFormat:@"%@-Detector",className];
         self.detector.detectorID = [NSString stringWithFormat:@"%@%@",className,[self uuid]];
+        
+    }else{ //save the current detector for undo purposes
+        self.previousDetector = [[Detector alloc] init];
+        self.previousDetector = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.detector]]; //trick to copy the object
     }
     
-    //save the current detector for undo purposes
-    self.previousDetector = [[Detector alloc] init];
-    self.previousDetector = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self.detector]]; //trick to copy the object
+
     
     [self.sendingView initializeForTraining];
     self.navigationController.navigationBarHidden = YES;
@@ -330,7 +332,8 @@
                 [self updateProgress:1];
                 
                 //update view of the detector
-                if(self.previousDetector != nil) self.undoButtonBar.enabled = YES;
+                _isFirstTraining = NO;
+                if(self.previousDetector !=  nil && !_isFirstTraining) self.undoButtonBar.enabled = YES;
                 [self saveAction:self];
                 [self loadDetectorInfo];
                 
