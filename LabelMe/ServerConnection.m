@@ -612,7 +612,7 @@ static BOOL didSignIn = NO;
                 [self.delegate photoSentCorrectly:filename];
                 break;
             case 2:
-                NSLog(@"not correct1");
+                NSLog(@"not correct");
                 //[self errorWithTitle:@"ERROR" andDescription:[divided objectAtIndex:divided.count-1]];
                 [self.delegate photoNotOnServer:[divided objectAtIndex:divided.count-3]];
                 break;

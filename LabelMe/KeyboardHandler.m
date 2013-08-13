@@ -8,7 +8,7 @@
 
 #import "KeyboardHandler.h"
 
-#define kOFFSET_FOR_KEYBOARD 20.0
+#define kOFFSET_FOR_KEYBOARD 40.0
 
 
 @interface KeyboardHandler()
@@ -17,6 +17,7 @@
     BOOL _moved;
     int _difference;
     UIToolbar *_toolbar; //word suggestion
+    
 }
 
 @end
@@ -63,10 +64,10 @@
     CGRect keyboardRect =[[[notification userInfo] objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue];
     
     // get the absolute coordinates of the view (inside UIWindow)
-    CGPoint absoluteOrigin = [_textField convertPoint:_textField.frame.origin toView:nil];
+    CGRect absoluteOriginRect = [_textField convertRect:_textField.frame toView:nil];
     
     // if the keyboard is hidding it, move it up
-    _difference = keyboardRect.origin.y - absoluteOrigin.y - kOFFSET_FOR_KEYBOARD;
+    _difference = keyboardRect.origin.y - (absoluteOriginRect.origin.y + absoluteOriginRect.size.height) - kOFFSET_FOR_KEYBOARD;
     if (_difference < 0)
     {
         [self moveUp:YES];

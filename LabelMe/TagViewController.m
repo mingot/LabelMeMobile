@@ -584,7 +584,6 @@
     [self.sendButton setEnabled:NO];
     [self.deleteButton setEnabled:NO];
     
-    NSLog(@"OJO!!!!! PHOTO SENT CORRECTLY!");
     self.labelsResourceHandler.isImageSent = YES;
 }
 
