@@ -11,7 +11,7 @@
 
 #define module(a, b) (a >= 0) ? (a)%b : ((a)%(b) + b)
 #define kViewTag 10
-#define kQueueDictionaryCapacity 10 //views to store in the internal dictionary
+#define kQueueDictionaryCapacity 5 //views to store in the internal dictionary
 #define kWidth self.frame.size.width
 #define kHeight self.frame.size.height
 // masks for flexible ajusting each views

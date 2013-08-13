@@ -182,6 +182,7 @@
     
     //save thumbnail and dictionary
     [self saveStateOnDisk];
+    [_recentLabels removeAllObjects];
     
 //    if (!self.tagView.userInteractionEnabled){
 //        self.tagView.userInteractionEnabled = YES;

@@ -17,7 +17,6 @@
     BOOL _moved;
     int _difference;
     UIToolbar *_toolbar; //word suggestion
-    
 }
 
 @end
