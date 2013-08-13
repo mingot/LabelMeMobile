@@ -68,13 +68,10 @@
     CGRect keyboardRect =[[[notification userInfo] objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue];
     
     // get the absolute coordinates of the view (inside UIWindow)
-    CGRect absoluteOriginRect = [_textField convertRect:_textField.frame toView:nil];
-    
-    NSLog(@"absolute origin rect:%@", NSStringFromCGRect(absoluteOriginRect));
-    NSLog(@"keyboard rect: %@", NSStringFromCGRect(keyboardRect));
+    CGRect absoluteOriginRect = [_textField convertRect:_textField.bounds toView:nil];
     
     // if the keyboard is hidding it, move it up
-    _difference = keyboardRect.origin.y - (absoluteOriginRect.origin.y + absoluteOriginRect.size.height) - kOFFSET_FOR_KEYBOARD;
+    _difference = (keyboardRect.origin.y - keyboardRect.size.height) - (absoluteOriginRect.origin.y + absoluteOriginRect.size.height) - kOFFSET_FOR_KEYBOARD;
     if (_difference < 0)
     {
         [self moveUp:YES];
