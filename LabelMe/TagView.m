@@ -39,7 +39,6 @@ UIViewAutoresizingFlexibleHeight
     float _lineWidth;
     BOOL _touchIsMoving;
     BOOL _touchIsResizing;
-    KeyboardHandler *_keyboardHandler;
 }
 
 
@@ -81,10 +80,6 @@ UIViewAutoresizingFlexibleHeight
     keyboardToolbar.barStyle = UIBarStyleBlackOpaque;
     keyboardToolbar.items = [NSArray arrayWithObjects:a,b, c,nil];
     self.label.inputAccessoryView = keyboardToolbar;
-    
-    //keyboardHandler to help when the keyboard ocludes the view
-    _keyboardHandler = [[KeyboardHandler alloc] initWithTextField:self.label];
-    //    _keyboardHandler = [[KeyboardHandler alloc] initWithDataSource:self];
 }
 
 - (IBAction)prova:(id)sender
@@ -212,10 +207,6 @@ UIViewAutoresizingFlexibleHeight
     return selectedBox;
 }
 
-- (void) setDataSourceForKeyboardSuggestions:(id<KeyboardHandlerDataSource>)dataSource
-{
-    _keyboardHandler.dataSource = dataSource;
-}
 
 #pragma mark -
 #pragma mark Draw Rect

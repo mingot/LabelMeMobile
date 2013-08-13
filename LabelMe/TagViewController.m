@@ -23,6 +23,7 @@
     BOOL *_isZoomIn;
     
     NSMutableSet *_recentLabels; //buffer with the recent labels for keyboard word suggestion
+    KeyboardHandler *_keyboardHandler;
 }
 
 @property (strong, nonatomic) LabelsResourcesHandler *labelsResourceHandler;
@@ -506,14 +507,23 @@
     self.tagImageView.delegate = self;
     self.tagImageView.tagView.delegate = self;
     [self.tagImageView reloadForRotation];
-    [self.tagImageView.tagView setDataSourceForKeyboardSuggestions:self]; //for label suggestion on the keyboard
     
+    [self setupKeyboardHandlerForTextField:self.tagImageView.tagView.label];
     
     //check if boxes not saved on the server
     [self.sendButton setEnabled:YES];
     if (self.labelsResourceHandler.boxesNotSent == 0) [self.sendButton setEnabled:NO];
     
     [self.view setNeedsDisplay];
+}
+
+- (void) setupKeyboardHandlerForTextField:(UITextField *)textField
+{
+    if (_keyboardHandler==nil) {
+        _keyboardHandler = [[KeyboardHandler alloc] initWithTextField:textField];
+        _keyboardHandler.dataSource = self;
+    }
+    [_keyboardHandler setTextField:textField];
 }
 
 #pragma mark -

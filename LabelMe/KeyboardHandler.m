@@ -9,6 +9,7 @@
 #import "KeyboardHandler.h"
 
 #define kOFFSET_FOR_KEYBOARD 40.0
+#define kToolbarWidth 44
 
 
 @interface KeyboardHandler()
@@ -33,7 +34,7 @@
         _textField = textField;
         
         //toolbar for word suggestion
-        _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+        _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kToolbarWidth)];
         _toolbar.barStyle = UIBarStyleBlackOpaque;
         _textField.inputAccessoryView = _toolbar;
 
@@ -46,6 +47,10 @@
 }
 
 
+- (void) setTextField:(UITextField *)textField
+{
+    _textField = textField;
+}
 
 - (void)dealloc
 {
@@ -64,6 +69,9 @@
     
     // get the absolute coordinates of the view (inside UIWindow)
     CGRect absoluteOriginRect = [_textField convertRect:_textField.frame toView:nil];
+    
+    NSLog(@"absolute origin rect:%@", NSStringFromCGRect(absoluteOriginRect));
+    NSLog(@"keyboard rect: %@", NSStringFromCGRect(keyboardRect));
     
     // if the keyboard is hidding it, move it up
     _difference = keyboardRect.origin.y - (absoluteOriginRect.origin.y + absoluteOriginRect.size.height) - kOFFSET_FOR_KEYBOARD;

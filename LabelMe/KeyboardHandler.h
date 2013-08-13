@@ -33,5 +33,6 @@
 
 - (id)initWithTextField:(UITextField *)textField;
 
+- (void) setTextField:(UITextField *) textField;
 
 @end

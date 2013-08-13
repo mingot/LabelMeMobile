@@ -35,6 +35,7 @@
  - Show a usage tip the first time the app runs
  - When a box has been modified, save state
  - Manage permissions of when the page scrolling is enabled in InfiniteLoopView
+ - Attach to each TagView label a keyboard handler for the suggestions and moving.
  
  */
 
