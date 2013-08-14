@@ -49,17 +49,6 @@
 #pragma mark -
 #pragma mark Initialization
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        _serverConnection = [[ServerConnection alloc] init];
-        _serverConnection.delegate = self;
-        
-    }
-    return self;
-}
-
 - (void) initializeBottomToolbar
 {
     [self.bottomToolbar setBarStyle:UIBarStyleBlackOpaque];
@@ -90,28 +79,30 @@
 
 - (void) initializeAndAddTipView
 {
-    int height = 100;
-    CGRect tipRect = CGRectMake(self.view.frame.size.width/5, self.bottomToolbar.frame.origin.y - height, kTipWidth, height);
-    self.tip = [[UIButton alloc] initWithFrame:tipRect];
-    [self.tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )] forState:UIControlStateNormal];
-    UILabel *tiplabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 12, self.tip.frame.size.width-24, self.tip.frame.size.height-24)];
-    tiplabel.numberOfLines = 4;
-    tiplabel.text = @"Tip:\nPress this button \nto add a bounding box!";
-    tiplabel.textColor = [UIColor redColor];
-    tiplabel.backgroundColor = [UIColor clearColor];
-    [self.tip addSubview:tiplabel];
-    [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
-    
     //Show only the first time the program loads
     self.tip.hidden = YES;
-    if (![@"1" isEqualToString:[[NSUserDefaults standardUserDefaults]
-                                objectForKey:@"Avalue"]]) {
+    if (![@"1" isEqualToString:[[NSUserDefaults standardUserDefaults] objectForKey:@"Avalue"]]) {
+        
         [[NSUserDefaults standardUserDefaults] setValue:@"1" forKey:@"Avalue"];
         [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        int height = 100;
+        CGRect tipRect = CGRectMake(self.view.frame.size.width/5, self.bottomToolbar.frame.origin.y - height, kTipWidth, height);
+        self.tip = [[UIButton alloc] initWithFrame:tipRect];
+        [self.tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )] forState:UIControlStateNormal];
+        UILabel *tiplabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 12, self.tip.frame.size.width-24, self.tip.frame.size.height-24)];
+        tiplabel.numberOfLines = 4;
+        tiplabel.text = @"Tip:\nPress this button \nto add a bounding box!";
+        tiplabel.textColor = [UIColor redColor];
+        tiplabel.backgroundColor = [UIColor clearColor];
+        [self.tip addSubview:tiplabel];
+        [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
+        
         self.tip.hidden = NO;
+        [self.view addSubview:self.tip];
     }
     
-    [self.view addSubview:self.tip];
+
 }
 
 - (void) initializeAndAddSendingView
@@ -157,6 +148,9 @@
 {
     [super viewDidLoad];
     
+    _serverConnection = [[ServerConnection alloc] init];
+    _serverConnection.delegate = self;
+    
     //load the resources direction for the current filename
     self.labelsResourceHandler = [[LabelsResourcesHandler alloc] initForUsername:self.username andFilename:self.filename];
     
@@ -181,7 +175,10 @@
 
     //scroll initialization
     int index = [self.imageFilenames indexOfObject:self.filename];
-    [self.infiniteLoopView initializeAtIndex:index];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.infiniteLoopView initializeAtIndex:index];
+    });
+        
 }
 
 

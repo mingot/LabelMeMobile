@@ -689,12 +689,6 @@
 {
     NSString *filename = (NSString *)[self.items objectAtIndex:selectedImage];
     
-//    //only scroll view of the objects of the same class.
-//    NSMutableArray *items = [[NSMutableArray alloc] init];
-//    if([objectClass isEqualToString:@""]){
-//        items = [NSMutableArray arrayWithArray:self.items];
-//    }else items = [NSMutableArray arrayWithArray:[self.labelsDictionary objectForKey:objectClass]];
-
     //load tagVC
     self.tagViewController.imageFilenames = [NSArray arrayWithArray:self.items]; //give a copy to avoid problems writing
     self.tagViewController.filename = filename;
