@@ -89,6 +89,14 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (void) reset
+{
+    _scrollView = nil;
+    _pageOneView = nil;
+    _pageTwoView = nil;
+    _pageThreeView = nil;
+}
+
 #pragma mark - 
 #pragma mark UIScrollViewDelegate
 

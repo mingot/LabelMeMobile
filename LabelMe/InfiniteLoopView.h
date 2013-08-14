@@ -47,4 +47,5 @@
 // Needed when a box is selected to diable scrolling
 - (void) disableScrolling:(BOOL) disable;
 
+- (void) reset;
 @end

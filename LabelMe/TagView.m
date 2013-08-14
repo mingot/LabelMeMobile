@@ -66,6 +66,7 @@ UIViewAutoresizingFlexibleHeight
     [self.label addTarget:self
                    action:@selector(labelFinish:)
          forControlEvents:UIControlEventEditingDidEndOnExit];
+    self.label.autocapitalizationType = UITextAutocapitalizationTypeNone;
     [self addSubview:self.label];
     
     
