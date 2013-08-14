@@ -90,7 +90,6 @@
 
 - (void) initializeAndAddTipView
 {
-    //tip
     int height = 100;
     int width = 250;
     CGRect tipRect = CGRectMake(self.view.frame.size.width/5, self.bottomToolbar.frame.origin.y - height, width, height);
@@ -103,9 +102,6 @@
     tiplabel.backgroundColor = [UIColor clearColor];
     [self.tip addSubview:tiplabel];
     [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
-    
-    NSLog(@"tipRect: %@", NSStringFromCGRect(tipRect));
-    NSLog(@"bottomToolar: %@", NSStringFromCGRect(self.bottomToolbar.frame));
     
     //Show only the first time the program loads
     self.tip.hidden = YES;
@@ -121,13 +117,30 @@
 
 - (void) initializeAndAddSendingView
 {
-
     self.sendingView = [[SendingView alloc] initWithFrame:self.view.frame];
     self.sendingView.hidden = YES;
     self.sendingView.textView.text = @"Uploading to the server...";
     [self.sendingView.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     self.sendingView.delegate = self;
+    
     [self.view addSubview:self.sendingView];
+}
+
+- (void)initializeAndAddLabelsView
+{
+    //labelsview (for the table showing the boxes in the image)
+    self.labelsView.dataSource = self;
+    self.labelsView.delegate = self;
+    self.labelsView.backgroundColor = [UIColor clearColor];
+    self.labelsView.hidden = YES;
+    self.labelsView.rowHeight = 30;
+    self.labelsView.scrollEnabled = NO;
+    UIImage *globo = [[UIImage imageNamed:@"globo4.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )];
+    UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.view.frame];
+    [backgroundView setImage:globo];
+    self.labelsView.backgroundView = backgroundView;
+    
+    [self.view addSubview:self.labelsView];
 }
 
 - (void) initializeLabelsSet
@@ -137,6 +150,8 @@
 
 #pragma mark -
 #pragma mark View Life Cycle
+
+
 
 - (void)viewDidLoad
 {
@@ -150,22 +165,9 @@
     
     //load and setup other window views
     [self initializeBottomToolbar];
-
     [self initializeAndAddSendingView];
+    [self initializeAndAddLabelsView];
     [self initializeLabelsSet];
-    
-    
-//    //labelsview (for the table showing the boxes in the image)
-//    [self.labelsView setBackgroundColor:[UIColor clearColor]];
-//    [self.labelsView setHidden:YES];
-//    [self.labelsView setDelegate:self];
-//    [self.labelsView setDataSource:self];
-//    [self.labelsView setRowHeight:30];
-//    self.labelsView.scrollEnabled = NO;
-//    UIImage *globo = [[UIImage imageNamed:@"globo4.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )];
-//    UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.scrollView.frame];
-//    [backgroundView setImage:globo];
-//    [self.labelsView setBackgroundView:backgroundView];
 }
 
 - (void) viewWillAppear:(BOOL)animated
@@ -178,13 +180,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
 
     //scroll initialization
-    int index = [self.items indexOfObject:self.filename];
+    int index = [self.imageFilenames indexOfObject:self.filename];
     [self.infiniteLoopView initializeAtIndex:index];
-    
-////        [self selectedAnObject:NO];
-////        if (self.tagView.boxes.count > 0)
-////            [self.labelsView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-
 }
 
 
@@ -195,15 +192,9 @@
     //save thumbnail and dictionary
     [self saveStateOnDisk];
     
-//    if (!self.tagView.userInteractionEnabled){
-//        self.tagView.userInteractionEnabled = YES;
-//        self.scrollView.frame = CGRectMake(0 , 0, self.view.frame.size.width, self.view.frame.size.height-self.bottomToolbar.frame.size.height);
-////        [self.label resignFirstResponder];
-//    }
-    
-//    self.labelsView.hidden = YES;
-//    self.labelsButton.selected = NO;
-//    if (![self.sendingView isHidden]) self.sendingView.hidden = YES;
+    self.labelsView.hidden = YES;
+    self.labelsButton.selected = NO;
+    self.sendingView.hidden = YES;
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -252,44 +243,20 @@
 
 -(IBAction)listAction:(id)sender
 {
-    NSLog(@"Boxes to be send: %d", self.labelsResourceHandler.boxesNotSent);
-    if (!_labelsResourceHandler.isImageSent) {
-        NSLog(@"Image not sent");
-    }else NSLog(@"Image sent");
+    //TODO: do not hardcode dimensions
+    [self.labelsView reloadData];
+    if (self.labelsView.hidden) {
+        int numberOfLabels = self.tagImageView.tagView.boxes.count;
+        int height = 30*numberOfLabels + 60;
+        int width = 300;
+        self.labelsView.frame = CGRectMake(self.view.frame.size.width - width, self.bottomToolbar.frame.origin.y - height, width, height);
+        self.labelsView.layer.masksToBounds = YES;
+        [self.labelsView.layer setCornerRadius:10];
+        
+    }
     
-//    [self.labelsView reloadData];
-//    if (self.labelsView.hidden) {
-//        
-//        //make buttons disappear
-//        self.previousButton.hidden = YES;
-//        self.nextButton.hidden = YES;
-//    
-//        if (self.tagView.boxes.count == 0) {
-//            [self.labelsView setFrame:CGRectMake(0.015625*self.view.frame.size.width+self.scrollView.contentOffset.x,
-//                                                 self.scrollView.frame.size.height-0.19375*self.view.frame.size.width+self.scrollView.contentOffset.y,
-//                                                 self.scrollView.frame.size.width-0.03125*self.view.frame.size.width,
-//                                                 0.19375*self.view.frame.size.width)];
-//            
-//        }else if (self.tagView.boxes.count*self.labelsView.rowHeight >= self.scrollView.frame.size.height/3) {
-//            [self.labelsView setFrame:CGRectMake(0.015625*self.view.frame.size.width+self.scrollView.contentOffset.x,
-//                                                 2*self.scrollView.frame.size.height/3-0.078125*self.view.frame.size.width+self.scrollView.contentOffset.y,
-//                                                 self.scrollView.frame.size.width-0.03125*self.view.frame.size.width,
-//                                                 self.scrollView.frame.size.height/3+0.0625*self.view.frame.size.width)];
-//            
-//        }else [self.labelsView setFrame:CGRectMake(0.015625*self.view.frame.size.width + self.scrollView.contentOffset.x,
-//                                                 self.scrollView.frame.size.height - self.tagView.boxes.count*self.labelsView.rowHeight-0.078125*self.view.frame.size.width + self.scrollView.contentOffset.y,
-//                                                 self.scrollView.frame.size.width - 0.03125*self.view.frame.size.width,
-//                                                 self.tagView.boxes.count*self.labelsView.rowHeight+0.0625*self.view.frame.size.width+5)];
-//        self.labelsView.layer.masksToBounds = YES;
-//        [self.labelsView.layer setCornerRadius:10];
-//        
-//    }else{
-//        self.previousButton.hidden = NO;
-//        self.nextButton.hidden = NO;
-//    }
-//    
-//    [self.labelsButton setSelected:!self.labelsButton.selected];
-//    [self.labelsView setHidden:!self.labelsView.hidden];
+    [self.labelsButton setSelected:!self.labelsButton.selected];
+    self.labelsView.hidden = !self.labelsView.hidden;
     
 }
 
@@ -366,14 +333,14 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (section == 0) return 1;//self.tagImageView.tagView.boxes.count;
+    if (section == 0) return self.tagImageView.tagView.boxes.count;
     else return 0;
 }
 
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-    if (section == 0) return @"0";//[NSString stringWithFormat:@"%d objects",self.tagImageView.tagView.boxes.count];
+    if (section == 0) return [NSString stringWithFormat:@"%d objects",self.tagImageView.tagView.boxes.count];
     else return  @"";
 }
 
@@ -401,7 +368,6 @@
     return view;
 }
 
-
 - (UITableViewCell*) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
      static NSString *CellIdentifier = @"Cell";
@@ -409,42 +375,43 @@
      if (cell == nil)
          cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
 
-//    [cell setBackgroundColor:[UIColor clearColor]];
-//    Box *b = nil;//[self.tagImageView.tagView.boxes objectAtIndex:indexPath.row];
-//    if (b.label.length != 0) {
-//        if ([cell.textLabel respondsToSelector:@selector(setAttributedText:)]) {
-//            NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:b.label];
-//            [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, b.label.length)];
-//            [attrString addAttribute:NSStrokeColorAttributeName value:b.color range:NSMakeRange(0, b.label.length)];
-//            [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, b.label.length)];
-//
-//            cell.textLabel.attributedText = attrString;
-//            
-//        }else [cell.textLabel setText:b.label];
-//        
-//    }else{
-//        if ([cell.textLabel respondsToSelector:@selector(setAttributedText:)]) {
-//            NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:@"(No Label)"];
-//
-//            [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0,10)];
-//            [attrString addAttribute:NSStrokeColorAttributeName value:b.color range:NSMakeRange(0, 10)];
-//            [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, 10)];
-//            
-//            cell.textLabel.attributedText = attrString;
-//            
-//        }else [cell.textLabel setText:@"(No Label)"];
-//        
-//    }
-////    [cell.detailTextLabel setText:[NSString stringWithFormat:@"%d x %d",(int)((b.lowerRight.x - b.upperLeft.x)*self.imageView.image.size.width/self.tagImageView.tagView.frame.size.width),(int)((b.lowerRight.y - b.upperLeft.y)*self.imageView.image.size.height/self.tagImageView.tagView.frame.size.height)]];
-//    
-//    [cell.detailTextLabel setText:@"TBD"];
-//    
-//    if (indexPath.row == self.tagImageView.tagView.selectedBox)
-//        [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
-//    
-//    else [cell setAccessoryType:UITableViewCellAccessoryNone];
-//    
-//    [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+    [cell setBackgroundColor:[UIColor clearColor]];
+    Box *b = [self.tagImageView.tagView.boxes objectAtIndex:indexPath.row];
+    if (b.label.length != 0) {
+        if ([cell.textLabel respondsToSelector:@selector(setAttributedText:)]) {
+            NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:b.label];
+            [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, b.label.length)];
+            [attrString addAttribute:NSStrokeColorAttributeName value:b.color range:NSMakeRange(0, b.label.length)];
+            [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, b.label.length)];
+
+            cell.textLabel.attributedText = attrString;
+            
+        }else [cell.textLabel setText:b.label];
+        
+    }else{
+        if ([cell.textLabel respondsToSelector:@selector(setAttributedText:)]) {
+            NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:@"(No Label)"];
+
+            [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0,10)];
+            [attrString addAttribute:NSStrokeColorAttributeName value:b.color range:NSMakeRange(0, 10)];
+            [attrString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-1.75] range:NSMakeRange(0, 10)];
+            
+            cell.textLabel.attributedText = attrString;
+            
+        }else [cell.textLabel setText:@"(No Label)"];
+        
+    }
+    
+    
+    [cell.detailTextLabel setText:[NSString stringWithFormat:@"%d x %d",(int)((b.lowerRight.x - b.upperLeft.x)*self.tagImageView.image.size.width/self.tagImageView.tagView.frame.size.width),(int)((b.lowerRight.y - b.upperLeft.y)*self.tagImageView.image.size.height/self.tagImageView.tagView.frame.size.height)]];
+    
+    
+    if (indexPath.row == self.tagImageView.tagView.selectedBox)
+        [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
+    
+    else [cell setAccessoryType:UITableViewCellAccessoryNone];
+    
+    [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     
     return cell;
 }
@@ -485,7 +452,7 @@
 {
     
     //set the resource handler with the correct filename
-    NSString *requestedFilename = [self.items objectAtIndex:index];
+    NSString *requestedFilename = [self.imageFilenames objectAtIndex:index];
     self.labelsResourceHandler.filename = requestedFilename;
     
     //construct the view
@@ -501,15 +468,15 @@
 
 - (int) numberOfViews
 {
-    return self.items.count;
+    return self.imageFilenames.count;
 }
 
 - (void) didShowView:(UIView *)view forIndex:(int)currentIndex;
 {    
     //title
-    self.title = [NSString stringWithFormat:@"%d of %d", currentIndex + 1, self.items.count];
+    self.title = [NSString stringWithFormat:@"%d of %d", currentIndex + 1, self.imageFilenames.count];
     
-    self.filename = [self.items objectAtIndex:currentIndex];
+    self.filename = [self.imageFilenames objectAtIndex:currentIndex];
     self.labelsResourceHandler.filename = self.filename;
     
     //hook current view with the delegate

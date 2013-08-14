@@ -696,7 +696,7 @@
 //    }else items = [NSMutableArray arrayWithArray:[self.labelsDictionary objectForKey:objectClass]];
 
     //load tagVC
-    self.tagViewController.items = [NSArray arrayWithArray:self.items]; //give a copy to avoid problems writing
+    self.tagViewController.imageFilenames = [NSArray arrayWithArray:self.items]; //give a copy to avoid problems writing
     self.tagViewController.filename = filename;
     self.tagViewController.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:self.tagViewController animated:YES];

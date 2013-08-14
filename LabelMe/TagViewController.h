@@ -58,10 +58,7 @@
 //model
 @property (strong, nonatomic) NSString *filename;
 @property (strong, nonatomic) NSString *username;
-
-//@property (strong, nonatomic) NSArray *paths;
-@property (strong, nonatomic) NSArray *items;
-//@property (strong, nonatomic) NSMutableDictionary *userDictionary;
+@property (strong, nonatomic) NSArray *imageFilenames;
 
 
 
