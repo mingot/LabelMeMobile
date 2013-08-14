@@ -22,6 +22,7 @@
 
 - (NSArray *) getBoxes;
 - (UIImage *) getImage;
+- (NSArray *) getClassesNames;
 
 - (void) saveThumbnail:(UIImage *)thumbnail;
 - (void) saveBoxes:(NSArray *)boxes;

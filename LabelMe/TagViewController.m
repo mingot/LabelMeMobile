@@ -56,8 +56,6 @@
         _serverConnection = [[ServerConnection alloc] init];
         _serverConnection.delegate = self;
         
-        _recentLabels = [[NSMutableSet alloc] init];
-        
     }
     return self;
 }
@@ -127,6 +125,11 @@
     [self.view addSubview:self.sendingView];
 }
 
+- (void) initializeLabelsSet
+{
+    _recentLabels = [NSMutableSet setWithArray:[_labelsResourceHandler getClassesNames]];
+}
+
 #pragma mark -
 #pragma mark View Life Cycle
 
@@ -144,6 +147,7 @@
     [self initializeBottomToolbar];
     [self initializeAndAddTipView];
     [self initializeAndAddSendingView];
+    [self initializeLabelsSet];
     
     
 //    //labelsview (for the table showing the boxes in the image)
@@ -183,7 +187,6 @@
     
     //save thumbnail and dictionary
     [self saveStateOnDisk];
-    [_recentLabels removeAllObjects];
     
 //    if (!self.tagView.userInteractionEnabled){
 //        self.tagView.userInteractionEnabled = YES;

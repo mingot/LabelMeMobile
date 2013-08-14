@@ -7,6 +7,7 @@
 //
 
 #import "LabelsResourcesHandler.h"
+#import "Box.h"
 #import "NSObject+Folders.h"
 
 #define IMAGES 0
@@ -141,6 +142,23 @@
 {
 
     [NSKeyedArchiver archiveRootObject:boxes toFile:_boxesPath];
+}
+
+- (NSArray *) getClassesNames
+{
+    NSMutableArray *list = [[NSMutableArray alloc] init];
+    NSArray *imagesList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@",[_paths objectAtIndex:THUMB]] error:NULL];
+    
+    for(NSString *imageName in imagesList){
+        NSString *path = [[_paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
+        NSMutableArray *objects = [[NSMutableArray alloc] initWithArray:[NSKeyedUnarchiver unarchiveObjectWithFile:path]];
+        for(Box *box in objects)
+            if([list indexOfObject:box.label] == NSNotFound && ![box.label isEqualToString:@""])
+                [list addObject:box.label];
+    }
+    
+    return [[NSArray arrayWithArray:list] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    
 }
 
 @end
