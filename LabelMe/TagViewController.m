@@ -91,7 +91,9 @@
 - (void) initializeAndAddTipView
 {
     //tip
-    CGRect tipRect = CGRectMake(25, 2*self.view.frame.size.height/3, self.view.frame.size.width/2, self.view.frame.size.height/3);
+    int height = 100;
+    int width = 250;
+    CGRect tipRect = CGRectMake(self.view.frame.size.width/5, self.bottomToolbar.frame.origin.y - height, width, height);
     self.tip = [[UIButton alloc] initWithFrame:tipRect];
     [self.tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )] forState:UIControlStateNormal];
     UILabel *tiplabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 12, self.tip.frame.size.width-24, self.tip.frame.size.height-24)];
@@ -101,6 +103,9 @@
     tiplabel.backgroundColor = [UIColor clearColor];
     [self.tip addSubview:tiplabel];
     [self.tip addTarget:self action:@selector(hideTip:) forControlEvents:UIControlEventTouchUpInside];
+    
+    NSLog(@"tipRect: %@", NSStringFromCGRect(tipRect));
+    NSLog(@"bottomToolar: %@", NSStringFromCGRect(self.bottomToolbar.frame));
     
     //Show only the first time the program loads
     self.tip.hidden = YES;
@@ -145,7 +150,7 @@
     
     //load and setup other window views
     [self initializeBottomToolbar];
-    [self initializeAndAddTipView];
+
     [self initializeAndAddSendingView];
     [self initializeLabelsSet];
     
@@ -166,6 +171,8 @@
 - (void) viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
+    
+    [self initializeAndAddTipView]; //needs |self.bottomToolbar| hooked to be called
     
     //register for notifications if box is selected
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isBoxSelected:) name:@"isBoxSelected" object:nil];
