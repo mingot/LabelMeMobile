@@ -143,7 +143,6 @@
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithContentsOfFile:[[paths objectAtIndex:USER] stringByAppendingPathComponent:@"settings.plist"]];
     
-    [dict removeObjectForKey:@"hogdimension"];
     [dict setObject:[NSNumber numberWithDouble:stepper.value] forKey:@"hogdimension"];
 
     [self.tableView reloadData];

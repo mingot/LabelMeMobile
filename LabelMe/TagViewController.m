@@ -13,7 +13,8 @@
 #import "UIButton+CustomViews.h"
 #import "UIViewController+ShowAlert.h"
 
-
+#define kLabelsViewRowHeight 30
+#define kTipWidth 250
 
 @interface TagViewController()
 {
@@ -52,7 +53,6 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.labelsView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
         _serverConnection = [[ServerConnection alloc] init];
         _serverConnection.delegate = self;
         
@@ -91,8 +91,7 @@
 - (void) initializeAndAddTipView
 {
     int height = 100;
-    int width = 250;
-    CGRect tipRect = CGRectMake(self.view.frame.size.width/5, self.bottomToolbar.frame.origin.y - height, width, height);
+    CGRect tipRect = CGRectMake(self.view.frame.size.width/5, self.bottomToolbar.frame.origin.y - height, kTipWidth, height);
     self.tip = [[UIButton alloc] initWithFrame:tipRect];
     [self.tip setBackgroundImage:[[UIImage imageNamed:@"globo.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )] forState:UIControlStateNormal];
     UILabel *tiplabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 12, self.tip.frame.size.width-24, self.tip.frame.size.height-24)];
@@ -129,11 +128,12 @@
 - (void)initializeAndAddLabelsView
 {
     //labelsview (for the table showing the boxes in the image)
+    self.labelsView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
     self.labelsView.dataSource = self;
     self.labelsView.delegate = self;
     self.labelsView.backgroundColor = [UIColor clearColor];
     self.labelsView.hidden = YES;
-    self.labelsView.rowHeight = 30;
+    self.labelsView.rowHeight = kLabelsViewRowHeight;
     self.labelsView.scrollEnabled = NO;
     UIImage *globo = [[UIImage imageNamed:@"globo4.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(21, 23, 21 , 23 )];
     UIImageView *backgroundView = [[UIImageView alloc] initWithFrame:self.view.frame];
@@ -243,12 +243,11 @@
 
 -(IBAction)listAction:(id)sender
 {
-    //TODO: do not hardcode dimensions
     [self.labelsView reloadData];
     if (self.labelsView.hidden) {
         int numberOfLabels = self.tagImageView.tagView.boxes.count;
-        int height = 30*numberOfLabels + 60;
-        int width = 300;
+        int height = kLabelsViewRowHeight*numberOfLabels + 2*kLabelsViewRowHeight;
+        int width = kTipWidth;
         self.labelsView.frame = CGRectMake(self.view.frame.size.width - width, self.bottomToolbar.frame.origin.y - height, width, height);
         self.labelsView.layer.masksToBounds = YES;
         [self.labelsView.layer setCornerRadius:10];
@@ -353,7 +352,7 @@
     
     // Create label with section title
     UILabel *label = [[UILabel alloc] init];
-    label.frame = CGRectMake(0,6,tableView.frame.size.width , 30);
+    label.frame = CGRectMake(0,6,tableView.frame.size.width , kLabelsViewRowHeight);
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor redColor];
     label.shadowColor = [UIColor grayColor];

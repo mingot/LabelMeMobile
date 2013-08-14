@@ -246,16 +246,32 @@
 {
     if (self = [super init]) {
         
-        _upperLeft.x = [aDecoder decodeFloatForKey:@"upperLeftx"];
-        _upperLeft.y = [aDecoder decodeFloatForKey:@"upperLefty"];
-        
-        _lowerRight.x = [aDecoder decodeFloatForKey:@"lowerRightx"];
-        _lowerRight.y = [aDecoder decodeFloatForKey:@"lowerRighty"];
         self.label = [aDecoder decodeObjectForKey:@"label"];
         self.color = [aDecoder decodeObjectForKey:@"color"];
         self.date = [aDecoder decodeObjectForKey:@"date"];
-        self.imageSize = [aDecoder decodeCGSizeForKey:@"imageSize"];
+        
+        _upperLeft.x = [aDecoder decodeFloatForKey:@"upperLeftx"];
+        _upperLeft.y = [aDecoder decodeFloatForKey:@"upperLefty"];
+        _lowerRight.x = [aDecoder decodeFloatForKey:@"lowerRightx"];
+        _lowerRight.y = [aDecoder decodeFloatForKey:@"lowerRighty"];
         self.sent = [aDecoder decodeBoolForKey:@"sent"];
+        
+        //compatibility with LabelMe 1.0
+        CGSize imageSize;
+        if ([aDecoder containsValueForKey:@"imageSize"]) { //new model
+            imageSize = [aDecoder decodeCGSizeForKey:@"imageSize"];
+            
+        } else { //old model
+            CGFloat UPPERBOUND = [aDecoder decodeFloatForKey:@"UPPERBOUND"];
+            CGFloat LOWERBOUND = [aDecoder decodeFloatForKey:@"LOWERBOUND"];
+            CGFloat RIGHTBOUND = [aDecoder decodeFloatForKey:@"RIGHTBOUND"];
+            CGFloat LEFTBOUND = [aDecoder decodeFloatForKey:@"LEFTBOUND"];
+            
+            imageSize.height = LOWERBOUND - UPPERBOUND;
+            imageSize.width = RIGHTBOUND - LEFTBOUND;
+        }
+        
+        self.imageSize = imageSize;
 
     }
     return self;

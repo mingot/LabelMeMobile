@@ -7,6 +7,7 @@
 //
 
 #import "SignInViewController.h"
+#import "MigrationHandler.h"
 #import "Constants.h"
 #import "Reachability.h"
 
@@ -337,10 +338,6 @@
     [self.sendingView.activityIndicator stopAnimating];
 }
 
-
-#pragma mark -
-#pragma mark ServerConnectionDelegate Methods
-
 -(void)signInComplete
 {
     if (!previousSession)
@@ -368,7 +365,6 @@
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         [sConnection downloadProfilePictureToUsername:self.usernameField.text];
     }
-
     
     self.sendingView.hidden = YES;
     [self.sendingView.activityIndicator stopAnimating];
