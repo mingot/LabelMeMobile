@@ -45,8 +45,9 @@
 							<object class="IBUIImageView" id="260811155">
 								<reference key="NSNextResponder" ref="370861908"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrameSize">{320, 480}</string>
+								<string key="NSFrameSize">{320, 568}</string>
 								<reference key="NSSuperview" ref="370861908"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="1013892367"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<object class="NSColor" key="IBUIBackgroundColor">
@@ -63,8 +64,9 @@
 							<object class="IBUITextField" id="1013892367">
 								<reference key="NSNextResponder" ref="370861908"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{48, 262}, {150, 30}}</string>
+								<string key="NSFrame">{{48, 350}, {150, 30}}</string>
 								<reference key="NSSuperview" ref="370861908"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="11835843"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
@@ -102,8 +104,9 @@
 							<object class="IBUITextField" id="11835843">
 								<reference key="NSNextResponder" ref="370861908"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{48, 297}, {150, 30}}</string>
+								<string key="NSFrame">{{48, 385}, {150, 30}}</string>
 								<reference key="NSSuperview" ref="370861908"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="6423869"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
@@ -134,8 +137,9 @@
 							<object class="IBUIButton" id="6423869">
 								<reference key="NSNextResponder" ref="370861908"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{48, 333}, {75, 30}}</string>
+								<string key="NSFrame">{{48, 421}, {75, 30}}</string>
 								<reference key="NSSuperview" ref="370861908"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="625935743"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
@@ -169,8 +173,9 @@
 							<object class="IBUIButton" id="625935743">
 								<reference key="NSNextResponder" ref="370861908"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{48, 381}, {116, 44}}</string>
+								<string key="NSFrame">{{48, 469}, {116, 44}}</string>
 								<reference key="NSSuperview" ref="370861908"/>
+								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="747345496"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
@@ -198,8 +203,9 @@
 							<object class="IBUIButton" id="747345496">
 								<reference key="NSNextResponder" ref="370861908"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{172, 381}, {137, 44}}</string>
+								<string key="NSFrame">{{172, 469}, {137, 44}}</string>
 								<reference key="NSSuperview" ref="370861908"/>
+								<reference key="NSWindow"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -212,8 +218,9 @@
 								<reference key="IBUIFont" ref="887725794"/>
 							</object>
 						</array>
-						<string key="NSFrame">{{0, 88}, {320, 480}}</string>
+						<string key="NSFrameSize">{320, 568}</string>
 						<reference key="NSSuperview" ref="191373211"/>
+						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="260811155"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
@@ -244,6 +251,7 @@
 				</array>
 				<string key="NSFrameSize">{320, 568}</string>
 				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="370861908"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">2</int>
@@ -417,28 +425,10 @@
 						<reference key="parent" ref="191373211"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">181</int>
-						<reference key="object" ref="1013892367"/>
-						<array class="NSMutableArray" key="children"/>
+						<int key="objectID">287</int>
+						<reference key="object" ref="747345496"/>
 						<reference key="parent" ref="370861908"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">196</int>
-						<reference key="object" ref="11835843"/>
-						<array class="NSMutableArray" key="children"/>
-						<reference key="parent" ref="370861908"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">208</int>
-						<reference key="object" ref="6423869"/>
-						<array class="NSMutableArray" key="children"/>
-						<reference key="parent" ref="370861908"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">219</int>
-						<reference key="object" ref="625935743"/>
-						<array class="NSMutableArray" key="children"/>
-						<reference key="parent" ref="370861908"/>
+						<string key="objectName">Button - Forgot your password</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">286</int>
@@ -446,10 +436,24 @@
 						<reference key="parent" ref="370861908"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">287</int>
-						<reference key="object" ref="747345496"/>
+						<int key="objectID">219</int>
+						<reference key="object" ref="625935743"/>
 						<reference key="parent" ref="370861908"/>
-						<string key="objectName">Button - Forgot your password</string>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">196</int>
+						<reference key="object" ref="11835843"/>
+						<reference key="parent" ref="370861908"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">181</int>
+						<reference key="object" ref="1013892367"/>
+						<reference key="parent" ref="370861908"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">208</int>
+						<reference key="object" ref="6423869"/>
+						<reference key="parent" ref="370861908"/>
 					</object>
 				</array>
 			</object>
@@ -473,7 +477,91 @@
 			<nil key="sourceID"/>
 			<int key="maxID">293</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes"/>
+		<object class="IBClassDescriber" key="IBDocument.Classes">
+			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
+				<object class="IBPartialClassDescription">
+					<string key="className">SignInViewController</string>
+					<string key="superclassName">UIViewController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="cancelAction:">id</string>
+						<string key="createAccountAction:">id</string>
+						<string key="forgotPassword:">id</string>
+						<string key="nextFieldAction:">id</string>
+						<string key="previousAction:">id</string>
+						<string key="signInAction:">id</string>
+						<string key="valueChanged:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="cancelAction:">
+							<string key="name">cancelAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="createAccountAction:">
+							<string key="name">createAccountAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="forgotPassword:">
+							<string key="name">forgotPassword:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="nextFieldAction:">
+							<string key="name">nextFieldAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="previousAction:">
+							<string key="name">previousAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="signInAction:">
+							<string key="name">signInAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="valueChanged:">
+							<string key="name">valueChanged:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="createAccountButton">UIButton</string>
+						<string key="forgotPasswordButton">UIButton</string>
+						<string key="passwordField">UITextField</string>
+						<string key="scrollView">UIScrollView</string>
+						<string key="signInButton">UIButton</string>
+						<string key="usernameField">UITextField</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="createAccountButton">
+							<string key="name">createAccountButton</string>
+							<string key="candidateClassName">UIButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="forgotPasswordButton">
+							<string key="name">forgotPasswordButton</string>
+							<string key="candidateClassName">UIButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="passwordField">
+							<string key="name">passwordField</string>
+							<string key="candidateClassName">UITextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="scrollView">
+							<string key="name">scrollView</string>
+							<string key="candidateClassName">UIScrollView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="signInButton">
+							<string key="name">signInButton</string>
+							<string key="candidateClassName">UIButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="usernameField">
+							<string key="name">usernameField</string>
+							<string key="candidateClassName">UITextField</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/SignInViewController.h</string>
+					</object>
+				</object>
+			</array>
+		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaTouchFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">

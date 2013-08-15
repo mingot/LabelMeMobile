@@ -106,7 +106,9 @@
 
     [self.usernameField setText:@""];
     [self.passwordField setText:@""];
-    previousSession = [self rememberMe];   
+    previousSession = [self rememberMe];
+    
+    [self resetScrollView];
     
     // Register keyboard events
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
@@ -163,9 +165,15 @@
 
 -(void)keyboardDidHide:(NSNotification *)notif
 {    
-    self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, self.scrollView.frame.size.width, self.view.frame.size.height);
+    [self resetScrollView];
 }
 
+
+- (void) resetScrollView
+{
+    self.scrollView.frame = CGRectMake(self.scrollView.frame.origin.x, self.scrollView.frame.origin.y, self.scrollView.frame.size.width, self.view.frame.size.height);
+    self.scrollView.scrollEnabled = NO;
+}
 
 #pragma mark -
 #pragma mark IBActions 
