@@ -2,6 +2,7 @@
 //  AYUIButton.h
 //
 //  Created by Andy Yanok on 5/5/11.
+//  Updated by Josep Marc Mingot.
 //  Copyright 2011 CSAIL. All rights reserved.
 //
 

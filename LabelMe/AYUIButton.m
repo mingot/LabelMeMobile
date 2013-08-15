@@ -2,6 +2,7 @@
 //  AYUIButton.m
 //
 //  Created by Andy Yanok on 5/5/11.
+//  Updated by Josep Marc Mingot.
 //  Copyright 2011 CSAIL. All rights reserved.
 //
 
@@ -51,6 +52,16 @@
     [self setTitleColor:[self titleColorForState:UIControlStateNormal] forState:UIControlStateHighlighted];
 }
 
+- (void) setSelected:(BOOL)selected
+{
+    [super setSelected:selected];
+    
+    UIColor *selectedColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateSelected]];
+    UIColor *normalColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateNormal]];
+    if (selectedColor != nil && self.selected) self.backgroundColor = selectedColor;
+    else self.backgroundColor = normalColor;
+}
+
 #pragma mark -
 #pragma mark Touches
 
@@ -83,7 +94,8 @@
     }
 }
 
-- (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
     [super touchesEnded:touches withEvent:event];
     
     UIColor *normalColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateNormal]];
@@ -96,16 +108,6 @@
     }
     
     self.selected = !self.selected;
-}
-
-- (void) setSelected:(BOOL)selected
-{
-    [super setSelected:selected];
-    
-    UIColor *selectedColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateSelected]];
-    UIColor *normalColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateNormal]];
-    if (selectedColor != nil && self.selected) self.backgroundColor = selectedColor;
-    else self.backgroundColor = normalColor;
 }
 
 

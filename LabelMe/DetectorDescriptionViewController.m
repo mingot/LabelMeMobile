@@ -336,6 +336,7 @@
                 if(self.previousDetector !=  nil && !_isFirstTraining) self.undoButtonBar.enabled = YES;
                 [self saveAction:self];
                 [self loadDetectorInfo];
+                [self.sendingView showMessage:@"\n\n\n ***** Successfully Finished Training! *****\n\n\n\n "];
                 
             }else if(trainingState == FAIL){
                 [self.sendingView showMessage:@"Error training"];
@@ -549,6 +550,7 @@
 {
     //initialization
     self.detector.imagesUsedTraining = [[NSMutableArray alloc] init];
+    [self.sendingView showMessage:@"\n**** Preparing data for training ****\n"];
     
     //constructs the training set of the images
     TrainingSet *trainingSet = [[TrainingSet alloc] initForTargetClasses:self.detector.targetClasses
@@ -568,7 +570,7 @@
     
     //train
     [self updateProgress:0.05];
-    [self.sendingView showMessage:@"Training begins!"];
+    [self.sendingView showMessage:@"\n\n ******* TRAINING begins! ******* "];
     int successTraining = [self.detector trainOnSet:trainingSet
                                           forMaxHOG:[self.detectorResourceHandler getHogFromPreferences]];
     [self.sendingView showMessage:@"Finished training"];
@@ -585,7 +587,7 @@
                                                      withFileHandler:_detectorResourceHandler];
     
     [self.sendingView showMessage:[NSString stringWithFormat:@"Number of images in the test set: %d",testSet.images.count]];
-    [self.sendingView showMessage:@"Testing begins!"];
+    [self.sendingView showMessage:@"\n\n ******* TESTING begins! *******"];
     [self.detector testOnSet:testSet atThresHold:0.0];
     [self.sendingView showMessage:@"Finished testing"];
 }

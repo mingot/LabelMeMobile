@@ -400,6 +400,7 @@
 {
     CGPoint coords = [gestureRecognizer locationInView:gestureRecognizer.view];
     if (!CGRectContainsPoint(self.settingsTableView.bounds, coords) && self.settingsButton.selected) {
+        //enable the effect of the button when tapped outside the |settingsTableView| and selected
         self.settingsButton.selected = !self.settingsButton.selected;
         [self showSettingsAction:nil];
     }
