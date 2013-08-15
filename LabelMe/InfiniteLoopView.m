@@ -91,10 +91,8 @@
 
 - (void) reset
 {
-    _scrollView = nil;
-    _pageOneView = nil;
-    _pageTwoView = nil;
-    _pageThreeView = nil;
+    //black screen after view disappears.
+    [_pageTwoView removeFromSuperview];
 }
 
 #pragma mark - 

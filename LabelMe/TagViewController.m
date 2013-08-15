@@ -189,6 +189,8 @@
     //save thumbnail and dictionary
     [self saveStateOnDisk];
     
+    [self.infiniteLoopView reset];
+    
     self.labelsView.hidden = YES;
     self.labelsButton.selected = NO;
     self.sendingView.hidden = YES;
