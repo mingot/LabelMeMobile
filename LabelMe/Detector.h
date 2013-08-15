@@ -43,6 +43,9 @@
 @property (strong, nonatomic) NSNumber *scaleFactor; //average ratio height/width of the positive bb of the training set
 @property (strong, nonatomic) NSNumber *detectionThreshold;
 
+// In case of error training, provide specific detail of what has happened
+@property (strong, nonatomic, readonly) NSString *errorMessage;
+
 
 - (id) initWithCoder:(NSCoder *)aDecoder;
 
@@ -74,7 +77,5 @@
 
 // get the hog image of the weights obtained
 - (UIImage *) getHogImageOfTheWeights;
-
-
 
 @end

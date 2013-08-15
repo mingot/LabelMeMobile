@@ -7,6 +7,7 @@
 //
 
 #import "ExecuteDetectorViewController.h"
+#import "BoundingBox.h"
 #import "ConvolutionHelper.h"
 #import "UIImage+HOG.h"
 #import "UIImage+Resize.h"
@@ -24,6 +25,7 @@
     BOOL _score;
     BOOL _fps;
     BOOL _scale;
+    int _level;
     BOOL _hog;
     
     const NSArray *_settingsStrings;
@@ -86,9 +88,11 @@
 
 - (void)initializeButtons
 {
-    [self.cancelButton transformButtonForCamera];    
+    [self.cancelButton transformButtonForCamera];
     [self.settingsButton transformButtonForCamera];
+    [self.settingsButton setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.8] forState:UIControlStateSelected];
     [self.switchButton transformButtonForCamera];
+    [self.switchButton setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.8] forState:UIControlStateSelected];
     self.switchButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
     self.switchButton.contentEdgeInsets = UIEdgeInsetsMake(5, 10, 5, 10);
     [self.switchButton setImage:[UIImage imageNamed:@"switchCamera"] forState:UIControlStateNormal];
@@ -237,7 +241,7 @@
     }
     
     // Update the navigation controller title with some information about the detection
-    int level = -1;
+    _level = -1;
     float scoreFloat = -1;
 
     //update label with the current FPS
@@ -246,7 +250,7 @@
     NSMutableString *screenLabelText = [[NSMutableString alloc] initWithString:@""];
     if(_score) [screenLabelText appendString:[NSString stringWithFormat:@"score:%.2f\n", scoreFloat]];
     if(_fps) [screenLabelText appendString: [NSString stringWithFormat:@"FPS: %.1f\n",-1.0/[start timeIntervalSinceNow]]];
-    if(_scale) [screenLabelText appendString: [NSString stringWithFormat:@"scale: %d\n",level]];
+    if(_scale) [screenLabelText appendString: [NSString stringWithFormat:@"scale: %d\n",_level]];
     [self.infoLabel performSelectorOnMainThread:@selector(setText:) withObject:[NSString stringWithString:screenLabelText] waitUntilDone:YES];
 }
 
@@ -264,14 +268,6 @@
     _numPyramids = (int) value;
 }
 
-#pragma mark -
-#pragma mark Core Location Delegate
-
-- (void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
-{
-    //    CLLocation *currentLocation = [locations objectAtIndex:0];
-    //    NSLog(@"latitude: %f, longitude: %f", currentLocation.coordinate.latitude, currentLocation.coordinate.longitude);
-}
 
 
 

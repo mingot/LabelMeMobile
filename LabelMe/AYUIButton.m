@@ -48,7 +48,6 @@
     [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4]];
     [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.8] forState:UIControlStateHighlighted];
     [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4] forState:UIControlStateNormal];
-    [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.8] forState:UIControlStateSelected];
     [self setTitleColor:[self titleColorForState:UIControlStateNormal] forState:UIControlStateHighlighted];
 }
 
@@ -58,7 +57,7 @@
     
     UIColor *selectedColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateSelected]];
     UIColor *normalColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateNormal]];
-    if (selectedColor != nil && self.selected) self.backgroundColor = selectedColor;
+    if (selectedColor != nil && selected) self.backgroundColor = selectedColor;
     else self.backgroundColor = normalColor;
 }
 

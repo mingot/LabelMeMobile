@@ -236,7 +236,7 @@ using namespace cv;
         //Get Bounding Boxes from detection
         [self getBoundingBoxesForTrainingSet:trainingSet];
         
-        //The first time that not enough positive or negative bb have been generated, try to unify all the sizes of the bounding boxes. This solve the problem in most of the cases at the cost of losing accuracy. However if still not solved, give an error saying not possible training done due to the ground truth bouning boxes shape.
+        //The first time that not enough positive or negative bb have been generated (due to bb with different geometries), try to unify all the sizes of the bounding boxes. This solve the problem in most of the cases at the cost of losing accuracy. However if still not solved, give an error saying not possible training done due to the ground truth bouning boxes shape.
         if(self.numberOfPositives.intValue < 2 || self.numberOfPositives.intValue == _numberOfTrainingExamples){
             if(firstTimeError){
                 [trainingSet unifyGroundTruthBoundingBoxes];
@@ -289,8 +289,9 @@ using namespace cv;
     NSMutableArray *candidateBoundingBoxes = [[NSMutableArray alloc] init];
 
     //scaling factor for the image
+    float ratio = image.size.width*1.0 / image.size.height;
     double initialScale = self.scaleFactor.doubleValue/sqrt(image.size.width*image.size.width);
-    if(UIDeviceOrientationIsLandscape(orientation)) initialScale = initialScale * 1.3;
+    if(ratio>1) initialScale = initialScale * 1.3;
     double scale = pow(2, 1.0/SCALES_PER_OCTAVE);
 
     //Pyramid limits
@@ -492,7 +493,6 @@ using namespace cv;
     return [UIImage hogImageFromFeatures:_weightsP withSize:_sizesP];
 }
 
-
 #pragma mark -
 #pragma mark Private methods
 
@@ -600,6 +600,12 @@ using namespace cv;
 
 - (void) getBoundingBoxesForTrainingSet:(TrainingSet *)trainingSet
 {
+    
+    // Constructs the training set of features.
+    // Given real images and Bounding boxes, it extracts cropped images
+    // representing positive an negative examples.
+    // The cropped images are extracted using the detector and classified (as positive or negative)
+    // depending on the overlapping area with the ground truth (GT) bounding boxes
     __block int positives = 0;
     _numberOfTrainingExamples = _numSupportVectors;
     
@@ -610,6 +616,8 @@ using namespace cv;
             UIImage *image = [trainingSet.images objectAtIndex:i];
             
             //run the detector on the current image
+            NSLog(@"image %zd orientation: %d",i, image.imageOrientation);
+            NSLog(@"image %zd size: %f x %f",i, image.size.height, image.size.width);
             NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp learningImageIndex:i];
             
             dispatch_sync(dispatch_get_main_queue(),^{[self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %zd: %d", i, newBoundingBoxes.count]];});
@@ -620,12 +628,20 @@ using namespace cv;
             NSMutableArray *aux = [selectedGT mutableCopy];
             
             for(BoundingBox *newBB in newBoundingBoxes){
+                
                 BOOL isNegative = NO;
                 BOOL GTFound = NO;
+                
                 for(BoundingBox *groundTruthBB in selectedGT){
                     if(groundTruthBB.imageIndex == i){
+                        NSLog(@"found bb: %@", newBB);
+                        NSLog(@"GT bb: %@", groundTruthBB);
+                        
                         GTFound = YES;
                         double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];
+//                        if (overlapArea>0.7)
+//                            NSLog(@"overlap area %f", overlapArea);
+                        
                         if (overlapArea > 0.8 && overlapArea<1){
                             newBB.label = 1;
                             isNegative = NO;

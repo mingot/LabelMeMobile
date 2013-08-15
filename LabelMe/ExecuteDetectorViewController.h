@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
 
 #import "CameraVideoViewController.h"
 #import "DetectView.h"
@@ -25,7 +24,7 @@
 @end
 
 
-@interface ExecuteDetectorViewController : CameraVideoViewController <CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface ExecuteDetectorViewController : CameraVideoViewController <UITableViewDataSource, UITableViewDelegate>
 
 
 @property (nonatomic, strong) id<ExecuteDetectorViewControllerDelegate> delegate;

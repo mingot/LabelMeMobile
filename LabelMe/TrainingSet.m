@@ -50,7 +50,7 @@
 }
 
 - (id) initForTargetClasses:(NSArray *)targetClasses
-             forImagesNames:(NSArray *) imagesNames
+             forImagesNames:(NSArray *)imagesNames
             withFileHandler:(DetectorResourceHandler *) detectorResourceHandler;
 {
     

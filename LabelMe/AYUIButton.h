@@ -22,4 +22,6 @@
 - (void) transformButtonForCamera;
 
 
+- (void) setSelected:(BOOL)selected;
+
 @end

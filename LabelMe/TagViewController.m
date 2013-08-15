@@ -137,6 +137,7 @@
 - (void) initializeLabelsSet
 {
     _recentLabels = [NSMutableSet setWithArray:[_labelsResourceHandler getClassesNames]];
+    if(_recentLabels==nil) _recentLabels = [[NSMutableSet alloc] init];
 }
 
 #pragma mark -
