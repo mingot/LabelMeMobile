@@ -58,7 +58,7 @@
 								<reference key="NSNextResponder" ref="448342639"/>
 								<int key="NSvFlags">298</int>
 								<array class="NSMutableArray" key="NSSubviews"/>
-								<string key="NSFrame">{{18, 72}, {282, 426}}</string>
+								<string key="NSFrame">{{18, 72}, {282, 242}}</string>
 								<reference key="NSSuperview" ref="448342639"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="926755696"/>
@@ -483,6 +483,25 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">CameraVideoViewController</string>
+					<string key="superclassName">UIViewController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">switchCameras:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">switchCameras:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">switchCameras:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/CameraVideoViewController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">DetectView</string>
 					<string key="superclassName">UIView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -492,14 +511,13 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">ExecuteDetectorViewController</string>
-					<string key="superclassName">UIViewController</string>
+					<string key="superclassName">CameraVideoViewController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="cancelAction:">id</string>
 						<string key="showSettingsAction:">id</string>
 						<string key="sliderChangeAction:">id</string>
 						<string key="switchCameras:">id</string>
 						<string key="switchValueDidChange:">UISwitch</string>
-						<string key="takePictureAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="cancelAction:">
@@ -522,21 +540,15 @@
 							<string key="name">switchValueDidChange:</string>
 							<string key="candidateClassName">UISwitch</string>
 						</object>
-						<object class="IBActionInfo" key="takePictureAction:">
-							<string key="name">takePictureAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="HOGimageView">UIImageView</string>
 						<string key="cancelButton">AYUIButton</string>
 						<string key="detectView">DetectView</string>
 						<string key="detectionThresholdSliderButton">UISlider</string>
-						<string key="imageView">UIImageView</string>
 						<string key="infoLabel">UILabel</string>
 						<string key="settingsButton">AYUIButton</string>
 						<string key="settingsTableView">UITableView</string>
-						<string key="settingsView">UIView</string>
 						<string key="switchButton">AYUIButton</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -556,10 +568,6 @@
 							<string key="name">detectionThresholdSliderButton</string>
 							<string key="candidateClassName">UISlider</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="imageView">
-							<string key="name">imageView</string>
-							<string key="candidateClassName">UIImageView</string>
-						</object>
 						<object class="IBToOneOutletInfo" key="infoLabel">
 							<string key="name">infoLabel</string>
 							<string key="candidateClassName">UILabel</string>
@@ -571,10 +579,6 @@
 						<object class="IBToOneOutletInfo" key="settingsTableView">
 							<string key="name">settingsTableView</string>
 							<string key="candidateClassName">UITableView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="settingsView">
-							<string key="name">settingsView</string>
-							<string key="candidateClassName">UIView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="switchButton">
 							<string key="name">switchButton</string>

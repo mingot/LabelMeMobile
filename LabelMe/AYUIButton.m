@@ -8,21 +8,33 @@
 #import "AYUIButton.h"
 
 
-@implementation AYUIButton
-
-
-- (void) setBackgroundColor:(UIColor *) _backgroundColor forState:(UIControlState) _state {
-    if (backgroundStates == nil) 
-        backgroundStates = [[NSMutableDictionary alloc] init];
-    
-    [backgroundStates setObject:_backgroundColor forKey:[NSNumber numberWithInt:_state]];
-    
-    if (self.backgroundColor == nil)
-        [self setBackgroundColor:_backgroundColor];
+@interface AYUIButton()
+{
+    NSMutableDictionary *_backgroundStates;
 }
 
-- (UIColor*) backgroundColorForState:(UIControlState) _state {
-    return [backgroundStates objectForKey:[NSNumber numberWithInt:_state]];
+@end
+
+
+@implementation AYUIButton
+
+#pragma mark -
+#pragma mark Public methods
+
+- (void) setBackgroundColor:(UIColor *)backgroundColor forState:(UIControlState)state
+{
+    if (_backgroundStates == nil)
+        _backgroundStates = [[NSMutableDictionary alloc] init];
+    
+    [_backgroundStates setObject:backgroundColor forKey:[NSNumber numberWithInt:state]];
+    
+    if (self.backgroundColor == nil)
+        [self setBackgroundColor:backgroundColor];
+}
+
+- (UIColor *) backgroundColorForState:(UIControlState)state
+{
+    return [_backgroundStates objectForKey:[NSNumber numberWithInt:state]];
 }
 
 - (void) transformButtonForCamera
@@ -35,16 +47,19 @@
     [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4]];
     [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.8] forState:UIControlStateHighlighted];
     [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.4] forState:UIControlStateNormal];
+    [self setBackgroundColor:[UIColor colorWithWhite:1.0 alpha:0.8] forState:UIControlStateSelected];
     [self setTitleColor:[self titleColorForState:UIControlStateNormal] forState:UIControlStateHighlighted];
 }
 
 #pragma mark -
 #pragma mark Touches
 
-- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
 	[super touchesBegan:touches withEvent:event];
     
-    UIColor *selectedColor = [backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateHighlighted]];
+    
+    UIColor *selectedColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateHighlighted]];
     if (selectedColor) {
         CATransition *animation = [CATransition animation];
         [animation setType:kCATransitionFade];
@@ -54,10 +69,11 @@
     }
 }
 
-- (void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+- (void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
 	[super touchesCancelled:touches withEvent:event];
 
-    UIColor *normalColor = [backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateNormal]];
+    UIColor *normalColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateNormal]];
     if (normalColor) {
         CATransition *animation = [CATransition animation];
         [animation setType:kCATransitionFade];
@@ -70,7 +86,7 @@
 - (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
     
-    UIColor *normalColor = [backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateNormal]];
+    UIColor *normalColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateNormal]];
     if (normalColor) {
         CATransition *animation = [CATransition animation];
         [animation setType:kCATransitionFade];
@@ -78,6 +94,18 @@
         [self.layer addAnimation:animation forKey:@"EaseOut"];
         self.backgroundColor = normalColor;
     }
+    
+    self.selected = !self.selected;
+}
+
+- (void) setSelected:(BOOL)selected
+{
+    [super setSelected:selected];
+    
+    UIColor *selectedColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateSelected]];
+    UIColor *normalColor = [_backgroundStates objectForKey:[NSNumber numberWithInt:UIControlStateNormal]];
+    if (selectedColor != nil && self.selected) self.backgroundColor = selectedColor;
+    else self.backgroundColor = normalColor;
 }
 
 

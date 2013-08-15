@@ -70,10 +70,6 @@ UIViewAutoresizingFlexibleHeight
     [self addSubview:self.label];
     
     
-    //add suggestion toolbar
-    //buttons settings
-
-    
     UIToolbar *keyboardToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 44)];
     keyboardToolbar.barStyle = UIBarStyleBlackOpaque;
     self.label.inputAccessoryView = keyboardToolbar;

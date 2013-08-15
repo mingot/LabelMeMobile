@@ -13,14 +13,9 @@
 */
 
 @interface AYUIButton : UIButton 
-{
-    @private
-        NSMutableDictionary *backgroundStates;    
-}
 
-- (void) setBackgroundColor:(UIColor *) _backgroundColor forState:(UIControlState) _state;
-- (UIColor*) backgroundColorForState:(UIControlState) _state;
-
+- (void) setBackgroundColor:(UIColor *)backgroundColor forState:(UIControlState)state;
+- (UIColor*) backgroundColorForState:(UIControlState)state;
 
 //preferences for camera buttons (transparency, round coreners and title highlight)
 - (void) transformButtonForCamera;

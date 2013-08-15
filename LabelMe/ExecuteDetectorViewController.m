@@ -32,6 +32,8 @@
 @property (strong, nonatomic) Pyramid *hogPyramid;
 @property (strong, nonatomic) NSMutableArray *initialDetectionThresholds; //initial threshold for mutliclass threshold sweeping
 
+// Responsible of disabling de |settingsTableView| when a touch outside it is done
+- (void)settingsViewCancelled:(UIGestureRecognizer *)gestureRecognizer;
 
 @end
 
@@ -123,6 +125,9 @@
     
     self.infoLabel.lineBreakMode = UILineBreakModeWordWrap;
     self.infoLabel.numberOfLines = 0;
+    
+    UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(settingsViewCancelled:)];
+    [self.view addGestureRecognizer:tgr];
     
     // Add subviews in front of  the prevLayer
     [self.view.layer addSublayer: _prevLayer];
@@ -281,7 +286,7 @@
 
 - (IBAction)showSettingsAction:(id)sender
 {
-    self.settingsTableView.hidden = self.settingsTableView.hidden? NO:YES;
+    self.settingsTableView.hidden = !self.settingsTableView.hidden;
 }
 
 - (IBAction)sliderChangeAction:(id)sender
@@ -386,6 +391,18 @@
 {
     [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeLeft animated:NO];
     return (interfaceOrientation == UIInterfaceOrientationLandscapeLeft);
+}
+
+#pragma mark -
+#pragma mark Private methods
+
+- (void)settingsViewCancelled:(UIGestureRecognizer *)gestureRecognizer
+{
+    CGPoint coords = [gestureRecognizer locationInView:gestureRecognizer.view];
+    if (!CGRectContainsPoint(self.settingsTableView.bounds, coords) && self.settingsButton.selected) {
+        self.settingsButton.selected = !self.settingsButton.selected;
+        [self showSettingsAction:nil];
+    }
 }
 
 

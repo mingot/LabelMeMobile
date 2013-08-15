@@ -10,7 +10,7 @@
 
 @protocol KeyboardHandlerDataSource <NSObject>
 
-- (NSArray *) arrayOfWords;
+- (NSArray *)arrayOfWords;
 
 @end
 
