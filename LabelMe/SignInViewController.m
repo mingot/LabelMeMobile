@@ -7,7 +7,6 @@
 //
 
 #import "SignInViewController.h"
-#import "MigrationHandler.h"
 #import "Constants.h"
 #import "Reachability.h"
 
@@ -55,15 +54,16 @@
     UIBarButtonItem *nextButton = [[UIBarButtonItem alloc]initWithTitle:@"Next" style:UIBarButtonItemStyleBordered target:self action:@selector(nextFieldAction:)];
     UIBarButtonItem *previousButton = [[UIBarButtonItem alloc]initWithTitle:@"Previous" style:UIBarButtonItemStyleBordered target:self action:@selector(previousAction:)];
     previousButton.enabled = NO;
-    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(signInAction:)];
-    
+//    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(signInAction:)];
+//    
+//    doneButton.enabled = NO;
     UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleDone target:self action:@selector(cancelAction:)];
-    doneButton.enabled = NO;
+
     UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
     self.keyboardToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
     self.keyboardToolbar.barStyle = UIBarStyleBlackOpaque;
-    self.keyboardToolbar.items = [NSArray arrayWithObjects:previousButton,nextButton,flexibleSpace,cancelButton, doneButton,nil];
+    self.keyboardToolbar.items = [NSArray arrayWithObjects:previousButton,nextButton,flexibleSpace,cancelButton,nil];
 }
 
 - (void)viewDidLoad
@@ -237,12 +237,12 @@
 
 -(IBAction)valueChanged:(id)sender
 {
-    UIBarButtonItem * doneButton = [[self.keyboardToolbar items] objectAtIndex:4];
-    
-    if ((self.passwordField.text.length*self.usernameField.text.length)==0)
-        [doneButton setEnabled:NO];
-    
-    else [doneButton setEnabled:YES];
+//    UIBarButtonItem * doneButton = [[self.keyboardToolbar items] objectAtIndex:4];
+//    
+//    if ((self.passwordField.text.length*self.usernameField.text.length)==0)
+//        [doneButton setEnabled:NO];
+//    
+//    else [doneButton setEnabled:YES];
     
 }
 

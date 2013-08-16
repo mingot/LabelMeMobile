@@ -291,7 +291,7 @@ using namespace cv;
     //scaling factor for the image
     float ratio = image.size.width*1.0 / image.size.height;
     double initialScale = self.scaleFactor.doubleValue/sqrt(image.size.width*image.size.width);
-    if(ratio>1) initialScale = initialScale * 1.3;
+    if(ratio>1) initialScale = initialScale * 1.3; 
     double scale = pow(2, 1.0/SCALES_PER_OCTAVE);
 
     //Pyramid limits

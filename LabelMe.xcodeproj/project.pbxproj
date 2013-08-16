@@ -234,7 +234,6 @@
 		FC9F94E617443BAA0004598C /* picaso.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94E317443BAA0004598C /* picaso.jpg */; };
 		FC9F94EE1745232B0004598C /* UIView+HierarchyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F94E91745232B0004598C /* UIView+HierarchyAdditions.m */; };
 		FC9F94F01745232C0004598C /* UITableView+TextFieldAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F94ED1745232B0004598C /* UITableView+TextFieldAdditions.m */; };
-		FCB18E7317BBBF2200BAE8F3 /* MigrationHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = FCB18E7217BBBF2200BAE8F3 /* MigrationHandler.m */; };
 		FCB97DB8175F7BC8007B5AEE /* sendingView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCB97DB7175F7BC8007B5AEE /* sendingView.xib */; };
 		FCB97DBB175F9486007B5AEE /* ImageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FCB97DBA175F9485007B5AEE /* ImageCell.m */; };
 		FCB97DBD175F9BE9007B5AEE /* ImageCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCB97DBC175F9BE9007B5AEE /* ImageCell.xib */; };
@@ -536,8 +535,6 @@
 		FC9F94E91745232B0004598C /* UIView+HierarchyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HierarchyAdditions.m"; sourceTree = "<group>"; };
 		FC9F94EC1745232B0004598C /* UITableView+TextFieldAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITableView+TextFieldAdditions.h"; sourceTree = "<group>"; };
 		FC9F94ED1745232B0004598C /* UITableView+TextFieldAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITableView+TextFieldAdditions.m"; sourceTree = "<group>"; };
-		FCB18E7117BBBF2100BAE8F3 /* MigrationHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MigrationHandler.h; sourceTree = "<group>"; };
-		FCB18E7217BBBF2200BAE8F3 /* MigrationHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MigrationHandler.m; sourceTree = "<group>"; };
 		FCB97DB7175F7BC8007B5AEE /* sendingView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = sendingView.xib; sourceTree = "<group>"; };
 		FCB97DB9175F9485007B5AEE /* ImageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageCell.h; sourceTree = "<group>"; };
 		FCB97DBA175F9485007B5AEE /* ImageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageCell.m; sourceTree = "<group>"; };
@@ -670,8 +667,6 @@
 		A558D61F16134E0C001DED8C /* LabelMe */ = {
 			isa = PBXGroup;
 			children = (
-				FCB18E7117BBBF2100BAE8F3 /* MigrationHandler.h */,
-				FCB18E7217BBBF2200BAE8F3 /* MigrationHandler.m */,
 				FC9F94A4174290680004598C /* UI */,
 				FC9F947E173AE34B0004598C /* Sign in */,
 				FC9F947F173AE3910004598C /* Image Gallery */,
@@ -724,7 +719,6 @@
 				A510E0F1161B947B00BC1B3A /* whiteballoon_4.png */,
 				A59552CC161B7D3200CA6295 /* whiteballoon_1.png */,
 				A59552CA161B6B3000CA6295 /* orange5.png */,
-				A5A567811617FC58008AFE2E /* iTunesArtwork@2x.png */,
 				A5B8F9ED166568E000D8F73A /* silueta.png */,
 				A5B8F9EE166568E100D8F73A /* silueta@2x.png */,
 				A5B8F9D916651B7300D8F73A /* labelmelogo-shadow.png */,
@@ -777,6 +771,7 @@
 		FC3A87E21767D34700236A9B /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				A5A567811617FC58008AFE2E /* iTunesArtwork@2x.png */,
 				A5A567781617FC58008AFE2E /* Icon-72.png */,
 				A5A567791617FC58008AFE2E /* Icon-72@2x.png */,
 				A5A5677A1617FC58008AFE2E /* Icon-Small-50.png */,
@@ -1512,7 +1507,6 @@
 				FC8359AC17B201900035A833 /* SendingView+DetectorDescription.m in Sources */,
 				FC8359AF17B2C40D0035A833 /* CameraVideoViewController.m in Sources */,
 				FC8359B617B323530035A833 /* DictionaryQueue.m in Sources */,
-				FCB18E7317BBBF2200BAE8F3 /* MigrationHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

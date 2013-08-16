@@ -128,7 +128,7 @@
     _modalTVC.modalSubtitle = @"1 of 2: select class(es)";
     _modalTVC.modalID = @"classes";
     _modalTVC.multipleChoice = YES;
-    _modalTVC.doneButtonTitle = @"Create";
+    _modalTVC.doneButtonTitle = @"Next";
     
     //data to be loaded in the modaltvcc
     _modalTVC.data = [_detectorResourceHandler getObjectClassesNames];
@@ -141,6 +141,8 @@
     _modalSent = @"imagesFirstTime";
     _modalTVC.modalTitle = @"New Detector";
     _modalTVC.modalSubtitle = @"2 of 2: select training image(es)";
+    _modalTVC.doneButtonTitle = @"Create";
+    NSLog(@"adapting to first training images!");
 }
 
 - (void) configureModalForTrainingImages

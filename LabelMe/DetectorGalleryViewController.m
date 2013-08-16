@@ -70,9 +70,9 @@
     self.noImages.layer.shadowColor = [UIColor grayColor].CGColor;
     self.noImages.textColor = [UIColor colorWithRed:160/255.0f green:32/255.0f blue:28/255.0f alpha:1.0];
     self.noImages.shadowColor = [UIColor grayColor];
-    self.noImages.numberOfLines = 3;
+    self.noImages.numberOfLines = 4;
     self.noImages.shadowOffset = CGSizeMake(0.0, 1.0);
-    self.noImages.text = @"You do not have detectors, \nstart training a detector";
+    self.noImages.text = @"You don't have any object detectors. \n Touch \"+\" and start creating and training  your own detectors.";
     [self.noImages setTextAlignment:NSTextAlignmentCenter];
     [self.noImages setUserInteractionEnabled:YES];
     self.noImages.hidden = YES;

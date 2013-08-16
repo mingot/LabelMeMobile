@@ -34,22 +34,12 @@
 {
     [super viewDidLoad];
     
-    //UI
     [self.doneButton highlightButton];
     [self.cancelButton highlightButton];
+    
     self.tableView.layer.cornerRadius = 10;
-    self.titleLabel.text = self.modalTitle;
-    self.subtitleLabel.text = self.modalSubtitle;
     self.tableView.backgroundView = nil;
     self.tableView.backgroundColor = [UIColor clearColor];
-    if(!self.doneButtonTitle) self.doneButtonTitle = @"Done";
-    [self.doneButton setTitle:self.doneButtonTitle forState:UIControlStateNormal];
-    
-    if(self.selectedItems.count == 0){
-        self.doneButton.enabled = NO;
-        self.doneButton.alpha = 0.6f;
-    }
-    self.cancelButton.hidden = !self.showCancelButton;
     
     //TODO: Size for iPad!!
     [self.collectionView registerClass:[ImageCell class] forCellWithReuseIdentifier:@"cvCell"];
@@ -65,15 +55,22 @@
 - (void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    self.titleLabel.text = self.modalTitle;
+    self.subtitleLabel.text = self.modalSubtitle;
+    if(!self.doneButtonTitle) self.doneButtonTitle = @"Done";
+    [self.doneButton setTitle:self.doneButtonTitle forState:UIControlStateNormal];
+    
+    if(self.selectedItems.count == 0){
+        self.doneButton.enabled = NO;
+        self.doneButton.alpha = 0.6f;
+    }
+    self.cancelButton.hidden = !self.showCancelButton;
     
     //show images or text?
     self.isGrid = [[self.data objectAtIndex:0] isKindOfClass:[UIImage class]];
     self.collectionView.hidden = !self.isGrid;
     self.tableView.hidden = self.isGrid;
     
-//    //hide subtitle if iphone and landscape
-//    if([[UIDevice currentDevice] userInterfaceIdiom]==UIUserInterfaceIdiomPhone && UIDeviceOrientationIsLandscape([[UIDevice currentDevice] orientation]))
-//        self.subtitleLabel.hidden = YES;
 }
 
 #pragma mark -
@@ -93,6 +90,7 @@
         [self.collectionView reloadData];
     }
 }
+
 
 #pragma mark
 #pragma mark - TableView Delegate and Datasource
