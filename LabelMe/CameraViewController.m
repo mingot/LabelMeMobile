@@ -76,6 +76,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         // Previous layer to show the video image
         self.prevLayer.frame = self.view.frame;
+        [self adaptToPhoneOrientation:[[UIDevice currentDevice] orientation]];
         [self.captureSession startRunning];
     });
     

@@ -59,4 +59,8 @@
 -(void)downloadProfilePictureToUsername:(NSString *) username;
 -(void)uploadProfilePicture:(UIImage *)ppicture;
 -(void)cancelRequestFor:(int)req;
+
+//returns the query necessary to download images from the server
+-(NSString *)getDownloadQueryForUsername:(NSString *)username;
+
 @end

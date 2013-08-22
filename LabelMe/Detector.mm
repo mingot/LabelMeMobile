@@ -616,8 +616,6 @@ using namespace cv;
             UIImage *image = [trainingSet.images objectAtIndex:i];
             
             //run the detector on the current image
-            NSLog(@"image %zd orientation: %d",i, image.imageOrientation);
-            NSLog(@"image %zd size: %f x %f",i, image.size.height, image.size.width);
             NSArray *newBoundingBoxes = [self detect:image minimumThreshold:-1 pyramids:10 usingNms:NO deviceOrientation:UIImageOrientationUp learningImageIndex:i];
             
             dispatch_sync(dispatch_get_main_queue(),^{[self.delegate sendMessage:[NSString stringWithFormat:@"New bb obtained for image %zd: %d", i, newBoundingBoxes.count]];});
@@ -634,8 +632,6 @@ using namespace cv;
                 
                 for(BoundingBox *groundTruthBB in selectedGT){
                     if(groundTruthBB.imageIndex == i){
-                        NSLog(@"found bb: %@", newBB);
-                        NSLog(@"GT bb: %@", groundTruthBB);
                         
                         GTFound = YES;
                         double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];

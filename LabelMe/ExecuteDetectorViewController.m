@@ -377,17 +377,14 @@
 
 - (void) adaptToPhoneOrientation:(UIDeviceOrientation) orientation
 {
-    [CATransaction begin];
-    _prevLayer.orientation = orientation;
-    _prevLayer.frame = self.view.frame;
-    [CATransaction commit];
+    if(orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationLandscapeLeft){
+        [CATransaction begin];
+        _prevLayer.orientation = orientation;
+        _prevLayer.frame = self.view.frame;
+        [CATransaction commit];
+    }
 }
 
--(BOOL)shouldAutorotateToInterfaceOrientation: (UIInterfaceOrientation)interfaceOrientation
-{
-    [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeLeft animated:NO];
-    return (interfaceOrientation == UIInterfaceOrientationLandscapeLeft);
-}
 
 #pragma mark -
 #pragma mark Private methods

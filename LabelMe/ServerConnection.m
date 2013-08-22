@@ -490,6 +490,12 @@ static BOOL didSignIn = NO;
 
 }
 
+
+-(NSString *)getDownloadQueryForUsername:(NSString *)username
+{
+    return [NSString stringWithFormat:@"%@?username=%@",self.downloadNamesURL ,username];
+}
+
 #pragma mark -
 #pragma mark NSURLConnectionDelegate Methods
 -(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
