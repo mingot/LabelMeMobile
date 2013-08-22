@@ -234,6 +234,7 @@
 		FC9F94E617443BAA0004598C /* picaso.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FC9F94E317443BAA0004598C /* picaso.jpg */; };
 		FC9F94EE1745232B0004598C /* UIView+HierarchyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F94E91745232B0004598C /* UIView+HierarchyAdditions.m */; };
 		FC9F94F01745232C0004598C /* UITableView+TextFieldAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FC9F94ED1745232B0004598C /* UITableView+TextFieldAdditions.m */; };
+		FCB18E7617C6B03D00BAE8F3 /* VideoSender.m in Sources */ = {isa = PBXBuildFile; fileRef = FCB18E7517C6B03C00BAE8F3 /* VideoSender.m */; };
 		FCB97DB8175F7BC8007B5AEE /* sendingView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCB97DB7175F7BC8007B5AEE /* sendingView.xib */; };
 		FCB97DBB175F9486007B5AEE /* ImageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FCB97DBA175F9485007B5AEE /* ImageCell.m */; };
 		FCB97DBD175F9BE9007B5AEE /* ImageCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCB97DBC175F9BE9007B5AEE /* ImageCell.xib */; };
@@ -535,6 +536,8 @@
 		FC9F94E91745232B0004598C /* UIView+HierarchyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HierarchyAdditions.m"; sourceTree = "<group>"; };
 		FC9F94EC1745232B0004598C /* UITableView+TextFieldAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITableView+TextFieldAdditions.h"; sourceTree = "<group>"; };
 		FC9F94ED1745232B0004598C /* UITableView+TextFieldAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITableView+TextFieldAdditions.m"; sourceTree = "<group>"; };
+		FCB18E7417C6B03C00BAE8F3 /* VideoSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoSender.h; sourceTree = "<group>"; };
+		FCB18E7517C6B03C00BAE8F3 /* VideoSender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoSender.m; sourceTree = "<group>"; };
 		FCB97DB7175F7BC8007B5AEE /* sendingView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = sendingView.xib; sourceTree = "<group>"; };
 		FCB97DB9175F9485007B5AEE /* ImageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageCell.h; sourceTree = "<group>"; };
 		FCB97DBA175F9485007B5AEE /* ImageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageCell.m; sourceTree = "<group>"; };
@@ -881,6 +884,8 @@
 				FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */,
 				FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */,
 				FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */,
+				FCB18E7417C6B03C00BAE8F3 /* VideoSender.h */,
+				FCB18E7517C6B03C00BAE8F3 /* VideoSender.m */,
 				FC83599B17B094750035A833 /* DetectorResourceHandler.h */,
 				FC83599C17B094750035A833 /* DetectorResourceHandler.m */,
 				FCED895B17034CAF0027CBE1 /* DetectView.h */,
@@ -1507,6 +1512,7 @@
 				FC8359AC17B201900035A833 /* SendingView+DetectorDescription.m in Sources */,
 				FC8359AF17B2C40D0035A833 /* CameraVideoViewController.m in Sources */,
 				FC8359B617B323530035A833 /* DictionaryQueue.m in Sources */,
+				FCB18E7617C6B03D00BAE8F3 /* VideoSender.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

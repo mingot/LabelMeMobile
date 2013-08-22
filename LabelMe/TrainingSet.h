@@ -11,7 +11,6 @@
 #import "DetectorResourceHandler.h"
 
 
-//@class Detector;
 @class DetectorResourceHandler;
 
 @interface TrainingSet : NSObject

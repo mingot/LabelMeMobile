@@ -253,15 +253,11 @@ using namespace cv;
         if(iter!=1) [self.delegate updateProgress:STOP_CRITERIA/_diff];
     }
     
-    
     if(_isTrainCancelled){
         [self.delegate sendMessage:@"\n TRAINING INTERRUPTED \n"];
         return INTERRUPTED;
     }
-//    if(iter == 0) return INTERRUPTED;
 
-
-    
     //update information about the detector
     self.numberSV = [NSNumber numberWithInt:_numSupportVectors];
     self.timeLearning = [NSNumber numberWithDouble:-[start timeIntervalSinceNow]];
@@ -274,6 +270,7 @@ using namespace cv;
     free(weightsPLast);
     free(_trainingImageFeatures);
     free(_trainingImageLabels);
+    
     return SUCCESS; 
 }
 
@@ -548,8 +545,6 @@ using namespace cv;
             BoundingBox *p = [[BoundingBox alloc] init];
             p.score = (*(c + x*convolutionSize[0] + y) - bias);
             if( p.score > -1 ){
-//                NSLog(@"Image hog size: %d x %d", blocks[1], blocks[0]);
-//                NSLog(@"Template hog size: %d x %d", _sizesP[1], _sizesP[1]);
                 
                 p.xmin = (double)(x + 1)/((double)blocks[1] + 2);
                 p.xmax = (double)(x + 1)/((double)blocks[1] + 2) + ((double)_sizesP[1]/((double)blocks[1] + 2));
@@ -557,8 +552,6 @@ using namespace cv;
                 p.ymax = (double)(y + 1)/((double)blocks[0] + 2) + ((double)_sizesP[0]/((double)blocks[0] + 2));
                 p.pyramidLevel = pyramidLevel;
                 p.targetClass = [self.targetClasses componentsJoinedByString:@"+"];
-                
-//                NSLog(@"Box obtained: %@", p);
                 
                 //save the location and image hog for the later feature extraction during the learning
                 if(_isLearning){
