@@ -103,6 +103,7 @@
 
 - (IBAction)cancelAction:(id)sender
 {
+    [self.cancelButton setTitle:@"Cancelling..." forState:UIControlStateNormal];
     [self.delegate cancel];
 }
 
