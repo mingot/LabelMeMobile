@@ -522,7 +522,7 @@
     dispatch_queue_t q = dispatch_queue_create("q", NULL);
     dispatch_async(q, ^{
         
-        NSString *query = [_serverConnection getDownloadQueryForUsername:self.username]; //[NSString stringWithFormat:@"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php?username=%@", self.username];
+        NSString *query = [_serverConnection getDownloadQueryForUsername:self.username];
         NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
         NSError *error = nil;
         NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
@@ -544,7 +544,7 @@
             //get the name of the image
             NSString *imageName = [element objectForKey:@"name"];
             
-            if([self.items indexOfObject:imageName] == NSNotFound){
+            if([self.items indexOfObject:imageName] == NSNotFound){//if we do not have the image in the phone
                 
                 //save the name of the image
                 [self.downloadedImageNames addObject:imageName];
@@ -579,11 +579,12 @@
                         label = [(NSString *) [box objectForKey:@"name"] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
                     else continue; //skip box
                     NSMutableArray *imageIndexes = [self.downloadedLabelsMap objectForKey:label];
+                    NSNumber *index = [NSNumber numberWithInt:self.downloadedImageNames.count-1];
                     if(imageIndexes==nil){
-                        imageIndexes = [[NSMutableArray alloc] initWithObjects:[NSNumber numberWithInt:self.downloadedImageNames.count-1], nil];
+                        imageIndexes = [[NSMutableArray alloc] initWithObjects:index, nil];
                         [self.downloadedLabelsMap setObject:imageIndexes forKey:label];
                         
-                    }else [imageIndexes addObject:[NSNumber numberWithInt:self.downloadedImageNames.count-1]];
+                    }else if(![imageIndexes containsObject:index]) [imageIndexes addObject:index];
                     
                     
                     NSDictionary *polygon = (NSDictionary *)[box objectForKey:@"polygon"];
