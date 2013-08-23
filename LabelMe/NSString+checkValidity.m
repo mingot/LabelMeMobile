@@ -35,8 +35,7 @@
 -(NSString *) replaceByUnderscore
 {
     NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@"-:;$&@\"?!'[]{}#%^*+=\\|~<>€"];
-
-    return  [[self componentsSeparatedByCharactersInSet:set] componentsJoinedByString:@"_"];
+    return  [[[self lowercaseString] componentsSeparatedByCharactersInSet:set] componentsJoinedByString:@"_"];
 }
 
 -(BOOL)checkEmailFormat
