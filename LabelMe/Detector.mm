@@ -386,10 +386,8 @@ using namespace cv;
                 imageHog = [pyramid.hogFeatures objectAtIndex:i + _iniPyramid];
             });
             candidatesForLevel = [self getBoundingBoxesIn:imageHog forPyramid:i+_iniPyramid forIndex:0];
-        }else{
-            NSLog(@"Error trying to retrieve pyramid %zd, not the correct class",i + _iniPyramid);
-            NSLog(@"Obtained class: %@", [[pyramid.hogFeatures objectAtIndex:i + _iniPyramid] class]);
         }
+        
         dispatch_sync(dispatch_get_main_queue(), ^{
             [candidateBoundingBoxes addObjectsFromArray:candidatesForLevel];
         });
@@ -452,13 +450,11 @@ using namespace cv;
     
     _isLearning = YES;
     //TODO: not multiimage
-    NSLog(@"Detection threshold: %f", detectionThreshold);
     int tp=0, fp=0, fn=0;// tn=0;
     for(BoundingBox *groundTruthBoundingBox in testSet.groundTruthBoundingBoxes){
         bool found = NO;
         UIImage *selectedImage = [testSet.images objectAtIndex:groundTruthBoundingBox.imageIndex];
         NSArray *detectedBoundingBoxes = [self detect:selectedImage minimumThreshold:detectionThreshold pyramids:10 usingNms:YES deviceOrientation:UIImageOrientationUp learningImageIndex:groundTruthBoundingBox.imageIndex];
-        NSLog(@"For image %d generated %d detecting boxes", groundTruthBoundingBox.imageIndex, detectedBoundingBoxes.count);
         for(BoundingBox *detectedBoundingBox in detectedBoundingBoxes)
             if ([detectedBoundingBox fractionOfAreaOverlappingWith:groundTruthBoundingBox]>0.5){
                 tp++;
@@ -466,9 +462,9 @@ using namespace cv;
             }else fp++;
         
         if(!found) fn++;
-        NSLog(@"tp at image %d: %d", groundTruthBoundingBox.imageIndex, tp);
-        NSLog(@"fp at image %d: %d", groundTruthBoundingBox.imageIndex, fp);
-        NSLog(@"fn at image %d: %d", groundTruthBoundingBox.imageIndex, fn);
+        //NSLog(@"tp at image %d: %d", groundTruthBoundingBox.imageIndex, tp);
+        //NSLog(@"fp at image %d: %d", groundTruthBoundingBox.imageIndex, fp);
+        //NSLog(@"fn at image %d: %d", groundTruthBoundingBox.imageIndex, fn);
     }
 
     [self.delegate sendMessage:[NSString stringWithFormat:@"PRECISION: %f", tp*1.0/(tp+fp)]];
@@ -683,8 +679,6 @@ using namespace cv;
     const CvSVMDecisionFunc *dec = SVM.decision_func;
     for(int i=0; i<_numOfFeatures+1; i++) _weightsP[i] = 0.0;
     
-    NSLog(@"Num of support vectors: %d\n", _numSupportVectors);
-    
     for (int i=0; i<_numSupportVectors; i++){
         float alpha = dec[0].alpha[i];
         const float *supportVector = SVM.get_support_vector(i);
@@ -697,7 +691,7 @@ using namespace cv;
         _trainingImageLabels[i] = SVM.predict(supportVectorMat);
         if(_trainingImageLabels[i]==1) positives++;
         free(sv_aux);
-        NSLog(@"label: %f   alpha: %f \n", _trainingImageLabels[i], alpha);
+        //NSLog(@"label: %f   alpha: %f \n", _trainingImageLabels[i], alpha);
         
         for(int j=0;j<_numOfFeatures;j++){
             // add to get the svm weights

@@ -168,10 +168,12 @@
 
 - (void) adaptToPhoneOrientation:(UIDeviceOrientation) orientation
 {
-    [CATransaction begin];
-    self.prevLayer.orientation = orientation;
-    self.prevLayer.frame = self.view.frame;
-    [CATransaction commit];
+    if(orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationLandscapeLeft){
+        [CATransaction begin];
+        self.prevLayer.orientation = orientation;
+        self.prevLayer.frame = self.view.frame;
+        [CATransaction commit];
+    }
 }
 
 @end

@@ -65,23 +65,23 @@ static BOOL didSignIn = NO;
 
 -(void)setURLs
 {
-    self.checkLoginURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/checkLoginFromiPhone.php";
-    self.createAccountURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/addUserFromiPhone2.php";
-    self.sendPhotoURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/sendPhotoFromiPhone.php";
-    self.updateAnnotationURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/updateAnnotation.php";
-    self.downloadProfilePictureURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/downloadProfilePicture.php";
-    self.downloadNamesURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/download.php";
-    self.uploadProfilePictureURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/uploadProfilePicture.php";
-    self.forgotPasswordURL = @"http://labelme.csail.mit.edu/Release3.0/browserTools/php/forgot_password.php";
+//    self.checkLoginURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/checkLoginFromiPhone.php";
+//    self.createAccountURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/addUserFromiPhone2.php";
+//    self.sendPhotoURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/sendPhotoFromiPhone.php";
+//    self.updateAnnotationURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/updateAnnotation.php";
+//    self.downloadProfilePictureURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/downloadProfilePicture.php";
+//    self.downloadNamesURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/download.php";
+//    self.uploadProfilePictureURL = @"http://labelme.csail.mit.edu/Release3.0/iphoneAppTools/uploadProfilePicture.php";
+//    self.forgotPasswordURL = @"http://labelme.csail.mit.edu/Release3.0/browserTools/php/forgot_password.php";
     
-//    self.checkLoginURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/checkLoginFromiPhone.php";
-//    self.createAccountURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/addUserFromiPhone2.php";
-//    self.sendPhotoURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/sendPhotoFromiPhone.php";
-//    self.updateAnnotationURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/updateAnnotation.php";
-//    self.downloadProfilePictureURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/downloadProfilePicture.php";
-//    self.downloadNamesURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php";
-//    self.uploadProfilePictureURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/uploadProfilePicture.php";
-//    self.forgotPasswordURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/browserTools/php/forgot_password.php";
+    self.checkLoginURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/checkLoginFromiPhone.php";
+    self.createAccountURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/addUserFromiPhone2.php";
+    self.sendPhotoURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/sendPhotoFromiPhone.php";
+    self.updateAnnotationURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/updateAnnotation.php";
+    self.downloadProfilePictureURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/downloadProfilePicture.php";
+    self.downloadNamesURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/download.php";
+    self.uploadProfilePictureURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/iphoneAppTools/uploadProfilePicture.php";
+    self.forgotPasswordURL = @"http://labelme2.csail.mit.edu/developers/mingot/LabelMe3.0/browserTools/php/forgot_password.php";
 }
 
 
@@ -613,17 +613,14 @@ static BOOL didSignIn = NO;
 
         switch (resultCode) {
             case 0:
-                NSLog(@"correct");
                 [filemng removeItemAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] error:NULL];
                 [self.delegate photoSentCorrectly:filename];
                 break;
             case 2:
-                NSLog(@"not correct");
                 //[self errorWithTitle:@"ERROR" andDescription:[divided objectAtIndex:divided.count-1]];
                 [self.delegate photoNotOnServer:[divided objectAtIndex:divided.count-3]];
                 break;
             default:
-                NSLog(@"default");
                 [self errorWithTitle:[divided objectAtIndex:divided.count-1] andDescription:@"Please, try again."];
                 [self.delegate sendPhotoError];
                 break;

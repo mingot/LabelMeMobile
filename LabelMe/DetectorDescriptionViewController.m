@@ -506,7 +506,6 @@
 
 -(void) didReceiveMemoryWarning
 {
-    NSLog(@"Memory warning received!!!");
     [super didReceiveMemoryWarning];
 }
 

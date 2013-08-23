@@ -68,17 +68,7 @@ UIViewAutoresizingFlexibleHeight
          forControlEvents:UIControlEventEditingDidEndOnExit];
     self.label.autocapitalizationType = UITextAutocapitalizationTypeNone;
     [self addSubview:self.label];
-    
-    
-    UIToolbar *keyboardToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 44)];
-    keyboardToolbar.barStyle = UIBarStyleBlackOpaque;
-    self.label.inputAccessoryView = keyboardToolbar;
-}
 
-- (IBAction)prova:(id)sender
-{
-    UIBarButtonItem *b = (UIBarButtonItem *) sender;
-    NSLog(@"prova with title:%@", b.title);
 }
 
 - (void) initialize

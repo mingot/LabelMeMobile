@@ -142,7 +142,6 @@
     _modalTVC.modalTitle = @"New Detector";
     _modalTVC.modalSubtitle = @"2 of 2: select training image(es)";
     _modalTVC.doneButtonTitle = @"Create";
-    NSLog(@"adapting to first training images!");
 }
 
 - (void) configureModalForTrainingImages

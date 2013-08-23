@@ -140,7 +140,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void) processImage:(CGImageRef) imageRef
 {
-    NSLog(@"Process Image in the parent must be overriden!");
+    //Process Image in the parent must be overriden!
 }
 
 

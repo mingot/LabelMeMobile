@@ -50,6 +50,7 @@
 - (void) setTextField:(UITextField *)textField
 {
     _textField = textField;
+    _textField.inputAccessoryView = _toolbar;
 }
 
 - (void)dealloc

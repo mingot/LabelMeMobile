@@ -210,9 +210,7 @@
 		
 		free(bitmapData);
 		
-	} else {
-		NSLog(@"Error getting bitmap pixel data\n");
-	}
+	}else NSLog(@"Error getting bitmap pixel data\n");
 	
 	CGContextRelease(context);
 	

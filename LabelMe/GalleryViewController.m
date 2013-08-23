@@ -826,7 +826,6 @@
             if (![filemng removeItemAtPath:path error:&error]) {
 
                 UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"It can not be removed." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
-                NSLog(@"3");
                 [alert show];
                 
             }else [filemng removeItemAtPath:[[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:[[[self.selectedItemsDelete objectAtIndex:0] stringByDeletingPathExtension] stringByAppendingPathExtension:@"txt"]] error:&error]; //delete location information

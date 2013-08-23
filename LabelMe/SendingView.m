@@ -84,7 +84,7 @@
 
 -(void) showMessage:(NSString *)message
 {
-    NSLog(@"LOG: %@", message);
+    //NSLog(@"LOG: %@", message);
     
     dispatch_async(dispatch_get_main_queue(), ^{
     
