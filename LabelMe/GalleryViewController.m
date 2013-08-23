@@ -512,7 +512,8 @@
     //sending view to show getting images from server
     self.sendingView.textView.text = @"Retrieving images from server...";
     self.sendingView.cancelButton.hidden = NO;
-    self.sendingView.progressView.hidden = YES;
+    self.sendingView.progressView.hidden = NO;
+    self.sendingView.progressView.progress = 0.0;
     self.sendingView.sendingViewID = @"retreiving";
     [self hideTabBar:self.tabBarController];
     [self.sendingView.activityIndicator startAnimating];
@@ -537,9 +538,13 @@
         NSArray *colors = [[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
         
         //select NUM images not currently present in iphone
+        __block int i = 0;
         for (NSDictionary *element in results) {
             
             if(self.cancelDownloading) break;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.sendingView.progressView setProgress:i++/(1.0*results.count) animated:YES];
+            });
             
             //get the name of the image
             NSString *imageName = [element objectForKey:@"name"];

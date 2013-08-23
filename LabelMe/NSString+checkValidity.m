@@ -10,7 +10,8 @@
 
 @implementation NSString (checkValidity)
 
--(BOOL) checkIfContainsOnlyAlphanumericAndUnderscore{
+-(BOOL) checkIfContainsOnlyAlphanumericAndUnderscore
+{
     NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_"];
     set = [set invertedSet];
     NSRange range = [self rangeOfCharacterFromSet:set];
@@ -19,7 +20,9 @@
     }
     return YES;
 }
--(BOOL) checkIfContainsOnlyAlphanumericAndUnderscoreWithSpaces{
+
+-(BOOL) checkIfContainsOnlyAlphanumericAndUnderscoreWithSpaces
+{
     NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_ "];
     set = [set invertedSet];
     NSRange range = [self rangeOfCharacterFromSet:set];
@@ -28,16 +31,16 @@
     }
     return YES;
 }
--(NSString *)replaceByUnderscore{
+
+-(NSString *) replaceByUnderscore
+{
     NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@"-:;$&@\"?!'[]{}#%^*+=\\|~<>€"];
 
     return  [[self componentsSeparatedByCharactersInSet:set] componentsJoinedByString:@"_"];
-    
-    
-    
-    
 }
--(BOOL)checkEmailFormat{
+
+-(BOOL)checkEmailFormat
+{
     NSString *emailRegEx =
     @"(?:[a-z0-9!#$%\\&'*+/=?\\^_`{|}~-]+(?:\\.[a-z0-9!#$%\\&'*+/=?\\^_`{|}"
     @"~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\"
@@ -50,4 +53,5 @@
     NSPredicate *regExPredicate = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegEx];
     return [regExPredicate evaluateWithObject:self];
 }
+
 @end

@@ -31,6 +31,7 @@
 
 -(void)setTotal:(int) i;
 -(void)incrementNum;
+
 -(void)reset;
 -(void)showMessage:(NSString *)message;
 -(void)clearScreen;
