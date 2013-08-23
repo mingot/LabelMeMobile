@@ -464,7 +464,6 @@
             [self.deleteButton setEnabled:NO];
             [self.tableViewGrid setFrame:CGRectMake(self.tableViewGrid.frame.origin.x, self.tableViewGrid.frame.origin.y, self.tableViewGrid.frame.size.width, self.tableViewGrid.frame.size.height + self.navigationController.toolbar.frame.size.height)];
             [self.navigationController setToolbarHidden:YES];
-            [self reloadGallery];
         }
         
     //list
