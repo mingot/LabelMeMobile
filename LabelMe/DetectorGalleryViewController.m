@@ -18,6 +18,7 @@
 @interface DetectorGalleryViewController()
 {
     NSInteger _selectedRow;
+    BOOL *_editingMode;
 }
 
 //detecotrs
@@ -151,28 +152,12 @@
 {
     UIButton *button = [self.editButton valueForKey:@"view"];
     
-    if(self.editing){
-        [super setEditing:NO animated:NO];
-        [self.tableView setEditing:NO animated:NO];
-        
-        [button setTitle:@"Edit" forState:UIControlStateNormal];
-        self.navigationItem.leftBarButtonItem = self.plusButton;
-        
-        [self.navigationController setToolbarHidden:YES];
-
-        
-    }else{
-        [super setEditing:YES animated:YES];
-        
-        [button setTitle:@"Done" forState:UIControlStateNormal];
-        self.navigationItem.leftBarButtonItem = nil;
-        
-        [self.navigationController setToolbarHidden:NO];
-        
-        NSArray *toolbarItems = [[NSArray alloc] initWithObjects:self.executeButton,self.deleteButton, nil];
-        [self.navigationController.toolbar setItems:toolbarItems];
-    }
-    
+    _editingMode = !_editingMode;
+    [button setTitle:_editingMode ? @"Done" : @"Edit" forState:UIControlStateNormal];
+    [self.navigationController setToolbarHidden:!_editingMode];
+    self.navigationItem.leftBarButtonItem = _editingMode ? nil : self.plusButton;
+    NSArray *toolbarItems = [[NSArray alloc] initWithObjects:self.executeButton,self.deleteButton, nil];
+    if(_editingMode) [self.navigationController.toolbar setItems:toolbarItems];
     [self.tableView reloadData];
 }
 
@@ -257,7 +242,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
     
-    if(self.editing) cell.accessoryType = UITableViewCellAccessoryNone;
+    if(_editingMode) cell.accessoryType = UITableViewCellAccessoryNone;
     else cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
     NSArray* reversedDetectors = [[self.detectors reverseObjectEnumerator] allObjects]; //reverse order to show newer first
@@ -268,7 +253,7 @@
     cell.imageView.image = [UIImage imageWithContentsOfFile:detector.averageImageThumbPath];
     
     //cell checkmarked when selected
-    if([self.selectedItems containsObject:[NSNumber numberWithInt:self.detectors.count - indexPath.row - 1]] && self.editing)
+    if([self.selectedItems containsObject:[NSNumber numberWithInt:self.detectors.count - indexPath.row - 1]] && _editingMode)
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     
     return cell;
@@ -285,7 +270,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    if (self.editing == NO) {
+    if (!_editingMode) {
         NSArray* reversedDetectors = [[self.detectors reverseObjectEnumerator] allObjects];
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
         _selectedRow = self.detectors.count - indexPath.row - 1;
