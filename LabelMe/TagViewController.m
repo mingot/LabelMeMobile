@@ -162,7 +162,6 @@
     [self initializeBottomToolbar];
     [self initializeAndAddSendingView];
     [self initializeAndAddLabelsView];
-    [self initializeLabelsSet];
 }
 
 - (void) viewWillAppear:(BOOL)animated
@@ -177,6 +176,7 @@
     //scroll initialization
     int index = [self.imageFilenames indexOfObject:self.filename];
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self initializeLabelsSet];
         [self.infiniteLoopView initializeAtIndex:index];
     });
         
