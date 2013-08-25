@@ -9,7 +9,7 @@
 #import "InfiniteLoopView.h"
 #import "DictionaryQueue.h"
 
-#define module(a, b) (a >= 0) ? (a)%b : ((a)%(b) + b)
+#define module(a, b) (a >= 0 || -(a) == (b)) ? (a)%(b) : ((a)%(b) + b)
 #define kViewTag 10
 #define kQueueDictionaryCapacity 5 //views to store in the internal dictionary
 #define kWidth self.frame.size.width
@@ -70,14 +70,25 @@
     
     // load all three pages into our scroll view
     int total = [self.dataSource numberOfViews];
+    _currIndex = initialIndex;
+    
+    
     [self loadPageWithId:module(initialIndex - 1,total) onPage:0];
     [self loadPageWithId:module(initialIndex, total) onPage:1];
     [self loadPageWithId:module(initialIndex + 1, total) onPage:2];
-    _currIndex = initialIndex;
     
     // notify about the first view
-
     UIView *currentView = [_pageTwoView viewWithTag:kViewTag];
+
+    if(total==1){ //necessary case to be treated separately when just one image to show
+        [self loadPageWithId:0 onPage:0];
+        _scrollView.contentSize = CGSizeMake(kWidth, kHeight);
+        _scrollView.pagingEnabled = NO;
+        
+        currentView = [_pageOneView viewWithTag:kViewTag];
+    }
+    
+    //notify the delegate about the view that is going to be shown.
     [self.delegate didShowView:currentView forIndex:_currIndex];
     
     [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(deviceOrientationDidChange:) name: UIDeviceOrientationDidChangeNotification object: nil];
@@ -92,6 +103,7 @@
 - (void) reset
 {
     //black screen after view disappears.
+    [_pageOneView removeFromSuperview];
     [_pageTwoView removeFromSuperview];
 }
 
@@ -153,7 +165,6 @@
         view = [self.dataSource viewForIndex:index];
         [_viewsQueue enqueueObject:view forKey:[NSNumber numberWithInt:index]];
     }
-    
     view.frame = _pageOneView.frame;
     view.tag = kViewTag;
     

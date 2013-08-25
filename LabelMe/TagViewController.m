@@ -449,7 +449,6 @@
 
 - (UIView *) viewForIndex:(int)index
 {
-    
     //set the resource handler with the correct filename
     NSString *requestedFilename = [self.imageFilenames objectAtIndex:index];
     self.labelsResourceHandler.filename = requestedFilename;
