@@ -35,6 +35,10 @@
 // Used to obtain the target classes and current training images
 - (Detector *) currentDetector;
 
+// If something go wrong during the selection, inform the delegate
+// and make it show an error message
+- (void) showErrorString:(NSString *)errorString;
+
 @end
 
 

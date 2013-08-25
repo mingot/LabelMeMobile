@@ -371,6 +371,11 @@
     return self.detector;
 }
 
+- (void) showErrorString:(NSString *)errorString
+{
+    [self showAlertWithTitle:@"No Images found" andDescription:@"Add at least one image for this detector class"];
+}
+
 
 #pragma mark -
 #pragma mark SendingViewDelegate

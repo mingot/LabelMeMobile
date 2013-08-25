@@ -58,8 +58,12 @@
     //set the current detector clases
     _detectorTargetClasses = [[self.delegate currentDetector] targetClasses];
     
+    
     [self configureModalForTrainingImages];
-    [_viewController presentModalViewController:_modalTVC animated:YES];
+    if (_modalTVC.data.count > 0) { //needed when removed all the images of a detector
+        [_viewController presentModalViewController:_modalTVC animated:YES];
+    }else [self.delegate showErrorString:@"There are no images for this detector"];
+
 }
 
 
