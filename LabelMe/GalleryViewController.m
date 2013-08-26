@@ -34,11 +34,9 @@
 }
 
 //arrays to store information about downloaded images from server
-@property (nonatomic, strong) NSMutableArray *downloadedThumbnails;
 @property (nonatomic, strong) NSMutableArray *downloadedAnnotations;
 @property (nonatomic, strong) NSMutableArray *downloadedImageUrls;
 @property (nonatomic, strong) NSMutableArray *downloadedImageNames;
-@property (nonatomic, strong) NSMutableDictionary *downloadedLabelsMap; //label -> array with indexes
 
 //models
 @property (nonatomic, strong) NSMutableArray *items; //filenames ordered by update date
@@ -528,11 +526,13 @@
         NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
         if (error) NSLog(@"[%@ %@] JSON error: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), error.localizedDescription);
         
-        self.downloadedThumbnails = [[NSMutableArray alloc] init];
+        
         self.downloadedAnnotations = [[NSMutableArray alloc] init];
         self.downloadedImageUrls = [[NSMutableArray alloc] init];
         self.downloadedImageNames = [[NSMutableArray alloc] init];
-        self.downloadedLabelsMap = [[NSMutableDictionary alloc] init];
+        
+        NSMutableArray *downloadedThumbnails = [[NSMutableArray alloc] init];
+        NSMutableDictionary *downloadedLabelsMap = [[NSMutableDictionary alloc] init];//label -> array with indexes
         
         NSArray *colors = [[NSArray alloc] initWithObjects:[UIColor blueColor],[UIColor cyanColor],[UIColor greenColor],[UIColor magentaColor],[UIColor orangeColor],[UIColor yellowColor],[UIColor purpleColor],[UIColor brownColor], nil];
         
@@ -556,8 +556,8 @@
                 //get and save thumb
                 NSString *thumbUrl = [element objectForKey:@"thumb"];
                 UIImage *thumbImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:thumbUrl]]];
-                if(thumbImage!=nil) [self.downloadedThumbnails addObject:thumbImage];
-                else [self.downloadedThumbnails addObject:[UIImage imageNamed:@"image_not_found.png"]];
+                if(thumbImage!=nil) [downloadedThumbnails addObject:thumbImage];
+                else [downloadedThumbnails addObject:[UIImage imageNamed:@"image_not_found.png"]];
                 
                 //get and save images urls
                 NSString *imageUrl = [element objectForKey:@"image"];
@@ -582,11 +582,11 @@
                     if([[box objectForKey:@"name"] isKindOfClass:[NSString class]])
                         label = [(NSString *) [box objectForKey:@"name"] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
                     else continue; //skip box
-                    NSMutableArray *imageIndexes = [self.downloadedLabelsMap objectForKey:label];
+                    NSMutableArray *imageIndexes = [downloadedLabelsMap objectForKey:label];
                     NSNumber *index = [NSNumber numberWithInt:self.downloadedImageNames.count-1];
                     if(imageIndexes==nil){
                         imageIndexes = [[NSMutableArray alloc] initWithObjects:index, nil];
-                        [self.downloadedLabelsMap setObject:imageIndexes forKey:label];
+                        [downloadedLabelsMap setObject:imageIndexes forKey:label];
                         
                     }else if(![imageIndexes containsObject:index]) [imageIndexes addObject:index];
                     
@@ -630,14 +630,14 @@
             self.sendingView.progressView.hidden = NO;
             
             //present the modal depending on the sender button: show images or labels
-            if(self.downloadedThumbnails.count>0 && !self.cancelDownloading){
+            if(downloadedThumbnails.count>0 && !self.cancelDownloading){
 
                 self.modalSectionsTVC = [[ModalSectionsTVC alloc] init];
                 self.modalSectionsTVC.showCancelButton = YES;
                 self.modalSectionsTVC.delegate = self;
                 self.modalSectionsTVC.modalTitle = @"Choose Images";
-                self.modalSectionsTVC.thumbnailImages = self.downloadedThumbnails;
-                self.modalSectionsTVC.dataDictionary = self.downloadedLabelsMap;
+                self.modalSectionsTVC.thumbnailImages = downloadedThumbnails;
+                self.modalSectionsTVC.dataDictionary = downloadedLabelsMap;
                 [self presentModalViewController:self.modalSectionsTVC animated:YES];
                     
             }else if(!self.cancelDownloading){
@@ -1307,14 +1307,17 @@
                 NSNumber *selectedIndex = [selectedItems objectAtIndex:i];
                 NSString *imageName = [self.downloadedImageNames objectAtIndex:selectedIndex.intValue];
                 
+                //download and save image
+                NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:[self.downloadedImageUrls objectAtIndex:selectedIndex.intValue]]];
+                if (imageData == nil) continue; //skip the image if it was not downloaded correctly
+                
+                UIImage *image = [UIImage imageWithData:imageData];
+                NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
+                [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
+                
                 //Save annotation
                 NSString *pathObject = [[self.paths objectAtIndex:OBJECTS] stringByAppendingPathComponent:imageName];
                 [NSKeyedArchiver archiveRootObject:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue] toFile:pathObject];
-                
-                //download and save image
-                UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[self.downloadedImageUrls objectAtIndex:selectedIndex.intValue]]]];
-                NSString *pathImages = [[self.paths objectAtIndex:IMAGES ] stringByAppendingPathComponent:imageName];
-                [[NSFileManager defaultManager] createFileAtPath:pathImages contents:UIImageJPEGRepresentation(image, 1.0) attributes:nil];
                 
                 //Save thumbnail
                 UIImage *thumbnailImage = [self thumbnailImageFromImage:image withBoxes:[self.downloadedAnnotations objectAtIndex:selectedIndex.intValue]];

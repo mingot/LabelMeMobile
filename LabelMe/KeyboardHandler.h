@@ -31,7 +31,7 @@
 
 @property (strong, nonatomic) id<KeyboardHandlerDataSource> dataSource;
 
-- (id)initWithTextField:(UITextField *)textField;
+- (id) initWithTextField:(UITextField *)textField;
 
 - (void) setTextField:(UITextField *) textField;
 
