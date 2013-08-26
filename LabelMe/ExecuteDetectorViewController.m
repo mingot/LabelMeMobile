@@ -64,7 +64,7 @@
 
 - (void) initializeConstants
 {
-    _settingsStrings = [[NSArray alloc] initWithObjects:@"Scale",@"FPS",@"Score",@"HOG", nil];
+    _settingsStrings = [[NSArray alloc] initWithObjects:@"FPS",@"HOG", nil]; //@"Scale",@"Score", 
     
     _fpsToShow = 0.0;
     _num = 0;

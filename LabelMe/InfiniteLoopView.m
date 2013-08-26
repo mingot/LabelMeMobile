@@ -43,6 +43,8 @@
     
     _scrollView = [[UIScrollView alloc] initWithFrame:self.frame];
     _scrollView.pagingEnabled = YES;
+    _scrollView.showsHorizontalScrollIndicator = NO;
+    _scrollView.bounces = NO;
     _scrollView.contentSize = CGSizeMake(3*kWidth, kHeight);
     [_scrollView scrollRectToVisible:CGRectMake(kWidth,0,kWidth,kHeight) animated:NO];
     _scrollView.delegate = self;
@@ -197,6 +199,7 @@
 
 - (void)deviceOrientationDidChange:(NSNotification *)notification
 {
+    NSLog(@"frame width: %f", kWidth);
     _pageOneView.frame = CGRectMake(0*kWidth, 0, kWidth, kHeight);
     _pageTwoView.frame = CGRectMake(1*kWidth, 0, kWidth, kHeight);
     _pageThreeView.frame = CGRectMake(2*kWidth, 0, kWidth, kHeight);
