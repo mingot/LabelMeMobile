@@ -8,7 +8,7 @@
 
 #import "KeyboardHandler.h"
 
-#define kOFFSET_FOR_KEYBOARD 40.0
+#define kOFFSET_FOR_KEYBOARD 10.0
 #define kToolbarWidth 44
 
 
@@ -71,8 +71,25 @@
     // get the absolute coordinates of the view (inside UIWindow)
     CGRect absoluteOriginRect = [_textField convertRect:_textField.bounds toView:nil];
     
-    // if the keyboard is hidding it, move it up
-    _difference = (keyboardRect.origin.y - keyboardRect.size.height) - (absoluteOriginRect.origin.y + absoluteOriginRect.size.height) - kOFFSET_FOR_KEYBOARD;
+    CGSize windowSize = [UIScreen mainScreen].bounds.size;
+    CGFloat keyboardOrigin = windowSize.height - keyboardRect.size.height;
+    CGFloat labelEnd = absoluteOriginRect.origin.y + absoluteOriginRect.size.height;
+    
+    // when rotating, the coordinate system also rotates!
+    if (UIInterfaceOrientationIsLandscape([[UIDevice currentDevice] orientation])){
+        keyboardOrigin = windowSize.width - keyboardRect.size.width;
+        labelEnd = windowSize.width - absoluteOriginRect.origin.x;
+    }
+    
+    //    NSLog(@"*******************************************");
+    //    NSLog(@"window size: %@", NSStringFromCGSize(windowSize));
+    //    NSLog(@"keyboard rect: %@", NSStringFromCGRect(keyboardRect));
+    //    NSLog(@"label rect: %@", NSStringFromCGRect(absoluteOriginRect));
+    //    NSLog(@"computed keyboardOrigin: %f", keyboardOrigin);
+    //    NSLog(@"computed labelEnd: %f", labelEnd);
+    
+    _difference = keyboardOrigin - labelEnd - kOFFSET_FOR_KEYBOARD;
+    
     if (_difference < 0)
     {
         [self moveUp:YES];

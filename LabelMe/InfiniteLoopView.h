@@ -30,7 +30,7 @@
  - Request the data source which is the UIView for a given index
  - Inform the delagate of the current view
  - Mantain a buffer of views for optimization
- - Rajust internal views when rotating 
+ - Reajust internal views when rotating 
  
  */
 

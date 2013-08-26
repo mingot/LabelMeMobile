@@ -197,10 +197,11 @@
 
 - (void)deviceOrientationDidChange:(NSNotification *)notification
 {
-    _scrollView.contentSize = CGSizeMake(3*kWidth, kHeight);
     _pageOneView.frame = CGRectMake(0*kWidth, 0, kWidth, kHeight);
     _pageTwoView.frame = CGRectMake(1*kWidth, 0, kWidth, kHeight);
     _pageThreeView.frame = CGRectMake(2*kWidth, 0, kWidth, kHeight);
+    _scrollView.contentSize = CGSizeMake(3*kWidth, kHeight);
+    
     [_scrollView scrollRectToVisible:CGRectMake(1*kWidth,0,kWidth,kHeight) animated:NO];
 }
 
