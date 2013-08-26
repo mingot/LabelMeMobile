@@ -71,6 +71,7 @@
 
 -(void) viewWillAppear:(BOOL)animated
 {
+    
     self.navigationController.navigationBarHidden = YES;
     self.thumbnailCaptureImageView.image = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -82,12 +83,24 @@
     
     //fix orientation
     [self adaptToPhoneOrientation:[[UIDevice currentDevice] orientation]];
+    
+    [self zoom];
 }
 
 -(void) viewWillDisappear:(BOOL)animated
 {
     [self.captureSession stopRunning];
     [super viewWillDisappear:animated];
+}
+
+- (void) zoom
+{
+    CGAffineTransform affineTransform = CGAffineTransformMakeScale(2, 2);
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:.025];
+    //previewLayer is object of AVCaptureVideoPreviewLayer
+    [self.cameraView.layer setAffineTransform:affineTransform];
+    [CATransaction commit];
 }
 
 #pragma mark -
