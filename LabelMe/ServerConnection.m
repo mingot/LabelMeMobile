@@ -12,60 +12,41 @@
 #import "NSObject+Folders.h"
 
 
-@implementation ServerConnection
+
+@interface ServerConnection()
 {
     
     NSMutableData *receivedData;
     float bytestowrite;
     NSString *_filenamePending;
-    BOOL cancel;
+    BOOL _cancel;
     
 }
 
-@synthesize checkLoginURL = _checkLoginURL;
-@synthesize createAccountURL = _createAccountURL;
-@synthesize updateAnnotationURL = _updateAnnotationURL;
-@synthesize sendPhotoURL = _sendPhotoURL;
-@synthesize downloadProfilePictureURL = _downloadProfilePictureURL;
-@synthesize uploadProfilePictureURL = _uploadProfilePictureURL;
-@synthesize forgotPasswordURL = _forgotPasswordURL;
 
 
-static UIImage* rotate(UIImage* src, UIImageOrientation orientation)
-{
-    UIGraphicsBeginImageContext(src.size);
-    [src drawAtPoint:CGPointMake(0, 0)];
-    
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    if (orientation == UIImageOrientationRight) {
-        CGContextRotateCTM (context, M_PI/2);
-    } else if (orientation == UIImageOrientationLeft) {
-        CGContextRotateCTM (context, (-M_PI/2));
-    } else if (orientation == UIImageOrientationDown) {
-        CGContextRotateCTM (context, (-M_PI));
-    } else if (orientation == UIImageOrientationUp) {
-        // NOTHING
-    }
-    
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
-}
+@end
+
+
+
+@implementation ServerConnection
+
 static BOOL didSignIn = NO;
+
 
 
 #pragma mark -
 #pragma mark Initialization Methods
 
--(id)init{
-    self = [super init];
-    if (self) {
+-(id)init
+{
+    if (self = [super init]) {
         [self setURLs];
-        cancel = NO;
+        _cancel = NO;
         receivedData = [[NSMutableData alloc]init];
         self.filenamePending = [[NSString alloc]init];
     }
+    
     return self;
 }
 
@@ -188,7 +169,7 @@ static BOOL didSignIn = NO;
 
 -(void)sendPhoto:(UIImage *) photo filename:(NSString *)filename path:(NSString *)objectpath withSize:(CGPoint)size andAnnotation:(NSMutableArray *)annotation
 {
-    cancel = NO;
+    _cancel = NO;
 
     //check settings for wifi only.
     NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:[[objectpath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"settings.plist"]];
@@ -243,7 +224,7 @@ static BOOL didSignIn = NO;
 
 -(void)sendPhotoWithFilename:(NSString *)filename
 {
-    cancel = NO;
+    _cancel = NO;
 
     NSString *boundary = @"AaB03x";
     
@@ -272,7 +253,7 @@ static BOOL didSignIn = NO;
 
 -(void)updateAnnotationFrom: (NSString *)filename withSize:(CGPoint)size :(NSMutableArray *)annotation
 {
-    cancel = NO;
+    _cancel = NO;
 
     NSString *boundary = @"AaB03x";
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.updateAnnotationURL]];
@@ -320,7 +301,7 @@ static BOOL didSignIn = NO;
 
     if (![[NSFileManager defaultManager] fileExistsAtPath:[tmpPath stringByAppendingPathComponent:[filename stringByDeletingPathExtension]] isDirectory:&isDir]) {
         NSString *boundary = @"AaB03x";
-        UIImage *imageToSend = rotate(image, image.imageOrientation);
+        UIImage *imageToSend = image;
         NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(imageToSend, 1.0)];
         NSData *annotationData = [[NSData alloc] initWithData:[self createXMLFromAnnotation:annotation andImageSize:point]];
         NSString *location = [[NSString alloc] initWithContentsOfFile:[objectpath stringByAppendingPathComponent:[[filename stringByDeletingPathExtension] stringByAppendingString:@".txt"] ] encoding:NSUTF8StringEncoding error:NULL];
@@ -346,7 +327,7 @@ static BOOL didSignIn = NO;
 
 -(void)updateAnnotationWithFilename:(NSString *)filename
 {
-    cancel = NO;
+    _cancel = NO;
 
     NSString *boundary = @"AaB03x";
     
@@ -451,7 +432,7 @@ static BOOL didSignIn = NO;
     NSArray *fields = [[NSArray alloc] initWithArray:[self signInAgain]];
         
     NSString *boundary = @"AaB03x";
-    UIImage *imageToSend = rotate(ppicture, ppicture.imageOrientation);
+    UIImage *imageToSend = ppicture;
     NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(imageToSend, 1.0)];
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.uploadProfilePictureURL]];
     [theRequest setHTTPMethod:@"POST"];
@@ -507,9 +488,9 @@ static BOOL didSignIn = NO;
 #pragma mark NSURLConnectionDelegate Methods
 -(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-     if (cancel) {
+     if (_cancel) {
         [connection cancel];
-        cancel = NO;
+        _cancel = NO;
     }
     [receivedData appendData:data];
 
@@ -518,9 +499,9 @@ static BOOL didSignIn = NO;
 
 -(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite
 {
-    if (cancel) {
+    if (_cancel) {
         [connection cancel];
-        cancel = NO;
+        _cancel = NO;
     }
     if ([connection.currentRequest.URL.absoluteString isEqualToString:self.sendPhotoURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.updateAnnotationURL]) {
         float p = (float) totalBytesWritten / (float) bytestowrite ;
@@ -659,7 +640,7 @@ static BOOL didSignIn = NO;
 
 -(void)cancelRequestFor:(int)req
 {
-    cancel = YES;
+    _cancel = YES;
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 }
 
@@ -673,5 +654,9 @@ static BOOL didSignIn = NO;
                                           otherButtonTitles:nil, nil];
     [alert show];
 }
+
+#pragma mark -
+#pragma mark Private methods
+
 
 @end
