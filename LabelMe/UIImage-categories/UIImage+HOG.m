@@ -14,8 +14,6 @@
 #define eps 0.00001
 //#define pixelsPerHogCell 6 //pixels per block
 
-//static const int pixelsPerHogCell = 6;
-
 
 double uu[9] = {1.0000, //non oriented HOG representants, sweeping from (1,0) to (-1,0).
     0.9397,
@@ -152,9 +150,6 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
             dy3 = (double)*(s+dims[1]*4) - *(s-dims[1]*4);
             v3 = dx3*dx3 + dy3*dy3;
             
-            v = dx*dx + dy*dy; //norm
-            v2 = dx2*dx2 + dy2*dy2;
-            v3 = dx3*dx3 + dy3*dy3;
             
             // pick channel with strongest gradient
             if (v2 > v) {
@@ -184,14 +179,14 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
             
             
             // Now the histogram value is computed, it is added to the for hog features around the pixel and proportionally weighted.
-            double xp = ((double)x+0.5)/(double)pixelsPerHogCell - 0.5;
-            double yp = ((double)y+0.5)/(double)pixelsPerHogCell - 0.5;
+            double xp = ((double)x + 0.5)/(double)pixelsPerHogCell - 0.5;
+            double yp = ((double)y + 0.5)/(double)pixelsPerHogCell - 0.5;
             int ixp = (int)floor(xp); //index of the HOG feature in *hist
             int iyp = (int)floor(yp);
-            double vx0 = xp-ixp; // decimal part of xp. Use to ponderate the strength of the vote to the gradient
-            double vy0 = yp-iyp;
-            double vx1 = 1.0-vx0;
-            double vy1 = 1.0-vy0;
+            double vx0 = xp - ixp; // decimal part of xp. Use to ponderate the strength of the vote to the gradient
+            double vy0 = yp - iyp;
+            double vx1 = 1.0 - vx0;
+            double vy1 = 1.0 - vy0;
             v = sqrt(v); //strongest gradient (the selected) modulus
             
             //The surroundings blocks are 5:(0,0);(1,0);(0,1);(-1,0);(0,-1)
@@ -282,7 +277,7 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
                 src += blocks[0]*blocks[1];
             }
             
-            // texture features //?? what do they do?
+            // texture features
             *dst = 0.2357 * t1;
             dst += hog.numBlocksY*hog.numBlocksX;
             *dst = 0.2357 * t2;
@@ -401,6 +396,7 @@ static inline int max_int(int x, int y) { return (x <= y ? y : x); }
     CGImageRef ima = CGBitmapContextCreateImage(context);
     CGContextRelease(context);
     UIImage *image = [UIImage imageWithCGImage:ima scale:1.0 orientation:UIImageOrientationUp];
+    CGImageRelease(ima);
     free(imageBuffer);
     free(f);
     return(image);

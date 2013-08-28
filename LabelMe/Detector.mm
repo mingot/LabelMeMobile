@@ -242,7 +242,12 @@ using namespace cv;
                 [trainingSet unifyGroundTruthBoundingBoxes];
                 firstTimeError = NO;
                 continue;
-            }else return FAIL;
+            }else{
+                free(weightsPLast);
+                free(_trainingImageFeatures);
+                free(_trainingImageLabels);
+                return FAIL;
+            }
         }
         
         //Train the SVM, update weights and store support vectors and labels
@@ -255,6 +260,9 @@ using namespace cv;
     
     if(_isTrainCancelled){
         [self.delegate sendMessage:@"\n TRAINING INTERRUPTED \n"];
+        free(weightsPLast);
+        free(_trainingImageFeatures);
+        free(_trainingImageLabels);
         return INTERRUPTED;
     }
 
@@ -624,8 +632,6 @@ using namespace cv;
                         
                         GTFound = YES;
                         double overlapArea = [newBB fractionOfAreaOverlappingWith:groundTruthBB];
-//                        if (overlapArea>0.7)
-//                            NSLog(@"overlap area %f", overlapArea);
                         
                         if (overlapArea > 0.8 && overlapArea<1){
                             newBB.label = 1;

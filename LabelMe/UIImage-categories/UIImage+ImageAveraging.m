@@ -56,6 +56,7 @@
     
     
     UIImage *image = [UIImage imageWithCGImage:imageResultRef scale:1.0 orientation:UIImageOrientationUp];
+    CFRelease(imageResultRef);
     return image;
 }
 

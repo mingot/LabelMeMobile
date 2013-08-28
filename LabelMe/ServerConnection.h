@@ -29,14 +29,7 @@
 
 
 @interface ServerConnection : NSObject <NSURLConnectionDataDelegate>
-{
-    
-    NSMutableData *receivedData;
-    float bytestowrite;
-    NSString *_filenamePending;
-    BOOL cancel;
 
-}
 
 
 @property (nonatomic, weak) id <ServerConnectionDelegate> delegate;

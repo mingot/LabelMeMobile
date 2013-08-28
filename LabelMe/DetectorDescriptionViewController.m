@@ -602,7 +602,7 @@
     CFUUIDRef uuidRef = CFUUIDCreate(NULL);
     CFStringRef uuidStringRef = CFUUIDCreateString(NULL, uuidRef);
     CFRelease(uuidRef);
-    NSString *result = (__bridge NSString *) uuidStringRef;
+    NSString *result = [NSString stringWithString:(__bridge NSString *) uuidStringRef];
     CFRelease(uuidStringRef);
     return [result substringToIndex:8];
 }

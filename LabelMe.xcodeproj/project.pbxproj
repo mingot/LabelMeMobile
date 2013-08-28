@@ -562,8 +562,8 @@
 		FCED895F17034CCA0027CBE1 /* Detector.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Detector.mm; sourceTree = "<group>"; };
 		FCED896117034CD70027CBE1 /* ConvolutionHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConvolutionHelper.h; sourceTree = "<group>"; };
 		FCED896217034CD70027CBE1 /* ConvolutionHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConvolutionHelper.m; sourceTree = "<group>"; };
-		FCED896617034D350027CBE1 /* UIImage+HOG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+HOG.h"; sourceTree = "<group>"; };
-		FCED896717034D350027CBE1 /* UIImage+HOG.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+HOG.m"; sourceTree = "<group>"; };
+		FCED896617034D350027CBE1 /* UIImage+HOG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+HOG.h"; path = "UIImage-categories/UIImage+HOG.h"; sourceTree = "<group>"; };
+		FCED896717034D350027CBE1 /* UIImage+HOG.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+HOG.m"; path = "UIImage-categories/UIImage+HOG.m"; sourceTree = "<group>"; };
 		FCED896F17034F980027CBE1 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		FCED8973170353FB0027CBE1 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		FCED8975170354010027CBE1 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
@@ -608,8 +608,6 @@
 		A5480D781617A364009F630D /* UIImage-categories */ = {
 			isa = PBXGroup;
 			children = (
-				FCED896617034D350027CBE1 /* UIImage+HOG.h */,
-				FCED896717034D350027CBE1 /* UIImage+HOG.m */,
 				A5480D791617A364009F630D /* UIImage+Alpha.h */,
 				A5480D7A1617A364009F630D /* UIImage+Alpha.m */,
 				A5480D7B1617A364009F630D /* UIImage+Resize.h */,
@@ -879,9 +877,9 @@
 				FC5C93A516FCE3A100637B69 /* DetectorGalleryViewController.xib */,
 				FC5C93A816FCFA8F00637B69 /* DetectorDescriptionViewController.h */,
 				FC5C93A916FCFA9000637B69 /* DetectorDescriptionViewController.m */,
+				FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */,
 				FC8359A117B17F4B0035A833 /* SelectionHandler.h */,
 				FC8359A217B17F4B0035A833 /* SelectionHandler.m */,
-				FC5C93AA16FCFA9100637B69 /* DetectorDescriptionViewController.xib */,
 				FC8359AD17B2C40C0035A833 /* CameraVideoViewController.h */,
 				FC8359AE17B2C40C0035A833 /* CameraVideoViewController.m */,
 				FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */,
@@ -928,6 +926,8 @@
 				FC74F8D2174A54FE004701CC /* Pyramid.m */,
 				FCC9FAFA170F6CF4009B7FC6 /* TrainingSet.h */,
 				FCC9FAFB170F6CF4009B7FC6 /* TrainingSet.m */,
+				FCED896617034D350027CBE1 /* UIImage+HOG.h */,
+				FCED896717034D350027CBE1 /* UIImage+HOG.m */,
 				FC8359A417B1CF380035A833 /* BoundingBox.h */,
 				FC8359A517B1CF380035A833 /* BoundingBox.m */,
 			);

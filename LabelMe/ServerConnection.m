@@ -13,7 +13,14 @@
 
 
 @implementation ServerConnection
-
+{
+    
+    NSMutableData *receivedData;
+    float bytestowrite;
+    NSString *_filenamePending;
+    BOOL cancel;
+    
+}
 
 @synthesize checkLoginURL = _checkLoginURL;
 @synthesize createAccountURL = _createAccountURL;
