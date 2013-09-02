@@ -235,6 +235,27 @@
 		FCA832BC17CC009900423652 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = FCA832BB17CC009800423652 /* Icon.png */; };
 		FCA832BE17CC00DB00423652 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = FCA832BD17CC00DA00423652 /* Icon-72.png */; };
 		FCA832C017CC00E000423652 /* Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FCA832BF17CC00E000423652 /* Icon-72@2x.png */; };
+		FCAE374717D3E01B00E7B389 /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = FCAE374017D3E01B00E7B389 /* base64.c */; };
+		FCAE374817D3E01B00E7B389 /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = FCAE374017D3E01B00E7B389 /* base64.c */; };
+		FCAE374917D3E01B00E7B389 /* NSData+SRB64Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE374317D3E01B00E7B389 /* NSData+SRB64Additions.m */; };
+		FCAE374A17D3E01B00E7B389 /* NSData+SRB64Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE374317D3E01B00E7B389 /* NSData+SRB64Additions.m */; };
+		FCAE374B17D3E01B00E7B389 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE374617D3E01B00E7B389 /* SRWebSocket.m */; };
+		FCAE374C17D3E01B00E7B389 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE374617D3E01B00E7B389 /* SRWebSocket.m */; };
+		FCAE374E17D3E0B300E7B389 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCAE374D17D3E0B300E7B389 /* Security.framework */; };
+		FCAE375017D3E0BD00E7B389 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCAE374F17D3E0BD00E7B389 /* CFNetwork.framework */; };
+		FCAE375217D3E0CC00E7B389 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FCAE375117D3E0CC00E7B389 /* libicucore.dylib */; };
+		FCAE375517D3EA0000E7B389 /* BoxSender.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE375417D3EA0000E7B389 /* BoxSender.m */; };
+		FCAE375617D3EA0000E7B389 /* BoxSender.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE375417D3EA0000E7B389 /* BoxSender.m */; };
+		FCAE376317D415C600E7B389 /* SocketIO.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE375917D415C600E7B389 /* SocketIO.m */; };
+		FCAE376417D415C600E7B389 /* SocketIO.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE375917D415C600E7B389 /* SocketIO.m */; };
+		FCAE376517D415C600E7B389 /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE375B17D415C600E7B389 /* SocketIOJSONSerialization.m */; };
+		FCAE376617D415C600E7B389 /* SocketIOJSONSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE375B17D415C600E7B389 /* SocketIOJSONSerialization.m */; };
+		FCAE376717D415C600E7B389 /* SocketIOPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE375D17D415C600E7B389 /* SocketIOPacket.m */; };
+		FCAE376817D415C600E7B389 /* SocketIOPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE375D17D415C600E7B389 /* SocketIOPacket.m */; };
+		FCAE376917D415C600E7B389 /* SocketIOTransportWebsocket.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE376017D415C600E7B389 /* SocketIOTransportWebsocket.m */; };
+		FCAE376A17D415C600E7B389 /* SocketIOTransportWebsocket.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE376017D415C600E7B389 /* SocketIOTransportWebsocket.m */; };
+		FCAE376B17D415C600E7B389 /* SocketIOTransportXHR.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE376217D415C600E7B389 /* SocketIOTransportXHR.m */; };
+		FCAE376C17D415C600E7B389 /* SocketIOTransportXHR.m in Sources */ = {isa = PBXBuildFile; fileRef = FCAE376217D415C600E7B389 /* SocketIOTransportXHR.m */; };
 		FCB18E7617C6B03D00BAE8F3 /* VideoSender.m in Sources */ = {isa = PBXBuildFile; fileRef = FCB18E7517C6B03C00BAE8F3 /* VideoSender.m */; };
 		FCB97DB8175F7BC8007B5AEE /* sendingView.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCB97DB7175F7BC8007B5AEE /* sendingView.xib */; };
 		FCB97DBB175F9486007B5AEE /* ImageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FCB97DBA175F9485007B5AEE /* ImageCell.m */; };
@@ -538,6 +559,29 @@
 		FCA832BB17CC009800423652 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../Icon.png; sourceTree = "<group>"; };
 		FCA832BD17CC00DA00423652 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72.png"; path = "../Icon-72.png"; sourceTree = "<group>"; };
 		FCA832BF17CC00E000423652 /* Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72@2x.png"; path = "../Icon-72@2x.png"; sourceTree = "<group>"; };
+		FCAE374017D3E01B00E7B389 /* base64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = base64.c; sourceTree = "<group>"; };
+		FCAE374117D3E01B00E7B389 /* base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base64.h; sourceTree = "<group>"; };
+		FCAE374217D3E01B00E7B389 /* NSData+SRB64Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+SRB64Additions.h"; sourceTree = "<group>"; };
+		FCAE374317D3E01B00E7B389 /* NSData+SRB64Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+SRB64Additions.m"; sourceTree = "<group>"; };
+		FCAE374417D3E01B00E7B389 /* SocketRocket-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SocketRocket-Prefix.pch"; sourceTree = "<group>"; };
+		FCAE374517D3E01B00E7B389 /* SRWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRWebSocket.h; sourceTree = "<group>"; };
+		FCAE374617D3E01B00E7B389 /* SRWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRWebSocket.m; sourceTree = "<group>"; };
+		FCAE374D17D3E0B300E7B389 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		FCAE374F17D3E0BD00E7B389 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		FCAE375117D3E0CC00E7B389 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
+		FCAE375317D3EA0000E7B389 /* BoxSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoxSender.h; sourceTree = "<group>"; };
+		FCAE375417D3EA0000E7B389 /* BoxSender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoxSender.m; sourceTree = "<group>"; };
+		FCAE375817D415C600E7B389 /* SocketIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIO.h; sourceTree = "<group>"; };
+		FCAE375917D415C600E7B389 /* SocketIO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIO.m; sourceTree = "<group>"; };
+		FCAE375A17D415C600E7B389 /* SocketIOJSONSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOJSONSerialization.h; sourceTree = "<group>"; };
+		FCAE375B17D415C600E7B389 /* SocketIOJSONSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOJSONSerialization.m; sourceTree = "<group>"; };
+		FCAE375C17D415C600E7B389 /* SocketIOPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOPacket.h; sourceTree = "<group>"; };
+		FCAE375D17D415C600E7B389 /* SocketIOPacket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOPacket.m; sourceTree = "<group>"; };
+		FCAE375E17D415C600E7B389 /* SocketIOTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOTransport.h; sourceTree = "<group>"; };
+		FCAE375F17D415C600E7B389 /* SocketIOTransportWebsocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOTransportWebsocket.h; sourceTree = "<group>"; };
+		FCAE376017D415C600E7B389 /* SocketIOTransportWebsocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOTransportWebsocket.m; sourceTree = "<group>"; };
+		FCAE376117D415C600E7B389 /* SocketIOTransportXHR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIOTransportXHR.h; sourceTree = "<group>"; };
+		FCAE376217D415C600E7B389 /* SocketIOTransportXHR.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocketIOTransportXHR.m; sourceTree = "<group>"; };
 		FCB18E7417C6B03C00BAE8F3 /* VideoSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoSender.h; sourceTree = "<group>"; };
 		FCB18E7517C6B03C00BAE8F3 /* VideoSender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoSender.m; sourceTree = "<group>"; };
 		FCB97DB7175F7BC8007B5AEE /* sendingView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = sendingView.xib; sourceTree = "<group>"; };
@@ -574,6 +618,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCAE375217D3E0CC00E7B389 /* libicucore.dylib in Frameworks */,
+				FCAE375017D3E0BD00E7B389 /* CFNetwork.framework in Frameworks */,
+				FCAE374E17D3E0B300E7B389 /* Security.framework in Frameworks */,
 				FC4D68811716164E002A73AD /* CoreMotion.framework in Frameworks */,
 				FC610AF4170A36D800851AC2 /* CoreImage.framework in Frameworks */,
 				FCED8976170354010027CBE1 /* CoreVideo.framework in Frameworks */,
@@ -646,6 +693,9 @@
 		A558D61816134E0C001DED8C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FCAE375117D3E0CC00E7B389 /* libicucore.dylib */,
+				FCAE374F17D3E0BD00E7B389 /* CFNetwork.framework */,
+				FCAE374D17D3E0B300E7B389 /* Security.framework */,
 				FC4D6890171A37E4002A73AD /* MediaPlayer.framework */,
 				FC4D68801716164E002A73AD /* CoreMotion.framework */,
 				FC610AF3170A36D800851AC2 /* CoreImage.framework */,
@@ -670,6 +720,7 @@
 		A558D61F16134E0C001DED8C /* LabelMe */ = {
 			isa = PBXGroup;
 			children = (
+				FCAE373E17D3DF5000E7B389 /* Network */,
 				FC9F94A4174290680004598C /* UI */,
 				FC9F947E173AE34B0004598C /* Sign in */,
 				FC9F947F173AE3910004598C /* Image Gallery */,
@@ -885,6 +936,8 @@
 				FC5C93B216FCFEA700637B69 /* ExecuteDetectorViewController.h */,
 				FC5C93B316FCFEA800637B69 /* ExecuteDetectorViewController.m */,
 				FC5C93B416FCFEA900637B69 /* ExecuteDetectorViewController.xib */,
+				FCAE375317D3EA0000E7B389 /* BoxSender.h */,
+				FCAE375417D3EA0000E7B389 /* BoxSender.m */,
 				FCB18E7417C6B03C00BAE8F3 /* VideoSender.h */,
 				FCB18E7517C6B03C00BAE8F3 /* VideoSender.m */,
 				FC83599B17B094750035A833 /* DetectorResourceHandler.h */,
@@ -969,10 +1022,6 @@
 				A564641B1614BA0D007D444E /* CreateAccountViewController.m */,
 				A564641C1614BA0D007D444E /* CreateAccountViewController_iPhone.xib */,
 				A56464211614BAFF007D444E /* CreateAccountViewController_iPad.xib */,
-				A558D6421613927F001DED8C /* ServerConnection.h */,
-				A558D64316139280001DED8C /* ServerConnection.m */,
-				A55A8447162CCFAA00C917DD /* Reachability.h */,
-				A55A8448162CCFAA00C917DD /* Reachability.m */,
 			);
 			name = "Sign in";
 			sourceTree = "<group>";
@@ -1166,6 +1215,51 @@
 				FC9F94ED1745232B0004598C /* UITableView+TextFieldAdditions.m */,
 			);
 			name = UITableViewTextFieldAditions;
+			sourceTree = "<group>";
+		};
+		FCAE373E17D3DF5000E7B389 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				FCAE375717D4159C00E7B389 /* SocketIO */,
+				FCAE373F17D3DF9F00E7B389 /* SocketRocket */,
+				A558D6421613927F001DED8C /* ServerConnection.h */,
+				A558D64316139280001DED8C /* ServerConnection.m */,
+				A55A8447162CCFAA00C917DD /* Reachability.h */,
+				A55A8448162CCFAA00C917DD /* Reachability.m */,
+			);
+			name = Network;
+			sourceTree = "<group>";
+		};
+		FCAE373F17D3DF9F00E7B389 /* SocketRocket */ = {
+			isa = PBXGroup;
+			children = (
+				FCAE374017D3E01B00E7B389 /* base64.c */,
+				FCAE374117D3E01B00E7B389 /* base64.h */,
+				FCAE374217D3E01B00E7B389 /* NSData+SRB64Additions.h */,
+				FCAE374317D3E01B00E7B389 /* NSData+SRB64Additions.m */,
+				FCAE374417D3E01B00E7B389 /* SocketRocket-Prefix.pch */,
+				FCAE374517D3E01B00E7B389 /* SRWebSocket.h */,
+				FCAE374617D3E01B00E7B389 /* SRWebSocket.m */,
+			);
+			name = SocketRocket;
+			sourceTree = "<group>";
+		};
+		FCAE375717D4159C00E7B389 /* SocketIO */ = {
+			isa = PBXGroup;
+			children = (
+				FCAE375817D415C600E7B389 /* SocketIO.h */,
+				FCAE375917D415C600E7B389 /* SocketIO.m */,
+				FCAE375A17D415C600E7B389 /* SocketIOJSONSerialization.h */,
+				FCAE375B17D415C600E7B389 /* SocketIOJSONSerialization.m */,
+				FCAE375C17D415C600E7B389 /* SocketIOPacket.h */,
+				FCAE375D17D415C600E7B389 /* SocketIOPacket.m */,
+				FCAE375E17D415C600E7B389 /* SocketIOTransport.h */,
+				FCAE375F17D415C600E7B389 /* SocketIOTransportWebsocket.h */,
+				FCAE376017D415C600E7B389 /* SocketIOTransportWebsocket.m */,
+				FCAE376117D415C600E7B389 /* SocketIOTransportXHR.h */,
+				FCAE376217D415C600E7B389 /* SocketIOTransportXHR.m */,
+			);
+			name = SocketIO;
 			sourceTree = "<group>";
 		};
 		FCB97DB6175E317B007B5AEE /* Launch Image */ = {
@@ -1517,6 +1611,15 @@
 				FC8359AF17B2C40D0035A833 /* CameraVideoViewController.m in Sources */,
 				FC8359B617B323530035A833 /* DictionaryQueue.m in Sources */,
 				FCB18E7617C6B03D00BAE8F3 /* VideoSender.m in Sources */,
+				FCAE374717D3E01B00E7B389 /* base64.c in Sources */,
+				FCAE374917D3E01B00E7B389 /* NSData+SRB64Additions.m in Sources */,
+				FCAE374B17D3E01B00E7B389 /* SRWebSocket.m in Sources */,
+				FCAE375517D3EA0000E7B389 /* BoxSender.m in Sources */,
+				FCAE376317D415C600E7B389 /* SocketIO.m in Sources */,
+				FCAE376517D415C600E7B389 /* SocketIOJSONSerialization.m in Sources */,
+				FCAE376717D415C600E7B389 /* SocketIOPacket.m in Sources */,
+				FCAE376917D415C600E7B389 /* SocketIOTransportWebsocket.m in Sources */,
+				FCAE376B17D415C600E7B389 /* SocketIOTransportXHR.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1525,6 +1628,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				FC447A8C17A99FC6004AA88B /* LabelMeLogicTests.m in Sources */,
+				FCAE374817D3E01B00E7B389 /* base64.c in Sources */,
+				FCAE374A17D3E01B00E7B389 /* NSData+SRB64Additions.m in Sources */,
+				FCAE374C17D3E01B00E7B389 /* SRWebSocket.m in Sources */,
+				FCAE375617D3EA0000E7B389 /* BoxSender.m in Sources */,
+				FCAE376417D415C600E7B389 /* SocketIO.m in Sources */,
+				FCAE376617D415C600E7B389 /* SocketIOJSONSerialization.m in Sources */,
+				FCAE376817D415C600E7B389 /* SocketIOPacket.m in Sources */,
+				FCAE376A17D415C600E7B389 /* SocketIOTransportWebsocket.m in Sources */,
+				FCAE376C17D415C600E7B389 /* SocketIOTransportXHR.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

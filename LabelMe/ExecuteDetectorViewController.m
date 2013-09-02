@@ -9,6 +9,7 @@
 #import "ExecuteDetectorViewController.h"
 #import "BoundingBox.h"
 #import "ConvolutionHelper.h"
+#import "BoxSender.h"
 #import "UIImage+HOG.h"
 #import "UIImage+Resize.h"
 
@@ -28,7 +29,11 @@
     int _level;
     BOOL _hog;
     
+    BOOL _sendBoxesToServer;
+    
     const NSArray *_settingsStrings;
+    BoxSender *_boxSender;
+    
 }
 
 @property (strong, nonatomic) Pyramid *hogPyramid;
@@ -120,6 +125,7 @@
 {
     [super viewDidLoad];
     self.title = @"Detector";
+    _boxSender = [[BoxSender alloc] init];
     
     [self initializeConstants];
     [self initializeSlider];
@@ -234,6 +240,9 @@
     //DISPLAY BOXES
     [self.detectView drawBoxes:detectedBoxes];
     
+    //SEND TO THE SEVER
+    if(_sendBoxesToServer) [_boxSender sendBoxes:detectedBoxes];
+    
     //Put the HOG picture on screen
     if (_hog){
         UIImage *image = [ [[UIImage imageWithCGImage:imageRef scale:1.0 orientation:UIImageOrientationRight] scaleImageTo:230/480.0] convertToHogImage];
@@ -328,6 +337,22 @@
     else if([label isEqualToString:@"FPS"]){ _fps = sw.on;}
     else if([label isEqualToString:@"Scale"]){ _scale = sw.on;}
     else if([label isEqualToString:@"Score"]){ _score = sw.on;}
+}
+
+- (IBAction)sendBoxesToServer:(UIButton *)senderButton
+{
+    if(!_sendBoxesToServer){
+        _sendBoxesToServer = YES;
+        [_boxSender openConnection];
+        [senderButton setTitle:@"Stop" forState:UIControlStateNormal];
+        NSLog(@"Sending boxes!");
+        
+    }else{
+        _sendBoxesToServer = NO;
+        [_boxSender closeConnection];
+        [senderButton setTitle:@"Send" forState:UIControlStateNormal];
+        NSLog(@"Not sending boxes!");
+    }
 }
 
 

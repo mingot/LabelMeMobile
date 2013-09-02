@@ -50,6 +50,7 @@
 - (IBAction)cancelAction:(id)sender;
 - (IBAction)switchCameras:(id)sender;
 - (IBAction)switchValueDidChange:(UISwitch *)sw;
+- (IBAction)sendBoxesToServer:(UIButton *)senderButton;
 
 
 @end

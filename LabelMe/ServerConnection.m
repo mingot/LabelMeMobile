@@ -427,18 +427,19 @@ static BOOL didSignIn = NO;
 
 
 
--(void)uploadProfilePicture:(UIImage *)ppicture
+-(void)uploadProfilePicture:(UIImage *)imageToSend
 {
     NSArray *fields = [[NSArray alloc] initWithArray:[self signInAgain]];
         
     NSString *boundary = @"AaB03x";
-    UIImage *imageToSend = ppicture;
     NSData *imageData = [[NSData alloc] initWithData:UIImageJPEGRepresentation(imageToSend, 1.0)];
     NSMutableURLRequest *theRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.uploadProfilePictureURL]];
+    
     [theRequest setHTTPMethod:@"POST"];
     NSString *contentType = [NSString stringWithFormat:@"multipart/form-data, boundary=%@", boundary];
     [theRequest setValue:contentType forHTTPHeaderField:@"Content-type"];
     NSMutableData *postBody = [[NSMutableData alloc] init];
+    
     [postBody appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"image_file\"; filename=\"%@\"\r\n", @"profilepicture.jpg"] dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[@"Content-Type: image/jpeg \r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
@@ -486,6 +487,7 @@ static BOOL didSignIn = NO;
 
 #pragma mark -
 #pragma mark NSURLConnectionDelegate Methods
+
 -(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
      if (_cancel) {
@@ -493,7 +495,6 @@ static BOOL didSignIn = NO;
         _cancel = NO;
     }
     [receivedData appendData:data];
-
 }
 
 
@@ -532,9 +533,8 @@ static BOOL didSignIn = NO;
         else [self errorWithTitle:error.localizedDescription andDescription:error.localizedRecoverySuggestion];
 
     }
+    
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-
-     // no se si deberia ir aqui
 }
 
 
@@ -614,7 +614,6 @@ static BOOL didSignIn = NO;
                 break;
         }
 
-       // [self.delegate photoSentCorrectly:filename];
      
     //finish downloading profile picture or upload profile picture
     }else if ([connection.currentRequest.URL.absoluteString isEqualToString:self.downloadProfilePictureURL] || [connection.currentRequest.URL.absoluteString isEqualToString:self.uploadProfilePictureURL]){
